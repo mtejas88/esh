@@ -1,17 +1,20 @@
 ### Load packages ###
-# If reshape2 is not already installed also run install.packages(reshape2)
+# If reshape2 is not already installed also run install.packages(reshape2) #
 require(reshape2)
 
 ### Set working directory. This may vary depending on computer ###
 setwd("~/Desktop/R Projects/Rep Sampling")
 
 ### Load Data ###
+# You'll need a districts table download as a CSV file in your working directory #
 districts <- read.csv("rep_sample_districts_9_24.csv")
+
+# Subset to clean data #
 #districts_verified <- districts[which(districts$num_open_dirty_flags==0), ]
 districts_verified <- districts[which(districts$exclude_from_analysis=="FALSE"), ]
 
-
 ### Load sample size requirements and collapse to single vector ###
+# You'll need 3 CSVs, one for each confidence level, specifiying how many districts are needed per bucket #
 sample_90 <- read.csv("sample_90_923.csv")
 sample_95 <- read.csv("sample_95.csv")
 sample_99 <- read.csv("sample_99.csv")
@@ -41,7 +44,7 @@ clean_states <- c("AK","AL","AZ","DC","DE","GA","IL","IN","KS","KY","LA","MA","M
 
 # Also use this list to return samples only from a particular state 
 # For example to just return Arizona sample run: 
-clean_states <- c("OH")
+clean_states <- c("AZ")
 
 sample_90_melt <- subset(sample_90_melt, sample_90_melt$postal_cd %in% clean_states)
 sample_95_melt <- subset(sample_95_melt, sample_95_melt$postal_cd %in% clean_states)
@@ -60,10 +63,13 @@ make_sample <- function(subset_state, subset_locale, subset_size, sample_size) {
   tryCatch(
     sample_subset <- population_subset[sample(nrow(population_subset), sample_size), ],
     error = function(e) {stop(paste(
-      'Not enough clean districts for',subset_state, subset_locale, subset_size, toString(nrow(population_subset)),toString(sample_size))); 
+      'Not enough clean districts for',subset_state, subset_locale, subset_size, 
+      toString(nrow(population_subset)),toString(sample_size))); 
       print(e); e })
+  # Catch bug where sample() takes sample of 1 from data.frame of length 0. Not curretly working #
   if(nrow(population_subset) == 0 && sample_size == 1) {
-    print(paste('Not enough clean districts for',subset_state, subset_locale, subset_size, toString(nrow(population_subset)),toString(sample_size)))
+    print(paste('Not enough clean districts for',subset_state, subset_locale, subset_size, 
+                toString(nrow(population_subset)),toString(sample_size)))
   }
   csv_name <- paste0(subset_state, "_", subset_locale, "_", toString(subset_size), "_sample_90.csv")
   write.csv(sample_subset, file = csv_name)
@@ -93,20 +99,27 @@ create_tables <- function(confidence_level) {
 setwd("~/Desktop/R Projects/Rep Sampling/CSVs")
 create_tables(90)
 
- ### Combine CSVs ###
+### Combine CSVs ###
+# You need to write files to a dedicated directory with no other CSvs in it #
 setwd("~/Desktop/R Projects/Rep Sampling/CSVs")
 filenames <- list.files()
 master <- do.call("rbind", lapply(filenames, read.csv, header = T, stringsAsFactors = F))
 setwd("~/Desktop/R Projects/Rep Sampling")
+# Choose name of master ouput file below #
 write.csv(master, "OH_9_24_EFA.csv")
 
-### REMOVES ALL FILES IN DIRECTORY ###
-setwd("~/Desktop/R Projects/Rep Sampling/CSVs")
-filenames <- list.files()
-do.call(file.remove,list(filenames))
+### WARNING: REMOVES ALL FILES IN WORKING DIRECTORY ###
+# Cleans up by removing all files in working directory #
+# Defines function and calls below #
+clear_dir <- function() {
+  setwd("~/Desktop/R Projects/Rep Sampling/CSVs")
+  filenames <- list.files()
+  print(paste("WARNING: do you want to delete all the following files permanently? (y/n)",
+              filenames))
+  if(readline() == "y") {
+    do.call(file.remove,list(filenames))
+  }
+}
 
-### Testing ###
-NE_sample <- subset(districts_verified, districts_verified$postal_cd == "AR" & districts_verified$locale == "Rural" & districts_verified$district_size == "Small")
-
-sample_subset <- NE_sample[sample(nrow(NE_sample), 1), ]
-nrow(NE_sample)
+clear_dir()
+### WARNING: REMOVES ALL FILES IN WORKING DIRECTORY ###
