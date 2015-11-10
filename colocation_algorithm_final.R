@@ -69,10 +69,10 @@ adjustCampus <- function(x) {
 
 ### Apply campus count to all arrays in data ### 
 data$adjusted_campus <- sapply(data$array_agg, function(x) toString(adjustCampus(x)))
-data$adjusted_campus <- sapply(data$adjusted_campus, function(x) toString(x)) # convert to string cause of weird behavior
+data$adjusted_campus <- sapply(data$adjusted_campus, function(x) toString(x)) # onvert to string cause of weird behavior
 table(data$adjusted_campus)
 
-### Grou By Esh ID ###
+### Group By Esh ID ###
 agg_by_eshid <- sqldf(
 "Select district_esh_id, sum(num_campus) as num_schools, sum(adjusted_campus) as adj_num_campus
 from data
