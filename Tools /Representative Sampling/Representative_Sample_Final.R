@@ -7,16 +7,17 @@ setwd("~/Desktop/R Projects/Rep Sampling")
 
 ### Load Data ###
 # You'll need a districts table download as a CSV file in your working directory #
-districts <- read.csv("rep_sample_districts_9_24.csv")
+districts <- read.csv("rep_sample_districts_10_8.csv")
 
 # Subset to clean data #
 #districts_verified <- districts[which(districts$num_open_dirty_flags==0), ]
 districts_verified <- districts[which(districts$exclude_from_analysis=="FALSE"), ]
+nrow(districts_verified)
 
 ### Load sample size requirements and collapse to single vector ###
 # You'll need 3 CSVs, one for each confidence level, specifiying how many districts are needed per bucket #
 sample_90 <- read.csv("sample_90_923.csv")
-sample_95 <- read.csv("sample_95.csv")
+sample_95 <- read.csv("sample_95_1005.csv")
 sample_99 <- read.csv("sample_99.csv")
 
 melt_samples <- function(data) {
@@ -44,7 +45,7 @@ clean_states <- c("AK","AL","AZ","DC","DE","GA","IL","IN","KS","KY","LA","MA","M
 
 # Also use this list to return samples only from a particular state 
 # For example to just return Arizona sample run: 
-clean_states <- c("AZ")
+clean_states <- c("MN")
 
 sample_90_melt <- subset(sample_90_melt, sample_90_melt$postal_cd %in% clean_states)
 sample_95_melt <- subset(sample_95_melt, sample_95_melt$postal_cd %in% clean_states)
@@ -59,6 +60,15 @@ make_sample <- function(subset_state, subset_locale, subset_size, sample_size) {
   population_subset <- districts_verified[which(districts_verified$postal_cd == subset_state & 
                                                   districts_verified$locale == subset_locale & 
                                                   districts_verified$district_size == subset_size), ]
+  
+  rows <- as.integer(nrow(population_subset))
+  samples <- as.integer(sample_size)
+  
+  if(rows < samples) {
+    print(paste("CHANGED:", subset_state, subset_locale, subset_size, sample_size, "to", rows))
+    sample_size <- nrow(population_subset)
+  }
+
   # Raises error if subset > population
   tryCatch(
     sample_subset <- population_subset[sample(nrow(population_subset), sample_size), ],
@@ -67,14 +77,9 @@ make_sample <- function(subset_state, subset_locale, subset_size, sample_size) {
       toString(nrow(population_subset)),toString(sample_size))); 
       print(e); e })
   # Catch bug where sample() takes sample of 1 from data.frame of length 0. Not curretly working #
-  if(nrow(population_subset) == 0 && sample_size == 1) {
-    print(paste('Not enough clean districts for',subset_state, subset_locale, subset_size, 
-                toString(nrow(population_subset)),toString(sample_size)))
-  }
   csv_name <- paste0(subset_state, "_", subset_locale, "_", toString(subset_size), "_sample_90.csv")
   write.csv(sample_subset, file = csv_name)
 }
-
 
 ### Function for creating sample at different confidenc levels ###
 create_tables <- function(confidence_level) {
@@ -106,7 +111,7 @@ filenames <- list.files()
 master <- do.call("rbind", lapply(filenames, read.csv, header = T, stringsAsFactors = F))
 setwd("~/Desktop/R Projects/Rep Sampling")
 # Choose name of master ouput file below #
-write.csv(master, "OH_9_24_EFA.csv")
+write.csv(master, "nat_sample_original.csv")
 
 ### WARNING: REMOVES ALL FILES IN WORKING DIRECTORY ###
 # Cleans up by removing all files in working directory #
