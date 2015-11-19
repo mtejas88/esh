@@ -31,14 +31,13 @@ connect.cat$postal_cd <- factor(connect.cat$postal_cd)
 # Split data into train and test sets, only include subset of variable for prediction
 data.size <- nrow(connect.cat)
 train.size <- round(data.size *.8, 0)
-dev.size <- data.size - train.size
-train_vector <- sample(data.size, train.size)
+train.vector <- sample(data.size, train.size)
 
 # Models include downstream speed, total cost, number of lines,
 # and whether it is WAN. Remove any records with NAs.
-connect.cat.train <- connect.cat[train_vector, c(10,28,56,57,2)]
+connect.cat.train <- connect.cat[train.vector, c(10,28,56,57,2)]
 connect.cat.train <- connect.cat.train[complete.cases(connect.cat.train),]
-connect.cat.test <- connect.cat[-train_vector,c(10,28,56,57,2)]
+connect.cat.test <- connect.cat[-train.vector,c(10,28,56,57,2)]
 connect.cat.test <- connect.cat.test[complete.cases(connect.cat.test),]
 
 ### K Nearest Neighbors ###
@@ -61,9 +60,9 @@ confusionMatrix(predict.forest, reference=connect.cat.test[,5])
 ### Random Forest With Service and Connect Type ###
 # Accuracy ~ 90%
 # Includes same variables and previous models along with service type and connect type
-connect.cat.train <- connect.cat[train_vector, c(10,28,56,57,26,35,2)]
+connect.cat.train <- connect.cat[train.vector, c(10,28,56,57,26,35,2)]
 connect.cat.train <- connect.cat.train[complete.cases(connect.cat.train),]
-connect.cat.test <- connect.cat[-train_vector,c(10,28,56,57,26,35,2)]
+connect.cat.test <- connect.cat[-train.vector,c(10,28,56,57,26,35,2)]
 connect.cat.test <- connect.cat.test[complete.cases(connect.cat.test),]
 
 connect.forest <- randomForest(as.factor(connect_category) ~ ., data=connect.cat.train, importance=T, ntrees=501)
