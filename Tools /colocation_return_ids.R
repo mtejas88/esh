@@ -109,11 +109,15 @@ school_ids <- unlist(unlist(adjusted_campus))
 
 #Combine columns
 final <- data.frame(cbind(school_ids, expanded_id, district_id_expanded))
+final$final_campus_id <- paste0(district_id_expanded, "_", expanded_id)
+final <- final[c(-2)]
 
 ### View data, write to csv ###
 View(final)
 View(data)
-write.csv(final, "campus_lookup_v2.csv")
+write.csv(final, "campus_lookup_v3.csv")
+length(unique(final$final_campus_id))
+
 
 ##########################################################################
 ### Bad Approaches - for reference ###
