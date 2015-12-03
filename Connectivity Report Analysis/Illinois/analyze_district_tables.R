@@ -1,0 +1,685 @@
+### PRELIMINARY AND UNCHECKED ###
+
+# Clear the console
+cat("\014")
+
+# Remove every object in the environment
+rm(list = ls())
+
+#install and load packages
+lib <- c("dplyr", "ggplot2", "RColorBrewer", "raster", "maps", "mapproj", "gridExtra", "reshape2", "scales")
+#sapply(lib, function(x) install.packages(x))
+sapply(lib, function(x) require(x, character.only = TRUE))
+
+# set working directory
+setwd("~/Desktop/R/Illinois CR/data/intermediate")
+
+###
+
+# load csv files
+ # try to avoid using basic table if possible
+basic <- read.csv("~/Desktop/R/Illinois CR/data/mode/basic_districts.csv", as.is = TRUE)
+deluxe <- read.csv("~/Desktop/R/Illinois CR/data/mode/deluxe_districts.csv", as.is = TRUE)
+rep <- read.csv("~/Desktop/R/Illinois CR/data/intermediate/rep_sample_20151124.csv", as.is = TRUE)
+counties <- read.csv("~/Desktop/R/Illinois CR/data/mode/il_county_names.csv", as.is = TRUE)
+
+###
+# Create additional columns needed for analyses!
+
+# order the locale/district_size factor in a logical way
+deluxe$locale <- factor(deluxe$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+deluxe$district_size <- factor(deluxe$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
+
+# rep: column which indicates rep sample status
+ # this will make iteration easier!
+deluxe$rep_sample <- ifelse(deluxe$nces_cd %in% rep$nces_cd, 1, 0)
+ # create a condition for which statement 
+in_rep <- which(deluxe$nces_cd %in% rep$nces_cd, 1, 0)
+
+# adj_ia_bandwidth_per_student: internet bandwidth per student adjusted by concurrency factor
+deluxe$adj_ia_bandwidth_per_student <- deluxe$ia_bandwidth_per_student * deluxe$ia_oversub_ratio
+
+# icn: column which shows which district has coverage through ICN
+ # ICN + two local affiliates
+to_match <- c("Illinois Century Network", "Illimois Central College", "Northern Illinois University")
+matches <- unique(grep(paste(to_match, collapse="|"), deluxe$internet_sp, value=TRUE))
+deluxe$icn <- ifelse(deluxe$internet_sp %in% matches, 1, 0)
+
+# il_region: column which indicates whether district is Chicago, Chicago Suburbs, or Other
+ # City of Chicago nces_cd: 1709930
+ # Chicago Suburbs = Rest of Cook NOT Chicago + Collar Counties(DuPage, Kane, Lake, McHenry, and Will)
+ # Other: the rest
+
+ # merge county name data to deluxe table
+deluxe <- merge(deluxe, counties, all.x = TRUE, all.y = FALSE, by = c("nces_cd"))
+
+ # simplify county names
+deluxe$county <- tolower(gsub(" .*$", "", deluxe$CONAME))
+deluxe$CONAME <- NULL
+
+# City of Chicago nces_cd: 1709930
+# Chicago Suburban = Rest of Cook NOT Chicago + Collar Counties(DuPage, Kane, Lake, McHenry, and Will)
+# The rest: Not either
+deluxe$il_region <- ifelse(deluxe$nces_cd == "1709930", "Chicago", ifelse(deluxe$county %in% c("cook", "dupage", "kane", "lake", "mchenry", "will"), "Chicago Suburbs", "The Rest"))
+deluxe$il_region <- factor(deluxe$il_region, levels = c("Chicago", "Chicago Suburbs", "The Rest"))
+
+# goals
+ # goal_2014: 1 if the district is meeting 2014 goal (100 kbps per student) or 0 otherwise; no contingency factor
+ # goal_2018: 1 if the district is meeting 2018 goal (1000 kbps per student) or 0 otherwise; use contingency factor
+
+deluxe$goal_2014 <- ifelse(deluxe$ia_bandwidth_per_student >= 100, 1, 0)
+deluxe$goal_2018 <- ifelse(deluxe$adj_ia_bandwidth_per_student >= 1000, 1, 0)
+
+ # checked that these columns are respectively identical to meeting_2014_goal_no_oversub and meeting_2018_goal_oversub
+
+ # for mapping -- import Illinois map by county
+usa <- getData('GADM', country="USA", level=2)
+il_map <- usa[usa$NAME_1 == "Illinois",] 
+il_map@data$id <- rownames(il_map@data)
+il_df <- merge(il_map@data, fortify(il_map), by = "id", all.y = TRUE)
+il_df <- il_df[,c("NAME_2", "long", "lat", "group")]
+names(il_df) <- c("county", "long", "lat", "group")
+il_df$county <- tolower(il_df$county)
+
+ # wan
+deluxe$has_wan <- ifelse(deluxe$gt_1g_wan_lines +deluxe$lt_1g_fiber_wan_lines +deluxe$lt_1g_nonfiber_wan_lines > 0, 1, 0)
+
+# scalability
+ # has_fiber: 1 if the district has fiber, 0 otherwise
+deluxe$has_fiber <- ifelse(grepl("Fiber", deluxe$all_ia_connectcat), 1, 0)
+
+ # has_dark_fiber: 1 if the district has dark fiber, 0 otherwise
+deluxe$has_dark_fiber <- ifelse(grepl("Dark Fiber", deluxe$all_ia_connecttype), 1, 0)
+
+ # some districts to highlight?
+
+ # slightly broader definition
+ # scalable: 1 if all_ia_connectcat is Fiber, Fixed Wireless, or Cable for < 100 students, 0 otherwise
+ 
+scale <- c("Fiber", "Fixed Wireless")
+cable <- c("Cable Modem")
+scale_match <- unique(grep(paste(scale, collapse="|"), deluxe$all_ia_connectcat, value=TRUE))
+cable_match <- unique(grep(paste(cable, collapse="|"), deluxe$all_ia_connecttype, value=TRUE))
+
+deluxe$scalable <- ifelse(deluxe$all_ia_connectcat %in% scale_match |
+                       (deluxe$all_ia_connectcat %in% scale_match & deluxe$num_students < 100), 1, 0)
+rm(scale, cable, scale_match, cable_match)
+
+### analyses
+
+ # summary table
+ # which type districts are meeting goals? 
+get_summary <- function(df) { 
+  df %>%
+    group_by(il_region) %>%
+    summarise(n = n(),
+              mean_frl = mean(frl_percent),
+              mean_fiber = mean(has_fiber),
+              mean_icn = mean(icn),
+              mean_yearly_cost_per_mbps = mean(ia_cost_per_mbps),
+              mean_ia = mean(ia_bandwidth_per_student),
+              mean_adj_ia = mean(adj_ia_bandwidth_per_student),
+              mean_goal_2014 = mean(goal_2014),
+              mean_goal_2018 = mean(goal_2018))
+}
+
+ # summary stats for all clean data
+#clean_summary <- get_summary(deluxe)
+ # summary stats for the 95% rep. sample
+rep_summary <- get_summary(deluxe[in_rep,])
+
+#insights and questions from rep summary
+ # what is the urban, tiny district?
+ # Urban - Mega: likely Chicago, they seem to be paying way more than other urban districts
+ # Small towns: tiny - small bucks the trend of economics of scale in cost
+
+# simple regression on affordability
+
+lm_cost <- lm(ia_cost_per_mbps ~ il_region + locale + num_schools + icn + has_fiber + frl_percent, data = deluxe)
+summary(lm_cost)
+
+# logit on meeting goals
+my_logit <- glm(meeting_2014_goal_oversub ~ locale + num_schools + ia_cost_per_mbps + icn + has_fiber + frl_percent, data = deluxe, family = 'binomial')
+summary(my_logit)
+
+# Urban/Tiny?
+
+urban_tiny <- filter(deluxe, locale == "Urban" & district_size == "Tiny")
+urban_tiny[, c("name", "nces_cd")]
+
+# this is the Fairview District in Skokie, IL
+# NCES confirms that this is a district classified as city, with 1 elemetary school of about 660 students
+# WEIRD
+
+# delve into connection cost per mbps
+
+deluxe <- arrange(deluxe, -ia_cost_per_mbps)
+extremes <- deluxe[{q <- rank(deluxe$ia_cost_per_mbps)/length(deluxe$ia_cost_per_mbps); q < 0.1 | q >= 0.9},
+                   c("il_region", "county", "name", "locale", "district_size", "ia_cost_per_mbps",
+                            "consortium_member", "all_ia_connectcat", "icn", "frl_percent", "adj_ia_bandwidth_per_student")]
+
+### visualizations
+
+ # simple visualization of the districts    
+ 
+map_geography <- function(df) {
+  
+  p <- ggplot() + 
+      geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#000000") +
+      geom_point(data = df, aes(x = longitude, y = latitude), color="#C0C0C0", size = 2, alpha = 0.5) +
+      theme_bw() +
+      theme(panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank()) +
+      theme(axis.title = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank()) +
+      borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") 
+  return(p)
+}
+
+p1 <- map_geography(deluxe[in_rep,])
+
+ # representativeness of the rep sample
+
+plot_tiles <- function(df) {
+
+il_region_types <- unique(deluxe$il_region)
+types <- unique(deluxe$locale)
+
+for_tile <- expand.grid(il_region = il_region_types, locale = types)
+count_table <- df %>%
+               group_by(il_region, locale) %>%
+               tally 
+
+plot_data <- merge(for_tile, count_table, all.x = TRUE, all.y = FALSE, by = c("il_region", "locale"))
+plot_data$n <- ifelse(is.na(plot_data$n), 0, plot_data$n)
+plot_data$locale <- factor(plot_data$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+
+p <- ggplot(plot_data, aes(il_region, locale)) + 
+     geom_tile(aes(fill = n), color = "white") +
+     scale_fill_gradient(name = "Number of Districts",
+                         low = "white", 
+                         high = "firebrick") +
+     theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank()) +
+    theme(legend.position = "bottom")
+ return(p)
+
+}
+
+tiles_all <- plot_tiles(deluxe) 
+p2_tiles_all <- tiles_all + 
+             ggtitle("Illinois Clean Total\nn = 395")
+tiles_rep <- plot_tiles(deluxe[in_rep, ]) 
+p3_tiles_rep <- tiles_rep +
+             ggtitle("Representative Sample\nn = 321")
+rm(tiles_all, tiles_rep)
+
+ # goals by district
+rep <- deluxe[in_rep, ]
+mm  <- data.frame(table(rep$goal_2014, rep$goal_2018)/nrow(rep))
+colnames(mm) <- c("meets_2014", "meets_2018", "percent")
+mm <- arrange(mm, meets_2014, meets_2018)
+
+ll <- 
+  mm %>%
+  group_by(meets_2014) %>%
+  summarize (percent = sum(percent))
+ll <- rbind(ll, mm[mm$meets_2014 == 1 & mm$meets_2018 ==1, c("meets_2014", "percent")])
+ll[, c("label")] <- paste0(as.character(round(ll$percent * 100, 2)),  "%")
+ll$percent[3] <- ll$percent[2] - 0.5 * ll$percent[3]
+
+# goals by student number; essentially districts weighed by num_students
+weighted_goal_2014 <- sum(rep$goal_2014 * rep$num_students) / sum(rep$num_students)
+#[1] 0.3979281
+sum(rep$goal_2018 * rep$num_students) / sum(rep$num_students)
+#[1] 0.00787718
+
+p4_goals <-  ggplot() + 
+  geom_bar(data = mm, aes(x = factor(meets_2014, levels = c(0, 1)), y = percent, fill = factor(meets_2018, levels = c(0, 1))),stat = 'identity') +
+  geom_text(data = ll, aes(x = meets_2014, y = percent, label = label, vjust = 0)) +
+  theme(legend.position = "none",
+        panel.background = element_rect(fill = 'white', colour = 'white'),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.x = element_line(size = 0.5, colour = "black"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, 1), breaks = seq(0, 1, 0.1), labels = percent) 
+
+# geography of districts meeting 2014 goals
+# test -- where are the rural and small/tiny districts
+#sub <- filter(deluxe[in_rep, ], locale == 'Rural' & district_size %in% c('Small'))
+p5_goals_map <- ggplot() + 
+              geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#0B162A") +
+              geom_point(data = deluxe[in_rep, ], 
+                         aes(x = longitude, y = latitude, color = factor(goal_2014, levels = c(0, 1))), size = 3, alpha = 0.5) +
+              scale_color_manual(name = "", values = c("#AF2626", "#8A8D8F"), 
+                                 labels = c("Does Not Meet Goals", "Meets Goals"), breaks = c(0, 1)) +
+              theme(legend.position = "bottom",
+                    panel.background = element_rect(fill = 'white', colour = 'white'),
+                    panel.grid.minor = element_blank(),
+                    panel.border = element_blank(),
+                    axis.title = element_blank(),
+                    axis.text = element_blank(),
+                    axis.ticks = element_blank()
+              ) +
+              borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") 
+
+# meeting goals by the three IL regions/locale/district
+# note: in deluxe districts table, ia_cost_per_mbps refers to annual cost, must be divided by 12
+
+by_region <- deluxe[in_rep, ] %>%
+              group_by(il_region) %>%
+              summarise(median_ia = median(ia_bandwidth_per_student),
+                        median_cost = median(ia_cost_per_mbps / 12),
+                        n = n())
+  
+by_locale <- deluxe[in_rep, ] %>%
+              group_by(locale) %>%
+              summarise(median_ia = median(ia_bandwidth_per_student),
+                        median_cost = median(ia_cost_per_mbps / 12),
+                        n = n())
+
+by_size <- deluxe[in_rep, ] %>%
+           group_by(district_size) %>%
+           summarise(median_ia = median(ia_bandwidth_per_student),
+                     median_cost = median(ia_cost_per_mbps / 12),
+                     n = n())
+
+plot_bars <- function(df, var_index, ylimit, ylabel) {
+  
+  df$label <- paste0("n = ", as.character(df$n))
+  
+  p <-  ggplot() + 
+        geom_bar(data = df, aes_q(x = as.name(names(df)[1]), y = as.name(names(df)[var_index])), 
+                 stat = 'identity', position = 'dodge', fill = 'steelblue1') +
+        geom_text(data = df, aes_q(x = as.name(names(df)[1]), y = as.name(names(df)[var_index]), label = quote(label))) +
+        theme(axis.line = element_line(size = 0.5, colour = "black"),
+              panel.background = element_rect(fill = 'white', colour = 'white'),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank(),
+              axis.title = element_blank(),
+              axis.text = element_text(size = 10)) +
+        scale_y_continuous(expand = c(0,0), limits = c(0, ylimit), breaks = seq(0, ylimit, ylimit / 5), labels = ylabel) 
+  return(p)
+  }
+
+med_bw_by_region <- plot_bars(by_region, 2, 200, comma)
+med_bw_by_region <- med_bw_by_region + 
+                    ggtitle("Median Bandwidth(kb) per Student") +
+                    geom_hline(aes(yintercept = 100), size = 1, color = "firebrick")  
+  
+#avg_cost_by_region <- plot_bars(by_region, 3, 300, dollar)
+#avg_cost_by_region <- avg_cost_by_region +
+#  ggtitle("Averge Cost per Mbps")
+
+med_bw_by_locale <- plot_bars(by_locale, 2, 200, comma)
+med_bw_by_locale <- med_bw_by_locale + 
+                    ggtitle("Median Bandwidth(kb) per Student") +
+                    geom_hline(aes(yintercept = 100), size = 1, color = "firebrick")  
+
+#avg_cost_by_locale <- plot_bars(by_locale, 3, 300, dollar)
+#avg_cost_by_locale <- avg_cost_by_locale +
+#                      ggtitle("Averge Cost per Mbps")
+
+med_bw_by_size <- plot_bars(by_size, 2, 200, comma)
+med_bw_by_size <- med_bw_by_size + 
+                  ggtitle("Median Bandwidth(kb) per Student") +
+                  geom_hline(aes(yintercept = 100), size = 1, color = "firebrick")  
+
+#avg_cost_by_size <- plot_bars(by_size, 3, 300, dollar)
+#avg_cost_by_size <- avg_cost_by_size +
+ #                   ggtitle("Averge Cost per Mbps")
+
+# WAN Connection analyses
+wan_1g <- sum(deluxe[in_rep, ]$gt_1g_wan_lines)
+wan_all <- sum(deluxe[in_rep, ]$lt_1g_fiber_wan_lines) + sum(deluxe[in_rep, ]$lt_1g_nonfiber_wan_lines)
+
+wan_plot <- data.frame(wan_1g / wan_all, (wan_all - wan_1g) / wan_all)
+names(wan_plot) <- c(">= 1G", "< 1G")
+wan_plot <- melt(wan_plot) 
+
+# A pie chart = stacked bar chart + polar coordinates
+p7_pie <- ggplot(data = wan_plot, aes(x = factor(1), fill = factor(variable))) +
+           geom_bar(width = 1) +
+           coord_polar(theta = "y") +
+           theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+                 axis.ticks = element_blank(),
+                 panel.grid = element_blank(),
+                 panel.border = element_blank(),
+                 axis.text = element_blank(),
+                 axis.itle = element_blank()) +
+          scale_fill_manual(name = "WAN Connection Speed",
+                        values = c("#FC8D59", "#FFFFBF")) +
+          theme(legend.position = "bottom", legend.text = element_text(size = 10)) 
+
+# where are the WAN connections?
+p <- ggplot() + 
+     geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#0B162A") +
+     geom_point(data = deluxe[in_rep, ], 
+             aes(x = longitude, y = latitude, color = factor(has_wan, levels = c(0, 1))), size = 3, alpha = 0.5) +
+      scale_color_manual(name = "", values = c("#AF2626", "#8A8D8F"), 
+                                       labels = c("No WAN", "Has at least 1 WAN Connection"), breaks = c(0, 1)) +
+      theme(legend.position = "bottom",
+            panel.background = element_rect(fill = 'white', colour = 'white'),
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            axis.title = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank()) +
+      borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") 
+
+# fiber / scalability analyses
+
+plot_pie <- function(col) {
+              rep <- deluxe[in_rep, ]
+              mm  <- data.frame(table(rep[, c(col)])/nrow(rep))
+              colnames(mm) <- c("variable", "percent")
+              mm[, c("label")] <- paste0(as.character(round(mm$percent * 100, 1)),  "%")
+              
+              pie <- ggplot(data = mm) +
+                     geom_bar(aes(x = factor(1), y = percent, fill = factor(variable, levels = c(0, 1))), width = 1, stat = "identity") +
+                     geom_text(aes(x = factor(1), y = percent , label = label), hjust = 1) +
+                     coord_polar(theta = "y") +
+                     theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+                           panel.grid = element_blank(),
+                           panel.border = element_blank(),
+                           axis.ticks = element_blank(),
+                           axis.text = element_blank(),
+                           axis.title = element_blank()) +
+                theme(legend.position = "bottom", legend.text = element_text(size = 10)) 
+              return(pie)
+              }
+# has Fiber
+pie_fiber <- plot_pie("has_fiber") +
+             scale_fill_manual(name = "",
+                              label = c("No Fiber", "Has Fiber"),
+                              values = c("#FC8D59", "#FFFFBF"))
+
+
+# has scalable technoogy
+pie_scale <- plot_pie("scalable") +
+  scale_fill_manual(name = "",
+                    label = c("Not Scalable", "Scalable"),
+                    values = c("#FC8D59", "#FFFFBF"))
+
+# cost 
+p_cost1 <-  ggplot(data = deluxe[in_rep,], aes(x = reorder(nces_cd, ia_cost_per_mbps), y = (ia_cost_per_mbps / 12))) + 
+      geom_bar(stat = 'identity', position = 'dodge', fill = 'maroon') +
+      theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+            axis.line = element_line(size = 0.5, colour = "black"),
+            panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            axis.title = element_blank(),
+            axis.text.x = element_blank()) +
+            scale_y_continuous(expand = c(0,0), limits = c(0, 900), breaks = seq(0, 900, 100), labels = dollar) 
+
+# cost by technology -- for highest connect types Fiber vs. Cable/DSL vs. Copper
+sub <- filter(deluxe[in_rep, ], highest_connect_type %in% c("Cable / DSL", "Copper", "Fiber"))  
+
+p_cost2 <-  ggplot(data = sub, aes(x = reorder(nces_cd, ia_cost_per_mbps), y = (ia_cost_per_mbps / 12))) + 
+  geom_bar(stat = 'identity', position = 'dodge', fill = 'maroon') +
+  theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+        axis.line = element_line(size = 0.5, colour = "black"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.title = element_blank(),
+        axis.text.x = element_blank()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, 900), breaks = seq(0, 900, 100), labels = dollar) +
+  facet_wrap(~ highest_connect_type, ncol = 1)
+rm(sub)
+
+# but fiber costs are not uniform either
+sub <- filter(deluxe[in_rep, ], has_fiber == 1)
+
+p_cost3 <- ggplot(data = sub) +
+           geom_boxplot(aes(x = factor(1), y = ia_cost_per_mbps), fill = 'pink') +
+           coord_flip() +
+           theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+                 axis.line.y = element_blank(),
+                 axis.line = element_line(size = 0.5, colour = "black"),
+                 panel.grid.major = element_blank(), 
+                 panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 axis.title = element_blank(),
+                 axis.text.y = element_blank()) +
+          scale_y_continuous(expand = c(0,0), limits = c(0, 140), breaks = seq(0, 140, 20), labels = dollar) 
+rm(sub)  
+
+# mean/median cost with the target on deck
+sub <- data.frame(3, 
+                  min(deluxe[in_rep, ]$ia_cost_per_mbps / 12), 
+                  median(deluxe[in_rep, ]$ia_cost_per_mbps / 12))
+names(sub) <- c("Target Price", "IL Minimum", "IL Median")
+sub <- melt(sub)
+sub$label <- paste0("$", as.character(round(sub$value, 2)))
+
+p <-  ggplot() + 
+      geom_bar(data = sub, aes(x = as.factor(variable), y = value),stat = 'identity', position = 'dodge', fill = 'limegreen') +
+      geom_text(data = sub, aes(x = as.factor(variable), y = value, label = label), vjust = 0) +
+      theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+            axis.line.y = element_blank(),
+            panel.grid = element_blank(),
+            panel.border = element_blank(),
+            axis.title = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.y = element_blank()) +
+            scale_y_continuous(expand = c(0,0), limits = c(0, 10), breaks = seq(0, 10, 2), labels = dollar) 
+
+# provider landscape
+  # ICN vs non-ICN
+p_icn <-  ggplot() + 
+          geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#0A174A") +
+          geom_point(data = deluxe[in_rep,], aes(x = longitude, y = latitude, color = factor(icn)), size = 3, alpha = 0.5) +
+          scale_color_manual(name = "", values = c("#AF2626", "#8A8D8F"), breaks = c(0, 1), labels = c("non-ICN", "ICN")) +
+          theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.border = element_blank(),
+                axis.title = element_blank(),
+                axis.text = element_blank(),
+                axis.ticks = element_blank()) +
+          borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") +
+          ggtitle("ICN vs. non-ICN") +
+          theme(plot.title = element_text(lineheight = .8, face = "bold")) +
+          theme(legend.position = "bottom")
+
+###
+
+### 
+map_geography <- function(df) {
+  
+  p0 <- ggplot() + 
+    geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#000000") +
+    geom_point(data = df, aes(x = longitude, y = latitude), color="#C0C0C0", size = 2, alpha = 0.5) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank()) +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank()
+    ) +
+    borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") +
+    ggtitle("Geography of 95% Rep. Sample in Illinois\nn = 321") +
+    theme(plot.title = element_text(lineheight = .8, face = "bold")) 
+  
+  return(p0)
+}
+
+rep_map <- map_geography(rep)
+
+# dispersion + locale information
+p2 <- ggplot() + 
+  geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#0B162A") +
+  geom_point(data = deluxe, aes(x = longitude, y = latitude, color = factor(locale)), size = 3, alpha = 0.5) +
+  scale_color_brewer(palette = "Set2") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank()) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()
+  ) +
+  borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") +
+  ggtitle("Illinois Districts by Locale") +
+  theme(plot.title = element_text(lineheight = .8, face = "bold")) +
+  theme(legend.position = "bottom") 
+
+# locale + size is a little too hard to capture
+# Chicago is HUGE
+p3 <- ggplot() + 
+  geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "#0B162A") +
+  geom_point(data = deluxe, aes(x = longitude, y = latitude, color = factor(locale), size = num_schools), alpha = 0.5) +
+  scale_color_brewer(palette = "Set2") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank()) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()
+  ) +
+  borders("county", colour="white", alpha = 0.5, size = 0.1, region = "illinois") +
+  ggtitle("Chicago is HUGE") +
+  theme(plot.title = element_text(lineheight = .8, face = "bold")) +
+  theme(legend.position = "bottom") 
+
+
+# export of preliminary analyses -- 11/23
+
+# change to export directory
+setwd("~/Desktop/R/Illinois CR/data/export/PDF/20151124")
+
+pdf("rep_vs_clean.pdf", onefile = TRUE, paper = "a4r", width = 13)
+grid.arrange(rep_map, p1, ncol = 2)
+print(p2)
+print(p3)
+print(p4)
+print(p5)
+dev.off()
+
+# let's break down the state population/rep sample by Chicago, Chicago Suburban, and Greater Illinois
+
+plot_classification <- function(df) {
+  
+  
+  il_region_types <- unique(merged$il_region)
+  types <- unique(merged$locale)
+  
+  for_tile <- expand.grid(il_region = il_region_types, locale = types)
+  count_table <- merged %>%
+    group_by(il_region, locale) %>%
+    tally 
+  
+  plot_data <- merge(for_tile, count_table, all.x = TRUE, all.y = FALSE, by = c("il_region", "locale"))
+  plot_data$n <- ifelse(is.na(plot_data$n), 0, plot_data$n)
+  plot_data$locale <- factor(plot_data$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+  
+  plot <- ggplot(plot_data, aes(il_region, locale)) + 
+    geom_tile(aes(fill = n), color = "white") +
+    scale_fill_gradient(name = "Number of Districts",
+                        low = "white", 
+                        high = "firebrick") +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank()) +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks = element_blank()) +
+    theme(legend.position = "bottom")
+  return(plot)
+}
+
+plot_basic_locale <- plot_classification(basic) 
+plot_basic_locale <- plot_basic_locale + 
+                     ggtitle("Counts by Region Classification and Locale\n(Population)") +
+                     theme(plot.title = element_text(lineheight = .8, face = "bold"))
+
+plot_rep_locale <- plot_classification(rep)
+plot_rep_locale <- plot_rep_locale + 
+                   ggtitle("Counts by Region Classification and Locale\n(Rep. Sample)") +
+                   theme(plot.title = element_text(lineheight = .8, face = "bold"))
+
+# need to merge the function to include locale or district size as second argument
+
+plot_classification <- function(df) {
+  merged <- merge(df, counties, all.x = TRUE, all.y = FALSE, by = c("nces_cd"))
+  
+  # simplify county names
+  merged$county <- tolower(gsub(" .*$", "", merged$CONAME))
+  merged$CONAME <- NULL
+  
+  # City of Chicago nces_cd: 1709930
+  # Chicago Suburban = Rest of Cook NOT Chicago + Collar Counties(DuPage, Kane, Lake, McHenry, and Will)
+  # The rest: Not either
+  merged$il_region <- ifelse(merged$nces_cd == "1709930", "Chicago", ifelse(merged$county %in% c("cook", "dupage", "kane", "lake", "mchenry", "will"), "Chicago Suburbs", "The Rest"))
+  
+  il_region_types <- unique(merged$il_region)
+  types <- unique(merged$district_size)
+  
+  for_tile <- expand.grid(il_region = il_region_types, district_size = types)
+  count_table <- merged %>%
+    group_by(il_region, district_size) %>%
+    tally 
+  
+  plot_data <- merge(for_tile, count_table, all.x = TRUE, all.y = FALSE, by = c("il_region", "district_size"))
+  plot_data$n <- ifelse(is.na(plot_data$n), 0, plot_data$n)
+  
+  plot_data$district_size <- factor(plot_data$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
+  
+    
+  plot <- ggplot(plot_data, aes(il_region, district_size)) + 
+    geom_tile(aes(fill = n), color = "white") +
+    scale_fill_gradient(name = "Number of Districts",
+                        low = "white", 
+                        high = "navy") +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank()) +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks = element_blank()) +
+    theme(legend.position = "bottom")
+  return(plot)
+}
+
+plot_basic_size <- plot_classification(basic) 
+plot_basic_size <- plot_basic_size + 
+                   ggtitle("Counts by Region Classification and Size\n(Population)") +
+                   theme(plot.title = element_text(lineheight = .8, face = "bold"))
+
+plot_rep_size <- plot_classification(rep) 
+plot_rep_size <- plot_rep_size + 
+                 ggtitle("Counts by Region Classification and Size\n(Rep. Sample)") +
+                 theme(plot.title = element_text(lineheight = .8, face = "bold"))
+
+
+# change to export directory
+setwd("~/Desktop/R/Illinois CR/data/export/PDF/20151124")
+
+pdf("Illinois_Distribution.pdf", onefile = TRUE, paper = "a4r", width = 13)
+grid.arrange(plot_basic_locale, plot_rep_locale, ncol = 2)
+grid.arrange(plot_basic_size, plot_rep_size, ncol = 2)
+dev.off()
+
