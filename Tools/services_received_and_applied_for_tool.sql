@@ -3,7 +3,8 @@ Author: Greg Kurzhals
 Created On Date: 11/01/2015
 Last Modified Date: 12/28/2015
 Name of QAing Analyst(s): Justine Schott
-Purpose: To identify and display the broadband services (district-dedicated, shared IA, and backbone) received or applied for by each district
+Purpose: To identify and display the broadband services (district-dedicated, shared IA, and backbone) received by each district, 
+or applied for by each entity
 Methodology: The query leverages the circuits table to identify each line item allocated to a district or its constituent schools 
 (but NOT to other locations).  Thus, a copy of each line item is created for each district that receives the services represented by 
 that line item.  Additionally,   based on existing metadata, each line item is classified as either 'Shared IA" (IA serving multiple districts), 
@@ -37,7 +38,7 @@ lines_to_district_by_line_item as (
 /*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
 to add demographic data used in metric calculations*/
 services_received as (
-      select ldli.district_esh_id,
+      select ldli.district_esh_id as esh_id,
       d.name,
       d.postal_cd,
       ldli.line_item_id,
@@ -189,9 +190,9 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 /*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
 to add demographic data used in metric calculations*/
 services_applied_for as (
-      select d.esh_id as district_esh_id,
-      d.name,
-      d.postal_cd,
+      select li.applicant_id as esh_id,
+      li.applicant_name,
+      li.postal_cd,
       li.id as line_item_id,
       li.consortium_shared,
 
@@ -279,8 +280,6 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       where li.broadband=true  
        and (li.consortium_shared=false 
          OR li.ia_conditions_met=true 
-         OR li.wan_conditions_met=true 
-         OR li.upstream_conditions_met=true 
          OR 'backbone'=any(li.open_flags)
        )  
        and d.include_in_universe_of_districts=true 
@@ -297,11 +296,11 @@ from services_applied_for svcs
     {% endif %}
 
 --Liquid parameters allow user to filter for district_esh_id, state, and clean status
-where (svcs.district_esh_id::varchar='{{district_esh_id}}' OR 'All'='{{district_esh_id}}') 
+where (svcs.esh_id::varchar='{{esh_id}}' OR 'All'='{{esh_id}}') 
   and (svcs.postal_cd='{{state}}' OR 'All'='{{state}}') 
-  and (svcs.exclude_from_analysis::varchar='{{exclude_from_analysis}}' OR 'All'='{{exclude_from_analysis}}')
+  and (svcs.exclude_from_analysis::varchar='{{exclude_from_analysis_received_only}}' OR 'All'='{{exclude_from_analysis_received_only}}')
 
-ORDER BY district_esh_id
+ORDER BY esh_id
 
 {% form %}
 received_or_applied_for:
@@ -311,7 +310,7 @@ received_or_applied_for:
             ['applied_for']
            ]
 
-district_esh_id:
+esh_id:
   type: text
   default: 'All'
   
@@ -319,7 +318,7 @@ state:
   type: text
   default: 'All'
   
-exclude_from_analysis:
+exclude_from_analysis_received_only:
   type: select
   default: 'All'
   options: [['true'],
