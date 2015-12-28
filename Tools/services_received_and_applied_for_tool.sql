@@ -73,23 +73,28 @@ the district (see previous comment).  For "Shared IA" and "Backbone" line items,
 proportionally between recipient districts based on their number of 
 students (e.g. num_students in district/num_students in ALL districts served by line item)*/ 
 
-      case when li.rec_elig_cost!='No data' 
-            and li.consortium_shared=false 
+      case when li.consortium_shared=false 
+            and (not('backbone'=any(li.open_flags)) or li.open_flags is null)
             and ldli.allocation_lines>=li.num_lines 
             and li.total_cost::numeric>0 
             and li.num_lines!=0 
-            and li.orig_r_months_of_service is not null
-            and li.orig_r_months_of_service!=0 
-              then li.total_cost::numeric/li.orig_r_months_of_service 
-           when li.consortium_shared=false and ldli.allocation_lines<li.num_lines and li.num_lines!=0 and li.total_cost::numeric>0 
-            and li.orig_r_months_of_service is not null 
-            and li.orig_r_months_of_service!=0 
-              then (ldli.allocation_lines/li.num_lines)*(li.total_cost::numeric/li.orig_r_months_of_service)
+              then li.total_cost::numeric
+           when li.consortium_shared=false 
+            and (not('backbone'=any(li.open_flags)) or li.open_flags is null)
+            and ldli.allocation_lines<li.num_lines 
+            and li.total_cost::numeric>0 
+            and li.num_lines!=0 
+              then (ldli.allocation_lines/li.num_lines)*(li.total_cost::numeric)
            when li.consortium_shared=true 
             OR 'backbone'=any(li.open_flags) 
-              then (d.num_students::numeric/district_info_by_li.num_students_served)*(li.total_cost::numeric/li.orig_r_months_of_service)  
+              then (d.num_students::numeric/district_info_by_li.num_students_served)*(li.total_cost::numeric) 
               else 0
-      end as "district_monthly_cost",
+      end/
+      case when li.orig_r_months_of_service is not null 
+           and li.orig_r_months_of_service!=0 
+            then li.orig_r_months_of_service 
+            else 12 
+      end as line_item_district_monthly_cost,
 
 --if months of service is null or zero, we assume that the services are in use throughout the entirety of the E-rate cycle
 
@@ -151,39 +156,23 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       left join districts d
       on ldli.district_esh_id=d.esh_id
 
-/*Group by line_item_id to yield students served by each line item (note that most fields in this sub-query are unused, 
-  and have been retained in case we want to build them into the main query*/
+--Group by line_item_id to yield students served by each line item 
       left join (
+                  select  ldli.line_item_id,
+                          sum(d.num_students::numeric) as num_students_served
 
-                  select  a.line_item_id,
-                          li.applicant_name,
-                          li.applicant_id,
-                          li.applicant_postal_cd,
-                          array_agg(DISTINCT dl.district_esh_id::varchar) as recepient_ids,
-                          count(DISTINCT dl.district_esh_id) as num_recepient_ids,
-                          sum(DISTINCT d.num_students::bigint) as num_students_served, -- fix: this would not count 2 districts with the same student count
-                          array_agg(DISTINCT d.name) as recepient_names,
-                          array_agg(DISTINCT eim.ben::varchar) as recepient_bens
-
-                  from allocations a
-
-                  left join district_lookup dl
-                  on a.recipient_id=dl.esh_id
+                  from lines_to_district_by_line_item ldli
 
                   left join districts d
-                  on dl.district_esh_id=d.esh_id
+                  on ldli.district_esh_id = d.esh_id
 
                   left join line_items li
-                  on a.line_item_id=li.id
+                  on ldli.line_item_id = li.id
 
-                  left join esh_id_mappings eim
-                  on d.esh_id=eim.entity_id
+                  where li.consortium_shared=true 
+                     OR 'backbone'=any(li.open_flags)
 
-                  where d.num_students!='No data'
-                  GROUP BY  a.line_item_id,
-                            li.applicant_name,
-                            li.applicant_id,
-                            li.applicant_postal_cd
+                  group by ldli.line_item_id
           ) district_info_by_li
       on ldli.line_item_id=district_info_by_li.line_item_id
 
