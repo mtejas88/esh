@@ -154,7 +154,6 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 /*Group by line_item_id to yield students served by each line item (note that most fields in this sub-query are unused, 
   and have been retained in case we want to build them into the main query*/
       left join (
-
                   select  a.line_item_id,
                           li.applicant_name,
                           li.applicant_id,
