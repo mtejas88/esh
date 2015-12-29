@@ -1,3 +1,14 @@
+/*
+Author: Justine Schott
+Created On Date: 12/29/2015
+Last Modified Date: 12/29/2015
+Name of QAing Analyst(s): 
+Purpose: To display all state snapshot metrics and QA metrics
+Methodology: Each metrics grouping begins with a comment. Any table that begins with "states" is calculating metrics at the state level, then 
+all "states" queries are merged in the final query. There are 3 different groups of districts that are used -- universe (ie, clean and dirty); 
+clean_goal_fiber (ie, clean), and clean_afford (ie, clean and has cost information).
+*/
+
 --state profile metrics
 with universe_districts as (
   select *
