@@ -5,26 +5,30 @@ Last Modified Date: 12/23/2015
 Name of QAing Analyst(s):  
 Purpose: Identifies formerly clean/dirty districts that have changed status since the previous morning's 
 flagging cycle.
-Methodology: Each query begins with the sub-qury "sc", which isolates every change to an entity-level flag 
-that occurred on the specified date(s). (Note that in most cases the user should enter the previous date in 
-the field "date_of_last_dqs_cleaning", as this is required to identify "call_to_clarify" flags manually 
-applied since the time of the previous automatic flagging cycle.) A district is identified as "newly cleaned"
+Methodology: Each query begins with the sub-query "sc", which isolates every change to an entity-level flag 
+that occurred on the specified date(s). (Note the user should enter the previous date in 
+the field "date_of_last_dqs_cleaning" ONLY.) A district is identified as "newly cleaned"
 if at least one of its entity-level flags was updated on the specified date(s), and if the district's
-'exclude_from_analysis' field is 'false.  The reverse criteria identify a district as "newly dirty", provided 
+'exclude_from_analysis' field is 'false'.  The reverse criteria identify a district as "newly dirty", provided 
 that the total number of dirty entity-level flags opened or added on the specified date(s) match the number 
 currently open.
 */
 
-with sc as (
 
-select ef.entity_id,
+with sc as 
+
+(select ef.entity_id,
 districts.exclude_from_analysis,
 v.item_id,
 case when object is null then 'created'
-  when LENGTH(v.item_id::varchar)=5
-  then 
-  SUBSTRING(object,63,1)
-  else SUBSTRING(object,64,1)
+  when LENGTH(v.item_id::varchar)=5 and LENGTH(ef.entity_id::varchar)=6
+    then SUBSTRING(object,63,1)
+  when LENGTH(v.item_id::varchar)=5 and LENGTH(ef.entity_id::varchar)=7
+    then SUBSTRING(object,64,1)
+  when LENGTH(v.item_id::varchar)=6 and LENGTH(ef.entity_id::varchar)=6
+    then SUBSTRING(object,64,1)
+  when LENGTH(v.item_id::varchar)=6 and LENGTH(ef.entity_id::varchar)=7
+    then SUBSTRING(object,65,1)
   end as "status_before_change",
   ef.status as "current_status",
   ef.label,
@@ -42,15 +46,15 @@ GROUP BY ver.item_id) x
 on v.item_id=x.item_id
 
 left join entity_flags ef
-on v.item_id=ef.id
+on v.item_id=ef.id 
 
 left join districts
 on ef.entity_id=districts.esh_id
 
-where item_type='EntityFlag'
-and ef.dirty=true
-and v.created_at=x.last_update
-and ((v.created_at::varchar LIKE '{{date_today}}%' and ef.label!='call_to_clarify')
+where item_type='EntityFlag' --limits versions table to only looking at entity flags, ie those flags which make districts dirty
+and ef.dirty=true --limits flags to those that are dirty
+and v.created_at=x.last_update --limits flags versions to the most up to date
+and ((v.created_at::varchar LIKE '{{date_today}}%' and ef.label!='call_to_clarify') --only allows for changes ON the date range
 OR (v.created_at::varchar LIKE '{{date_of_last_dqs_cleaning}}%' and ef.label='call_to_clarify'))
 ORDER BY item_id),
 
