@@ -1,0 +1,8 @@
+name: Shiny_Line_Items_Updated
+account: cforter
+server: shinyapps.io
+bundleId: 335021
+url: https://cforter.shinyapps.io/Shiny_Line_Items_Updated
+when: 1450461998.52129
+asMultiple: FALSE
+asStatic: FALSE
