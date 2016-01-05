@@ -1,8 +1,8 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 11/02/2015
-Last Modified Date: 12/04/2015
-Name of QAing Analyst(s): 
+Last Modified Date: 01/05/2016
+Name of QAing Analyst(s): Justine Schott
 Purpose: Returns the list of recipients (including name, id, type, and district_esh_id) of a specified line item
 Methodology: Subquery creates a universal list of entities (i.e. all districts, schools, and other locations), and joins this list to the allocations table - Liquid parameter 
 template allows user to limit results to a single line item
@@ -17,11 +17,11 @@ a.recipient_type,
 a.recipient_ben,
 a.recipient_name,
 a.num_lines_to_allocate,
-b.district_esh_id,
-c.name,
-c.num_schools,
-c.num_students,
-c.include_in_universe_of_districts
+district_lookup_incl_noned.district_esh_id,
+d.name,
+d.num_schools,
+d.num_students,
+d.include_in_universe_of_districts
 
 from allocations a
 
@@ -34,16 +34,16 @@ left join lateral (select esh_id, district_esh_id, postal_cd
   union
   select esh_id, district_esh_id, postal_cd
   from other_locations
-  where district_esh_id is not null) b
-on a.recipient_id=b.esh_id
+  where district_esh_id is not null) district_lookup_incl_noned
+on a.recipient_id=district_lookup_incl_noned.esh_id
 
-left join districts c
-on b.district_esh_id=c.esh_id
+left join districts d
+on district_lookup_incl_noned.district_esh_id=c.esh_id
 
 --where statement limits results to user-entered line_item_id
 
 where a.line_item_id='{{line_item_id}}'
-ORDER BY b.district_esh_id, c.include_in_universe_of_districts
+ORDER BY district_lookup_incl_noned.district_esh_id, d.include_in_universe_of_districts
 
 {% form %}
 
