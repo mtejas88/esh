@@ -1,8 +1,8 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 11/02/2015
-Last Modified Date: 12/03/2015
-Name of QAing Analyst(s): 
+Last Modified Date: 01/05/2016
+Name of QAing Analyst(s): Justine Schott
 Purpose: A version of the "Services Received" query that returns a list of services where the applicant and recipient appear to be located 
 in different states - designed to identify potential misallocations and incorrect BEN-NCES mappings
 Methodology: Applies allocation logic and formatting of "Services Received" query, and filters for rows where the postal_cd of the recipient 
