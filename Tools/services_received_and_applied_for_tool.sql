@@ -85,7 +85,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
             and ldli.allocation_lines<li.num_lines 
             and li.total_cost::numeric>0 
             and li.num_lines!=0 
-              then (ldli.allocation_lines/li.num_lines)*(li.total_cost::numeric)
+              then (ldli.allocation_lines::numeric/li.num_lines)*(li.total_cost::numeric)
            when li.consortium_shared=true 
             OR 'backbone'=any(li.open_flags) 
               then (d.num_students::numeric/district_info_by_li.num_students_served)*(li.total_cost::numeric) 
