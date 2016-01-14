@@ -59,7 +59,9 @@ d.ia_cost_per_mbps
 from districts_served
 
 left join districts d
-on districts_served.district_esh_id=d.esh_id),
+on districts_served.district_esh_id=d.esh_id
+
+where d.postal_cd!='DC'),
 
 
 
@@ -93,7 +95,26 @@ case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 
           then district_data.num_students::numeric*district_data.ia_bandwidth_per_student::numeric else 0 end)/
           sum(case when district_data.exclude_from_analysis = false and district_data.ia_bandwidth_per_student!='Insufficient data'
           then district_data.num_students::numeric
-          else 0 end))::varchar end as "aggregate_bandwidth_per_student(kbps)_clean_districts"
+          else 0 end))::varchar end as "aggregate_bandwidth_per_student(kbps)_clean_districts",
+          
+case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)=0
+          then 'No clean districts served'
+          
+     when sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
+          and district_data.ia_cost_per_mbps!='Insufficient data'
+          then district_data.num_students::numeric*(district_data.ia_bandwidth_per_student::numeric/1000)
+          else 0 end) = 0
+          then 'Bandwidth unknown'
+     else
+        
+          (sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
+          and district_data.ia_cost_per_mbps!='Insufficient data'
+          then (district_data.ia_cost_per_mbps::numeric/12)*district_data.num_students::numeric*(district_data.ia_bandwidth_per_student::numeric/1000)
+          else 0 end)/
+          sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
+          and district_data.ia_cost_per_mbps!='Insufficient data'
+          then district_data.num_students::numeric*(district_data.ia_bandwidth_per_student::numeric/1000)
+          else 0 end))::varchar end as "aggregate_monthly_ia_cost_per_mbps_clean_districts"
           
 
 
@@ -180,9 +201,19 @@ ORDER BY f1.consortium_state, COUNT(DISTINCT f2.num_students_served::bigint)
 
 select rc.student_count_rank,
 f1.*,
+applicant_ia.num_li_consortium_procured_ia_services,
+applicant_ia.num_clean_li_consortium_procured_ia_services,
+applicant_ia.num_circuits_consortium_procured_ia_services,
+applicant_ia.num_clean_circuits_consortium_procured_ia_services,
+applicant_ia.total_cost_all_consortium_procured_broadband_services,
+applicant_ia.total_cost_clean_consortium_procured_broadband_services,
 applicant_ia.total_cost_consortium_procured_ia_services,
+applicant_ia.total_cost_clean_consortium_procured_ia_services,
 applicant_ia.total_consortium_procured_ia_bandwidth,
-applicant_ia.ia_cost_per_mbps_consortium_procured_services
+applicant_ia.clean_consortium_procured_ia_bandwidth,
+applicant_ia.ia_cost_per_mbps_consortium_procured_services,
+applicant_ia.ia_cost_per_mbps_clean_consortium_procured_services
+
 
 from ranked_consortia rc
 left join filter f1
@@ -190,49 +221,170 @@ on rc.applicant_id=f1.applicant_id
 
 left join lateral (
 select li.applicant_id,
-sum(case when ((internet_conditions_met=true
-              OR upstream_conditions_met=true and consortium_shared=false)
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
               OR 
               (ia_conditions_met=true and consortium_shared=true)
               OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          then 1
+          else 0 end)::numeric as "num_li_consortium_procured_ia_services",
+
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then 1
+          else 0 end)::numeric as "num_clean_li_consortium_procured_ia_services",
+
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          then num_lines
+          else 0 end)::numeric as "num_circuits_consortium_procured_ia_services",         
+
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then num_lines
+          else 0 end)::numeric as "num_clean_circuits_consortium_procured_ia_services",
+          
+          
+          
+          
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          then rec_elig_cost::numeric
+          else 0 end)::numeric as "total_cost_consortium_procured_ia_services",
+          
+          
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then rec_elig_cost::numeric
+          else 0 end)::numeric as "total_cost_clean_consortium_procured_ia_services",
+          
+sum(case when broadband=true
           and
               rec_elig_cost!='No data'
           then rec_elig_cost::numeric
-          else 0 end)::numeric as "total_cost_consortium_procured_ia_services",
-sum(case when (internet_conditions_met=true
-              OR upstream_conditions_met=true and consortium_shared=false)
+          else 0 end)::numeric as "total_cost_all_consortium_procured_broadband_services",
+          
+sum(case when broadband=true
+          and rec_elig_cost!='No data'
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then rec_elig_cost::numeric
+          else 0 end)::numeric as "total_cost_clean_consortium_procured_broadband_services",
+          
+          
+sum(case when ((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
           and
               rec_elig_cost!='No data'
           then bandwidth_in_mbps::numeric*num_lines
           else 0 end)::numeric as "total_consortium_procured_ia_bandwidth",
           
+          
+sum(case when ((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              and rec_elig_cost!='No data'
+              and not('exclude'=any(open_flags))
+              and not('charter_service'=any(open_flags))
+              and not('videoconferencing'=any(open_flags))
+          then bandwidth_in_mbps::numeric*num_lines
+          else 0 end)::numeric as "clean_consortium_procured_ia_bandwidth",
+          
+          
 case when 
-          (sum(case when (internet_conditions_met=true
-              OR upstream_conditions_met=true and consortium_shared=false)
+          (sum(case when ((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
           and
               rec_elig_cost!='No data'
           then bandwidth_in_mbps::numeric*num_lines::numeric
           else 0 end))>0
           
           then
-            ((sum(case when ((internet_conditions_met=true
-                OR upstream_conditions_met=true and consortium_shared=false)
+            ((sum(case when (((internet_conditions_met=true
+                OR upstream_conditions_met=true) and consortium_shared=false)
                 OR 
                 (ia_conditions_met=true and consortium_shared=true)
-                OR 'backbone'=any(open_flags))
-            and
-                rec_elig_cost!='No data'
+                OR ('backbone'=any(open_flags)))
+            and rec_elig_cost!='No data'
               then rec_elig_cost::numeric
               else 0 end))::numeric/
-            (sum(case when (internet_conditions_met=true
-                OR upstream_conditions_met=true and consortium_shared=false)
+            (sum(case when ((internet_conditions_met=true
+                OR upstream_conditions_met=true) and consortium_shared=false)
             and
                 rec_elig_cost!='No data'
               then bandwidth_in_mbps::numeric*num_lines::numeric
               else 0 end))
             )::varchar
           
-          else 'No reported costs' end as "ia_cost_per_mbps_consortium_procured_services"
+          else 'No reported costs' end as "ia_cost_per_mbps_consortium_procured_services",
+          
+          
+          
+          
+case when 
+          (sum(case when ((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              and rec_elig_cost!='No data'
+              and not('exclude'=any(open_flags))
+              and not('charter_service'=any(open_flags))
+              and not('videoconferencing'=any(open_flags))
+          then bandwidth_in_mbps::numeric*num_lines::numeric
+          else 0 end))>0
+          
+          then
+            ((sum(case when (((internet_conditions_met=true
+                OR upstream_conditions_met=true) and consortium_shared=false)
+                OR 
+                (ia_conditions_met=true and consortium_shared=true)
+                OR ('backbone'=any(open_flags)))
+              and rec_elig_cost!='No data'
+              and not('exclude'=any(open_flags))
+              and not('charter_service'=any(open_flags))
+              and not('videoconferencing'=any(open_flags))
+              then rec_elig_cost::numeric
+              else 0 end))::numeric/
+            (sum(case when ((internet_conditions_met=true
+                OR upstream_conditions_met=true) and consortium_shared=false)
+            and
+                rec_elig_cost!='No data'
+            and not('exclude'=any(open_flags))
+              and not('charter_service'=any(open_flags))
+              and not('videoconferencing'=any(open_flags))
+              then bandwidth_in_mbps::numeric*num_lines::numeric
+              else 0 end))
+            )::varchar
+          
+          else 'No reported costs' end as "ia_cost_per_mbps_clean_consortium_procured_services"
 
 from line_items li
 
@@ -243,9 +395,3 @@ on rc.applicant_id=applicant_ia.applicant_id
 
 
 ORDER BY f1.consortium_state, rc.student_count_rank
-
-
-
-
-
-
