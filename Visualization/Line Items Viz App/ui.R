@@ -19,7 +19,19 @@ shinyUI(fluidPage(
         font-weight: 500;
         line-height: 1.1;
         color: #F26B21;
+        display: inline-block;
+        margin-top: 0px;
       }
+
+      img {
+        font-family: 'Roboto Slab';
+        font-weight: 500;
+        line-height: 1.1;
+        color: #F26B21;
+        margin-top: 500px
+        align: right;
+        display: inline-block;
+        }
 
       h2 {
         font-family: 'Lato', sans-serif;
@@ -68,35 +80,47 @@ shinyUI(fluidPage(
     "))
   ),
   title="Price Dispersion",
-  titlePanel(h1("Price Dispersion")),
+  titlePanel(div(h1("Price Dispersion"), img(src='esh-logo.png', align = "right", width='230px'))),
   sidebarLayout(
-    conditionalPanel(condition="input.condition_panel == 'Cost - Box and Whiskers'",
+    conditionalPanel(condition="1==1",
       sidebarPanel(
-      sliderInput("bandwidth",
-                  h2("Circuit Size"),
-                  min = 0,
-                  max = 10000,
-                  value = c(0,10000),
-                  step = 50),
+      checkboxGroupInput("bandwidths", 
+                    h2("Select Circuit Sizes"),
+                    choices = c(50,100,500,1000,10000),
+                    selected = c(50,100,500,1000,10000)),
+      selectInput("purpose", 
+                  h2("Select Purpose"),
+                  choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP')),
       selectInput("connection", 
                   h2("Select Connection Type"),
-                  choices = c("Fiber", "Copper", "Cable / DSL", "Fixed Wireless", "Other / Uncategorized")),
+                  choices = c("All", "Fiber", "Dark Fiber", "Copper", "Cable / DSL", "Fixed Wireless", "Other / Uncategorized")),
       selectInput("locale", 
                   h2("Select District Locale"), 
-                  choices = c('Rural', 'Small Town', 'Suburban', 'Urban'), selected="Rural"),
+                  choices = c('All', 'Rural', 'Small Town', 'Suburban', 'Urban'), selected="All"),
       selectInput("size", 
                   h2("Select District Size"), 
-                  choices = c('Tiny', 'Small', 'Medium', 'Large', 'Mega'), selected="Tiny"),
+                  choices = c('All', 'Tiny', 'Small', 'Medium', 'Large', 'Mega'), selected="All"),
       selectInput("state", 
                   h2("Select State"), 
-                  choices = c('All', 'CA', 'IN', 'MT', 'MN'), selected="Tiny"),
+                  choices = c('All', 'AK','AL','AR','AZ',
+                              'CA','CO','CT','DC',
+                              'DE','FL','GA','HI','IA',
+                              'ID','IL','IN','KS',
+                              'KY','LA','MA','MD',
+                              'ME','MI','MN','MO',
+                              'MS','MT','NC','ND',
+                              'NE','NH','NJ','NM',
+                              'NV','NY','OH','OK',
+                              'OR','PA','RI','SC',
+                              'SD','TN','TX','UT','VA',
+                              'WA','WI','WV','WY'), selected="All"),
       width=3
     )),
     mainPanel(
       tabsetPanel(
         tabPanel("Cost - Box and Whiskers", imageOutput("distPlot", height="550px", width="1000px"),
                  div(id="test1", class="test", textOutput("n_observations"))),
-        tabPanel("Cost - Histogram", plotOutput("histPlot", height="800px", width="1000px")),
+        tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
       id="condition_panel"
   )
 )
