@@ -5,36 +5,165 @@ cat("\014")
 rm(list = ls())
 
 #install and load packages
-lib <- c("dplyr", "ggplot2", "RColorBrewer", "raster", "maps", "mapproj", "gridExtra", "reshape2", "scales")
+lib <- c("dplyr", "ggplot2", "RColorBrewer", "raster", "maps", "mapproj", "gridExtra", "reshape2", "scales", "tidyr")
 #sapply(lib, function(x) install.packages(x))
 sapply(lib, function(x) require(x, character.only = TRUE))
 
 # set working directory
-setwd("~/Desktop/R/Illinois CR/data/intermediate")
+setwd("~/Google Drive/R/Illinois CR/data/export/for_graphing")
 
-# load csv
-line <- read.csv("~/Desktop/R/Illinois CR/data/mode/line_items.csv", as.is = TRUE)
+# load csvs
+line <- read.csv("~/Google Drive/R/Illinois CR/data/mode/line_items_20160105.csv", as.is = TRUE)
+deluxe <- read.csv("~/Google Drive/R/Illinois CR/data/mode/deluxe_districts_20160105.csv", as.is = TRUE)
+counties <- read.csv("~/Google Drive/R/Illinois CR/data/mode/il_county_names.csv", as.is = TRUE)
 
 # limit to clean data
 line <- filter(line, exclude == FALSE)
-# note: filter for ia_condition_met or wan_condition_met to TRUE depending on analyses
+# limit to clean districts!
+line <- line[line$nces_cd %in% deluxe$nces_cd, ]
+
+# order the locale/district_size factor in a logical way
+line$locale <- factor(line$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+line$district_size <- factor(line$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
 
  # create columns and conditions
-
 # cost_per_line: (total_cost / num_lines) / 12 * monthly measure
 line$monthly_cost_per_line <- (line$total_cost / line$num_lines) /12
 
 # cost_per_line_mbps: normalize by bandwidth
-line$monthly_cost_per_line_mbps <- line$monthly_cost_per_line / line$bandwidth_in_mbps
+line$monthly_cost_per_mbps <- line$monthly_cost_per_line / line$bandwidth_in_mbps
+
+# total_bandwidth
+line$total_bandwidth_in_mbps <- line$bandwidth_in_mbps * line$num_lines
+
+# new district_size
+#line$district_size_new <- ifelse(line$district_size %in% c("Tiny", "Small"), "Small", as.character(line$district_size))
+#line$district_size_new <- factor(line$district_size_new, levels = c("Small", "Medium", "Large", "Mega"))
 
 # which conditions
-ia <- which(line$ia_conditions_met == TRUE, 1, 0)
-wan <- which(line$wan_conditions_met == TRUE, 1, 0)
-upstream <- which(line$upstream_conditions_met == TRUE, 1, 0)
+ia <- which(line$internet_conditions_met == TRUE)
+wan <- which(line$wan_conditions_met == TRUE)
+#upstream <- which(line$upstream_conditions_met == TRUE)
+
+# merge county names
+# merge county name data to deluxe table
+#line <- merge(line, counties, all.x = TRUE, all.y = FALSE, by = c("nces_cd"))
+
+# merge goal information
+#deluxe <- dplyr::select(deluxe, nces_cd, goal_2014 = meeting_2014_goal_no_oversub, ia_cost_per_mbps)
+
+#line <- merge(line, deluxe, all.x = TRUE, all.y = FALSE, by = c("nces_cd"))
+
+# simplify county names
+##line$county <- tolower(gsub(" .*$", "", line$CONAME))
+#line$CONAME <- NULL
+
+# for mapping -- import Illinois map by county
+#usa <- getData('GADM', country="USA", level=2)
+#il_map <- usa[usa$NAME_1 == "Illinois",] 
+#il_map@data$id <- rownames(il_map@data)
+#il_df <- merge(il_map@data, fortify(il_map), by = "id", all.y = TRUE)
+#il_df <- il_df[,c("NAME_2", "long", "lat", "group")]
+#names(il_df) <- c("county", "long", "lat", "group")
+#il_df$county <- tolower(il_df$county)
 
 ### analyses
- # cost analyses per line / per line and per mbps
- # function using var as an argument fails and i can't dwell on it now
+ # IA cost analyses per line / per line and per mbps
+
+target_cost <-
+line[ia,] %>%
+  summarize(q25 = quantile(monthly_cost_per_mbps, 0.25),
+            median = median(monthly_cost_per_mbps),
+            q75 = quantile(monthly_cost_per_mbps, 0.75))
+
+target_cost <- melt(target_cost)
+target_cost <- cbind(target_cost, rep(3, 3), rep(4, 3))
+names(target_cost) <- c("measure", "cost", "target", "national_q25")
+# export
+write.csv(target_cost, "target_cost.csv", row.names = FALSE)
+
+# cut by locale and size for all items in IA
+
+cost_by_locale_size <-
+  line[line$internet_conditions_met == TRUE & line$connect_category == "Fiber", ] %>%
+  group_by(district_size, locale) %>%
+  summarize(n = n(),
+            #min = min(monthly_cost_per_line_mbps),
+            #q25 = quantile(monthly_cost_per_line_mbps, 0.25),
+            median = median(monthly_cost_per_mbps))
+            #q75 = quantile(monthly_cost_per_line_mbps, 0.75),
+            #q90 = quantile(monthly_cost_per_line_mbps, 0.90),
+            #max = max(monthly_cost_per_line_mbps))
+
+
+#median_cost <- data.frame(spread(cost_by_locale_size[, c("locale", "n", "district_size", "median")], locale, median))
+write.csv(cost_by_locale_size, "median_locale_size_all_ia.csv", row.names = FALSE)
+
+# for 100 mbps lit fiber only
+cost_by_locale_size <-
+  line[line$connect_category == "Fiber" &
+         line$purpose == "Internet" &
+         line$bandwidth_in_mbps == 100, ] %>%
+  group_by(district_size, locale) %>%
+  summarize(n = n(),
+            median = median(monthly_cost_per_line_mbps))
+
+
+# WAN cost per circuit
+target_cost <-
+  line[wan,] %>%
+  summarize(q25 = quantile(monthly_cost_per_line, 0.25),
+            median = median(monthly_cost_per_line),
+            q75 = quantile(monthly_cost_per_line, 0.75))
+
+target_cost <- melt(target_cost)
+target_cost <- cbind(target_cost, rep(750), rep(690, 3))
+names(target_cost) <- c("measure", "cost", "target", "national_q25")
+
+# export
+write.csv(target_cost, "wan_cost.csv", row.names = FALSE)
+
+# goal vs. affordability
+
+line[ia,] %>%
+  group_by(goal_2014) %>%
+  summarize(weighted_avg_cost = weighted.mean(ia_cost_per_mbps, total_bandwidth_in_mbps))
+  
+  summarize(weighted_avg = sum(total_cost / 12) / sum(total_bandwidth_in_mbps))
+              
+
+target_cost <- melt(target_cost)
+target_cost <- cbind(target_cost, rep(750), rep(690, 3))
+names(target_cost) <- c("measure", "cost", "target", "national_q25")
+
+
+(line$total_cost / 12) / line$total_bandwidth_in_mbps
+
+
+
+# exploratory map
+ggplot() + 
+  geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "white") +
+  geom_point(data = map_data, aes(x = longitude, y = latitude, size = monthly_cost_per_line_mbps), color = "#fdb913", alpha = 0.5) +
+  #scale_color_manual(name = "", values = c("#4a4a4a", "#fdb913"), breaks = c(0, 1), labels = c("no e-rate", "e-rate")) +
+  theme(panel.background = element_rect(fill = 'white', colour = 'white'),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  borders("county", colour="black", alpha = 0.5, size = 0.1, region = "illinois") +
+  theme(legend.position = "bottom")
+
+
+# d
+
+
+
+
+
+
 
 # filter down to most common bandwidth -- 100, 2000, 1000 mbps
  # Lit Fiber
@@ -44,6 +173,7 @@ upstream <- which(line$upstream_conditions_met == TRUE, 1, 0)
 
 sub <- filter(line[ia, ], bandwidth_in_mbps %in% c(100, 200, 1000) & 
                 (connect_type == "Lit Fiber Service" | (connect_type == "Ethernet" & bandwidth_in_mbps >= 150)))
+
 
   sum <- 
     sub %>%
@@ -190,8 +320,6 @@ line[ia, ]  %>%
             median = median(cost_per_line),
             avg = mean(cost_per_line),
             max = max(cost_per_line))
-
-
 
 
 # check ICN + local affiliates coverage
