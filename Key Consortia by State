@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
-Last Modified Date: 
+Last Modified Date: 1/25/2016
 Name of QAing Analyst(s): 
 Purpose: Returns the three consortia in each state that serve the greatest number of students within our 
 population, and calculates summary statistics re: districts served and service procured.
@@ -202,15 +202,29 @@ ORDER BY f1.consortium_state, COUNT(DISTINCT f2.num_students_served::bigint)
 select rc.student_count_rank,
 f1.*,
 applicant_ia.num_li_consortium_procured_ia_services,
+applicant_ia.num_li_consortium_procured_broadband_services,
+
 applicant_ia.num_clean_li_consortium_procured_ia_services,
+applicant_ia.num_clean_li_consortium_procured_broadband_services,
+
 applicant_ia.num_circuits_consortium_procured_ia_services,
+applicant_ia.num_circuits_consortium_procured_broadband_services,
+
 applicant_ia.num_clean_circuits_consortium_procured_ia_services,
-applicant_ia.total_cost_all_consortium_procured_broadband_services,
-applicant_ia.total_cost_clean_consortium_procured_broadband_services,
+applicant_ia.num_clean_circuits_consortium_procured_broadband_services,
+
 applicant_ia.total_cost_consortium_procured_ia_services,
+applicant_ia.total_cost_consortium_procured_broadband_services,
+
+applicant_ia.total_cost_consortium_procured_ia_services,
+applicant_ia.total_cost_consortium_procured_broadband_services,
+
 applicant_ia.total_cost_clean_consortium_procured_ia_services,
+applicant_ia.total_cost_clean_consortium_procured_broadband_services,
+
 applicant_ia.total_consortium_procured_ia_bandwidth,
 applicant_ia.clean_consortium_procured_ia_bandwidth,
+
 applicant_ia.ia_cost_per_mbps_consortium_procured_services,
 applicant_ia.ia_cost_per_mbps_clean_consortium_procured_services
 
@@ -226,30 +240,23 @@ sum(case when (((internet_conditions_met=true
               OR 
               (ia_conditions_met=true and consortium_shared=true)
               OR 'backbone'=any(open_flags))
-          and rec_elig_cost!='No data'
+              and not('exclude'=any(open_flags))
+              and not('charter_service'=any(open_flags))
+              and not('videoconferencing'=any(open_flags))
+              
+              and rec_elig_cost!='No data'
           then 1
           else 0 end)::numeric as "num_li_consortium_procured_ia_services",
 
-sum(case when (((internet_conditions_met=true
-              OR upstream_conditions_met=true) and consortium_shared=false)
-              OR 
-              (ia_conditions_met=true and consortium_shared=true)
-              OR 'backbone'=any(open_flags))
-          and rec_elig_cost!='No data'
+
+sum(case when rec_elig_cost!='No data'
+          and broadband=true
           and not('exclude'=any(open_flags))
           and not('charter_service'=any(open_flags))
           and not('videoconferencing'=any(open_flags))
           then 1
-          else 0 end)::numeric as "num_clean_li_consortium_procured_ia_services",
+          else 0 end)::numeric as "num_li_consortium_procured_broadband_services",        
 
-sum(case when (((internet_conditions_met=true
-              OR upstream_conditions_met=true) and consortium_shared=false)
-              OR 
-              (ia_conditions_met=true and consortium_shared=true)
-              OR 'backbone'=any(open_flags))
-          and rec_elig_cost!='No data'
-          then num_lines
-          else 0 end)::numeric as "num_circuits_consortium_procured_ia_services",         
 
 sum(case when (((internet_conditions_met=true
               OR upstream_conditions_met=true) and consortium_shared=false)
@@ -260,9 +267,65 @@ sum(case when (((internet_conditions_met=true
           and not('exclude'=any(open_flags))
           and not('charter_service'=any(open_flags))
           and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
+          then 1
+          else 0 end)::numeric as "num_clean_li_consortium_procured_ia_services",
+
+         
+sum(case when 
+          rec_elig_cost!='No data'
+          and broadband=true
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
+          then 1
+          else 0 end)::numeric as "num_clean_li_consortium_procured_broadband_services",
+
+
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          then num_lines
+          else 0 end)::numeric as "num_circuits_consortium_procured_ia_services",
+          
+sum(case when 
+          rec_elig_cost!='No data'
+          and broadband=true
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then num_lines
+          else 0 end)::numeric as "num_circuits_consortium_procured_broadband_services",
+
+sum(case when (((internet_conditions_met=true
+              OR upstream_conditions_met=true) and consortium_shared=false)
+              OR 
+              (ia_conditions_met=true and consortium_shared=true)
+              OR 'backbone'=any(open_flags))
+          and rec_elig_cost!='No data'
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
           then num_lines
           else 0 end)::numeric as "num_clean_circuits_consortium_procured_ia_services",
           
+
+
+sum(case when 
+          rec_elig_cost!='No data'
+          and broadband=true
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
+          then num_lines
+          else 0 end)::numeric as "num_clean_circuits_consortium_procured_broadband_services",
+ 
           
           
           
@@ -275,6 +338,15 @@ sum(case when (((internet_conditions_met=true
           then rec_elig_cost::numeric
           else 0 end)::numeric as "total_cost_consortium_procured_ia_services",
           
+sum(case when 
+          rec_elig_cost!='No data'
+          and broadband=true
+          and not('exclude'=any(open_flags))
+          and not('charter_service'=any(open_flags))
+          and not('videoconferencing'=any(open_flags))
+          then rec_elig_cost::numeric
+          else 0 end)::numeric as "total_cost_consortium_procured_broadband_services",
+          
           
 sum(case when (((internet_conditions_met=true
               OR upstream_conditions_met=true) and consortium_shared=false)
@@ -285,23 +357,21 @@ sum(case when (((internet_conditions_met=true
           and not('exclude'=any(open_flags))
           and not('charter_service'=any(open_flags))
           and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
           then rec_elig_cost::numeric
           else 0 end)::numeric as "total_cost_clean_consortium_procured_ia_services",
           
-sum(case when broadband=true
-          and
-              rec_elig_cost!='No data'
-          then rec_elig_cost::numeric
-          else 0 end)::numeric as "total_cost_all_consortium_procured_broadband_services",
-          
+
+
 sum(case when broadband=true
           and rec_elig_cost!='No data'
           and not('exclude'=any(open_flags))
           and not('charter_service'=any(open_flags))
           and not('videoconferencing'=any(open_flags))
+          and number_of_dirty_line_item_flags=0
           then rec_elig_cost::numeric
           else 0 end)::numeric as "total_cost_clean_consortium_procured_broadband_services",
-          
+
           
 sum(case when ((internet_conditions_met=true
               OR upstream_conditions_met=true) and consortium_shared=false)
