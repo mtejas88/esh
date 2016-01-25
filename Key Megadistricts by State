@@ -1,11 +1,13 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
-Last Modified Date: 
+Last Modified Date: 1/24/2016
+    Nature of Modification: removed exclusionary rule that eliminated all districts except for those with
+    "district_size"='Mega'
 Name of QAing Analyst(s): 
-Purpose: Returns the three megadistricts in each state that serve the greatest number of students within 
+Purpose: Returns the three districts in each state that serve the greatest number of students within 
 our population, and calculates summary statistics re: services procured.
-Methodology: This query uses a self-join of the "districts" table to assign rankings to each megadistrict
+Methodology: This query uses a self-join of the "districts" table to assign rankings to each district
 within a state based on the number of students that they contain.
 */
 
@@ -20,7 +22,6 @@ FROM
 districts d1 
 JOIN districts d2 ON (d1.num_students::bigint <= d2.num_students::bigint and d1.postal_cd=d2.postal_cd)
 where d1.include_in_universe_of_districts=true and d2.include_in_universe_of_districts=true 
-and d1.district_size='Mega'
 GROUP BY d1.esh_id,d1.postal_cd
 having COUNT(DISTINCT d2.num_students::bigint) <=3)
 
@@ -33,7 +34,7 @@ districts.num_campuses,
 districts.num_students,
 districts.ia_bandwidth_per_student,
 case when ia_cost_per_mbps!='Insufficient data' then districts.ia_cost_per_mbps::numeric/12 else null end as "monthly_ia_cost_per_mbps",
-districts.exclude_from_analysis
+case when districts.exclude_from_analysis=true then 'Dirty' else 'Clean' end as "clean_status" 
 
 from ranked_mega
 
