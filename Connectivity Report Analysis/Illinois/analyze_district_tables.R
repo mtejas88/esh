@@ -136,8 +136,13 @@ rm(scale, cable, scale_match, cable_match)
 # no fiber district
 deluxe$no_fiber <- ifelse(deluxe$hierarchy_connect_category != "Fiber", 1, 0)
 
+# has_unscalable_campus
+deluxe$has_unscalable_campus <- ifelse(deluxe$known_unscalable_campuses + deluxe$assumed_unscalable_campuses > 0, 1, 0)
+
+
 # limit to rep sample
 rep_sample <- filter(deluxe, rep_sample == 1)
+
 
 
 
@@ -236,26 +241,49 @@ wan_all <- sum(rep_sample$gt_1g_wan_lines) +
            sum(rep_sample$lt_1g_fiber_wan_lines) + 
            sum(rep_sample$lt_1g_nonfiber_wan_lines)
 il_wan <- wan_1g / wan_all
+
+
+
 # SotS Report figure
 national <- 0.6
 wan_data <- data.frame(il_wan, national, wan_all)
 # export
 write.csv(wan_data, "wan_greater_than_1g.csv", row.names = FALSE)
 
-# export list of districts that did not fiel e-rate
-#write.csv(basic)
+# WAN goal by locale
 
+aggregate(x$Frequency, by=list(Category=x$Category), FUN=sum)
+Category  x
+1    
+
+tapply(x$Frequency, by $Category, FUN=sum)
+
+tapply(rep_sample$gt_1g_wan_lines, by = c(rep_sample$locale, rep_sample$district_size), FUN = sum)
+
+rep_sample[rep_sample$il_region != "Chicago",] %>%
+  group_by(district_size) %>%
+  summarize( n = n(),
+             gt_1g_total = sum(gt_1g_wan_lines),
+             lt_1g_total = sum(lt_1g_fiber_wan_lines) + sum(lt_1g_nonfiber_wan_lines),
+             ratio = gt_1g_total / (gt_1g_total + lt_1g_total))
+
+
+rep_sample %>%
+  group_by(district_size) %>%
+  summarize( gt_1g_total = sum(gt_1g_wan_lines),
+             lt_1g_total = sum(lt_1g_fiber_wan_lines) + sum(lt_1g_nonfiber_wan_lines),
+             ratio = gt_1g_total / (gt_1g_total + lt_1g_total))
 
 # any salient characteristics about districts that did not file e-rate?
-no_erate <- basic[basic$erate == 0, c("nces_cd", "name", "city", "zip")]
-write.csv(no_erate, "districts_no_erate_1516.csv")
+no_erate <- basic[basic$erate == 0, c("nces_cd", "name", "city", "zip", "num_schools", "num_students")]
+write.csv(no_erate, "districts_no_erate_1516.csv", row.names = FALSE)
 
 #71
 table(basic[basic$erate == 0, ]$locale, basic[basic$erate == 0, ]$district_size)
 # 44/71 are in rural districts
 # 69/71 are small or tiny
 
-View(basic[basic$erate == 0 & basic$district_size %in% c("Large", "Medium"),])
+#View(basic[basic$erate == 0 & basic$district_size %in% c("Large", "Medium"),])
 
 
 no_erate_map <-
@@ -325,3 +353,23 @@ requires_wan  <-
 requires_wan$perc <- requires_wan$n / nrow(rep_sample)
 
 write.csv(rep_sample[rep_sample$requires_wan == 1 & rep_sample$has_wan == 0, ], "no_wan_requests.csv", row.names = FALSE)
+
+# goals and affordability
+
+goal_cost <-
+rep_sample %>%
+  group_by(goal_2014) %>%
+  summarize(test = sum(total_ia_monthly_cost) / sum(total_ia_bw_mbps))
+
+write.csv(goal_cost, "goal_and_affordability.csv", row.names = FALSE)
+
+nrow(rep_sample[rep_sample$goal_2014 == 0, ])
+
+# hypothetical bandwidth
+rep_sample$but_for_total_bw <- rep_sample$total_ia_monthly_cost / 6.748627
+
+# meeting goals under but-for scenario
+nrow(rep_sample[rep_sample$goal_2014 == 0 & rep_sample$but_for_total_bw >= 100, ])
+
+
+                             

@@ -106,7 +106,7 @@ cost_by_locale_size <-
          line$bandwidth_in_mbps == 100, ] %>%
   group_by(district_size, locale) %>%
   summarize(n = n(),
-            median = median(monthly_cost_per_line_mbps))
+            median = median(monthly_cost_per_mbps))
 
 
 # WAN cost per circuit
@@ -123,47 +123,6 @@ names(target_cost) <- c("measure", "cost", "target", "national_q25")
 # export
 write.csv(target_cost, "wan_cost.csv", row.names = FALSE)
 
-# goal vs. affordability
-
-line[ia,] %>%
-  group_by(goal_2014) %>%
-  summarize(weighted_avg_cost = weighted.mean(ia_cost_per_mbps, total_bandwidth_in_mbps))
-  
-  summarize(weighted_avg = sum(total_cost / 12) / sum(total_bandwidth_in_mbps))
-              
-
-target_cost <- melt(target_cost)
-target_cost <- cbind(target_cost, rep(750), rep(690, 3))
-names(target_cost) <- c("measure", "cost", "target", "national_q25")
-
-
-(line$total_cost / 12) / line$total_bandwidth_in_mbps
-
-
-
-# exploratory map
-ggplot() + 
-  geom_polygon(data = il_df, aes(x = long, y = lat, group = group), fill = "white") +
-  geom_point(data = map_data, aes(x = longitude, y = latitude, size = monthly_cost_per_line_mbps), color = "#fdb913", alpha = 0.5) +
-  #scale_color_manual(name = "", values = c("#4a4a4a", "#fdb913"), breaks = c(0, 1), labels = c("no e-rate", "e-rate")) +
-  theme(panel.background = element_rect(fill = 'white', colour = 'white'),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        axis.title = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank()) +
-  borders("county", colour="black", alpha = 0.5, size = 0.1, region = "illinois") +
-  theme(legend.position = "bottom")
-
-
-# d
-
-
-
-
-
-
 
 # filter down to most common bandwidth -- 100, 2000, 1000 mbps
  # Lit Fiber
@@ -172,7 +131,8 @@ ggplot() +
   # ETHERNET >= 150 mb
 
 sub <- filter(line[ia, ], bandwidth_in_mbps %in% c(100, 200, 1000) & 
-                (connect_type == "Lit Fiber Service" | (connect_type == "Ethernet" & bandwidth_in_mbps >= 150)))
+                (connect_type == "Lit Fiber Service" | 
+                   (connect_type == "Ethernet" & bandwidth_in_mbps >= 150)))
 
 
   sum <- 
@@ -273,71 +233,5 @@ sum3 <-
     #max = max(monthly_cost_per_line)
   )
 
-sum3 <- melt(sum3, id.var = c("n"))
-sum3$stat <- factor(sum3$variable, levels = c("q10", "q25", "median", "q75", "q90"))
-#sum2$bandwidth_in_mbps <- factor(sum2$bandwidth_in_mbps, levels = c("100", "200", "1000"))
-sum3$label <- paste0("$", prettyNum(round(sum3$value, 0), big.mark = ",", scientific = FALSE))
-
-p_bars3 <-  
-  
-  ggplot(data = sum3) + 
-  geom_bar(aes(x = stat, y = value, order = stat), stat = 'identity', fill = '#7fcdbb') +
-  geom_text(aes(x = stat, y = value, label = label, vjust = 1)) +
-  geom_text(aes(x = 0, y = 750, label = "Target Price: $750", vjust = -1)) +
-  geom_hline(aes(yintercept = 750), linetype = 2, size = 1, color = "#2c7fb8")  +
-  theme(legend.position = "bottom",
-        panel.background = element_rect(fill = 'white', colour = 'white'),
-        axis.line.y = element_blank(),
-        axis.ticks = element_blank(),
-        axis.line.x = element_line(size = 0.5, colour = "black"),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        axis.title = element_blank(),
-        axis.text.y = element_blank()) +
-  scale_x_discrete(expand = c(0,0), labels = c("10th Quartile", "25th Quartile", "Median", "75th Quartile", "90th Percentile")) +
-  scale_y_continuous(expand = c(0,0)) +
-  ggtitle("Monthly WAN Cost per Circuit\n1,000 mbps Lit Fiber")
-
-
-
-
-# state of the states Report -- national median; pages 30 and 31
-
-# analyses
-line[ia, ]  %>%
-  group_by(connect_type) %>%
-  summarize(min = min(cost_per_line),
-            median = median(cost_per_line),
-            avg = mean(cost_per_line),
-            max = max(cost_per_line))
- # connect type seems useful 
- # internet_conditions_met?
-
-line[ia, ]  %>%
-  group_by(connect_type) %>%
-  summarize(min = min(cost_per_line),
-            median = median(cost_per_line),
-            avg = mean(cost_per_line),
-            max = max(cost_per_line))
-
-
-# check ICN + local affiliates coverage
-
-data$icn <- ifelse(data$service_provider_name %in% c("Illinois Century Network"), 1, 0)
-data$icn_plus_affiliates <- ifelse(data$service_provider_name %in% c("Illinois Century Network", "Illimois Central College", "Northern Illinois University"), 1, 0)
-
-mean(data$icn)
-# .0984
-mean(data$icn_plus_affiliates)
-#.1344
-
-# per Jeff, ICN exclusively provides internet access (as opposed to upstream circuits)
-# denominator should be only IA items
-
-
-check <- data[data$internet_conditions_met == "TRUE",]
-
-mean(check$icn)
-x
-
+## Monthly Cost per Circuit for Lit fiber at Commond Bandwidth
+line[ia, ]
