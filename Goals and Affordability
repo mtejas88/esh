@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
-Created On Date: 1/12/2016
-Last Modified Date: 
+Created On Date: 01/12/2016
+Last Modified Date: 01/29/2016 
 Name of QAing Analyst(s): 
 Purpose: Returns the # of districts and students in each state that would additionally meet connectivity 
 goals (100 Kbps, 200 Kbps, 500 Kbps, 1 Mbps) if each district's Internet access cost per mbps dropped by
@@ -20,7 +20,6 @@ bandwidth required to meet each connectivity target given the size of the distri
 "postal_cd" yields the number of districts and students in our sample that would meet goals given each 
 reduction percentage, values which can be extrapolated to the population-level using the proportion of
 districts/students represented by the sample.
-
 */
 
 
@@ -474,244 +473,331 @@ sum(case when ds.exclude_from_analysis=false then ds.num_students else 0 end) as
 --100 kbps
 
 sum(case when "meeting_100_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_100_kbps",
 
 sum(case when "meeting_100_kbps_10%"='Yes' 
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_10%_reduction",
-sum(case when "meeting_100_kbps_10%"='Yes' 
+sum(case when "meeting_100_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_10%_reduction",
 
 
 sum(case when "meeting_100_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_20%_reduction",
-sum(case when "meeting_100_kbps_20%"='Yes' 
+sum(case when "meeting_100_kbps_20%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_20%_reduction",
 
-sum(case when "meeting_100_kbps_30%"='Yes' 
+sum(case when "meeting_100_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_30%_reduction",
-sum(case when "meeting_100_kbps_30%"='Yes' 
+sum(case when "meeting_100_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_30%_reduction",
 
 sum(case when "meeting_100_kbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_40%_reduction",
-sum(case when "meeting_100_kbps_40%"='Yes' 
+sum(case when "meeting_100_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_40%_reduction",
 
 sum(case when "meeting_100_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_50%_reduction",
-sum(case when "meeting_100_kbps_50%"='Yes' 
+sum(case when "meeting_100_kbps_50%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_50%_reduction",
 
 --200 kbps
 
 sum(case when "meeting_200_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_200_kbps",
 
 sum(case when "meeting_200_kbps_10%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_10%_reduction",
-sum(case when "meeting_200_kbps_10%"='Yes' 
+sum(case when "meeting_200_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_10%_reduction",
 
 sum(case when "meeting_200_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_20%_reduction",
-sum(case when "meeting_200_kbps_20%"='Yes' 
+sum(case when "meeting_200_kbps_20%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_20%_reduction",
 
-sum(case when "meeting_200_kbps_30%"='Yes' 
+sum(case when "meeting_200_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_30%_reduction",
-sum(case when "meeting_200_kbps_30%"='Yes' 
+sum(case when "meeting_200_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_30%_reduction",
 
-sum(case when "meeting_200_kbps_40%"='Yes' 
+sum(case when "meeting_200_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_40%_reduction",
-sum(case when "meeting_200_kbps_40%"='Yes' 
+sum(case when "meeting_200_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_40%_reduction",
 
 sum(case when "meeting_200_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_50%_reduction",
 sum(case when "meeting_200_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_50%_reduction",
 
 --500 kbps
 
 sum(case when "meeting_500_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_500_kbps",
 
 sum(case when "meeting_500_kbps_10%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_10%_reduction",
-sum(case when "meeting_500_kbps_10%"='Yes' 
+sum(case when "meeting_500_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_10%_reduction",
 
 sum(case when "meeting_500_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_20%_reduction",
 sum(case when "meeting_500_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_20%_reduction",
 
 sum(case when "meeting_500_kbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_30%_reduction",
 sum(case when "meeting_500_kbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_30%_reduction",
 
 sum(case when "meeting_500_kbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_40%_reduction",
-sum(case when "meeting_500_kbps_40%"='Yes' 
+sum(case when "meeting_500_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_40%_reduction",
 
 sum(case when "meeting_500_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_50%_reduction",
-sum(case when "meeting_500_kbps_50%"='Yes' 
+sum(case when "meeting_500_kbps_50%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_50%_reduction",
 
 --1 mbps
 
 sum(case when "meeting_1_mbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_1_mbps",
 
-sum(case when "meeting_1_mbps_10%"='Yes' 
+sum(case when "meeting_1_mbps_10%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_10%_reduction",
-sum(case when "meeting_1_mbps_10%"='Yes' 
+sum(case when "meeting_1_mbps_10%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_10%_reduction",
 
-sum(case when "meeting_1_mbps_20%"='Yes' 
+sum(case when "meeting_1_mbps_20%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_20%_reduction",
 sum(case when "meeting_1_mbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_20%_reduction",
 
-sum(case when "meeting_1_mbps_30%"='Yes' 
+sum(case when "meeting_1_mbps_30%"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_30%_reduction",
 sum(case when "meeting_1_mbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_30%_reduction",
 
 sum(case when "meeting_1_mbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_40%_reduction",
-sum(case when "meeting_1_mbps_40%"='Yes' 
+sum(case when "meeting_1_mbps_40%"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_40%_reduction",
 
 sum(case when "meeting_1_mbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_50%_reduction",
 sum(case when "meeting_1_mbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_50%_reduction",
 
 --W/OVERSUB
 --100 kbps
 
 sum(case when "meeting_100_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_100_kbps_oversub",
 
 sum(case when "meeting_100_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_10%_reduction_oversub",
-sum(case when "meeting_100_kbps_10%_oversub"='Yes' 
+sum(case when "meeting_100_kbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_10%_reduction_oversub",
 
 sum(case when "meeting_100_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_20%_reduction_oversub",
 sum(case when "meeting_100_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_20%_reduction_oversub",
 
 sum(case when "meeting_100_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_30%_reduction_oversub",
-sum(case when "meeting_100_kbps_30%_oversub"='Yes' 
+sum(case when "meeting_100_kbps_30%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_30%_reduction_oversub",
 
 sum(case when "meeting_100_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_40%_reduction_oversub",
-sum(case when "meeting_100_kbps_40%_oversub"='Yes' 
+sum(case when "meeting_100_kbps_40%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_40%_reduction_oversub",
 
 sum(case when "meeting_100_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_100_kbps_50%_reduction_oversub",
 sum(case when "meeting_100_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_50%_reduction_oversub",
 
 --200 kbps
 
 sum(case when "meeting_200_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_200_kbps_oversub",
 
 sum(case when "meeting_200_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_10%_reduction_oversub",
 sum(case when "meeting_200_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_10%_reduction_oversub",
 
 sum(case when "meeting_200_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_20%_reduction_oversub",
 sum(case when "meeting_200_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_20%_reduction_oversub",
 
 sum(case when "meeting_200_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_30%_reduction_oversub",
 sum(case when "meeting_200_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_30%_reduction_oversub",
 
 sum(case when "meeting_200_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_40%_reduction_oversub",
-sum(case when "meeting_200_kbps_40%_oversub"='Yes' 
+sum(case when "meeting_200_kbps_40%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_40%_reduction_oversub",
 
 sum(case when "meeting_200_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_200_kbps_50%_reduction_oversub",
 sum(case when "meeting_200_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_50%_reduction_oversub",
 
 --500 kbps
 
 sum(case when "meeting_500_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_500_kbps_oversub",
 
 sum(case when "meeting_500_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_10%_reduction_oversub",
 sum(case when "meeting_500_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_10%_reduction_oversub",
 
 sum(case when "meeting_500_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_20%_reduction_oversub",
 sum(case when "meeting_500_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_20%_reduction_oversub",
 
 sum(case when "meeting_500_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_30%_reduction_oversub",
 sum(case when "meeting_500_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_30%_reduction_oversub",
 
 sum(case when "meeting_500_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_40%_reduction_oversub",
 sum(case when "meeting_500_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_40%_reduction_oversub",
 
 sum(case when "meeting_500_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_500_kbps_50%_reduction_oversub",
 sum(case when "meeting_500_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_50%_reduction_oversub",
 
 --1 mbps
 
 sum(case when "meeting_1_mbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "districts_not_meeting_1_mbps_oversub",
 
 
-sum(case when "meeting_1_mbps_10%_oversub"='Yes' 
+sum(case when "meeting_1_mbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_10%_reduction_oversub",
-sum(case when "meeting_1_mbps_10%_oversub"='Yes' 
+sum(case when "meeting_1_mbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_10%_reduction_oversub",
 
 sum(case when "meeting_1_mbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_20%_reduction_oversub",
 sum(case when "meeting_1_mbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_20%_reduction_oversub",
 
 sum(case when "meeting_1_mbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_30%_reduction_oversub",
 sum(case when "meeting_1_mbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_30%_reduction_oversub",
 
 sum(case when "meeting_1_mbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_40%_reduction_oversub",
 sum(case when "meeting_1_mbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_40%_reduction_oversub",
 
 sum(case when "meeting_1_mbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then 1 else 0 end) as "additional_districts_meeting_1_mbps_50%_reduction_oversub",
 sum(case when "meeting_1_mbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
 then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_50%_reduction_oversub"
 
 from district_summary ds
@@ -834,3 +920,5 @@ select p.*,
 "additional_students_meeting_1_mbps_40%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_40%_oversub",
 "additional_students_meeting_1_mbps_50%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_50%_oversub"
 from proportion p
+
+
