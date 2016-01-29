@@ -14,6 +14,11 @@ entities outside of our population (see "consortium_applicants" sub-query).  Fin
 is joined to itself to allow for a ranking by number of students served (see "ranked_consortia"), and 
 aggregate applicant-level statistics are calculated and joined to the recipient-level summaries 
 (see "applicant_ia" sub-query within main query).
+
+Error Definitions:
+
+'E-1' - no clean districts
+'E-2' - at least one clean district, but no districts with valid metric
 */
 
 
@@ -86,11 +91,13 @@ sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)/count
 sum(case when district_data.exclude_from_analysis=false then district_data.num_campuses::numeric else 0 end)/sum(district_data.num_campuses)::numeric as "pct_campuses_clean",
 
 case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)=0
-          then 'No clean districts served'
+          then 'E-1'
+     when sum(case when district_data.exclude_from_analysis = false and district_data.ia_bandwidth_per_student!='Insufficient data'
+     then district_data.num_students::numeric else 0 end)=0 
+          then 'E-2'
+          
      else
-          
-          
-          
+
           (sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data' 
           then district_data.num_students::numeric*district_data.ia_bandwidth_per_student::numeric else 0 end)/
           sum(case when district_data.exclude_from_analysis = false and district_data.ia_bandwidth_per_student!='Insufficient data'
@@ -98,13 +105,13 @@ case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 
           else 0 end))::varchar end as "aggregate_bandwidth_per_student(kbps)_clean_districts",
           
 case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)=0
-          then 'No clean districts served'
+          then 'E-1'
           
      when sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
           and district_data.ia_cost_per_mbps!='Insufficient data'
           then district_data.num_students::numeric*(district_data.ia_bandwidth_per_student::numeric/1000)
           else 0 end) = 0
-          then 'Bandwidth unknown'
+          then 'E-2'
      else
         
           (sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
@@ -465,3 +472,9 @@ on rc.applicant_id=applicant_ia.applicant_id
 
 
 ORDER BY f1.consortium_state, rc.student_count_rank
+
+
+
+
+
+
