@@ -1,8 +1,11 @@
 /*
+https://github.com/educationsuperhighway/ficher/blob/Services-Received-and-Applied-For-Tool/
+Broadband-Cat.-2-Recipients
+
 Author: Greg Kurzhals
-Created On Date: 01/28/2015
-Last Modified Date:
-Name of QAing Analyst(s): 
+Created On Date: 01/28/2016
+Last Modified Date: 01/29/2016
+Name of QAing Analyst(s): Justine Schott 
 Purpose: To classify districts in our sample as either applicants/non-applicants or recipients/non-recipients
 Methodology: The query leverages the existing "Services Received" query (see first query linked to dashboard)
 to determine the sub-set of districts that receive broadband services (of ANY purpose, including 
@@ -293,27 +296,15 @@ case when esh_id in (
               
 from districts d
 
-where (d.esh_id::varchar='All' OR 'All'='All') and (d.postal_cd='All' OR
-'All'='All') and (d.exclude_from_analysis::varchar='All' OR 'All'='All')
+where d.postal_cd='{{state}}' OR
+'All'='{{state}}'
 
-ORDER BY d.postal_cd
+ORDER BY postal_cd
 
 {% form %}
-
-district_esh_id:
-  type: text
-  default: 'All'
   
 state:
   type: text
   default: 'All'
-  
-exclude_from_analysis:
-  type: select
-  default: 'All'
-  options: [['true'],
-            ['false'],
-            ['All']
-           ]
 
 {% endform %}
