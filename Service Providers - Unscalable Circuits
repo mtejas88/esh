@@ -322,6 +322,7 @@ where shared_service='District-dedicated' and (internet_conditions_met=true OR w
 upstream_conditions_met=true) and exclude_from_analysis=false
 and connect_category not in ('Fiber', 'Fixed Wireless')
 and not(connect_type='Cable Modem' and num_students::numeric<=100)
+and serv.name not in ('District_owned', 'District Owned', 'District_Owned')
 
 GROUP BY spc.reporting_name, postal_cd),
 
