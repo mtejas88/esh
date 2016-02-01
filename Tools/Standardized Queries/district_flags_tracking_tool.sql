@@ -1,3 +1,12 @@
+/*
+Author: Justine Schott
+Created On Date: 12/30/2015
+Last Modified Date: 01/04/2016
+Name of QAing Analyst(s): Greg Kurzhals
+Purpose: To track district flags, line items, costs, and applicants as data comes in for 2016
+Methodology:Using districts table, entity_flags, and line_items tables
+*/
+
 select  label,
 		dirty,
 		count(1) as count_of_districts,
