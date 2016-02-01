@@ -304,6 +304,7 @@ on af.service_provider_id=serv.id
 same exclusionary rules defined above
 */
 where shared_service='District-dedicated' and internet_conditions_met=true and exclude_from_analysis=false
+and serv.name not in ('District_owned', 'District Owned', 'District_Owned')
 
 GROUP BY spc.reporting_name, postal_cd
 
