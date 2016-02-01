@@ -1,0 +1,924 @@
+/*
+Author: Greg Kurzhals
+Created On Date: 01/12/2016
+Last Modified Date: 01/29/2016 
+Name of QAing Analyst(s): 
+Purpose: Returns the # of districts and students in each state that would additionally meet connectivity 
+goals (100 Kbps, 200 Kbps, 500 Kbps, 1 Mbps) if each district's Internet access cost per mbps dropped by
+a given percentage (10, 20, 30, 40, or 50%)
+Methodology: Initial sub-queries determine each district's:
+      -current IA spend
+      -current IA bandwidth
+      -oversubscription factor
+      -current status relative to 100 Kbps per student connectivity target (w/ and w/o oversubscription)
+      -minimum bandwidth required to meet 100 Kbps per student target
+      
+After calculating the cost per mbps value produced by each percentage reduction, the "theoretical 
+bandwidth" sub-query calculates the amount of bandwidth that the district could procure at the adjusted
+rate assuming no increase in overall spend.  This theoretical bandwidth is then compared to the
+bandwidth required to meet each connectivity target given the size of the district.  Finally, grouping by
+"postal_cd" yields the number of districts and students in our sample that would meet goals given each 
+reduction percentage, values which can be extrapolated to the population-level using the proportion of
+districts/students represented by the sample.
+*/
+
+
+
+
+with ia_stats_no_oversub as (
+
+select esh_id,
+name,
+postal_cd,
+exclude_from_analysis,
+num_students::numeric,
+case when district_size in ('Tiny','Small') then 1
+when district_size='Medium' then 1.5
+when district_size='Large' then 1.75
+else 2.25 end as "ia_oversub_factor",
+ia_bandwidth_per_student::numeric,
+ia_cost_per_mbps::numeric/12 as "ia_cost_per_mbps_per_month",
+(ia_cost_per_mbps::numeric/12)*(ia_bandwidth_per_student::numeric/1000)*(num_students::numeric) as "total_ia_cost",
+round((ia_bandwidth_per_student::numeric/1000)*num_students::numeric) as "total_ia_bandwidth",
+case when ia_bandwidth_per_student::numeric<100 then 'No' else 'Yes' end as "meeting_100_kbps_per_student_goal",
+
+
+case when ia_bandwidth_per_student::numeric<1000 then 'No' else 'Yes' end as "meeting_1_mbps_per_student_goal",
+
+
+num_students::numeric*0.1 as "minimum_bandwidth_mbps_required_100_kbps"
+
+from districts d
+
+where ia_cost_per_mbps!='Insufficient data' and ia_bandwidth_per_student!='Insufficient data'
+and num_students!='No data'),
+
+ia_stats as (
+select *,
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+then 'No' else 'Yes' end as "meeting_100_kbps_per_student_goal_oversub",
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+then 'No' else 'Yes' end as "meeting_1_mbps_per_student_goal_oversub",
+(num_students::numeric*0.1)/ia_oversub_factor as "minimum_bandwidth_mbps_required_100_kbps_oversub"
+
+from ia_stats_no_oversub),
+
+cost_per_mbps_reduced as (
+
+select ia_stats.*,
+(ia_stats.ia_cost_per_mbps_per_month)-(ia_stats.ia_cost_per_mbps_per_month*0.1) as "10%_reduction_cost_per_mbps",
+(ia_stats.ia_cost_per_mbps_per_month)-(ia_stats.ia_cost_per_mbps_per_month*0.2) as "20%_reduction_cost_per_mbps",
+(ia_stats.ia_cost_per_mbps_per_month)-(ia_stats.ia_cost_per_mbps_per_month*0.3) as "30%_reduction_cost_per_mbps",
+(ia_stats.ia_cost_per_mbps_per_month)-(ia_stats.ia_cost_per_mbps_per_month*0.4) as "40%_reduction_cost_per_mbps",
+(ia_stats.ia_cost_per_mbps_per_month)-(ia_stats.ia_cost_per_mbps_per_month*0.5) as "50%_reduction_cost_per_mbps"
+
+from ia_stats),
+
+theoretical_bandwidth as (
+
+select cpmr.*,
+total_ia_cost/"10%_reduction_cost_per_mbps" as "theoretical_bandwidth_10%",
+total_ia_cost/"20%_reduction_cost_per_mbps" as "theoretical_bandwidth_20%",
+total_ia_cost/"30%_reduction_cost_per_mbps" as "theoretical_bandwidth_30%",
+total_ia_cost/"40%_reduction_cost_per_mbps" as "theoretical_bandwidth_40%",
+total_ia_cost/"50%_reduction_cost_per_mbps" as "theoretical_bandwidth_50%"
+
+from cost_per_mbps_reduced cpmr),
+
+district_summary as (
+
+select tb.*,
+--W/O OVERSUB
+--100 kbps
+
+case when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps"
+then 'No'
+when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_10%",
+
+
+case when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps"
+then 'No'
+when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_20%",
+
+case when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps"
+then 'No'
+when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_30%",
+
+case when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps"
+then 'No'
+when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_40%",
+
+case when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps"
+then 'No'
+when ia_bandwidth_per_student::numeric<100 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_50%",
+
+--200 kbps
+
+case when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps"*2
+then 'No'
+when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_10%",
+
+
+case when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps"*2
+then 'No'
+when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_20%",
+
+case when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps"*2
+then 'No'
+when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_30%",
+
+case when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps"*2
+then 'No'
+when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_40%",
+
+case when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps"*2
+then 'No'
+when ia_bandwidth_per_student::numeric<200 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_50%",
+
+--500 kbps
+
+case when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps"*5
+then 'No'
+when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_10%",
+
+case when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps"*5
+then 'No'
+when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_20%",
+
+
+case when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps"*5
+then 'No'
+when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_30%",
+
+
+case when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps"*5
+then 'No'
+when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_40%",
+
+
+case when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps"*5
+then 'No'
+when ia_bandwidth_per_student::numeric<500 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_50%",
+
+--1 mbps
+
+case when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps"*10
+then 'No'
+when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_10%",
+
+
+
+case when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps"*10
+then 'No'
+when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_20%",
+
+
+case when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps"*10
+then 'No'
+when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_30%",
+
+
+case when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps"*10
+then 'No'
+when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_40%",
+
+
+case when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps"*10
+then 'No'
+when ia_bandwidth_per_student::numeric<1000 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_50%",
+
+--W/OVERSUB
+--100 kbps
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_10%_oversub",
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_20%_oversub",
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_30%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_40%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<100 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps_oversub"
+then 'Yes'
+else 'Already meeting goal' end as "meeting_100_kbps_50%_oversub",
+
+--200 kbps
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_10%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_20%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_30%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_40%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<200 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*2
+then 'Yes'
+else 'Already meeting goal' end as "meeting_200_kbps_50%_oversub",
+
+--500 Kbps
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_10%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_20%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_30%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_40%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<500 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*5
+then 'Yes'
+else 'Already meeting goal' end as "meeting_500_kbps_50%_oversub",
+
+--1 mbps
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_10%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_10%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_10%_oversub",
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_20%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_20%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_20%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_30%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_30%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_30%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_40%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_40%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_40%_oversub",
+
+
+case when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_50%"<"minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'No'
+when ia_bandwidth_per_student::numeric*ia_oversub_factor<1000 
+and "theoretical_bandwidth_50%">="minimum_bandwidth_mbps_required_100_kbps_oversub"*10
+then 'Yes'
+else 'Already meeting goal' end as "meeting_1_mbps_50%_oversub"
+
+
+from theoretical_bandwidth tb),
+
+state_total as (
+select postal_cd,
+count(esh_id) as "num_districts_in_population",
+sum(case when num_students!='No data' then num_students::numeric else 0 end) as "num_students_in_population"
+
+from districts d
+
+where include_in_universe_of_districts=true
+
+GROUP BY postal_cd),
+
+state_sample as (
+select ds.postal_cd,
+count(ds.esh_id) as "districts_with_valid_metrics",
+sum(ds.num_students) as "students_in_districts_with_valid_metrics",
+sum(case when ds.exclude_from_analysis=false then 1 else 0 end) as "clean_districts_with_valid_metrics",
+sum(case when ds.exclude_from_analysis=false then ds.num_students else 0 end) as "students_in_clean_districts_with_valid_metrics",
+
+--W/O OVERSUB
+--100 kbps
+
+sum(case when "meeting_100_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_100_kbps",
+
+sum(case when "meeting_100_kbps_10%"='Yes' 
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_10%_reduction",
+sum(case when "meeting_100_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_10%_reduction",
+
+
+sum(case when "meeting_100_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_20%_reduction",
+sum(case when "meeting_100_kbps_20%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_20%_reduction",
+
+sum(case when "meeting_100_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_30%_reduction",
+sum(case when "meeting_100_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_30%_reduction",
+
+sum(case when "meeting_100_kbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_40%_reduction",
+sum(case when "meeting_100_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_40%_reduction",
+
+sum(case when "meeting_100_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_50%_reduction",
+sum(case when "meeting_100_kbps_50%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_50%_reduction",
+
+--200 kbps
+
+sum(case when "meeting_200_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_200_kbps",
+
+sum(case when "meeting_200_kbps_10%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_10%_reduction",
+sum(case when "meeting_200_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_10%_reduction",
+
+sum(case when "meeting_200_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_20%_reduction",
+sum(case when "meeting_200_kbps_20%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_20%_reduction",
+
+sum(case when "meeting_200_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_30%_reduction",
+sum(case when "meeting_200_kbps_30%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_30%_reduction",
+
+sum(case when "meeting_200_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_40%_reduction",
+sum(case when "meeting_200_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_40%_reduction",
+
+sum(case when "meeting_200_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_50%_reduction",
+sum(case when "meeting_200_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_50%_reduction",
+
+--500 kbps
+
+sum(case when "meeting_500_kbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_500_kbps",
+
+sum(case when "meeting_500_kbps_10%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_10%_reduction",
+sum(case when "meeting_500_kbps_10%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_10%_reduction",
+
+sum(case when "meeting_500_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_20%_reduction",
+sum(case when "meeting_500_kbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_20%_reduction",
+
+sum(case when "meeting_500_kbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_30%_reduction",
+sum(case when "meeting_500_kbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_30%_reduction",
+
+sum(case when "meeting_500_kbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_40%_reduction",
+sum(case when "meeting_500_kbps_40%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_40%_reduction",
+
+sum(case when "meeting_500_kbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_50%_reduction",
+sum(case when "meeting_500_kbps_50%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_50%_reduction",
+
+--1 mbps
+
+sum(case when "meeting_1_mbps_10%"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_1_mbps",
+
+sum(case when "meeting_1_mbps_10%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_10%_reduction",
+sum(case when "meeting_1_mbps_10%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_10%_reduction",
+
+sum(case when "meeting_1_mbps_20%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_20%_reduction",
+sum(case when "meeting_1_mbps_20%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_20%_reduction",
+
+sum(case when "meeting_1_mbps_30%"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_30%_reduction",
+sum(case when "meeting_1_mbps_30%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_30%_reduction",
+
+sum(case when "meeting_1_mbps_40%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_40%_reduction",
+sum(case when "meeting_1_mbps_40%"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_40%_reduction",
+
+sum(case when "meeting_1_mbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_50%_reduction",
+sum(case when "meeting_1_mbps_50%"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_50%_reduction",
+
+--W/OVERSUB
+--100 kbps
+
+sum(case when "meeting_100_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_100_kbps_oversub",
+
+sum(case when "meeting_100_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_10%_reduction_oversub",
+sum(case when "meeting_100_kbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_10%_reduction_oversub",
+
+sum(case when "meeting_100_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_20%_reduction_oversub",
+sum(case when "meeting_100_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_20%_reduction_oversub",
+
+sum(case when "meeting_100_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_30%_reduction_oversub",
+sum(case when "meeting_100_kbps_30%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_30%_reduction_oversub",
+
+sum(case when "meeting_100_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_40%_reduction_oversub",
+sum(case when "meeting_100_kbps_40%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_40%_reduction_oversub",
+
+sum(case when "meeting_100_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_100_kbps_50%_reduction_oversub",
+sum(case when "meeting_100_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_100_kbps_50%_reduction_oversub",
+
+--200 kbps
+
+sum(case when "meeting_200_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_200_kbps_oversub",
+
+sum(case when "meeting_200_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_10%_reduction_oversub",
+sum(case when "meeting_200_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_10%_reduction_oversub",
+
+sum(case when "meeting_200_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_20%_reduction_oversub",
+sum(case when "meeting_200_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_20%_reduction_oversub",
+
+sum(case when "meeting_200_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_30%_reduction_oversub",
+sum(case when "meeting_200_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_30%_reduction_oversub",
+
+sum(case when "meeting_200_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_40%_reduction_oversub",
+sum(case when "meeting_200_kbps_40%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_40%_reduction_oversub",
+
+sum(case when "meeting_200_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_200_kbps_50%_reduction_oversub",
+sum(case when "meeting_200_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_200_kbps_50%_reduction_oversub",
+
+--500 kbps
+
+sum(case when "meeting_500_kbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_500_kbps_oversub",
+
+sum(case when "meeting_500_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_10%_reduction_oversub",
+sum(case when "meeting_500_kbps_10%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_10%_reduction_oversub",
+
+sum(case when "meeting_500_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_20%_reduction_oversub",
+sum(case when "meeting_500_kbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_20%_reduction_oversub",
+
+sum(case when "meeting_500_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_30%_reduction_oversub",
+sum(case when "meeting_500_kbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_30%_reduction_oversub",
+
+sum(case when "meeting_500_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_40%_reduction_oversub",
+sum(case when "meeting_500_kbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_40%_reduction_oversub",
+
+sum(case when "meeting_500_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_500_kbps_50%_reduction_oversub",
+sum(case when "meeting_500_kbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_500_kbps_50%_reduction_oversub",
+
+--1 mbps
+
+sum(case when "meeting_1_mbps_10%_oversub"!='Already meeting goal'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "districts_not_meeting_1_mbps_oversub",
+
+
+sum(case when "meeting_1_mbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_10%_reduction_oversub",
+sum(case when "meeting_1_mbps_10%_oversub"='Yes'
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_10%_reduction_oversub",
+
+sum(case when "meeting_1_mbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_20%_reduction_oversub",
+sum(case when "meeting_1_mbps_20%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_20%_reduction_oversub",
+
+sum(case when "meeting_1_mbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_30%_reduction_oversub",
+sum(case when "meeting_1_mbps_30%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_30%_reduction_oversub",
+
+sum(case when "meeting_1_mbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_40%_reduction_oversub",
+sum(case when "meeting_1_mbps_40%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_40%_reduction_oversub",
+
+sum(case when "meeting_1_mbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then 1 else 0 end) as "additional_districts_meeting_1_mbps_50%_reduction_oversub",
+sum(case when "meeting_1_mbps_50%_oversub"='Yes' 
+and ds.exclude_from_analysis=false
+then ds.num_students::numeric else 0 end) as "additional_students_meeting_1_mbps_50%_reduction_oversub"
+
+from district_summary ds
+
+where ds.postal_cd!='DC'
+
+GROUP BY ds.postal_cd
+ORDER BY ds.postal_cd),
+
+proportion as (
+
+select state_sample.postal_cd as "state",
+state_total.num_districts_in_population,
+state_total.num_students_in_population,
+state_sample.districts_with_valid_metrics::numeric/state_total.num_districts_in_population::numeric as "proportion_district_population_in_sample",
+state_sample.students_in_districts_with_valid_metrics::numeric/state_total.num_students_in_population::numeric as "proportion_student_population_in_sample",
+state_sample.*
+
+from state_sample
+
+left join state_total
+on state_sample.postal_cd=state_total.postal_cd
+)
+
+select p.*,
+"additional_districts_meeting_100_kbps_10%_reduction"::numeric/"proportion_district_population_in_sample"::numeric as "eadm_100_kbps_10%",
+"additional_districts_meeting_100_kbps_20%_reduction"/"proportion_district_population_in_sample" as "eadm_100_kbps_20%",
+"additional_districts_meeting_100_kbps_30%_reduction"/"proportion_district_population_in_sample" as "eadm_100_kbps_30%",
+"additional_districts_meeting_100_kbps_40%_reduction"/"proportion_district_population_in_sample" as "eadm_100_kbps_40%",
+"additional_districts_meeting_100_kbps_50%_reduction"/"proportion_district_population_in_sample" as "eadm_100_kbps_50%",
+
+"additional_students_meeting_100_kbps_10%_reduction"/"proportion_student_population_in_sample" as "easm_100_kbps_10%",
+"additional_students_meeting_100_kbps_20%_reduction"/"proportion_student_population_in_sample" as "easm_100_kbps_20%",
+"additional_students_meeting_100_kbps_30%_reduction"/"proportion_student_population_in_sample" as "easm_100_kbps_30%",
+"additional_students_meeting_100_kbps_40%_reduction"/"proportion_student_population_in_sample" as "easm_100_kbps_40%",
+"additional_students_meeting_100_kbps_50%_reduction"/"proportion_student_population_in_sample" as "easm_100_kbps_50%",
+
+"additional_districts_meeting_200_kbps_10%_reduction"/"proportion_district_population_in_sample" as "eadm_200_kbps_10%",
+"additional_districts_meeting_200_kbps_20%_reduction"/"proportion_district_population_in_sample" as "eadm_200_kbps_20%",
+"additional_districts_meeting_200_kbps_30%_reduction"/"proportion_district_population_in_sample" as "eadm_200_kbps_30%",
+"additional_districts_meeting_200_kbps_40%_reduction"/"proportion_district_population_in_sample" as "eadm_200_kbps_40%",
+"additional_districts_meeting_200_kbps_50%_reduction"/"proportion_district_population_in_sample" as "eadm_200_kbps_50%",
+
+"additional_students_meeting_200_kbps_10%_reduction"/"proportion_student_population_in_sample" as "easm_200_kbps_10%",
+"additional_students_meeting_200_kbps_20%_reduction"/"proportion_student_population_in_sample" as "easm_200_kbps_20%",
+"additional_students_meeting_200_kbps_30%_reduction"/"proportion_student_population_in_sample" as "easm_200_kbps_30%",
+"additional_students_meeting_200_kbps_40%_reduction"/"proportion_student_population_in_sample" as "easm_200_kbps_40%",
+"additional_students_meeting_200_kbps_50%_reduction"/"proportion_student_population_in_sample" as "easm_200_kbps_50%",
+
+"additional_districts_meeting_500_kbps_10%_reduction"/"proportion_district_population_in_sample" as "eadm_500_kbps_10%",
+"additional_districts_meeting_500_kbps_20%_reduction"/"proportion_district_population_in_sample" as "eadm_500_kbps_20%",
+"additional_districts_meeting_500_kbps_30%_reduction"/"proportion_district_population_in_sample" as "eadm_500_kbps_30%",
+"additional_districts_meeting_500_kbps_40%_reduction"/"proportion_district_population_in_sample" as "eadm_500_kbps_40%",
+"additional_districts_meeting_500_kbps_50%_reduction"/"proportion_district_population_in_sample" as "eadm_500_kbps_50%",
+
+"additional_students_meeting_500_kbps_10%_reduction"/"proportion_student_population_in_sample" as "easm_500_kbps_10%",
+"additional_students_meeting_500_kbps_20%_reduction"/"proportion_student_population_in_sample" as "easm_500_kbps_20%",
+"additional_students_meeting_500_kbps_30%_reduction"/"proportion_student_population_in_sample" as "easm_500_kbps_30%",
+"additional_students_meeting_500_kbps_40%_reduction"/"proportion_student_population_in_sample" as "easm_500_kbps_40%",
+"additional_students_meeting_500_kbps_50%_reduction"/"proportion_student_population_in_sample" as "easm_500_kbps_50%",
+
+"additional_districts_meeting_1_mbps_10%_reduction"/"proportion_district_population_in_sample" as "eadm_1_mbps_10%",
+"additional_districts_meeting_1_mbps_20%_reduction"/"proportion_district_population_in_sample" as "eadm_1_mbps_20%",
+"additional_districts_meeting_1_mbps_30%_reduction"/"proportion_district_population_in_sample" as "eadm_1_mbps_30%",
+"additional_districts_meeting_1_mbps_40%_reduction"/"proportion_district_population_in_sample" as "eadm_1_mbps_40%",
+"additional_districts_meeting_1_mbps_50%_reduction"/"proportion_district_population_in_sample" as "eadm_1_mbps_50%",
+
+"additional_students_meeting_1_mbps_10%_reduction"/"proportion_student_population_in_sample" as "easm_1_mbps_10%",
+"additional_students_meeting_1_mbps_20%_reduction"/"proportion_student_population_in_sample" as "easm_1_mbps_20%",
+"additional_students_meeting_1_mbps_30%_reduction"/"proportion_student_population_in_sample" as "easm_1_mbps_30%",
+"additional_students_meeting_1_mbps_40%_reduction"/"proportion_student_population_in_sample" as "easm_1_mbps_40%",
+"additional_students_meeting_1_mbps_50%_reduction"/"proportion_student_population_in_sample" as "easm_1_mbps_50%",
+
+
+"additional_districts_meeting_100_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_100_kbps_10%_oversub",
+"additional_districts_meeting_100_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_100_kbps_20%_oversub",
+"additional_districts_meeting_100_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_100_kbps_30%_oversub",
+"additional_districts_meeting_100_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_100_kbps_40%_oversub",
+"additional_districts_meeting_100_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_100_kbps_50%_oversub",
+
+"additional_students_meeting_100_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_100_kbps_10%_oversub",
+"additional_students_meeting_100_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_100_kbps_20%_oversub",
+"additional_students_meeting_100_kbps_30%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_100_kbps_30%_oversub",
+"additional_students_meeting_100_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_100_kbps_40%_oversub",
+"additional_students_meeting_100_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_100_kbps_50%_oversub",
+
+"additional_districts_meeting_200_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_200_kbps_10%_oversub",
+"additional_districts_meeting_200_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_200_kbps_20%_oversub",
+"additional_districts_meeting_200_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_200_kbps_30%_oversub",
+"additional_districts_meeting_200_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_200_kbps_40%_oversub",
+"additional_districts_meeting_200_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_200_kbps_50%_oversub",
+
+"additional_students_meeting_200_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_200_kbps_10%_oversub",
+"additional_students_meeting_200_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_200_kbps_20%_oversub",
+"additional_students_meeting_200_kbps_30%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_200_kbps_30%_oversub",
+"additional_students_meeting_200_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_200_kbps_40%_oversub",
+"additional_students_meeting_200_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_200_kbps_50%_oversub",
+
+"additional_districts_meeting_500_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_500_kbps_10%_oversub",
+"additional_districts_meeting_500_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_500_kbps_20%_oversub",
+"additional_districts_meeting_500_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_500_kbps_30%_oversub",
+"additional_districts_meeting_500_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_500_kbps_40%_oversub",
+"additional_districts_meeting_500_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_500_kbps_50%_oversub",
+
+"additional_students_meeting_500_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_500_kbps_10%_oversub",
+"additional_students_meeting_500_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_500_kbps_20%_oversub",
+"additional_students_meeting_500_kbps_30%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_500_kbps_30%_oversub",
+"additional_students_meeting_500_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_500_kbps_40%_oversub",
+"additional_students_meeting_500_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_500_kbps_50%_oversub",
+
+"additional_districts_meeting_1_mbps_10%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_1_mbps_10%_oversub",
+"additional_districts_meeting_1_mbps_20%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_1_mbps_20%_oversub",
+"additional_districts_meeting_1_mbps_30%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_1_mbps_30%_oversub",
+"additional_districts_meeting_1_mbps_40%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_1_mbps_40%_oversub",
+"additional_districts_meeting_1_mbps_50%_reduction_oversub"/"proportion_district_population_in_sample" as "eadm_1_mbps_50%_oversub",
+
+"additional_students_meeting_1_mbps_10%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_10%_oversub",
+"additional_students_meeting_1_mbps_20%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_20%_oversub",
+"additional_students_meeting_1_mbps_30%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_30%_oversub",
+"additional_students_meeting_1_mbps_40%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_40%_oversub",
+"additional_students_meeting_1_mbps_50%_reduction_oversub"/"proportion_student_population_in_sample" as "eadm_1_mbps_50%_oversub"
+from proportion p
+
+
