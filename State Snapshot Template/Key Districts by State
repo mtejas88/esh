@@ -4,7 +4,7 @@ Created On Date: 1/12/2016
 Last Modified Date: 1/24/2016
     Nature of Modification: removed exclusionary rule that eliminated all districts except for those with
     "district_size"='Mega'
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s): Justine Schott
 Purpose: Returns the three districts in each state that serve the greatest number of students within 
 our population, and calculates summary statistics re: services procured.
 Methodology: This query uses a self-join of the "districts" table to assign rankings to each district
