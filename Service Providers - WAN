@@ -288,6 +288,7 @@ left join service_providers serv
 on af.service_provider_id=serv.id
 
 where shared_service='District-dedicated' and wan_conditions_met=true and exclude_from_analysis=false
+and serv.name not in ('District_owned', 'District Owned', 'District_Owned')
 
 GROUP BY reporting_name, postal_cd),
 
