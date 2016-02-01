@@ -2,7 +2,7 @@
 Author: Greg Kurzhals
 Created On Date: 01/12/2016
 Last Modified Date: 01/29/2016 
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s): Justine Schott 
 Purpose: Returns the # of districts and students in each state that would additionally meet connectivity 
 goals (100 Kbps, 200 Kbps, 500 Kbps, 1 Mbps) if each district's Internet access cost per mbps dropped by
 a given percentage (10, 20, 30, 40, or 50%)

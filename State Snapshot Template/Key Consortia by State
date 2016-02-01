@@ -2,7 +2,7 @@
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
 Last Modified Date: 1/25/2016
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s): Justine Schott 
 Purpose: Returns the three consortia in each state that serve the greatest number of students within our 
 population, and calculates summary statistics re: districts served and service procured.
 Methodology: Using the same temp tables ("district_lookup" and "ad") found in Justine's recipient queries,

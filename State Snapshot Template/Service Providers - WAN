@@ -1,3 +1,24 @@
+/*
+Author: Greg Kurzhals
+Created On Date: 01/24/2016
+Last Modified Date: 
+Name of QAing Analyst(s): Justine Schott
+Purpose: Ranks service providers by the number of bundled Internet circuits provided to clean districts in each state
+Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of
+bundled Internet circuits serving each clean district.  Once these circuit counts have been determined, 
+several parallel sub-queries pulling from the temp table "af" calculate:
+1) the total number and cost of WAN circuits serving clean districts, 2) the number and cost of 
+WAN circuits supplied by each provider, and 3) the number of districts and students served by each
+provider.  These sub-query results are then combined in the main query via lateral joins, allowing for the determination
+of each provider's share of: 1) the total cost of WAN services, 2) the number of districts 
+connected by bundled Internet services, and 3) the number of students connected by WAN services. 
+Finally, self-joining the "provider_summary" sub-query allows for the assignment of ranks to each state's set 
+of service providers based on the number of bundled Internet circuits supplied to clean districts.
+
+Notes: Sub-queries "district_lookup" to "af" are taken from existing "Services Received" query
+(https://modeanalytics.com/educationsuperhighway/reports/7fe09fee682e) 
+*/
+
 with district_lookup as (
   select esh_id, district_esh_id, postal_cd
   from schools

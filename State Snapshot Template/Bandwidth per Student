@@ -2,7 +2,7 @@
 Author: Greg Kurzhals
 Created On Date: 01/22/2015
 Last Modified Date:
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s): Justine Schott
 Purpose: Quantifies the clean districts that are not currently meeting various connectivity goals, as well as
 the subset of those that will be unable to meet that goal without upgrading their existing Internet infrastructure
 Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of

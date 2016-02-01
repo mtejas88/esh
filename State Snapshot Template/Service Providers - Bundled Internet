@@ -1,8 +1,8 @@
 /*
 Author: Greg Kurzhals
-Created On Date: 01/24/2015
+Created On Date: 01/24/2016
 Last Modified Date: 
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s): Justine Schott
 Purpose: Ranks service providers by the number of bundled Internet circuits provided to clean districts in each state
 Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of
 bundled Internet circuits serving each clean district.  Once these circuit counts have been determined, 

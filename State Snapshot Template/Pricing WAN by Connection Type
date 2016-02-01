@@ -1,7 +1,7 @@
 /*Author: Greg Kurzhals 
 Created On Date: 01/11/2016 
 Last Modified Date: 01/28/2016
-Name of QAing Analyst(s):  
+Name of QAing Analyst(s):  Justine Schott
 Purpose: summarizes bundled Internet cost/mbps and WAN cost/connection on a circuit-level for each state, stratified by bandwidth range and by lit fiber vs. all conn. types
 Methodology: 
 
@@ -9,7 +9,6 @@ min, 10th, 25th, median, 75th, 90th, max, mean, line item n, circuit n
 for the most common bandwidth/connection type categories in each state 
 
 */
-
 
 with district_lookup as (
   select esh_id, district_esh_id, postal_cd
@@ -90,77 +89,77 @@ from districts
 where include_in_universe_of_districts=true))
 ORDER BY c.line_item_id),
 
-internet_circuit_frequency as (
+wan_circuit_frequency as (
 
 select applicant_postal_cd,
 bandwidth_in_mbps,
 revised_connect_category,
-count(id) as "internet_circuits",
-count(distinct line_item_id) as "internet_line_items",
-min(circuit_cost::numeric) as "min_internet_cost_per_connection",
-avg(circuit_cost::numeric) as "mean_internet_cost_per_connection",
-max(circuit_cost::numeric) as "max_internet_cost_per_connection",
-sum(case when (circuit_cost::numeric/bandwidth_in_mbps::numeric)/12<=3.00 then 1 else 0 end)::numeric/
-    count(id)::numeric as "%_internet_circuits_meeting_afford_target"
+count(id) as "wan_circuits",
+count(distinct line_item_id) as "wan_line_items",
+min(circuit_cost::numeric) as "min_wan_cost_per_connection",
+avg(circuit_cost::numeric) as "mean_wan_cost_per_connection",
+max(circuit_cost::numeric) as "max_wan_cost_per_connection",
+sum(case when circuit_cost::numeric/12<=750 then 1 else 0 end)::numeric/
+    count(id)::numeric as "%_wan_circuits_meeting_afford_target"
 
 from circuit_list
 
-where internet_conditions_met=true
+where internet_conditions_met=false
 
 GROUP BY applicant_postal_cd, bandwidth_in_mbps, revised_connect_category
 ORDER BY count(distinct line_item_id) DESC),
 
-internet_ranks as (
+wan_ranks as (
 
-select icf1.applicant_postal_cd,
-icf1.bandwidth_in_mbps,
-icf1.revised_connect_category,
-count(distinct icf2.internet_line_items) as "rank"
+select wcf1.applicant_postal_cd,
+wcf1.bandwidth_in_mbps,
+wcf1.revised_connect_category,
+count(distinct wcf2.wan_line_items) as "rank"
 
-from internet_circuit_frequency icf1
-join internet_circuit_frequency icf2
-on icf1.internet_line_items <= icf2.internet_line_items and icf1.applicant_postal_cd=icf2.applicant_postal_cd 
+from wan_circuit_frequency wcf1
+join wan_circuit_frequency wcf2
+on wcf1.wan_line_items <= wcf2.wan_line_items and wcf1.applicant_postal_cd=wcf2.applicant_postal_cd 
 
-GROUP BY icf1.applicant_postal_cd, icf1.bandwidth_in_mbps, icf1.revised_connect_category),
+GROUP BY wcf1.applicant_postal_cd, wcf1.bandwidth_in_mbps, wcf1.revised_connect_category),
 
 temp as (
 
-select ir."rank",
-row_number() over (partition by icf1.applicant_postal_cd order by ir."rank") as "row_num",
-icf1.*,
-internet_percentiles."10th_percentile_internet_cost_per_connection",
-internet_percentiles."25th_percentile_internet_cost_per_connection",
-internet_percentiles."median_internet_cost_per_connection",
-internet_percentiles."75th_percentile_internet_cost_per_connection",
-internet_percentiles."90th_percentile_internet_cost_per_connection"
+select wr."rank",
+row_number() over (partition by wcf1.applicant_postal_cd order by wr."rank") as "row_num",
+wcf1.*,
+wan_percentiles."10th_percentile_wan_cost_per_connection",
+wan_percentiles."25th_percentile_wan_cost_per_connection",
+wan_percentiles."median_wan_cost_per_connection",
+wan_percentiles."75th_percentile_wan_cost_per_connection",
+wan_percentiles."90th_percentile_wan_cost_per_connection"
 
 
-from internet_circuit_frequency icf1
+from wan_circuit_frequency wcf1
 
-left join internet_ranks ir
-on icf1.applicant_postal_cd=ir.applicant_postal_cd and icf1.bandwidth_in_mbps=ir.bandwidth_in_mbps
-and icf1.revised_connect_category=ir.revised_connect_category
+left join wan_ranks wr
+on wcf1.applicant_postal_cd=wr.applicant_postal_cd and wcf1.bandwidth_in_mbps=wr.bandwidth_in_mbps
+and wcf1.revised_connect_category=wr.revised_connect_category
 
 left join lateral (
 select applicant_postal_cd, 
 bandwidth_in_mbps,
-PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "10th_percentile_internet_cost_per_connection",
-PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "25th_percentile_internet_cost_per_connection",
-PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "median_internet_cost_per_connection",
-PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "75th_percentile_internet_cost_per_connection",
-PERCENTILE_CONT (0.9) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "90th_percentile_internet_cost_per_connection"
+PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "10th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "25th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "median_wan_cost_per_connection",
+PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "75th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.9) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "90th_percentile_wan_cost_per_connection"
 
 from circuit_list
-where internet_conditions_met=true
-GROUP BY applicant_postal_cd, bandwidth_in_mbps) internet_percentiles
-on icf1.applicant_postal_cd=internet_percentiles.applicant_postal_cd and icf1.bandwidth_in_mbps=internet_percentiles.bandwidth_in_mbps
+where internet_conditions_met=false
+GROUP BY applicant_postal_cd, bandwidth_in_mbps) wan_percentiles
+on wcf1.applicant_postal_cd=wan_percentiles.applicant_postal_cd and wcf1.bandwidth_in_mbps=wan_percentiles.bandwidth_in_mbps
 
-where ir."rank"<=3 and icf1.internet_line_items>1 
+where wr."rank"<=3 and wcf1.wan_line_items>1 
 
-ORDER BY icf1.applicant_postal_cd, ir."rank")
+ORDER BY wcf1.applicant_postal_cd, wr."rank")
 
 select *
 
 from temp
 
-where row_num<=5
+where "row_num"<=5

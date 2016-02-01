@@ -1,7 +1,7 @@
 /*Author: Greg Kurzhals 
 Created On Date: 01/11/2016 
 Last Modified Date: 01/28/2016
-Name of QAing Analyst(s):  
+Name of QAing Analyst(s): Justine Schott
 Purpose: summarizes bundled Internet cost/mbps and WAN cost/connection on a circuit-level for each state, stratified by bandwidth range and by lit fiber vs. all conn. types
 Methodology: 
 
