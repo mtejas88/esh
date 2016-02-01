@@ -38,7 +38,7 @@ left join lateral (select esh_id, district_esh_id, postal_cd
 on a.recipient_id=district_lookup_incl_noned.esh_id
 
 left join districts d
-on district_lookup_incl_noned.district_esh_id=c.esh_id
+on district_lookup_incl_noned.district_esh_id=d.esh_id
 
 --where statement limits results to user-entered line_item_id
 
