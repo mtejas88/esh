@@ -1,0 +1,165 @@
+/*Author: Greg Kurzhals 
+Created On Date: 01/11/2016 
+Last Modified Date: 01/28/2016
+Name of QAing Analyst(s):  
+Purpose: summarizes bundled Internet cost/mbps and WAN cost/connection on a circuit-level for each state, stratified by bandwidth range and by lit fiber vs. all conn. types
+Methodology: 
+
+min, 10th, 25th, median, 75th, 90th, max, mean, line item n, circuit n
+for the most common bandwidth/connection type categories in each state 
+
+*/
+
+with district_lookup as (
+  select esh_id, district_esh_id, postal_cd
+  from schools
+  union
+  select esh_id, esh_id as district_esh_id, postal_cd
+  from districts
+  union
+  select esh_id, district_esh_id, postal_cd
+  from other_locations
+  where district_esh_id is not null
+),
+ad as (
+  select district_esh_id, a.*
+  from allocations a
+  join district_lookup dl
+  on dl.esh_id = a.recipient_id
+),
+
+circuit_list as (select c.id,
+c.line_item_id,
+c.service_provider_id,
+line_items.applicant_postal_cd,
+c.connect_type,
+case when c.connect_category='Fiber' and c.connect_type!='Dark Fiber Service' then 'Lit Fiber'
+when c.connect_category='Fiber' and c.connect_type='Dark Fiber Service' then 'Dark Fiber'
+when c.connect_type='Cable Modem' then 'Cable'
+when c.connect_type='Digital Subscriber Line (DSL)' then 'DSL'
+else c.connect_category end as "revised_connect_category", 
+c.connect_category,
+c.num_recipients,
+c.bandwidth_in_mbps,
+c.circuit_cost,
+c.orig_r_months_of_service,
+c.ia_conditions_met,
+c.wan_conditions_met,
+c.internet_conditions_met,
+c.isp_conditions_met,
+c.upstream_conditions_met,
+c.number_of_dirty_line_item_flags,
+c.open_flags,
+c.exclude_from_reporting,
+c.consortium_shared
+
+from circuits c
+
+left join line_items
+on c.line_item_id=line_items.id
+
+where (c.internet_conditions_met=true OR c.wan_conditions_met=true)
+and c.line_item_id in (
+
+select line_items.id
+from line_items
+
+where exists (
+    select *
+    from ad
+    left join districts
+    on ad.district_esh_id = districts.esh_id
+    where line_items.id = ad.line_item_id
+    and districts.include_in_universe_of_districts=true
+      
+)
+and broadband = true
+and exclude=false
+and rec_elig_cost!='No data'
+and rec_elig_cost::numeric >0)
+and c.num_recipients>0
+and c.id in (
+select entity_circuits.circuit_id 
+from entity_circuits
+left join ad
+on entity_circuits.entity_id=ad.recipient_id
+where ad.district_esh_id in (
+select esh_id
+from districts
+where include_in_universe_of_districts=true))
+ORDER BY c.line_item_id),
+
+wan_circuit_frequency as (
+
+select applicant_postal_cd,
+bandwidth_in_mbps,
+revised_connect_category,
+count(id) as "wan_circuits",
+count(distinct line_item_id) as "wan_line_items",
+min(circuit_cost::numeric) as "min_wan_cost_per_connection",
+avg(circuit_cost::numeric) as "mean_wan_cost_per_connection",
+max(circuit_cost::numeric) as "max_wan_cost_per_connection",
+sum(case when circuit_cost::numeric/12<=750 then 1 else 0 end)::numeric/
+    count(id)::numeric as "%_wan_circuits_meeting_afford_target"
+
+from circuit_list
+
+where internet_conditions_met=false
+
+GROUP BY applicant_postal_cd, bandwidth_in_mbps, revised_connect_category
+ORDER BY count(distinct line_item_id) DESC),
+
+wan_ranks as (
+
+select wcf1.applicant_postal_cd,
+wcf1.bandwidth_in_mbps,
+wcf1.revised_connect_category,
+count(distinct wcf2.wan_line_items) as "rank"
+
+from wan_circuit_frequency wcf1
+join wan_circuit_frequency wcf2
+on wcf1.wan_line_items <= wcf2.wan_line_items and wcf1.applicant_postal_cd=wcf2.applicant_postal_cd 
+
+GROUP BY wcf1.applicant_postal_cd, wcf1.bandwidth_in_mbps, wcf1.revised_connect_category),
+
+temp as (
+
+select wr."rank",
+row_number() over (partition by wcf1.applicant_postal_cd order by wr."rank") as "row_num",
+wcf1.*,
+wan_percentiles."10th_percentile_wan_cost_per_connection",
+wan_percentiles."25th_percentile_wan_cost_per_connection",
+wan_percentiles."median_wan_cost_per_connection",
+wan_percentiles."75th_percentile_wan_cost_per_connection",
+wan_percentiles."90th_percentile_wan_cost_per_connection"
+
+
+from wan_circuit_frequency wcf1
+
+left join wan_ranks wr
+on wcf1.applicant_postal_cd=wr.applicant_postal_cd and wcf1.bandwidth_in_mbps=wr.bandwidth_in_mbps
+and wcf1.revised_connect_category=wr.revised_connect_category
+
+left join lateral (
+select applicant_postal_cd, 
+bandwidth_in_mbps,
+PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "10th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "25th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "median_wan_cost_per_connection",
+PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "75th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.9) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "90th_percentile_wan_cost_per_connection"
+
+from circuit_list
+where internet_conditions_met=false
+GROUP BY applicant_postal_cd, bandwidth_in_mbps) wan_percentiles
+on wcf1.applicant_postal_cd=wan_percentiles.applicant_postal_cd and wcf1.bandwidth_in_mbps=wan_percentiles.bandwidth_in_mbps
+
+where wr."rank"<=3 and wcf1.wan_line_items>1 
+
+ORDER BY wcf1.applicant_postal_cd, wr."rank")
+
+select *
+
+from temp
+
+where "row_num"<=5
