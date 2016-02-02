@@ -1,6 +1,6 @@
 /*Author: Greg Kurzhals 
 Created On Date: 01/11/2016 
-Last Modified Date: 01/28/2016
+Last Modified Date: 02/01/2016
 Name of QAing Analyst(s):  Justine Schott
 Purpose: summarizes bundled Internet cost/mbps and WAN cost/connection on a circuit-level for each state, stratified by bandwidth range and by lit fiber vs. all conn. types
 Methodology: 
@@ -34,8 +34,11 @@ c.line_item_id,
 c.service_provider_id,
 line_items.applicant_postal_cd,
 c.connect_type,
-case when c.connect_category='Fiber' and c.connect_type!='Dark Fiber Service' then 'Y'
-else 'N' end as "lit_fiber", 
+case when c.connect_category='Fiber' and c.connect_type!='Dark Fiber Service' then 'Lit Fiber'
+when c.connect_category='Fiber' and c.connect_type='Dark Fiber Service' then 'Dark Fiber'
+when c.connect_type='Cable Modem' then 'Cable'
+when c.connect_type='Digital Subscriber Line (DSL)' then 'DSL'
+else c.connect_category end as "revised_connect_category", 
 c.connect_category,
 c.num_recipients,
 c.bandwidth_in_mbps,
@@ -91,35 +94,38 @@ internet_circuit_frequency as (
 
 select applicant_postal_cd,
 bandwidth_in_mbps,
+revised_connect_category,
 count(id) as "internet_circuits",
 count(distinct line_item_id) as "internet_line_items",
 min(circuit_cost::numeric) as "min_internet_cost_per_connection",
 avg(circuit_cost::numeric) as "mean_internet_cost_per_connection",
 max(circuit_cost::numeric) as "max_internet_cost_per_connection",
-
 sum(case when (circuit_cost::numeric/bandwidth_in_mbps::numeric)/12<=3.00 then 1 else 0 end)::numeric/
     count(id)::numeric as "%_internet_circuits_meeting_afford_target"
 
 from circuit_list
 
-where internet_conditions_met=true and connect_category='Fiber' and connect_type!='Dark Fiber Service'
+where internet_conditions_met=true
 
-GROUP BY applicant_postal_cd, bandwidth_in_mbps
+GROUP BY applicant_postal_cd, bandwidth_in_mbps, revised_connect_category
 ORDER BY count(distinct line_item_id) DESC),
 
 internet_ranks as (
 
 select icf1.applicant_postal_cd,
 icf1.bandwidth_in_mbps,
+icf1.revised_connect_category,
 count(distinct icf2.internet_line_items) as "rank"
 
 from internet_circuit_frequency icf1
 join internet_circuit_frequency icf2
-on icf1.internet_line_items <= icf2.internet_line_items and icf1.applicant_postal_cd=icf2.applicant_postal_cd
+on icf1.internet_line_items <= icf2.internet_line_items and icf1.applicant_postal_cd=icf2.applicant_postal_cd 
 
-GROUP BY icf1.applicant_postal_cd, icf1.bandwidth_in_mbps),
+GROUP BY icf1.applicant_postal_cd, icf1.bandwidth_in_mbps, icf1.revised_connect_category),
 
-temp as (select ir."rank", 
+temp as (
+
+select ir."rank",
 row_number() over (partition by icf1.applicant_postal_cd order by ir."rank") as "row_num",
 icf1.*,
 internet_percentiles."10th_percentile_internet_cost_per_connection",
@@ -133,11 +139,11 @@ from internet_circuit_frequency icf1
 
 left join internet_ranks ir
 on icf1.applicant_postal_cd=ir.applicant_postal_cd and icf1.bandwidth_in_mbps=ir.bandwidth_in_mbps
+and icf1.revised_connect_category=ir.revised_connect_category
 
 left join lateral (
 select applicant_postal_cd, 
 bandwidth_in_mbps,
-row_number() over (partition by icf1.applicant_postal_cd order by ir."rank", internet_circuits DESC) as "row_num",
 PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "10th_percentile_internet_cost_per_connection",
 PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "25th_percentile_internet_cost_per_connection",
 PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "median_internet_cost_per_connection",
@@ -149,15 +155,12 @@ where internet_conditions_met=true
 GROUP BY applicant_postal_cd, bandwidth_in_mbps) internet_percentiles
 on icf1.applicant_postal_cd=internet_percentiles.applicant_postal_cd and icf1.bandwidth_in_mbps=internet_percentiles.bandwidth_in_mbps
 
-where ir."rank"<=5 and icf1.internet_line_items>1 
+where ir."rank"<=3 and icf1.internet_line_items>1 
 
 ORDER BY icf1.applicant_postal_cd, ir."rank")
 
-select temp.*
+select *
 
 from temp
 
 where row_num<=5
-
-
-
