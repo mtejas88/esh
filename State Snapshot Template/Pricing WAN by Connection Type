@@ -154,7 +154,7 @@ where internet_conditions_met=false
 GROUP BY applicant_postal_cd, bandwidth_in_mbps) wan_percentiles
 on wcf1.applicant_postal_cd=wan_percentiles.applicant_postal_cd and wcf1.bandwidth_in_mbps=wan_percentiles.bandwidth_in_mbps
 
-where wr."rank"<=3 and wcf1.wan_line_items>1 
+where wr."rank"<=5 and wcf1.wan_line_items>1 
 
 ORDER BY wcf1.applicant_postal_cd, wr."rank")
 

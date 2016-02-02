@@ -155,7 +155,7 @@ where internet_conditions_met=true
 GROUP BY applicant_postal_cd, bandwidth_in_mbps) internet_percentiles
 on icf1.applicant_postal_cd=internet_percentiles.applicant_postal_cd and icf1.bandwidth_in_mbps=internet_percentiles.bandwidth_in_mbps
 
-where ir."rank"<=3 and icf1.internet_line_items>1 
+where ir."rank"<=5 and icf1.internet_line_items>1 
 
 ORDER BY icf1.applicant_postal_cd, ir."rank")
 
