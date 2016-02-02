@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
-Last Modified Date: 1/25/2016
+Last Modified Date: 2/2/2016
 Name of QAing Analyst(s): Justine Schott 
 Purpose: Returns the three consortia in each state that serve the greatest number of students within our 
 population, and calculates summary statistics re: districts served and service procured.
@@ -17,8 +17,8 @@ aggregate applicant-level statistics are calculated and joined to the recipient-
 
 Error Definitions:
 
-'E-1' - no clean districts
-'E-2' - at least one clean district, but no districts with valid metric
+'NA1' - no clean districts
+'NA2' - at least one clean district, but no districts with valid metric
 */
 
 
@@ -91,10 +91,10 @@ sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)/count
 sum(case when district_data.exclude_from_analysis=false then district_data.num_campuses::numeric else 0 end)/sum(district_data.num_campuses)::numeric as "pct_campuses_clean",
 
 case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)=0
-          then 'E-1'
+          then 'NA1'
      when sum(case when district_data.exclude_from_analysis = false and district_data.ia_bandwidth_per_student!='Insufficient data'
      then district_data.num_students::numeric else 0 end)=0 
-          then 'E-2'
+          then 'NA2'
           
      else
 
@@ -105,13 +105,13 @@ case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 
           else 0 end))::varchar end as "aggregate_bandwidth_per_student(kbps)_clean_districts",
           
 case when sum(case when district_data.exclude_from_analysis=false then 1 else 0 end)=0
-          then 'E-1'
+          then 'NA1'
           
      when sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
           and district_data.ia_cost_per_mbps!='Insufficient data'
           then district_data.num_students::numeric*(district_data.ia_bandwidth_per_student::numeric/1000)
           else 0 end) = 0
-          then 'E-2'
+          then 'NA2'
      else
         
           (sum(case when district_data.exclude_from_analysis=false and district_data.ia_bandwidth_per_student!='Insufficient data'
