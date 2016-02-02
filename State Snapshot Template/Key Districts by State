@@ -32,8 +32,8 @@ districts.district_size,
 districts.num_schools,
 districts.num_campuses,
 districts.num_students,
-case when districts.ia_bandwidth_per_student !='Insufficient data' then districts.ia_bandwidth_per_student else 'NA' end as ia_bandwidth_per_student,
-case when ia_cost_per_mbps!='Insufficient data' then districts.ia_cost_per_mbps::numeric/12 else 'NA' end as "monthly_ia_cost_per_mbps",
+case when districts.ia_bandwidth_per_student !='Insufficient data' then districts.ia_bandwidth_per_student else null end as ia_bandwidth_per_student,
+case when ia_cost_per_mbps!='Insufficient data' then districts.ia_cost_per_mbps::numeric/12 else null end as "monthly_ia_cost_per_mbps",
 case when districts.exclude_from_analysis=true then 'Dirty' else 'Clean' end as "clean_status" 
 
 from ranked_mega
