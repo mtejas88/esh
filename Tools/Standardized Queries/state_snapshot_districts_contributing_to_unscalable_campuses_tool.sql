@@ -1,7 +1,7 @@
 /*
 Author: Justine Schott
 Created On Date: 12/29/2015
-Last Modified Date: 12/29/2015
+Last Modified Date: 2/1/2016
 Name of QAing Analyst(s): 
 Purpose: To display all districts in a state that have unscalable campuses according to the state snapshot fiber pct query
 Methodology: All tables are same as state_snapshot_tool.sql without the summary up to the state level. Only districts with
@@ -156,35 +156,72 @@ cdd_calc as (
 
   select 
     cdd_calc.district_esh_id,
-    d.name,
-    d.city,
-    cdd_calc.postal_cd,
-    d.nces_cd,
-    d.district_Type,
-    d.locale,
-    cdd_calc.num_students,
-    cdd_calc.num_schools,
-    cdd_calc.num_campuses,
-    cdd_calc.fiber_equiv_lines,
-    cdd_calc.cable_lines,
-    cdd_calc.copper_dsl_lines,
-    cdd_calc.fiber_equiv_lines + case when cdd_calc.num_students < 100 then cdd_calc.cable_lines else 0 end as scalable_lines,
-    cdd_calc.copper_dsl_lines + case when cdd_calc.num_students >= 100 then cdd_calc.cable_lines else 0 end as non_scalable_lines,
-    cdd_calc.known_scalable_campuses,
-    cdd_calc.assumed_scalable_campuses,
-    cdd_calc.known_unscalable_campuses,
-    cdd_calc.assumed_unscalable_campuses,
+    d.name as district_name,
+    d.city as district_city,
+    cdd_calc.postal_cd as district_state,
+    d.nces_cd as district_nces_cd,
+    d.district_type,
+    d.locale as district_locale,
+    cdd_calc.num_students as district_num_students,
+    cdd_calc.num_schools as district_num_schools,
+    cdd_calc.num_campuses as district_num_campuses,
+    cdd_calc.fiber_equiv_lines as district_num_fiber_equiv_lines,
+    cdd_calc.cable_lines as district_num_cable_lines,
+    cdd_calc.copper_dsl_lines as district_num_copper_dsl_lines,
+    cdd_calc.fiber_equiv_lines + case when cdd_calc.num_students < 100 then cdd_calc.cable_lines else 0 end as district_num_scalable_lines,
+    cdd_calc.copper_dsl_lines + case when cdd_calc.num_students >= 100 then cdd_calc.cable_lines else 0 end as district_num_unscalable_lines,
+    cdd_calc.known_scalable_campuses as district_num_known_scalable_campuses,
+    cdd_calc.assumed_scalable_campuses as district_num_assumed_scalable_campuses,
+    cdd_calc.known_unscalable_campuses as district_num_known_unscalable_campuses,
+    cdd_calc.assumed_unscalable_campuses as district_num_assumed_unscalable_campuses,
     schools.esh_id as school_esh_id,
     schools.name as school_name,
-    schools.address,
+    schools.address as school_address,
     schools.school_nces_cd,
-    schools.co_located
+    schools.co_located as school_colocated,
+    school_li_as.school_allocated_purpose,
+    school_li_as.school_allocated_connect_category,
+    school_li_as.school_allocated_service_provider_name,
+    school_li_as.school_allocated_num_lines,
+    school_li_as.school_allocated_bandwidth_in_mbps_per_circuit,
+    school_li_as.school_allocated_rec_elig_cost_per_circuit,
+    school_li_as.school_allocated_one_time_eligible_cost_per_circuit
 
   from cdd_calc
   left join districts d
   on d.esh_id = cdd_calc.district_esh_id
   left join schools
   on schools.district_esh_id = cdd_calc.district_esh_id
+  left join (
+      select eim.entity_id,
+             array_agg(li.purpose) as school_allocated_purpose,
+             array_agg(li.connect_category) as school_allocated_connect_category,
+             array_agg(li.service_provider_name) as school_allocated_service_provider_name,
+             array_agg(a.num_lines_to_allocate) as school_allocated_num_lines,
+             array_agg(li.bandwidth_in_mbps) as school_allocated_bandwidth_in_mbps_per_circuit,
+             array_agg(
+                  case when li.rec_elig_cost != 'No data' 
+                    then round(li.rec_elig_cost::numeric/num_lines,2)
+                  end
+             ) as school_allocated_rec_elig_cost_per_circuit,
+             array_agg(
+                  case when li.rec_elig_cost != 'No data' 
+                    then round(li.one_time_eligible_cost::numeric/num_lines,2)
+                  end
+             ) as school_allocated_one_time_eligible_cost_per_circuit
+      from allocations a
+      left join esh_id_mappings eim
+      on a.recipient_ben = eim.ben
+      left join line_items li
+      on a.line_item_id = li.id
+      where entity_type = 'School'
+      and a.num_lines_to_allocate > 0
+      and a.broadband = true
+      and li.exclude = false
+      group by eim.entity_id
+  ) school_li_as
+  on schools.esh_id = school_li_as.entity_id
+
   where cdd_calc.postal_cd =  '{{ state }}'
   and known_unscalable_campuses + assumed_unscalable_campuses > 0
   and schools.charter= false
