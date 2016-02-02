@@ -23,7 +23,7 @@ expect <- function(factor, dummy) {
   factor_percentage <- aggregate(dummy ~ factor, FUN=function(x) paste0(round(mean(x, na.rm=T)*100,1),"%"))
   factor_count <- aggregate(dummy ~ factor, FUN=function(x) length(x))
   cat(noquote("\n\nActual observed:\n"))
-  factor_data <- data.frame(merge(factor_percentage, factor_count, by.x="factor", by.="factor"))
+  factor_data <- data.frame(merge(factor_percentage, factor_count, by.x="factor", by.y="factor"))
   colnames(factor_data) <- c("Factor","Percentage", "Count")
   print(factor_data)
   }
