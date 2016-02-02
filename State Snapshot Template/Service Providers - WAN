@@ -1,22 +1,22 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 01/24/2016
-Last Modified Date: 
-Name of QAing Analyst(s): Justine Schott
-Purpose: Ranks service providers by the number of bundled Internet circuits provided to clean districts in each state
+Last Modified Date: 02/01/2016 
+Name of QAing Analyst(s): 
+Purpose: Ranks service providers by the number of WAN circuits provided to clean districts in each state
 Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of
-bundled Internet circuits serving each clean district.  Once these circuit counts have been determined, 
-several parallel sub-queries pulling from the temp table "af" calculate:
+bundled Internet, upstream, and WAN circuits of each connection type serving to each clean district.  Once these 
+circuit counts have been determined, several parallel sub-queries pulling from the temp table "af" calculate:
 1) the total number and cost of WAN circuits serving clean districts, 2) the number and cost of 
-WAN circuits supplied by each provider, and 3) the number of districts and students served by each
-provider.  These sub-query results are then combined in the main query via lateral joins, allowing for the determination
-of each provider's share of: 1) the total cost of WAN services, 2) the number of districts 
-connected by bundled Internet services, and 3) the number of students connected by WAN services. 
-Finally, self-joining the "provider_summary" sub-query allows for the assignment of ranks to each state's set 
-of service providers based on the number of bundled Internet circuits supplied to clean districts.
+WAN circuits supplied by each provider, and 3) the number of districts and students served by each provider.
+These sub-query results are then combined in the main query via lateral joins, allowing for the determination
+of each provider's share of: 1) the total cost of WAN services, 2) the number of districts connected 
+by WAN services, and 3) the number of students connected by WAN service.  Finally, self-joining
+the "provider_summary" sub-query allows for the assignment of ranks to each state's set of service providers
+based on the number of WAN circuits supplied to clean districts.
 
 Notes: Sub-queries "district_lookup" to "af" are taken from existing "Services Received" query
-(https://modeanalytics.com/educationsuperhighway/reports/7fe09fee682e) 
+(https://modeanalytics.com/educationsuperhighway/reports/7fe09fee682e)
 */
 
 with district_lookup as (
@@ -227,32 +227,49 @@ GROUP BY af.postal_cd),
 
 
 cost_summary as (
-select af.service_provider_id,
+select spc.reporting_name,
+max(serv.name) as "name",
 af.postal_cd,
 af.line_item_id,
 sum(district_monthly_cost::numeric) as "line_item_monthly_share"
 
 from af
 
+left join service_provider_categories spc
+on af.service_provider_name=spc.name
+
+left join service_providers serv
+on af.service_provider_id=serv.id
+
 where shared_service='District-dedicated' and wan_conditions_met=true
 and exclude_from_analysis=false
 
-GROUP BY af.service_provider_id, af.postal_cd, af.line_item_id),
+GROUP BY spc.reporting_name, af.postal_cd, af.line_item_id),
 
 provider_goals as (
-select service_provider_id,
+select spc.reporting_name,
+max(serv.name) as "name",
 postal_cd,
 count(distinct district_esh_id) as "clean_districts_meeting_goals"
 
 from af
 
+left join service_provider_categories spc
+on af.service_provider_name=spc.name
+
+left join service_providers serv
+on af.service_provider_id=serv.id
+
 where ia_bandwidth_per_student!='Insufficient data' and ia_bandwidth_per_student::numeric>=100
 and shared_service='District-dedicated' and wan_conditions_met=true
 
-GROUP BY service_provider_id, postal_cd),
+GROUP BY reporting_name, postal_cd),
 
 provider_summary as (
-select service_provider_id,
+select spc.reporting_name,
+max(serv.name) as "name",
+row_number() over (partition by af.postal_cd order by sum(quantity_of_lines_received_by_district::numeric) DESC,
+sum(distinct num_students::numeric) DESC) as "row_num",
 postal_cd,
 array_agg(distinct district_esh_id) as "district_list",
 sum(distinct num_students::numeric) as "num_students_served",
@@ -264,11 +281,18 @@ sum(case when connect_category='Fiber' then quantity_of_lines_received_by_distri
 
 from af
 
+left join service_provider_categories spc
+on af.service_provider_name=spc.name
+
+left join service_providers serv
+on af.service_provider_id=serv.id
+
 where shared_service='District-dedicated' and wan_conditions_met=true and exclude_from_analysis=false
+and serv.name not in ('District_owned', 'District Owned', 'District_Owned')
 
-GROUP BY service_provider_id, postal_cd),
+GROUP BY reporting_name, postal_cd),
 
-circuit_ranks as (select ps1.service_provider_id,
+circuit_ranks as (select ps1.reporting_name,
 ps1.postal_cd,
 COUNT(distinct ps2.num_lines) as "num_lines_rank"
 from provider_summary ps1
@@ -276,13 +300,18 @@ from provider_summary ps1
 join provider_summary ps2
 on ps1.num_lines <= ps2.num_lines and ps1.postal_cd=ps2.postal_cd
 
-GROUP BY ps1.service_provider_id, ps1.postal_cd)
+GROUP BY ps1.reporting_name, ps1.postal_cd)
 
-select cr."num_lines_rank",
-sr.name,
-case when sr.ilec=true then 'ILEC' when sr.clec=true then 'CLEC'
-else 'Other' end as "provider_type",
-ps.*,
+select
+case when ps.reporting_name is null then concat(ps.name,' (DQS-created)') else ps.reporting_name end as "reporting_name",
+ps.postal_cd,
+ps.row_num,
+ps.num_lines,
+ps.num_students_served,
+ps.districts_served,
+ps.district_list,
+ps.num_line_items,
+ps.num_fiber_lines,
 provider_cost.provider_total_cost,
 
 case when ss.state_services_cost>0 
@@ -309,26 +338,23 @@ else null end as "provider_student_share"
 from provider_summary ps
 
 left join lateral (
-select cs.service_provider_id,
+select cs.reporting_name,
 cs.postal_cd,
 sum(line_item_monthly_share) as "provider_total_cost"
 
 from cost_summary cs
 
-GROUP BY cs.service_provider_id, cs.postal_cd) provider_cost
-on ps.service_provider_id=provider_cost.service_provider_id and ps.postal_cd=provider_cost.postal_cd
+GROUP BY cs.reporting_name, cs.postal_cd) provider_cost
+on ps.reporting_name=provider_cost.reporting_name and ps.postal_cd=provider_cost.postal_cd
 
 left join circuit_ranks cr
-on ps.postal_cd=cr.postal_cd and ps.service_provider_id=cr.service_provider_id
-
-left join service_providers sr
-on ps.service_provider_id=sr.id
+on ps.postal_cd=cr.postal_cd and ps.reporting_name=cr.reporting_name
 
 left join state_summary ss
 on ps.postal_cd=ss.postal_cd
 
 left join provider_goals pg
-on ps.postal_cd=pg.postal_cd and ps.service_provider_id=pg.service_provider_id
+on ps.postal_cd=pg.postal_cd and ps.reporting_name=pg.reporting_name
 
 left join lateral(
 select postal_cd,
@@ -344,6 +370,6 @@ where include_in_universe_of_districts=true and exclude_from_analysis=false
 GROUP BY postal_cd) cd
 on ps.postal_cd=cd.postal_cd
 
-where cr."num_lines_rank"<=3
+where ps.row_num<=3
 
-ORDER BY ps.postal_cd, ps.num_lines DESC
+ORDER BY ps.postal_cd, ps.row_num
