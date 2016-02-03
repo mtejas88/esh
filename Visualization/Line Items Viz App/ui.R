@@ -79,8 +79,8 @@ shinyUI(fluidPage(
       }
     "))
   ),
-  title="Price Dispersion",
-  titlePanel(div(h1("Price Dispersion"), img(src='esh-logo.png', align = "right", width='230px'))),
+  title="Price Dispersion - EducationSuperHighway",
+  titlePanel(div(h1("Price Dispersion"))), #, img(src='esh-logo.png', align = "right", width='230px'))),
   sidebarLayout(
     conditionalPanel(condition="1==1",
       sidebarPanel(
@@ -90,7 +90,7 @@ shinyUI(fluidPage(
                     selected = c(50,100,500,1000,10000)),
       selectInput("purpose", 
                   h2("Select Purpose"),
-                  choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP')),
+                  choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
       selectInput("connection", 
                   h2("Select Connection Type"),
                   choices = c("All", "Fiber", "Dark Fiber", "Copper", "Cable / DSL", "Fixed Wireless", "Other / Uncategorized")),
@@ -118,9 +118,15 @@ shinyUI(fluidPage(
     )),
     mainPanel(
       tabsetPanel(
+        tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(),br() 
+                                              )), 
+                 width="300px"),
         tabPanel("Cost - Box and Whiskers", imageOutput("distPlot", height="550px", width="1000px"),
                  div(id="test1", class="test", textOutput("n_observations"))),
         tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
+        tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px")),
+        tabPanel("Meeting Goals Map", fluidRow(column(12, align = "center", plotOutput("mg_map", height="550px", width="1000px")))),
+        tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
       id="condition_panel"
   )
 )
