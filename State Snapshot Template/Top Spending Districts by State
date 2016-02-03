@@ -22,7 +22,11 @@ with selected_districts as (
 ranked_districts as (
 				select  d1.esh_id, 
 						d1.postal_cd,
-						row_number() over (partition by d1.postal_cd order by d1.ia_cost_per_mbps::numeric desc) AS "ia_cost_per_mbps_rank",
+						row_number() over (
+											partition by d1.postal_cd 
+											order by d1.ia_cost_per_mbps::numeric desc, 
+													 d1.num_students::bigint desc
+									 ) AS "ia_cost_per_mbps_rank",
 						d1.name,
 						d1.locale,
 						d1.district_size,
