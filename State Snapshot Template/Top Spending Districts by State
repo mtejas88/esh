@@ -1,11 +1,9 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
-Last Modified Date: 2/2/2016
-    Nature of Modification: removed exclusionary rule that eliminated all districts except for those with
-    "district_size"='Mega'
+Last Modified Date: 2/3/2016 -- && renamed
 Name of QAing Analyst(s): Justine Schott
-Purpose: Returns the three districts in each state that serve the greatest number of students within 
+Purpose: Returns the three districts in each state that have the highest IA cost/mbps 
 our population, and calculates summary statistics re: services procured.
 Methodology: This query uses a self-join of the "districts" table to assign rankings to each district
 within a state based on the number of students that they contain.
@@ -13,34 +11,35 @@ within a state based on the number of students that they contain.
 
 
 
-with ranked_mega as (
+with selected_districts as (
+				select *
+				from districts
+				where include_in_universe_of_districts=true 
+				and exclude_from_analysis=false
+				and ia_cost_per_mbps!='Insufficient data'
+),
 
-select d1.esh_id, 
-d1.postal_cd,
-COUNT(DISTINCT d2.num_students::bigint) AS "student_count_rank"
-FROM
-districts d1 
-JOIN districts d2 ON (d1.num_students::bigint <= d2.num_students::bigint and d1.postal_cd=d2.postal_cd)
-where d1.include_in_universe_of_districts=true and d2.include_in_universe_of_districts=true 
-GROUP BY d1.esh_id,d1.postal_cd
-having COUNT(DISTINCT d2.num_students::bigint) <=3)
+ranked_districts as (
+				select  d1.esh_id, 
+						d1.postal_cd,
+						row_number() over (partition by d1.postal_cd order by d1.ia_cost_per_mbps::numeric desc) AS "ia_cost_per_mbps_rank",
+						d1.name,
+						d1.locale,
+						d1.district_size,
+						d1.num_schools,
+						d1.num_campuses,
+						d1.num_students,
+						case when d1.ia_bandwidth_per_student !='Insufficient data' then d1.ia_bandwidth_per_student else null end as ia_bandwidth_per_student,
+						d1.ia_cost_per_mbps::numeric/12 as "monthly_ia_cost_per_mbps",
+						case when d1.exclude_from_analysis=true then 'Dirty' else 'Clean' end as "clean_status"
+				FROM selected_districts d1 
+)
 
-select ranked_mega.*,
-districts.name,
-districts.locale,
-districts.district_size,
-districts.num_schools,
-districts.num_campuses,
-districts.num_students,
-case when districts.ia_bandwidth_per_student !='Insufficient data' then districts.ia_bandwidth_per_student else null end as ia_bandwidth_per_student,
-case when ia_cost_per_mbps!='Insufficient data' then districts.ia_cost_per_mbps::numeric/12 else null end as "monthly_ia_cost_per_mbps",
-case when districts.exclude_from_analysis=true then 'Dirty' else 'Clean' end as "clean_status" 
+select  ranked_districts.*
 
-from ranked_mega
+from ranked_districts
 
-left join districts
-on ranked_mega.esh_id=districts.esh_id
+where ranked_districts.postal_cd!='DC'
+and "ia_cost_per_mbps_rank" <= 3
 
-where ranked_mega.postal_cd!='DC'
-
-ORDER BY postal_cd, student_count_rank
+ORDER BY postal_cd, ia_cost_per_mbps_rank
