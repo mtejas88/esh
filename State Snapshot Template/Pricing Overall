@@ -1,6 +1,6 @@
 /*Author: Greg Kurzhals 
 Created On Date: 01/11/2016 
-Last Modified Date: 01/28/2016
+Last Modified Date: 02/03/2016
 Name of QAing Analyst(s): Justine Schott
 Purpose: summarizes bundled Internet cost/mbps and WAN cost/connection on a circuit-level for each state, stratified by bandwidth range and by lit fiber vs. all conn. types
 Methodology: 
@@ -162,7 +162,10 @@ wan_percentiles."90th_percentile_wan_cost_per_connection",
 wcf.max_wan_cost_per_connection,
 
 wcf."1_gbps_wan_circuits",
-wcf."%_1_gbps_wan_circuits_meeting_afford_target"
+wcf."%_1_gbps_wan_circuits_meeting_afford_target",
+
+"%_internet_circuits_meeting_afford_target",
+"%_wan_circuits_meeting_afford_target"
 
 from internet_circuit_frequency icf
 
