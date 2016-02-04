@@ -86,7 +86,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       case when li.rec_elig_cost!='No data' and li.consortium_shared=false and ae.district_num_lines_received>=li.num_lines and li.total_cost::numeric>0 and li.num_lines!=0 and li.orig_r_months_of_service is not null
       and li.orig_r_months_of_service!=0 
       then li.total_cost::numeric/li.orig_r_months_of_service 
-      when li.consortium_shared=false and ae.district_num_lines_received0 
+      when li.consortium_shared=false and ae.district_num_lines_received<li.num_lines and li.num_lines!=0 and li.total_cost::numeric>0 
       and li.orig_r_months_of_service is not null and li.orig_r_months_of_service!=0 
       then (ae.district_num_lines_received/li.num_lines)*
       (li.total_cost::numeric/li.orig_r_months_of_service)
