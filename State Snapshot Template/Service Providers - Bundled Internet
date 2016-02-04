@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 01/24/2016
-Last Modified Date: 02/01/2016 
+Last Modified Date: 02/02/2016 
 Name of QAing Analyst(s): 
 Purpose: Ranks service providers by the number of bundled Internet circuits provided to clean districts in each state
 Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of
@@ -231,21 +231,47 @@ and internet_conditions_met=true
 
 GROUP BY af.postal_cd),
 
+state_li_all_services as (
+select af.postal_cd,
+af.line_item_id,
+max(af."line_item_total_cost"::numeric) as "total_cost",
+max(af.line_item_total_num_lines) as "total_num_circuits"
+
+from af
+
+/*
+exclusionary rules: 1) clean districts only, 2) district_dedicated circuits only,
+3) bundled IA only
+*/
+
+where broadband=true
+
+GROUP BY af.postal_cd, af.line_item_id),
+
+state_summary_all_services as (
+select slas.postal_cd,
+sum(slas.total_cost) as "state_total_cost_all_services",
+sum(slas.total_num_circuits) as "state_total_num_circuits"
+
+from state_li_all_services slas
+
+GROUP BY slas.postal_cd),
+
 --costs of service supplied by a given provider in a given state
 cost_summary as (
 select spc.reporting_name,
-max(serv.name) as "sp_name",
+max(spc.name) as "sp_name",
 af.postal_cd,
 af.line_item_id,
 sum(district_monthly_cost::numeric) as "line_item_monthly_share"
 
 from af
 
-left join service_provider_categories spc
-on af.service_provider_name=spc.name
-
-left join service_providers serv
-on af.service_provider_id=serv.id 
+left join lateral (
+select distinct reporting_name,
+name
+from service_provider_categories) spc
+on af.service_provider_name=spc.name 
 
 /*
 same exclusionary rules defined above
@@ -255,20 +281,43 @@ and exclude_from_analysis=false
 
 GROUP BY spc.reporting_name, af.postal_cd, af.line_item_id),
 
+total_cost_summary as (
+select spc.reporting_name,
+max(spc.name) as "sp_name",
+af.postal_cd,
+af.line_item_id,
+max(af.line_item_total_num_lines) as "line_item_num_circuits",
+max(af."line_item_total_cost"::numeric) as "line_item_total_cost"
+
+from af
+
+left join lateral (
+select distinct reporting_name,
+name
+from service_provider_categories) spc
+on af.service_provider_name=spc.name 
+
+/*
+same exclusionary rules defined above
+*/
+where broadband=true
+
+GROUP BY spc.reporting_name, af.postal_cd, af.line_item_id), 
+
 --number of districts meeting 2014 goals served by a particular provider
 provider_goals as (
 select spc.reporting_name,
-max(serv.name) as "sp_name",
+max(spc.name) as "sp_name",
 postal_cd,
 count(distinct district_esh_id) as "clean_districts_meeting_goals"
 
 from af
 
-left join service_provider_categories spc
+left join lateral (
+select distinct reporting_name,
+name
+from service_provider_categories) spc
 on af.service_provider_name=spc.name
-
-left join service_providers serv
-on af.service_provider_id=serv.id
 /*
 same exclusionary rules defined above, with addition of restriction to subset of districts meeting 2014 goals
 */
@@ -280,7 +329,7 @@ GROUP BY spc.reporting_name, postal_cd),
 --the number of districts and students in a given state served by each provider, as well as the number of circuits and line items provided
 provider_summary as (
 select spc.reporting_name,
-max(serv.name) as "name",
+max(spc.name) as "name",
 postal_cd,
 row_number() over (partition by af.postal_cd order by sum(quantity_of_lines_received_by_district::numeric) DESC, 
 sum(distinct num_students::numeric) DESC) as "row_num",
@@ -294,17 +343,17 @@ sum(case when connect_category='Fiber' then quantity_of_lines_received_by_distri
 
 from af
 
-left join service_provider_categories spc
+left join lateral (
+select distinct reporting_name,
+name
+from service_provider_categories) spc
 on af.service_provider_name=spc.name
-
-left join service_providers serv
-on af.service_provider_id=serv.id
 
 /*
 same exclusionary rules defined above
 */
 where shared_service='District-dedicated' and internet_conditions_met=true and exclude_from_analysis=false
-and serv.name not in ('District_owned', 'District Owned', 'District_Owned')
+and af.service_provider_name not in ('District_owned', 'District Owned', 'District_Owned')
 
 GROUP BY spc.reporting_name, postal_cd
 
@@ -331,11 +380,11 @@ ps.district_list,
 ps.num_line_items,
 ps.num_fiber_lines,
 
-provider_cost.provider_total_cost,
+provider_cost.provider_total_cost_per_month,
 
 --proportion of total cost of circuits in state represented by cost of provider's services
 case when ss.state_services_cost>0 
-then provider_cost.provider_total_cost::numeric/ss.state_services_cost::numeric
+then provider_cost.provider_total_cost_per_month::numeric/ss.state_services_cost::numeric
 else null end as "provider_market_share",
 
 --proportion of total number of circuits in state supplied by provider
@@ -359,19 +408,36 @@ else null end as "provider_districts_meeting_goals_share",
 --proportion of students in state supplied by provider
 case when cd.clean_students>0 
 then ps.num_students_served::numeric/cd.clean_students::numeric
-else null end as "provider_student_share"
+else null end as "provider_student_share",
+
+tpc.provider_total_num_circuits as "provider_num_circuits_all_categories",
+tpc.provider_total_cost_all_services::numeric/12 as "provider_market_share_all_categories",
+tpc.provider_total_cost_all_services::numeric/ssas.state_total_cost_all_services::numeric
+as "%_provider_market_share_all_categories"
 
 from provider_summary ps
 
 left join lateral (
 select cs.reporting_name,
 cs.postal_cd,
-sum(line_item_monthly_share) as "provider_total_cost"
+sum(line_item_monthly_share) as "provider_total_cost_per_month"
 
 from cost_summary cs
 
 GROUP BY cs.reporting_name, cs.postal_cd) provider_cost
 on ps.reporting_name=provider_cost.reporting_name and ps.postal_cd=provider_cost.postal_cd
+
+left join lateral (
+select tcs.reporting_name,
+tcs.postal_cd,
+--count(cs.line_item_id) as "num_line_items_all_services",
+sum(tcs.line_item_num_circuits) as "provider_total_num_circuits",
+sum("line_item_total_cost") as "provider_total_cost_all_services"
+
+from total_cost_summary tcs
+
+GROUP BY tcs.reporting_name, tcs.postal_cd) tpc
+on ps.reporting_name=tpc.reporting_name and ps.postal_cd=tpc.postal_cd
 
 left join circuit_ranks cr
 on ps.postal_cd=cr.postal_cd and ps.reporting_name=cr.reporting_name
@@ -381,6 +447,9 @@ on ps.postal_cd=ss.postal_cd
 
 left join provider_goals pg
 on ps.postal_cd=pg.postal_cd and ps.reporting_name=pg.reporting_name
+
+left join state_summary_all_services ssas
+on ps.postal_cd=ssas.postal_cd
 
 left join lateral(
 select postal_cd,
