@@ -1,8 +1,8 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 1/12/2016
-Last Modified Date: 02/03/2016
-Name of QAing Analyst(s): Justine Schott 
+Last Modified Date: 
+Name of QAing Analyst(s): 
 Purpose: Returns the # of districts and students in each state that would additionally meet connectivity 
 goals (100 Kbps, 200 Kbps, 500 Kbps, 1 Mbps) if each district's Internet access cost per mbps dropped by
 a given percentage (10, 20, 30, 40, or 50%)
@@ -822,8 +822,13 @@ left join state_total
 on state_sample.postal_cd=state_total.postal_cd
 )
 
---'easm' is abbreviation for 'Extrapolated Additional Students Meeting...'
-select p."state",
+select p.*,
+
+round("additional_districts_meeting_100_kbps_10%_reduction"::numeric/"proportion_district_population_in_sample"::numeric) as "eadm_100_kbps_10%",
+round("additional_districts_meeting_100_kbps_20%_reduction"/"proportion_district_population_in_sample") as "eadm_100_kbps_20%",
+round("additional_districts_meeting_100_kbps_30%_reduction"/"proportion_district_population_in_sample") as "eadm_100_kbps_30%",
+round("additional_districts_meeting_100_kbps_40%_reduction"/"proportion_district_population_in_sample") as "eadm_100_kbps_40%",
+round("additional_districts_meeting_100_kbps_50%_reduction"/"proportion_district_population_in_sample") as "eadm_100_kbps_50%",
 
 round("additional_students_meeting_100_kbps_10%_reduction"/"proportion_student_population_in_sample") as "easm_100_kbps_10%",
 round("additional_students_meeting_100_kbps_20%_reduction"/"proportion_student_population_in_sample") as "easm_100_kbps_20%",
@@ -831,11 +836,23 @@ round("additional_students_meeting_100_kbps_30%_reduction"/"proportion_student_p
 round("additional_students_meeting_100_kbps_40%_reduction"/"proportion_student_population_in_sample") as "easm_100_kbps_40%",
 round("additional_students_meeting_100_kbps_50%_reduction"/"proportion_student_population_in_sample") as "easm_100_kbps_50%",
 
+round("additional_districts_meeting_200_kbps_10%_reduction"/"proportion_district_population_in_sample") as "eadm_200_kbps_10%",
+round("additional_districts_meeting_200_kbps_20%_reduction"/"proportion_district_population_in_sample") as "eadm_200_kbps_20%",
+round("additional_districts_meeting_200_kbps_30%_reduction"/"proportion_district_population_in_sample") as "eadm_200_kbps_30%",
+round("additional_districts_meeting_200_kbps_40%_reduction"/"proportion_district_population_in_sample") as "eadm_200_kbps_40%",
+round("additional_districts_meeting_200_kbps_50%_reduction"/"proportion_district_population_in_sample") as "eadm_200_kbps_50%",
+
 round("additional_students_meeting_200_kbps_10%_reduction"/"proportion_student_population_in_sample") as "easm_200_kbps_10%",
 round("additional_students_meeting_200_kbps_20%_reduction"/"proportion_student_population_in_sample") as "easm_200_kbps_20%",
 round("additional_students_meeting_200_kbps_30%_reduction"/"proportion_student_population_in_sample") as "easm_200_kbps_30%",
 round("additional_students_meeting_200_kbps_40%_reduction"/"proportion_student_population_in_sample") as "easm_200_kbps_40%",
 round("additional_students_meeting_200_kbps_50%_reduction"/"proportion_student_population_in_sample") as "easm_200_kbps_50%",
+
+round("additional_districts_meeting_500_kbps_10%_reduction"/"proportion_district_population_in_sample") as "eadm_500_kbps_10%",
+round("additional_districts_meeting_500_kbps_20%_reduction"/"proportion_district_population_in_sample") as "eadm_500_kbps_20%",
+round("additional_districts_meeting_500_kbps_30%_reduction"/"proportion_district_population_in_sample") as "eadm_500_kbps_30%",
+round("additional_districts_meeting_500_kbps_40%_reduction"/"proportion_district_population_in_sample") as "eadm_500_kbps_40%",
+round("additional_districts_meeting_500_kbps_50%_reduction"/"proportion_district_population_in_sample") as "eadm_500_kbps_50%",
 
 round("additional_students_meeting_500_kbps_10%_reduction"/"proportion_student_population_in_sample") as "easm_500_kbps_10%",
 round("additional_students_meeting_500_kbps_20%_reduction"/"proportion_student_population_in_sample") as "easm_500_kbps_20%",
@@ -843,11 +860,24 @@ round("additional_students_meeting_500_kbps_30%_reduction"/"proportion_student_p
 round("additional_students_meeting_500_kbps_40%_reduction"/"proportion_student_population_in_sample") as "easm_500_kbps_40%",
 round("additional_students_meeting_500_kbps_50%_reduction"/"proportion_student_population_in_sample") as "easm_500_kbps_50%",
 
+round("additional_districts_meeting_1_mbps_10%_reduction"/"proportion_district_population_in_sample") as "eadm_1_mbps_10%",
+round("additional_districts_meeting_1_mbps_20%_reduction"/"proportion_district_population_in_sample") as "eadm_1_mbps_20%",
+round("additional_districts_meeting_1_mbps_30%_reduction"/"proportion_district_population_in_sample") as "eadm_1_mbps_30%",
+round("additional_districts_meeting_1_mbps_40%_reduction"/"proportion_district_population_in_sample") as "eadm_1_mbps_40%",
+round("additional_districts_meeting_1_mbps_50%_reduction"/"proportion_district_population_in_sample") as "eadm_1_mbps_50%",
+
 round("additional_students_meeting_1_mbps_10%_reduction"/"proportion_student_population_in_sample") as "easm_1_mbps_10%",
 round("additional_students_meeting_1_mbps_20%_reduction"/"proportion_student_population_in_sample") as "easm_1_mbps_20%",
 round("additional_students_meeting_1_mbps_30%_reduction"/"proportion_student_population_in_sample") as "easm_1_mbps_30%",
 round("additional_students_meeting_1_mbps_40%_reduction"/"proportion_student_population_in_sample") as "easm_1_mbps_40%",
 round("additional_students_meeting_1_mbps_50%_reduction"/"proportion_student_population_in_sample") as "easm_1_mbps_50%",
+
+
+round("additional_districts_meeting_100_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_100_kbps_10%_oversub",
+round("additional_districts_meeting_100_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_100_kbps_20%_oversub",
+round("additional_districts_meeting_100_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_100_kbps_30%_oversub",
+round("additional_districts_meeting_100_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_100_kbps_40%_oversub",
+round("additional_districts_meeting_100_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_100_kbps_50%_oversub",
 
 round("additional_students_meeting_100_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_100_kbps_10%_oversub",
 round("additional_students_meeting_100_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_100_kbps_20%_oversub",
@@ -855,11 +885,23 @@ round("additional_students_meeting_100_kbps_30%_reduction_oversub"/"proportion_s
 round("additional_students_meeting_100_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_100_kbps_40%_oversub",
 round("additional_students_meeting_100_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_100_kbps_50%_oversub",
 
+round("additional_districts_meeting_200_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_200_kbps_10%_oversub",
+round("additional_districts_meeting_200_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_200_kbps_20%_oversub",
+round("additional_districts_meeting_200_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_200_kbps_30%_oversub",
+round("additional_districts_meeting_200_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_200_kbps_40%_oversub",
+round("additional_districts_meeting_200_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_200_kbps_50%_oversub",
+
 round("additional_students_meeting_200_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_200_kbps_10%_oversub",
 round("additional_students_meeting_200_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_200_kbps_20%_oversub",
 round("additional_students_meeting_200_kbps_30%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_200_kbps_30%_oversub",
 round("additional_students_meeting_200_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_200_kbps_40%_oversub",
 round("additional_students_meeting_200_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_200_kbps_50%_oversub",
+
+round("additional_districts_meeting_500_kbps_10%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_500_kbps_10%_oversub",
+round("additional_districts_meeting_500_kbps_20%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_500_kbps_20%_oversub",
+round("additional_districts_meeting_500_kbps_30%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_500_kbps_30%_oversub",
+round("additional_districts_meeting_500_kbps_40%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_500_kbps_40%_oversub",
+round("additional_districts_meeting_500_kbps_50%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_500_kbps_50%_oversub",
 
 round("additional_students_meeting_500_kbps_10%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_500_kbps_10%_oversub",
 round("additional_students_meeting_500_kbps_20%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_500_kbps_20%_oversub",
@@ -867,10 +909,15 @@ round("additional_students_meeting_500_kbps_30%_reduction_oversub"/"proportion_s
 round("additional_students_meeting_500_kbps_40%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_500_kbps_40%_oversub",
 round("additional_students_meeting_500_kbps_50%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_500_kbps_50%_oversub",
 
+round("additional_districts_meeting_1_mbps_10%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_1_mbps_10%_oversub",
+round("additional_districts_meeting_1_mbps_20%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_1_mbps_20%_oversub",
+round("additional_districts_meeting_1_mbps_30%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_1_mbps_30%_oversub",
+round("additional_districts_meeting_1_mbps_40%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_1_mbps_40%_oversub",
+round("additional_districts_meeting_1_mbps_50%_reduction_oversub"/"proportion_district_population_in_sample") as "eadm_1_mbps_50%_oversub",
+
 round("additional_students_meeting_1_mbps_10%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_1_mbps_10%_oversub",
 round("additional_students_meeting_1_mbps_20%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_1_mbps_20%_oversub",
 round("additional_students_meeting_1_mbps_30%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_1_mbps_30%_oversub",
 round("additional_students_meeting_1_mbps_40%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_1_mbps_40%_oversub",
 round("additional_students_meeting_1_mbps_50%_reduction_oversub"/"proportion_student_population_in_sample") as "easm_1_mbps_50%_oversub"
-
 from proportion p

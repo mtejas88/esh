@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 01/22/2015
-Last Modified Date:
+Last Modified Date: 02/03/2016
 Name of QAing Analyst(s): Justine Schott
 Purpose: Quantifies the clean districts that are not currently meeting various connectivity goals, as well as
 the subset of those that will be unable to meet that goal without upgrading their existing Internet infrastructure
@@ -386,7 +386,7 @@ case when num_fiber_lines_received>0
         ("num_T1_lines_received"*1.5) +
         ("num_T3_lines_received"*45) +
         "bandwidth_other/uncategorized_connections_received")>=
-        (num_students::numeric*0.2) then 'Yes'
+        (num_students::numeric) then 'Yes'
         else 'No' end as "able_to_meet_1_mbps",
         
 case when num_fiber_lines_received>0 
@@ -414,34 +414,34 @@ state_calc as (
 select state,
 count(district_esh_id) as "num_clean_districts",
 sum(num_students::numeric) as "num_clean_students",
-sum(case when ia_bandwidth_per_student<100 then 1 else 0 end) as "districts_not_meeting_100_kbps",
-sum(case when ia_bandwidth_per_student<200 then 1 else 0 end) as "districts_not_meeting_200_kbps",
-sum(case when ia_bandwidth_per_student<500 then 1 else 0 end) as "districts_not_meeting_500_kbps",
-sum(case when ia_bandwidth_per_student<1000 then 1 else 0 end) as "districts_not_meeting_1_mbps",
+sum(case when ia_bandwidth_per_student>=100 then 1 else 0 end) as "districts_meeting_100_kbps",
+sum(case when ia_bandwidth_per_student>=200 then 1 else 0 end) as "districts_meeting_200_kbps",
+sum(case when ia_bandwidth_per_student>=500 then 1 else 0 end) as "districts_meeting_500_kbps",
+sum(case when ia_bandwidth_per_student>=1000 then 1 else 0 end) as "districts_meeting_1_mbps",
 
-sum(case when ia_bandwidth_per_student<100 then num_students::numeric else 0 end) as "students_not_meeting_100_kbps",
-sum(case when ia_bandwidth_per_student<200 then num_students::numeric else 0 end) as "students_not_meeting_200_kbps",
-sum(case when ia_bandwidth_per_student<500 then num_students::numeric else 0 end) as "students_not_meeting_500_kbps",
-sum(case when ia_bandwidth_per_student<1000 then num_students::numeric else 0 end) as "students_not_meeting_1_mbps",
+sum(case when ia_bandwidth_per_student>=100 then num_students::numeric else 0 end) as "students_meeting_100_kbps",
+sum(case when ia_bandwidth_per_student>=200 then num_students::numeric else 0 end) as "students_meeting_200_kbps",
+sum(case when ia_bandwidth_per_student>=500 then num_students::numeric else 0 end) as "students_meeting_500_kbps",
+sum(case when ia_bandwidth_per_student>=1000 then num_students::numeric else 0 end) as "students_meeting_1_mbps",
 
 
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 
-then 1 else 0 end) as "districts_not_meeting_100_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 
-then 1 else 0 end) as "districts_not_meeting_200_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 
-then 1 else 0 end) as "districts_not_meeting_500_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 
-then 1 else 0 end) as "districts_not_meeting_1_mbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=100 
+then 1 else 0 end) as "districts_meeting_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=200 
+then 1 else 0 end) as "districts_meeting_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=500 
+then 1 else 0 end) as "districts_meeting_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=1000 
+then 1 else 0 end) as "districts_meeting_1_mbps_oversub",
 
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 
-then num_students::numeric else 0 end) as "students_not_meeting_100_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 
-then num_students::numeric else 0 end) as "students_not_meeting_200_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 
-then num_students::numeric else 0 end) as "students_not_meeting_500_kbps_oversub",
-sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 
-then num_students::numeric else 0 end) as "students_not_meeting_1_mbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=100 
+then num_students::numeric else 0 end) as "students_meeting_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=200 
+then num_students::numeric else 0 end) as "students_meeting_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=500 
+then num_students::numeric else 0 end) as "students_meeting_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor>=1000 
+then num_students::numeric else 0 end) as "students_meeting_1_mbps_oversub",
 
 sum(case when ia_bandwidth_per_student<100 and "able_to_meet_100_kbps"='Yes' 
 then 1 else 0 end) as "additional_districts_able_to_meet_100_kbps",
@@ -487,27 +487,30 @@ ORDER BY state)
 select state_calc.state,
 extrap.single_campus_districts,
 extrap.single_campus_districts::numeric/extrap.num_districts_state as "%_single_campus_districts",
-districts_not_meeting_100_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_100_kbps",
-districts_not_meeting_200_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_200_kbps",
-districts_not_meeting_500_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_500_kbps",
-districts_not_meeting_1_mbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_1_mbps",
 
-students_not_meeting_100_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_100_kbps",
-students_not_meeting_200_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_200_kbps",
-students_not_meeting_500_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_500_kbps",
-students_not_meeting_1_mbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_1_mbps",
+(state_calc."districts_meeting_100_kbps"+"additional_districts_able_to_meet_100_kbps")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_100_kbps",
 
-districts_not_meeting_100_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_100_kbps_oversub",
-districts_not_meeting_200_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_200_kbps_oversub",
-districts_not_meeting_500_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_500_kbps_oversub",
-districts_not_meeting_1_mbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_1_mbps_oversub",
+(state_calc."districts_meeting_200_kbps"+"additional_districts_able_to_meet_200_kbps")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_200_kbps",
 
-students_not_meeting_100_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_100_kbps_oversub",
-students_not_meeting_200_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_200_kbps_oversub",
-students_not_meeting_500_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_500_kbps_oversub",
-students_not_meeting_1_mbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_1_mbps_oversub",
+(state_calc."districts_meeting_500_kbps"+"additional_districts_able_to_meet_500_kbps")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_500_kbps",
 
-state_calc.*
+(state_calc."districts_meeting_1_mbps"+"additional_districts_able_to_meet_1_mbps")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_1_mbps",
+
+(state_calc."districts_meeting_100_kbps_oversub"+"additional_districts_able_to_meet_100_kbps_oversub")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_100_kbps_oversub",
+
+(state_calc."districts_meeting_200_kbps_oversub"+"additional_districts_able_to_meet_200_kbps_oversub")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_200_kbps_oversub",
+
+(state_calc."districts_meeting_500_kbps_oversub"+"additional_districts_able_to_meet_500_kbps_oversub")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_500_kbps_oversub",
+
+(state_calc."districts_meeting_1_mbps_oversub"+"additional_districts_able_to_meet_1_mbps_oversub")/
+state_calc."num_clean_districts"::numeric as "%_districts_meeting_or_able_to_meet_1_mbps_oversub"
 
 from state_calc
 
@@ -530,5 +533,4 @@ on state_calc.state=extrap.postal_cd
 where state!='DC'
 
 ORDER BY postal_cd
-
 
