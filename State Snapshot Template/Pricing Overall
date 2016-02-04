@@ -69,6 +69,7 @@ where exists (
     on ad.district_esh_id = districts.esh_id
     where line_items.id = ad.line_item_id
     and districts.include_in_universe_of_districts=true
+    and districts.exclude_from_analysis=false
       
 )
 and broadband = true
@@ -84,7 +85,8 @@ on entity_circuits.entity_id=ad.recipient_id
 where ad.district_esh_id in (
 select esh_id
 from districts
-where include_in_universe_of_districts=true))
+where include_in_universe_of_districts=true
+and exclude_from_analysis=false))
 ORDER BY c.line_item_id),
 
 internet_circuit_frequency as (
