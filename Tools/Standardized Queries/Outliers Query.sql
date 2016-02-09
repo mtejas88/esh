@@ -43,6 +43,69 @@ ad as (
         on dl.esh_id = a.recipient_id
 ),
 
+--following sub-queries taken from "Dimensioning Clean" query
+
+version_order as (
+                select fy2015_item21_services_and_cost_id,
+                      case when contacted is null or contacted = false then 'false' 
+                        when contacted = true then 'true'
+                      end as contacted,
+                      version_id,
+                      row_number() over (
+                                        partition by fy2015_item21_services_and_cost_id 
+                                        order by version_id desc
+                                        ) as row_num
+                
+                from line_item_notes
+                where note not like '%little magician%'
+),
+most_recent as (
+                select ad.line_item_id,
+                      version_order.contacted,
+                      ad.district_esh_id,
+                      case when 'assumed_ia' = any(open_flags)
+                            or 'assumed_wan' = any(open_flags)
+                            or 'assumed_fiber' = any(open_flags)
+                      then true else false end as assumed_flags
+                      
+                from ad
+                left join version_order
+                on ad.line_item_id = version_order.fy2015_item21_services_and_cost_id
+                left join line_items
+                on ad.line_item_id = line_items.id
+                
+                where (row_num = 1
+                or row_num is null)
+                and exclude = false
+                ),
+                
+district_counts as (
+                    select district_esh_id,
+                          count(case when contacted = 'true' then 1 end) as true_count,
+                          count(case when contacted = 'false' then 1 end) as false_count,
+                          count(case when contacted is null and assumed_flags = true then 1 end) as null_assumed_count,
+                          count(case when contacted is null and assumed_flags = false then 1 end) as null_untouched_count
+                    
+                    from most_recent
+                    
+                    group by district_esh_id
+),
+
+district_contacted as (
+                        select district_esh_id,
+                              case when true_count >= 1 then 'verified'
+                                when true_count = 0 and false_count >= 1 then 'inferred'
+                                when true_count = 0 and false_count = 0 and null_assumed_count >= 1 then 'interpreted'
+                                when true_count = 0 and false_count = 0 and null_assumed_count = 0 and null_untouched_count >= 1 then 'assumed'
+                              end as clean_categorization,
+                              case when true_count >= 1 and false_count = 0 and null_assumed_count = 0 and null_untouched_count = 0
+                                then true else false end as totally_verified
+                                
+                        from district_counts
+),
+
+--start of sub-query sequence from "Dimensioning Clean" query
+
 --Groups allocations sub-query by line item and district to create a distinct row for each line item-district pairing
 ae as (
       select district_esh_id,
@@ -258,6 +321,11 @@ GROUP BY district_esh_id)
 select esh_id,
 name,
 postal_cd,
+case when dc.clean_categorization='verified' 
+and dc.totally_verified=true then 'All li verified' 
+when dc.clean_categorization='verified'
+and dc.totally_verified=false then 'Some li verified'
+else 'Not verified' end as "verification_status",
 case when (dml."num_shared_ia_li">0 and dml."num_upstream_li"=0)
   then 'Yes' else 'No' end as "Shared IA w/o upstream",
 case when (dzc."num_li_zero_lines_allocated">0)
@@ -293,6 +361,9 @@ on districts.esh_id=dml.district_esh_id
 
 left join district_new_line_items dnli
 on districts.esh_id=dnli.district_esh_id
+
+left join district_contacted dc
+on districts.esh_id=dc.district_esh_id
 
 left join lateral (
 select applicant_id,
