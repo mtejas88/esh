@@ -163,6 +163,8 @@ district_line_items as (
             else 'unknown'
           end as district_targeting_categorization,
           case 
+            when exclude_from_analysis = true 
+              then 'unknown'
             when fiber_ia_count > 0 
                   or (num_students::numeric*.1 <= --2014 bw goal
                               (cable_ia_count*150) +
@@ -176,6 +178,8 @@ district_line_items as (
                     else 'No'
           end as district_able_to_meet_2014_goal_given_current_circuits,
           case 
+            when exclude_from_analysis = true 
+              then 'unknown'
             when fiber_ia_count > 0 
                   or (num_students::numeric*.1/ia_oversub_factor <= --2014 bw goal
                               (cable_ia_count*150) +
