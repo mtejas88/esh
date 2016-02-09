@@ -24,7 +24,7 @@ with district_lookup as (
 lines_to_district_by_line_item as (
   select dl.district_esh_id,
          c.line_item_id,
-         count(*) as allocation_lines
+         count(distinct ec.circuit_id) as allocation_lines
         
   from entity_circuits ec
   join circuits c
