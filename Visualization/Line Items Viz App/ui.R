@@ -88,6 +88,9 @@ shinyUI(fluidPage(
                     h2("Select Circuit Sizes"),
                     choices = c(50,100,500,1000,10000),
                     selected = c(50,100,500,1000,10000)),
+      selectInput("dataset",
+                  h2("Select Dataset"),
+                  choices = c('All', 'Clean', 'Dirty')),
       selectInput("purpose", 
                   h2("Select Purpose"),
                   choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
@@ -114,6 +117,10 @@ shinyUI(fluidPage(
                               'OR','PA','RI','SC',
                               'SD','TN','TX','UT','VA',
                               'WA','WI','WV','WY'), selected="All"),
+      selectInput("goals",
+                  h2("Select Goal Status"), 
+                  choices = c('2014 Goals', '2018 Goals'),
+                  selected = '2014 Goals'),
       width=3
     )),
     mainPanel(
@@ -125,8 +132,8 @@ shinyUI(fluidPage(
                  div(id="test1", class="test", textOutput("n_observations"))),
         tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
         tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px")),
-        tabPanel("Meeting Goals Map", fluidRow(column(12, align = "center", plotOutput("mg_map", height="550px", width="1000px")))),
         tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
+        tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px")))),
       id="condition_panel"
   )
 )

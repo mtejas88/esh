@@ -5,10 +5,14 @@ shinyServer(function(input, output, session) {
   library(dplyr)
   library(grid)
   library(tidyr)
+  library(maps)
+  library(ggmap)
   
-  
+  ### Map ###
   li <- read.csv("li_shiny_1_14.csv")
-  us_ddt <- read.csv("us_ddt.csv")
+  ddt <- read.csv("us_ddt.csv")
+  
+  ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
   li$bandwidth_in_mbps <- as.numeric(as.character(li$bandwidth_in_mbps))
   li$ia_bandwidth_per_student <- as.numeric(as.character(li$ia_bandwidth_per_student))
@@ -23,8 +27,17 @@ shinyServer(function(input, output, session) {
   li$new_purpose[li$wan_conditions_met == 'TRUE'] <- "WAN"
   li$new_purpose[li$isp_conditions_met == 'TRUE'] <- "ISP Only"
   li$new_purpose[li$upstream_conditions_met == 'TRUE'] <- "Upstream"
+  
+  ### New Variables for Sujin's Map
+  ddt$exclude <- ifelse(ddt$exclude_from_analysis == "false", "Clean", "Dirty")
+  ddt$meeting_2014_goal_no_oversub <- ifelse(ddt$meeting_2014_goal_no_oversub == "true", "Meeting 2014 Goals",
+                                             "Below 2014 Goals")
+  ddt$meeting_2018_goal_no_oversub <- ifelse(ddt$meeting_2018_goal_no_oversub == "true", "Meeting 2018 Goals",
+                                             "Below 2018 Goals")
+  ddt$meeting_2018_goal_no_oversub <- as.factor(ddt$meeting_2018_goal_no_oversub)
+  ddt$meeting_2014_goal_no_oversub <- as.factor(ddt$meeting_2014_goal_no_oversub)
 
-  output$distPlot <- renderPlot({
+   output$distPlot <- renderPlot({
     selected_purpose <- paste0('\"',input$purpose, '\"')
     selected_size <- paste0('\"',input$size, '\"')
     selected_locale <- paste0('\"',input$locale, '\"')
@@ -167,59 +180,70 @@ output$natComparison <- renderPlot({
           ))
 })
 
-### Sujin's
-output$mg_map <- renderPlot({
+############### Sujin's ####################
+### Don't Update outside of here ###
+output$gen_map <- renderPlot({
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
   
-  width  <- session$clientData$output_distPlot_width
-  height <- session$clientData$output_distPlot_height
-  #us_ddt_subset <- us_ddt
-  #colnames(us_ddt_subset)
-
   
-  if(input$state == 'All') {
-    us_ddt_subset <- subset(us_ddt, us_ddt$postal_cd != 'AK' & us_ddt$postal_cd != 'HI')
-    state_map <- map_data("state", region = ".")
-    zoom <- 4
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter(!postal_cd %in% c('AK', 'HI') )
+                   
+  validate(
+    need(nrow(ddt_subset) > 0, "No districts in given subset")
+  )
+  
+  state_lookup <- data.frame(cbind(name = c('All', 'california', 'oregon', 'washington', 'nevada', 
+                                            'iowa', 'nebraska', 'new mexico', 'colorado', 
+                                            'montana' , 'minnesota', 'north dakota', 'south dakota', 
+                                            'illinois', 'wisconsin', 'indiana', 'pennsylvania','new york', 
+                                            'michigan', 'new jersey', 'florida', 'maine', 'new hampshire', 'massachusetts', 
+                                            'rhode island', 'delaware', 'maryland', 'montana', 'north carolina', 'south carolina',
+                                            'virginia', 'west virginia', 'louisiana', 'missouri', 'arkansas',
+                                            'mississippi', 'kansas', 'georgia', 'texas'), 
+                                   code = c('.', 'CA', 'OR', 'WA', 'NV', 
+                                            'IA', 'NE', 'NM', 'CO', 
+                                            'MT' , 'MN', 'ND', 'SD', 
+                                            'IL', 'WI', 'IN', 'PA','NY', 
+                                            'MI', 'NJ', 'FL', 'ME', 'NH', 'MA', 
+                                            'RI', 'DE', 'MD', 'MT', 'NC', 'SC',
+                                            'VA', 'WV', 'LS', 'MO', 'AR',
+                                            'MS', 'KS', 'GA', 'TX')), stringsAsFactors = F)
+  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
+  state_map <- map_data("state", region = state_name)
+  #ddt_subset$meeting_2018_goal_no_oversub <- as.factor(ddt_subset$meeting_2018_goal_no_oversub)
+  
+  if(input$goals == '2014 Goals') {
+    colors <- c("dimgray", "darkolivegreen4")
+    goals <- 'meeting_2014_goal_no_oversub'
   }
   else {
-    us_ddt_subset <- subset(us_ddt, us_ddt$postal_cd == input$state)
-    state_lookup <- data.frame(cbind(name = c('california', 'oregon', 'washington', 'nevada', 
-                                              'iowa', 'nebraska', 'new mexico', 'colorado', 
-                                              'montana' , 'minnesota', 'north dakota', 'south dakota', 
-                                              'illinois', 'wisconsin', 'indiana', 'pennsylvania','new york', 
-                                              'michigan', 'new jersey', 'florida', 'maine', 'new hampshire', 'massachusetts', 
-                                              'rhode island', 'delaware', 'maryland', 'montana', 'north carolina', 'south carolina',
-                                              'virginia', 'west virginia', 'louisiana', 'missouri', 'arkansas',
-                                              'mississippi', 'kansas', 'georgia', 'texas'), 
-                                     code = c('CA', 'OR', 'WA', 'NV', 
-                                              'IA', 'NE', 'NM', 'CO', 
-                                              'MT' , 'MN', 'ND', 'SD', 
-                                              'IL', 'WI', 'IN', 'PA','NY', 
-                                              'MI', 'NJ', 'FL', 'ME', 'NH', 'MA', 
-                                              'RI', 'DE', 'MD', 'MT', 'NC', 'SC',
-                                              'VA', 'WV', 'LS', 'MO', 'AR',
-                                              'MS', 'KS', 'GA', 'TX')), stringsAsFactors = F)
-    state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-    state_map <- map_data("state", region = state_name)
+    colors <- c("dimgray", "dodgerblue4")
+    goals <- 'meeting_2018_goal_no_oversub'
   }
+  print(levels(ddt_subset$meeting_2018_goal_no_oversub))
+  print(colors)
   
-  
-  #state_map <- map_data("state", region = ".")
-  state_base <- ggplot(state_map, aes(x = long, y = lat)) #long and lat are names within state_map dataset
-  q <- state_base + geom_point(data = us_ddt_subset, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), alpha=0.7, size = 4, position = position_jitter(w = 0.03, h = 0.03)) +
-    #coord_fixed(1.3) +
-    geom_polygon(data = state_map, aes(x = long, y= lat, group = group), color = 'black', fill = NA) +
+  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour=goals), alpha=0.5, size = 5, position = position_jitter(w = 0.05, h = 0.05)) +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    geom_polygon(data = state_map, aes(x = long, y= lat, group = group, fill=NA), colour='black') +
     theme_classic() + 
-    ggtitle("District - Clean Versus Not Clean") +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16)) +
-    guides(shape=guide_legend(override.aes=list(size=7))) +
-   coord_map()
-  
-  print(q) #pink: false, blue: true
-  
-  })
+    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
+          #legend.text = element_text(size=16), legend.position=c(1.6, 0.5)) #+
+  #labs(title = paste("N = ", toString(nrow(us_ddt_subset))))
+  print(q + coord_map()) 
+})
+############### END ####################
+
 output$bwProjection <- renderPlot({
   selected_size <- paste0('\"',input$size, '\"')
   selected_locale <- paste0('\"',input$locale, '\"')
@@ -253,7 +277,7 @@ output$bwProjection <- renderPlot({
 
   ggplot(need_fiber, aes(x=Year, y=Need_Fiber, group=1)) + geom_line(colour="#F26B21") +
     xlab("Year") +
-    ggtitle("Percentage of Schools Needing Fiber") +
+    ggtitle("Percentage of Schools Without Fiber That Need Fiber") +
     scale_y_continuous(labels=percent) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           panel.background = element_blank(), axis.line = element_blank(), 
