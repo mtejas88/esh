@@ -12,6 +12,10 @@ shinyServer(function(input, output, session) {
   li <- read.csv("li_shiny_1_14.csv")
   ddt <- read.csv("us_ddt.csv")
   
+  #Sujin: using li csv in fischer
+  #li <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/li_for_shiny.csv")
+  #ddt <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/us_ddt.csv")
+  
   ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
   li$bandwidth_in_mbps <- as.numeric(as.character(li$bandwidth_in_mbps))
@@ -31,9 +35,9 @@ shinyServer(function(input, output, session) {
   ### New Variables for Sujin's Map
   ddt$exclude <- ifelse(ddt$exclude_from_analysis == "false", "Clean", "Dirty")
   ddt$meeting_2014_goal_no_oversub <- ifelse(ddt$meeting_2014_goal_no_oversub == "true", "Meeting 2014 Goals",
-                                             "Below 2014 Goals")
+                                             "Not Meeting 2014 Goals")
   ddt$meeting_2018_goal_no_oversub <- ifelse(ddt$meeting_2018_goal_no_oversub == "true", "Meeting 2018 Goals",
-                                             "Below 2018 Goals")
+                                             "Not Meeting 2018 Goals")
   ddt$meeting_2018_goal_no_oversub <- as.factor(ddt$meeting_2018_goal_no_oversub)
   ddt$meeting_2014_goal_no_oversub <- as.factor(ddt$meeting_2014_goal_no_oversub)
 

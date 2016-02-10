@@ -90,7 +90,7 @@ shinyUI(fluidPage(
                     selected = c(50,100,500,1000,10000)),
       selectInput("dataset",
                   h2("Select Dataset"),
-                  choices = c('All', 'Clean', 'Dirty')),
+                  choices = c('All', 'Clean', 'Dirty'), selected = "All"),
       selectInput("purpose", 
                   h2("Select Purpose"),
                   choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
