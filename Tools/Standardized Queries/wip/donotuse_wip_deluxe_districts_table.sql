@@ -278,8 +278,11 @@ cdd_calc as (
 ),
 
 av as (
-        select distinct district_esh_id, line_item_id
-        from cd
+        select distinct district_esh_id, a.line_item_id
+        from allocations a
+        join district_lookup dl
+          on dl.esh_id = a.recipient_id
+        where broadband = true
       ),
 
 version_order as (
@@ -369,7 +372,7 @@ district_contacted as (
   case 
     when cdd_calc.ia_cost_per_mbps is null 
       then districts.ia_cost_per_mbps 
-      else cdd_calc.ia_cost_per_mbps/12 
+      else (cdd_calc.ia_cost_per_mbps/12)::varchar
   end as "monthly_ia_cost_per_mbps",
   districts.wan_cost_per_connection,
   districts.wan_bandwidth_low,
