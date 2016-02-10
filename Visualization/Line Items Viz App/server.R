@@ -9,12 +9,13 @@ shinyServer(function(input, output, session) {
   library(ggmap)
   
   ### Map ###
-  li <- read.csv("li_shiny_1_14.csv")
-  ddt <- read.csv("us_ddt.csv")
+  #Carson: 
+  #li <- read.csv("li_shiny_1_14.csv")
+  #ddt <- read.csv("us_ddt.csv")
   
-  #Sujin: using li csv in fischer
-  #li <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/li_for_shiny.csv")
-  #ddt <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/us_ddt.csv")
+  #Sujin: 
+  li <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/li_shiny_1_14.csv")
+  ddt <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/us_ddt.csv")
   
   ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
@@ -192,6 +193,7 @@ output$gen_map <- renderPlot({
   selected_locale <- paste0('\"',input$locale, '\"')
   selected_connection <- paste0('\"',input$connection, '\"')
   selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
   
   
   ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
@@ -199,6 +201,7 @@ output$gen_map <- renderPlot({
     filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
     filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
     filter(!postal_cd %in% c('AK', 'HI') )
                    
   validate(
@@ -226,26 +229,58 @@ output$gen_map <- renderPlot({
   #ddt_subset$meeting_2018_goal_no_oversub <- as.factor(ddt_subset$meeting_2018_goal_no_oversub)
   
   if(input$goals == '2014 Goals') {
-    colors <- c("dimgray", "darkolivegreen4")
+    colors <- c("#009296", "#CCCCCC")
     goals <- 'meeting_2014_goal_no_oversub'
+    colors2 = NULL
   }
-  else {
-    colors <- c("dimgray", "dodgerblue4")
+  else if(input$goals == '2018 Goals'){
+    colors <- c("#A3E5E6", "#CCCCCC")
     goals <- 'meeting_2018_goal_no_oversub'
+  }
+  
+  else {
+    #02/09: figure out better way to make all points one color
+    colors <- c("#0073B6","#0073B6")
+    goals <- 'meeting_2018_goal_no_oversub'
+    #goals <- NULL
+    
   }
   print(levels(ddt_subset$meeting_2018_goal_no_oversub))
   print(colors)
   
-  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour=goals), alpha=0.5, size = 5, position = position_jitter(w = 0.05, h = 0.05)) +
-    scale_fill_manual(values=colors) +
-    scale_color_manual(values=colors) +
+  set.seed(123) #to control jitter
+  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour= goals), alpha=0.8, size = 8, position = position_jitter(w = 0.03, h = 0.03)) +
+    scale_fill_manual(values= colors) +
+    scale_color_manual(values= colors) +
     geom_polygon(data = state_map, aes(x = long, y= lat, group = group, fill=NA), colour='black') +
     theme_classic() + 
-    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
-          #legend.text = element_text(size=16), legend.position=c(1.6, 0.5)) #+
-  #labs(title = paste("N = ", toString(nrow(us_ddt_subset))))
-  print(q + coord_map()) 
+    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), legend.position = "none")
+
+  print(q + coord_map())
+  })
+
+output$n_observations_ddt <- renderText({
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
+  
+  
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    filter(!postal_cd %in% c('AK', 'HI') )
+  
+  
+  paste("n =", toString(nrow(ddt_subset)))
 })
+
+
 ############### END ####################
 
 output$bwProjection <- renderPlot({
