@@ -90,7 +90,7 @@ shinyUI(fluidPage(
                     selected = c(50,100,500,1000,10000)),
       selectInput("dataset",
                   h2("Select Dataset"),
-                  choices = c('All', 'Clean'), selected = "All"),
+                  choices = c('All', 'Clean', 'Dirty'), selected = "All"),
       selectInput("purpose", 
                   h2("Select Purpose"),
                   choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
@@ -119,13 +119,8 @@ shinyUI(fluidPage(
                               'WA','WI','WV','WY'), selected="All"),
       selectInput("goals",
                   h2("Select Goal Status"), 
-                  choices = c('All', '2014 Goals', '2018 Goals'),
-                  selected = 'All'),
-      
-      selectInput("percfiber",
-                  h2("Select Percentage Fiber"),
-                  choices = c('Not applicable', 'No fiber', 'Some fiber', 'All fiber'),
-                  selected = 'Not applicable'),
+                  choices = c('2014 Goals', '2018 Goals'),
+                  selected = '2014 Goals'),
       width=3
     )),
     mainPanel(
@@ -138,8 +133,7 @@ shinyUI(fluidPage(
         tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
         tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px")),
         tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
-        tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px"))),
-                 div(id="test1", class="test", textOutput("n_observations_ddt"))),
+        tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px")))),
       id="condition_panel"
   )
 )
