@@ -22,7 +22,8 @@ application_discount_rate as (
 	select
 		"Application Number",
 		round(sum( "Full/Part Count"::numeric * "Cat 1 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c1_discount_rate,
-		round(sum( "Full/Part Count"::numeric * "Cat 2 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c2_discount_rate
+		round(sum( "Full/Part Count"::numeric * "Cat 2 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c2_discount_rate,
+		sum("Full/Part Count"::numeric) as num_students_usac
 
 	from distinct_application_entities
 
@@ -76,8 +77,9 @@ ben_funding_by_category as (
 		  sum(category_2_cost) / num_students 
 		else NULL
 		end as ben_category_2_cost_per_student,
-		agg_c1_discount_rate,
-		agg_c2_discount_rate
+		sum(agg_c1_discount_rate*num_students_usac)/sum(num_students_usac) as agg_c1_discount_rate,
+		sum(agg_c2_discount_rate*num_students_usac)/sum(num_students_usac) as agg_c2_discount_rate,
+		sum(num_students_usac) as num_students_usac
 
 
 	from application_funding_by_category
@@ -111,8 +113,8 @@ select
 	sum(case when num_students is not null then ben_category_2_cost end) / sum (num_students) as "Average C2 Cost per Student",
 	count(case when ben_category_2_cost_per_student >= 150 then ben end)/count(case when num_students is not null then ben end)::numeric 
 		as "Pct of Entities Meeting C2 Budget",
-	agg_c1_discount_rate,
-	agg_c2_discount_rate
+	sum(agg_c1_discount_rate*num_students_usac)/sum(num_students_usac) as agg_c1_discount_rate,
+	sum(agg_c2_discount_rate*num_students_usac)/sum(num_students_usac) as agg_c2_discount_rate
 
 from ben_funding_by_category
 left join all_students_in_state
