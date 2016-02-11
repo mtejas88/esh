@@ -65,6 +65,7 @@ services_received as (
 
       li.bandwidth_in_mbps,
       li.connect_type,
+      li.connect_category,
       li.purpose,
       li.wan,
 
@@ -147,12 +148,26 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       d.locale,
       d.district_size,
       d.exclude_from_analysis,
-      d.consortium_member
+      d.consortium_member,
+      'n/a' as recipient_districts,
+      'n/a' as recipient_postal_cd,
+      case 
+        when d.exclude_from_analysis = true
+          then 'exclude dirty'
+          else 'include clean'
+      end as dirty_status,
+      spc.reporting_name
 
       from lines_to_district_by_line_item ldli
 
       left join line_items li
       on ldli.line_item_id=li.id
+
+      left join (
+          select distinct name, reporting_name
+          from service_provider_categories
+      ) spc
+      on li.service_provider_name = spc.name
 
       left join districts d
       on ldli.district_esh_id=d.esh_id
@@ -210,6 +225,7 @@ services_applied_for as (
 
       li.bandwidth_in_mbps,
       li.connect_type,
+      li.connect_category,
       li.purpose,
       li.wan,
 
@@ -270,12 +286,38 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       d.locale,
       d.district_size,
       d.exclude_from_analysis,
-      d.consortium_member
+      d.consortium_member,
+      x.recipient_districts,
+      x.recipient_postal_cd,
+      case 
+        when 'false' = any(x.recipient_district_cleanliness)
+          then 'include clean'
+          else 'exclude dirty'
+      end as dirty_status,
+      spc.reporting_name
 
       from districts d
 
       left join line_items li
       on d.esh_id=li.applicant_id
+
+
+      left join (
+          select distinct name, reporting_name
+          from service_provider_categories
+      ) spc
+      on li.service_provider_name = spc.name
+
+      left join lateral (
+        select  line_item_id,
+                array_agg(DISTINCT district_esh_id) as "recipient_districts",
+                array_agg(DISTINCT postal_cd) as "recipient_postal_cd",
+                array_agg(DISTINCT exclude_from_analysis) as "recipient_district_cleanliness"
+        from lines_to_district_by_line_item ldli
+        left join districts
+        on ldli.district_esh_id = districts.esh_id
+        GROUP BY line_item_id) x
+      on li.id=x.line_item_id
 
       where li.broadband=true  
        and (li.consortium_shared=false 
@@ -298,7 +340,7 @@ from services_applied_for svcs
 --Liquid parameters allow user to filter for district_esh_id, state, and clean status
 where (svcs.esh_id::varchar='{{esh_id}}' OR 'All'='{{esh_id}}') 
   and (svcs.postal_cd='{{state}}' OR 'All'='{{state}}') 
-  and (svcs.exclude_from_analysis::varchar='{{exclude_from_analysis_received_only}}' OR 'All'='{{exclude_from_analysis_received_only}}')
+  and (svcs.dirty_status='{{dirty_status}}' OR 'All'='{{dirty_status}}') 
 
 ORDER BY esh_id
 
@@ -318,11 +360,11 @@ state:
   type: text
   default: 'All'
   
-exclude_from_analysis_received_only:
+dirty_status:
   type: select
   default: 'All'
-  options: [['true'],
-            ['false'],
+  options: [['exclude dirty'],
             ['All']
            ]
+
 {% endform %}

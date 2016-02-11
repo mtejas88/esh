@@ -200,31 +200,19 @@ cdd as (
         cgfd.num_campuses,
         cgfd.locale,
         sum(case when li.connect_category in ('Fiber', 'Fixed Wireless') 
-              then case when cd.allocation_lines < li.num_lines 
-                    then cd.allocation_lines
-                    else li.num_lines 
-                  end
+              then cd.allocation_lines
               else 0
             end) as fiber_equiv_lines,
         sum(case when li.connect_type = 'Cable Modem' 
-              then case when cd.allocation_lines < li.num_lines 
-                    then cd.allocation_lines
-                    else li.num_lines 
-                  end
+              then cd.allocation_lines
               else 0
             end) as cable_lines,
         sum(case when li.connect_type != 'Cable Modem' and li.connect_category in ('Copper', 'Cable / DSL') 
-              then case when cd.allocation_lines < li.num_lines 
-                    then cd.allocation_lines
-                    else li.num_lines 
-                  end
+              then cd.allocation_lines
               else 0
             end) as copper_dsl_lines,
         sum(case when li.wan_conditions_met = true and exclude = false
-              then case when cd.allocation_lines < li.num_lines 
-                    then cd.allocation_lines
-                    else li.num_lines 
-                  end
+              then cd.allocation_lines
               else 0
             end) as wan_lines
             
