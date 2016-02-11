@@ -188,13 +188,13 @@ output$natComparison <- renderPlot({
 ############### Sujin's ####################
 ### Don't Update outside of here ###
 output$gen_map <- renderPlot({
+
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_size <- paste0('\"',input$size, '\"')
   selected_locale <- paste0('\"',input$locale, '\"')
   selected_connection <- paste0('\"',input$connection, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   selected_percfiber <- paste0('\"', input$percfiber, '\"')
-  
   
   ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
     filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
@@ -245,8 +245,6 @@ output$gen_map <- renderPlot({
     #goals <- NULL
     
   }
-  print(levels(ddt_subset$meeting_2018_goal_no_oversub))
-  print(colors)
   
   set.seed(123) #to control jitter
   q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour= goals), alpha=0.8, size = 8, position = position_jitter(w = 0.03, h = 0.03)) +
@@ -259,6 +257,8 @@ output$gen_map <- renderPlot({
   print(q + coord_map())
   })
 
+
+#Show n's for maps
 output$n_observations_ddt <- renderText({
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_size <- paste0('\"',input$size, '\"')
@@ -267,6 +267,41 @@ output$n_observations_ddt <- renderText({
   selected_state <- paste0('\"',input$state, '\"')
   selected_percfiber <- paste0('\"', input$percfiber, '\"')
   
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    filter(!postal_cd %in% c('AK', 'HI') )
+
+  paste("n =", toString(nrow(ddt_subset)))
+})
+
+#For downloadable subsets
+datasetInput <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_purpose <- paste0('\"',input$purpose, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
+  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  li_subset <- li %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("district_postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
+    filter(cost_per_line < 40000) %>%
+    mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
+    filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  
+  validate(
+    need(nrow(li_subset) > 0, "No districts in given subset")
+    )
   
   ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
     filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
@@ -276,9 +311,71 @@ output$n_observations_ddt <- renderText({
     filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
     filter(!postal_cd %in% c('AK', 'HI') )
   
+  validate(
+    need(nrow(ddt_subset) > 0, "No districts in given subset")
+    )
+
+  switch(input$subset,
+         "Line items" = li_subset,
+         "Deluxe districts" = ddt_subset)
+  })
+
+output$table <- renderTable({
+  datasetInput()
+  })
+
+output$downloadData <- downloadHandler(
+  filename = function(){
+    paste(input$subset, '.csv', sep = '')},
+  content = function(file){
+    write.csv(datasetInput(), file)
+    }
+  )
+
+#For density spread plot
+output$densPlot <- renderPlot({
   
-  paste("n =", toString(nrow(ddt_subset)))
-})
+  #using "exclude_from_analysis" column from li to filter for clean LI (instead of "exclude" column)
+  li$exclude_from_analysis <- ifelse(li$exclude_from_analysis == FALSE, "Clean", "Dirty")
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_purpose <- paste0('\"',input$purpose, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  li_subset <- li %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude_from_analysis ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("district_postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
+    filter(cost_per_line > 1000 & cost_per_line < 10000) %>% #limiting range to remove outliers
+    mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
+    filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  
+  validate(
+    need(nrow(li_subset) > 0, "No circuits in given subset")
+  )
+  
+  d_plot <- ggplot(li_subset, aes(x=band_factor, y=cost_per_line, colour = band_factor)) + geom_point(size=8, alpha=0.75) + 
+          scale_color_manual(values = c("#FDB913", "#F26B21", "#A3E5E6", "#009296", "#0073B6"))+
+          xlab("Bandwidth (Mbps)") + ylab("Monthly Cost Per Circuit ($)") + theme_classic() + theme(legend.position="none") 
+          #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          #      panel.background = element_blank(), axis.line = element_blank(), 
+          #      axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          #      axis.text.y=element_text(size=14, colour= "#899DA4"),
+          #      axis.ticks=element_blank(),
+          #      axis.title.x=element_blank(),
+          #      axis.title.y=element_blank()
+          #))
+  print(d_plot)
+  
+}) 
+
 
 
 ############### END ####################
