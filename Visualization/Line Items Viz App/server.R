@@ -187,6 +187,7 @@ output$natComparison <- renderPlot({
 
 ############### Sujin's ####################
 ### Don't Update outside of here ###
+
 output$gen_map <- renderPlot({
 
   selected_dataset <- paste0('\"', input$dataset, '\"')
@@ -208,22 +209,20 @@ output$gen_map <- renderPlot({
     need(nrow(ddt_subset) > 0, "No districts in given subset")
   )
   
-  state_lookup <- data.frame(cbind(name = c('All', 'california', 'oregon', 'washington', 'nevada', 
-                                            'iowa', 'nebraska', 'new mexico', 'colorado', 
-                                            'montana' , 'minnesota', 'north dakota', 'south dakota', 
-                                            'illinois', 'wisconsin', 'indiana', 'pennsylvania','new york', 
-                                            'michigan', 'new jersey', 'florida', 'maine', 'new hampshire', 'massachusetts', 
-                                            'rhode island', 'delaware', 'maryland', 'montana', 'north carolina', 'south carolina',
-                                            'virginia', 'west virginia', 'louisiana', 'missouri', 'arkansas',
-                                            'mississippi', 'kansas', 'georgia', 'texas'), 
-                                   code = c('.', 'CA', 'OR', 'WA', 'NV', 
-                                            'IA', 'NE', 'NM', 'CO', 
-                                            'MT' , 'MN', 'ND', 'SD', 
-                                            'IL', 'WI', 'IN', 'PA','NY', 
-                                            'MI', 'NJ', 'FL', 'ME', 'NH', 'MA', 
-                                            'RI', 'DE', 'MD', 'MT', 'NC', 'SC',
-                                            'VA', 'WV', 'LS', 'MO', 'AR',
-                                            'MS', 'KS', 'GA', 'TX')), stringsAsFactors = F)
+  
+  state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
+                                       'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
+                                       'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
+                                       'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey',
+                                       'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon',
+                                       'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+                                       'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming'),
+                             
+                             code = c('.', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
+                                      "GA", 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+                                      'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+                                      'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+                                      'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_map <- map_data("state", region = state_name)
   #ddt_subset$meeting_2018_goal_no_oversub <- as.factor(ddt_subset$meeting_2018_goal_no_oversub)
@@ -245,6 +244,7 @@ output$gen_map <- renderPlot({
     #goals <- NULL
     
   }
+  
   
   set.seed(123) #to control jitter
   q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour= goals), alpha=0.8, size = 8, position = position_jitter(w = 0.03, h = 0.03)) +
