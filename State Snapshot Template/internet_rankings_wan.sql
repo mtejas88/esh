@@ -35,8 +35,6 @@ lines_to_district_by_line_item as (
   group by  district_esh_id,
          line_item_id
 ),
-/*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
-to add demographic data used in metric calculations*/
 services_received as (
       select ldli.district_esh_id as esh_id,
       d.name,
@@ -322,45 +320,54 @@ students (e.g. num_students in district/num_students in ALL districts served by 
        )  
        and d.include_in_universe_of_districts=true 
        and (case when 'exclude'=any(li.open_flags) then true else false end)=false
+),
+
+internet_clean as (
+  select reporting_name,
+  postal_cd,
+  sum(distinct num_students::numeric) as num_students,
+  count(distinct esh_id) as num_districts,
+  count(distinct line_item_id) as num_line_items,
+  sum(quantity_of_lines_received_by_district::numeric) as num_circuits,
+  sum(line_item_district_monthly_cost) as total_cost
+
+from services_received
+where internet_conditions_met = true and dirty_status = 'include clean' and shared_service = 'District-dedicated' 
+group by reporting_name, postal_cd
+),
+
+parent_overall as (
+  select reporting_name,
+  postal_cd,
+  sum(line_item_total_num_lines) as num_line_items_overall,
+  sum(line_item_total_monthly_cost) as total_cost_overall
+
+from services_applied_for
+group by reporting_name, postal_cd
+),
+
+overall as (
+  select postal_cd,
+  sum(line_item_total_monthly_cost) as total_cost_state
+
+from services_applied_for
+group by postal_cd
+),
+
+ranked as (
+  select ic.*,
+  po.num_line_items_overall,
+  po.total_cost_overall,
+  po.total_cost_overall/o.total_cost_state::numeric as pct_total_cost_overall,
+  row_number() over (partition by ic.postal_cd order by num_circuits desc, num_students desc) as ranking
+
+  from internet_clean ic
+  left join parent_overall po
+  on concat(ic.postal_cd,ic.reporting_name) = concat(po.postal_cd,po.reporting_name)
+  left join overall o
+  on ic.postal_cd = o.postal_cd
 )
-  
-select * 
 
-    {% if received_or_applied_for == 'received' %}
-from services_received svcs
-    {% endif %}
-    {% if received_or_applied_for == 'applied_for' %}
-from services_applied_for svcs
-    {% endif %}
-
---Liquid parameters allow user to filter for district_esh_id, state, and clean status
-where (svcs.esh_id::varchar='{{esh_id}}' OR 'All'='{{esh_id}}') 
-  and (svcs.postal_cd='{{state}}' OR 'All'='{{state}}') 
-  and (svcs.dirty_status='{{dirty_status}}' OR 'All'='{{dirty_status}}') 
-
-ORDER BY esh_id
-
-{% form %}
-received_or_applied_for:
-  type: select
-  default: 'received'
-  options: [['received'],
-            ['applied_for']
-           ]
-
-esh_id:
-  type: text
-  default: 'All'
-  
-state:
-  type: text
-  default: 'AZ'
-  
-dirty_status:
-  type: select
-  default: 'All'
-  options: [['exclude dirty'],
-            ['All']
-           ]
-
-{% endform %}
+select *
+from ranked
+where ranking <= 3
