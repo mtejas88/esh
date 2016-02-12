@@ -1,9 +1,9 @@
 /*
 Author: Justine Schott
 Created On Date: 12/29/2015
-Last Modified Date: 12/29/2015
-Name of QAing Analyst(s): 
-Purpose: To display all state snapshot metrics and QA metrics
+Last Modified Date: 02/10/2016
+Name of QAing Analyst(s):  
+Purpose: To display all state snapshot metrics and QA metrics, with addition of state-level broadband spending
 Methodology: Each metrics grouping begins with a comment. Any table that begins with "states" is calculating metrics at the state level, then 
 all "states" queries are merged in the final query. There are 3 different groups of districts that are used -- universe (ie, clean and dirty); 
 clean_goal_fiber (ie, clean), and clean_afford (ie, clean and has cost information).
@@ -47,26 +47,95 @@ c2_li as (
   from line_items
   where service_category ilike '%internal%'
 ),
+
+broadband_li as (
+select *
+from line_items
+where broadband=true),
+
+c1_li as (
+  select *
+  from line_items
+  where broadband=true OR service_category='VOICE SERVICES'), 
+
 distinct_application_entities as (
-	select distinct
-	  "Application Number",
-	  postal_cd,
-	  "Full/Part Count",
-	  "Cat 2 Disc Rate"
+  select distinct
+    "Application Number",
+    postal_cd,
+    "Full/Part Count",
+    "Cat 2 Disc Rate"
 
-	from fy2015_discount_calculations dc
+  from fy2015_discount_calculations dc
 
-	where "Stud NSLP Perc" != '0' and "Cat 2 Disc Rate"::numeric > 0
+  where "Stud NSLP Perc" != '0' and "Cat 2 Disc Rate"::numeric >0
 ),
+
+distinct_application_entities_broadband as (
+select distinct
+    dc."Application Number",
+    postal_cd,
+    "Full/Part Count",
+    "Cat 1 Disc Rate"
+
+  from fy2015_discount_calculations dc
+  --we want to exclude applications where every FRN is voice services (and thus neither broadband nor C2) 
+  left join lateral (
+  select "Application Number",
+  count(distinct "FRN") as "num_frns",
+  sum(case when "FRN Service Type"='VOICE SERVICES'
+  then 1 else 0 end) as "num_voice_services_frns"
+  
+  from public.fy2015_funding_request_key_informations
+  
+  GROUP BY "Application Number") voice_filter
+  on dc."Application Number"=voice_filter."Application Number"
+
+  where "Stud NSLP Perc" != '0' and num_voice_services_frns!=num_frns and "Cat 1 Disc Rate"::numeric >0),
+  
+distinct_application_entities_c1 as (
+select distinct
+    dc."Application Number",
+    postal_cd,
+    "Full/Part Count",
+    "Cat 1 Disc Rate"
+
+  from fy2015_discount_calculations dc
+
+  where "Stud NSLP Perc" != '0' and "Cat 1 Disc Rate"::numeric >0),
+
 states_application_discount_rate as (
-	select
-		postal_cd,
-		round(sum( "Full/Part Count"::numeric * "Cat 2 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c2_discount_rate
+  select
+    postal_cd,
+    round(sum("Full/Part Count"::numeric * "Cat 2 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c2_discount_rate
 
-	from distinct_application_entities
+  from distinct_application_entities
 
-	group by postal_cd
+  group by postal_cd
 ),
+
+states_application_discount_rate_broadband as (
+  select
+    postal_cd,
+    round(sum("Full/Part Count"::numeric * "Cat 1 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_broadband_discount_rate
+
+  from distinct_application_entities_broadband
+  
+  where "Cat 1 Disc Rate"::numeric >0
+
+  group by postal_cd
+),
+
+states_application_discount_rate_c1 as (
+select
+    postal_cd,
+    round(sum("Full/Part Count"::numeric * "Cat 1 Disc Rate"::numeric)/sum("Full/Part Count"::numeric),0) as agg_c1_discount_rate
+
+  from distinct_application_entities_c1
+  
+  where "Cat 1 Disc Rate"::numeric >0
+
+  group by postal_cd),
+
 district_lookup as (
   select esh_id, esh_id as district_esh_id
   from universe_districts
@@ -85,11 +154,41 @@ ad as (
   on a.recipient_id = dl.esh_id
   where exists (select 1 from c2_li where c2_li.id = a.line_item_id)
 ),
+
+ad_broadband as (
+  select
+    a.line_item_id,
+    dl.district_esh_id
+  from allocations a
+  left join district_lookup dl
+  on a.recipient_id = dl.esh_id
+  where exists (select 1 from broadband_li where broadband_li.id = a.line_item_id)),
+  
+ad_c1 as (
+select
+    a.line_item_id,
+    dl.district_esh_id
+  from allocations a
+  left join district_lookup dl
+  on a.recipient_id = dl.esh_id
+  where exists (select 1 from c1_li where c1_li.id = a.line_item_id)),
+
 districts_c2 as (
   select *
   from universe_districts sd
   where exists (select 1 from ad where ad.district_esh_id = sd.esh_id)
 ),
+
+districts_broadband as (
+  select *
+  from universe_districts sd
+  where exists (select 1 from ad_broadband where ad_broadband.district_esh_id = sd.esh_id)),
+  
+districts_c1 as (
+select *
+  from universe_districts sd
+  where exists (select 1 from ad_c1 where ad_c1.district_esh_id = sd.esh_id)),
+
 states_c2_applicant as (
   select
     applicant_postal_cd as postal_cd,
@@ -97,6 +196,23 @@ states_c2_applicant as (
   from c2_li
   group by applicant_postal_cd
 ),
+
+states_broadband_applicant as (
+  select
+    applicant_postal_cd as postal_cd,
+    sum(total_cost) as broadband_cost
+  from broadband_li
+  group by applicant_postal_cd
+),
+
+states_c1_applicant as (
+select
+    applicant_postal_cd as postal_cd,
+    sum(total_cost) as c1_cost
+  from c1_li
+  group by applicant_postal_cd
+),
+
 states_c2_recipient as (
   select
     postal_cd,
@@ -111,6 +227,40 @@ states_c2_recipient as (
       where sd.postal_cd = districts_c2.postal_cd
     ) as count_districts    
   from districts_c2
+  group by postal_cd
+),
+
+states_broadband_recipient as (
+  select
+    postal_cd,
+    count(*)::numeric / (
+      select count(*)
+      from universe_districts sd
+      where sd.postal_cd = districts_broadband.postal_cd
+    )::numeric as pct_receiving_broadband,
+    (
+      select count(*)
+      from universe_districts sd
+      where sd.postal_cd = districts_broadband.postal_cd
+    ) as count_districts    
+  from districts_broadband
+  group by postal_cd
+),
+
+states_c1_recipient as (
+select
+    postal_cd,
+    count(*)::numeric / (
+      select count(*)
+      from universe_districts sd
+      where sd.postal_cd = districts_c1.postal_cd
+    )::numeric as pct_receiving_c1,
+    (
+      select count(*)
+      from universe_districts sd
+      where sd.postal_cd = districts_c1.postal_cd
+    ) as count_districts    
+  from districts_c1
   group by postal_cd
 ),
 
@@ -200,19 +350,31 @@ cdd as (
         cgfd.num_campuses,
         cgfd.locale,
         sum(case when li.connect_category in ('Fiber', 'Fixed Wireless') 
-              then cd.allocation_lines
+              then case when cd.allocation_lines < li.num_lines 
+                    then cd.allocation_lines
+                    else li.num_lines 
+                  end
               else 0
             end) as fiber_equiv_lines,
         sum(case when li.connect_type = 'Cable Modem' 
-              then cd.allocation_lines
+              then case when cd.allocation_lines < li.num_lines 
+                    then cd.allocation_lines
+                    else li.num_lines 
+                  end
               else 0
             end) as cable_lines,
         sum(case when li.connect_type != 'Cable Modem' and li.connect_category in ('Copper', 'Cable / DSL') 
-              then cd.allocation_lines
+              then case when cd.allocation_lines < li.num_lines 
+                    then cd.allocation_lines
+                    else li.num_lines 
+                  end
               else 0
             end) as copper_dsl_lines,
         sum(case when li.wan_conditions_met = true and exclude = false
-              then cd.allocation_lines
+              then case when cd.allocation_lines < li.num_lines 
+                    then cd.allocation_lines
+                    else li.num_lines 
+                  end
               else 0
             end) as wan_lines
             
@@ -340,13 +502,18 @@ states_afford as (
 
 select
   sn.postal_cd,
---wifi metrics    
+--Broadband/Wifi metrics   
   (((sn.overall_student_count*150) - sap.c2_cost)/1000000)*(sadr.agg_c2_discount_rate/100) as "$M remaining E-Rate funds to support Wi-Fi and other internal connectivity equipment purchases",
+  sc1.pct_receiving_c1 as "% of districts that are receiving c1 services this year",
+  sb.pct_receiving_broadband as "% of districts that are receiving broadband this year",
   sr.pct_receiving_c2 as "% of districts that have requested any funding for Wi-Fi and other internal connectivity equipment this year",
---wifi QA metrics 
   (sn.overall_student_count*150)/1000000 as c2_budget_of_esh_district_population,
   ((sn.overall_student_count*150) - sap.c2_cost)/1000000 as c2_cost_remaining,
+  sc1a.c1_cost/1000000 as cost_of_all_c1_applications,
+  sba.broadband_cost/1000000 as cost_of_all_broadband_applications,
   sap.c2_cost/1000000 as cost_of_all_c2_applications,
+  sadrc1.agg_c1_discount_rate as dr_of_all_c1_applications,
+  sadrb.agg_broadband_discount_rate as dr_of_all_broadband_applications,
   sadr.agg_c2_discount_rate as dr_of_all_c2_applications,
 --goals metric
   sg.pct_districts_meeting_current_goal_unadj,
@@ -425,10 +592,35 @@ from states_nces sn
 --wifi metrics
 left join states_c2_recipient sr
 on sn.postal_cd = sr.postal_cd
+
+left join states_broadband_recipient sb
+on sn.postal_cd=sb.postal_cd
+
+left join states_c1_recipient sc1
+on sn.postal_cd=sc1.postal_cd
+
+
+
 left join states_c2_applicant sap
 on sn.postal_cd = sap.postal_cd
+
+left join states_broadband_applicant sba
+on sn.postal_cd=sba.postal_cd
+
+left join states_c1_applicant sc1a
+on sn.postal_cd=sc1a.postal_cd
+
+
 left join states_application_discount_rate sadr
-on sadr.postal_cd = sn.postal_cd
+on sn.postal_cd = sadr.postal_cd
+
+left join states_application_discount_rate_broadband sadrb
+on sn.postal_cd=sadrb.postal_cd
+
+left join states_application_discount_rate_c1 sadrc1
+on sn.postal_cd=sadrc1.postal_cd
+
+
 --goals metrics and sample metrics
 left join states_goals sg
 on sg.postal_cd = sn.postal_cd
