@@ -66,13 +66,16 @@ shinyServer(function(input, output, session) {
       need(nrow(li_subset) > 0, "No circuits in given subset")
     )
     
+    p0 <- ggplot(li_subset, aes(x=band_factor, y=cost_per_line)) + geom_boxplot(fill="#009291", colour="#ABBFC6", 
+                                                                          outlier.colour="#009291", width=.5)
+    ylim1 <- boxplot.stats(li_subset$cost_per_line)$stats[c(1, 5)]
+  
     meds <- li_subset %>% group_by(band_factor) %>% summarise(medians = median(cost_per_line))
     dollar_format(largest_with_cents=1)
-    print(ggplot(li_subset, aes(x=band_factor, y=cost_per_line)) + geom_boxplot(fill="#009291", colour="#ABBFC6", 
-      outlier.colour="#009291", width=.5) +
+    print(p0 + coord_cartesian(ylim = ylim1*1.05) +
       scale_y_continuous("",labels=dollar) +
-      geom_text(data = meds, aes(x = band_factor, y = min(medians), label = dollar(medians)), 
-                 size = 4, vjust = -1, colour= "#F26B21", hjust=2.1)+
+      geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
+                 size = 4, vjust = 0, colour= "#F26B21", hjust=2.1)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -104,8 +107,9 @@ shinyServer(function(input, output, session) {
       filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
       mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
       filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
-    
-      paste("n =", toString(nrow(li_subset)))
+      ns <- li_subset %>% group_by(band_factor) %>% summarise(len = length(cost_per_line))
+      print(ns[,2])
+      paste("N's =", ns[1,2], ns[2,2], ns[3,2], ns[4,2], ns[5,2])
     })
   
   output$histPlot <- renderPlot({
