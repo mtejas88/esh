@@ -1,0 +1,532 @@
+*
+Author: Greg Kurzhals
+Created On Date: 01/22/2015
+Last Modified Date:
+Name of QAing Analyst(s): Justine Schott
+Purpose: Quantifies the clean districts that are not currently meeting various connectivity goals, as well as
+the subset of those that will be unable to meet that goal without upgrading their existing Internet infrastructure
+Methodology: This query builds upon the "Services Received" query (see note below) to identify the number of
+circuits of each connection type providing Internet access to each clean district.  Once these circuit counts
+have been determined, the theoretical maximum bandwidth for each district's existing infrastructure is 
+calculated using the following assumptions: fiber circuits are effectively scalable in all circumstances,
+fixed wireless circuits can scale to 1 Gbps, cable modems can scale to 150 mbps, and DSL circuits can scale 
+to 50 mbps.  Other connection types (e.g. Data Plan/Air Card Services, fixed-bandwidth technologies such as 
+T-1 or T-3 lines) are included using the existing bandwidth provided rather than a
+projected or theoretical maximum value.  Each district's theoretical maximum bandwidth is then compared
+to the threshold bandwidth in mbps necessary to meet 100 Kbps, 200 Kbps, 500 Kbps, and 1 Mbps bandwidth
+per student values.
+
+Aggregating by state yields the number of districts in the clean sample that are unable to meet each connectivity target.
+
+Notes: Sub-queries "district_lookup" to "af" are taken from existing "Services Received" query
+(https://modeanalytics.com/educationsuperhighway/reports/7fe09fee682e) 
+*/
+
+with district_lookup as (
+       select esh_id, district_esh_id, postal_cd
+        from schools
+        union
+        select esh_id, esh_id as district_esh_id, postal_cd
+        from districts
+),
+
+--Adds district_esh_id to all entries in allocations table
+ad as (
+        select district_esh_id, a.*
+        from allocations a
+        join district_lookup dl
+        on dl.esh_id = a.recipient_id
+),
+
+--Groups allocations sub-query by line item and district to create a distinct row for each line item-district pairing
+ae as (
+      select district_esh_id,
+      line_item_id,
+      sum(num_lines_to_allocate) as "district_num_lines_received"
+      from ad
+      GROUP BY district_esh_id,line_item_id
+),
+
+/*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
+to add demographic data used in metric calculations*/
+
+--start of sub-query "af"; for clarity, sub-query "af" contains sub-query "z", which contains "y", which contains "b" and "e"
+
+af as (
+      select ae.district_esh_id,
+      x.name,
+      x.postal_cd,
+      ae.line_item_id,
+      li.consortium_shared,
+
+--classifies circuits as either "Shared IA", "Backbone", or "District-dedicated"
+      case when li.consortium_shared=true and ia_conditions_met=true
+      then 'Shared IA'
+      when li.consortium_shared=true and 'backbone'=any(open_flags)
+      then 'Backbone'
+      else 'District-dedicated' end as "shared_service",
+
+--limits lines received by district to the total num_lines listed in the line item, unless the line item is allocated to multiple districts
+      case when li.consortium_shared=false and ae.district_num_lines_received>=li.num_lines 
+      then li.num_lines::varchar
+      when li.consortium_shared=true OR 'backbone'=any(open_flags)
+      then 'Shared Circuit'
+      else ae.district_num_lines_received::varchar end as "quantity_of_lines_received_by_district",
+
+      li.bandwidth_in_mbps,
+      li.connect_type,
+      li.connect_category,
+      li.purpose,
+      li.wan,
+
+/*For "District-dedicated circuits", the district share of the line item cost is calculated by multiplying the line item cost by the proportion of the total num_lines allocated to 
+the district (see previous comment).  For "Shared IA" and "Backbone" line items, line item cost is divided proportionally between recipient districts based on their number of 
+students (e.g. num_students in district/num_students in ALL districts served by line item)*/ 
+
+      case when li.rec_elig_cost!='No data' and li.consortium_shared=false and ae.district_num_lines_received>=li.num_lines and li.total_cost::numeric>0 and li.num_lines!=0 and li.orig_r_months_of_service is not null
+      and li.orig_r_months_of_service!=0 
+      then li.total_cost::numeric/li.orig_r_months_of_service 
+      when li.consortium_shared=false and ae.district_num_lines_received<li.num_lines and li.num_lines!=0 and li.total_cost::numeric>0 
+      and li.orig_r_months_of_service is not null and li.orig_r_months_of_service!=0 
+      then (ae.district_num_lines_received/li.num_lines)*
+      (li.total_cost::numeric/li.orig_r_months_of_service)
+      when li.consortium_shared=true OR 'backbone'=any(li.open_flags) then (x.num_students::numeric/z.num_students_served)*(li.total_cost::numeric/li.orig_r_months_of_service)  
+      else 0 end as "district_monthly_cost",
+
+--if months of service is null or zero, we assume that the services are in use throughout the entirety of the E-rate cycle
+
+      case when li.orig_r_months_of_service is not null and li.rec_elig_cost!='No data'
+      and li.orig_r_months_of_service!=0 then li.total_cost::numeric/li.orig_r_months_of_service 
+      else li.total_cost::numeric/12 end as "line_item_total_monthly_cost",
+
+      ae.district_num_lines_received as "cat.1_allocations_to_district",
+      li.num_lines as "line_item_total_num_lines",
+      li.total_cost as "line_item_total_cost",
+      li.rec_elig_cost as "line_item_recurring_elig_cost",
+      li.one_time_eligible_cost as "line_item_one-time_cost",
+      li.orig_r_months_of_service,
+      li.applicant_name,
+      li.isp_conditions_met,
+      li.internet_conditions_met,
+      li.ia_conditions_met,
+      li.wan_conditions_met,
+      li.upstream_conditions_met,
+      li.broadband,
+      li.service_provider_name,
+      li.exclude,
+      li.erate,
+      li.open_flags,
+      
+      case when 'exclude'=any(open_flags) then true else false end as "dqs_excluded",
+      
+      case when x.ia_cost_per_mbps!='Insufficient data' and x.ia_cost_per_mbps!='Infinity' and x.ia_cost_per_mbps!='NaN' 
+      then x.ia_cost_per_mbps::numeric/12 else null end as "monthly_ia_cost_per_mbps",
+
+--total IA "backed out" from metrics by multiplying bandwidth per student by num_students
+      
+      case when x.ia_bandwidth_per_student!='Insufficient data' and x.num_students!='No data' then 
+      ((x.ia_bandwidth_per_student::numeric*x.num_students::bigint)/1000)::int
+      else null end as "district_total_ia_rounded_to_nearest_mbps",
+
+      x.ia_bandwidth_per_student,
+      x.num_students,
+      x.num_students_and_staff,
+      x.num_schools,
+      x.latitude,
+      x.longitude,
+      x.locale,
+      x.district_size,
+      case when x.district_size in ('Tiny', 'Small') then 1
+      when x.district_size='Medium' then 1.5
+      when x.district_size='Large' then 1.75
+      else 2.25 end as "ia_oversub_factor",
+      x.exclude_from_analysis,
+      x.consortium_member
+
+      from ae
+
+      left join line_items li
+      on ae.line_item_id=li.id
+
+      left join districts x
+      on ae.district_esh_id=x.esh_id
+
+--this sub-query ("z") is currently being used only to obtain the number of students served by each line item, which is used in calculating district cost for shared line items
+
+      left join lateral (
+
+            select y.line_item_id,
+            y.num_students_served
+
+--start of "y"
+
+            from (
+/*Group by line_item_id to yield students served by each line item (note that most fields in this sub-query are unused, and have been retained in case we want to build them 
+into the main query*/
+
+                  select a.line_item_id,
+                  max(f.applicant_name) as "applicant_name",
+                  max(f.applicant_id) as "applicant_id",
+                  max(f.applicant_postal_cd) as "applicant_postal_cd",
+                  array_agg(DISTINCT b.district_esh_id::varchar) as "district_esh_id",
+                  count(DISTINCT b.district_esh_id) as "num_district_recipients",
+                  sum(DISTINCT c.num_students::bigint) as "num_students_served",
+                  array_agg(DISTINCT c.name) as "district_name",
+                  array_agg(DISTINCT e.district_ben::varchar) as "district_ben"
+
+                  from allocations a
+
+--first sub-query within "y"
+
+                  left join lateral (
+                        select esh_id, district_esh_id, postal_cd
+                        from schools
+                        union
+                        select esh_id, esh_id as district_esh_id, postal_cd
+                        from districts
+                        union
+                        select esh_id, district_esh_id, postal_cd
+                        from other_locations
+                        where district_esh_id is not null) b
+                  on a.recipient_id=b.esh_id
+
+                  left join districts c
+                  on b.district_esh_id=c.esh_id
+
+--second sub-query within "y"
+
+                  left join lateral (
+                        select array_agg(d.ben) as "district_ben",
+                        d.entity_id
+                        from esh_id_mappings d
+                        GROUP BY d.entity_id) e
+                        on c.esh_id=e.entity_id
+
+                  left join line_items f
+                  on a.line_item_id=f.id
+
+                  where c.num_students!='No data'
+                  GROUP BY a.line_item_id)y 
+      )z
+      on ae.line_item_id=z.line_item_id
+
+      where li.broadband=true and 
+      (li.consortium_shared=false OR li.ia_conditions_met=true OR 'backbone'=any(li.open_flags))  
+      and x.include_in_universe_of_districts=true 
+      and (case when 'exclude'=any(open_flags) then true else false end)=false
+),
+
+--preceding line is end of sub-query "af", the final sub-query used
+
+--first new sub-query - isolates rows corresponding to dedicated IA/upstream circuits received by districts that are not currently meeting the 2018 connectivity target
+  
+filter as (
+select *,
+
+--for non-Erate line items, pulls from line-item total num_lines rather than num_lines allocated to district
+case when erate=true then quantity_of_lines_received_by_district::numeric
+else line_item_total_num_lines::numeric end as "ia_upstream_lines_received"
+from af
+
+where district_esh_id in(
+select esh_id
+
+from districts c
+
+where exclude_from_analysis=false
+and ia_bandwidth_per_student!='Insufficient data')
+
+and consortium_shared=false
+and (internet_conditions_met=true
+OR upstream_conditions_met=true)
+
+--exclusionary rules eliminate DQS-excluded lines, circuits used for non-IA purposes, andcircuits exclusively serving charter schools
+and not('exclude'=any(open_flags))
+and not('charter_service'=any(open_flags))
+and not('videoconferencing'=any(open_flags))
+
+ORDER BY district_esh_id),
+
+--sub-query aggregates all IA/upstream line items allocated to district to return number of circuits of each connection type
+
+ia_summary as (
+
+select district_esh_id,
+max(name) as "name",
+max(postal_cd) as "state",
+max(num_students) as "num_students",
+max(ia_bandwidth_per_student::numeric) as "ia_bandwidth_per_student",
+
+--backing out current ia_bandwidth from calculated metrics
+max(ia_bandwidth_per_student::numeric*num_students::numeric)/1000 as "current_ia_bandwidth_mbps",
+max(ia_oversub_factor) as "ia_oversub_factor",
+
+--for additional reference, this field classifies districts by identifying the "most scalable" connection received
+
+case when sum(case when connect_category='Fiber'
+              then 1 else 0 end)>0 then 'Fiber'
+      when sum(case when connect_category='Fixed Wireless'
+              then 1 else 0 end)>0 then 'Fixed Wireless'
+      when sum(case when connect_type='Cable Modem'
+              then 1 else 0 end)>0 then 'Cable'
+      else 'Non-Scalable' end as "highest_ia_connect_type",
+      
+sum(case when connect_category='Fiber' then ia_upstream_lines_received::numeric
+else 0 end) as "num_fiber_lines_received",
+sum(case when connect_category='Fixed Wireless' then ia_upstream_lines_received::numeric
+else 0 end) as "num_fixed_wireless_connections_received",
+sum(case when connect_type='Cable Modem' then ia_upstream_lines_received::numeric
+else 0 end) as "num_cable_lines_received",
+sum(case when connect_type='Digital Subscriber Line (DSL)' then ia_upstream_lines_received::numeric
+else 0 end) as "num_DSL_lines_received",
+sum(case when connect_type='DS-3 (T-3)' then ia_upstream_lines_received::numeric
+else 0 end) as "num_T3_lines_received",
+sum(case when connect_type='DS-1 (T-1)' then ia_upstream_lines_received::numeric
+else 0 end) as "num_T1_lines_received",
+
+--rather than a theoretical maximum bandwidth, this field captures the existing bandwidth from these "uncategorized" connections
+sum(case when connect_category='Other / Uncategorized' then ia_upstream_lines_received::numeric*bandwidth_in_mbps::numeric
+else 0 end) as "bandwidth_other/uncategorized_connections_received",
+sum(case when connect_type='Cable Modem' then line_item_total_num_lines::numeric
+else 0 end) as "num_cable_lines_in_li",
+sum(case when connect_type='Cable Modem' then ia_upstream_lines_received*bandwidth_in_mbps::numeric
+else 0 end) as "total_bandwidth_received_over_cable"
+
+from filter
+
+GROUP by district_esh_id
+),
+
+scalable_technology as (
+select *,
+
+ia_bandwidth_per_student::numeric*ia_oversub_factor::numeric as "ia_bandwidth_per_student_oversub",
+--1 mbps per student connectivity goal
+
+
+/*Assumes theoretical maximums of 1 Gbps for fixed wireless, 150 mbps for cable modem, and 50 mbps for DSL;
+if the district is not connected via fiber, the query evaluates whether existing infrastructure is sufficient
+to meet eventual bandwidth demands (as represented by the 2018 1 mbps per student connectivity goal).  
+Multiplying the number of lines of each connection type by the theoretical maximum bandwidth for that
+transmission technology (or by the existing bandwidth for fixed-bandwidth or "uncategorized" connections)
+yields the bandwidth capacity of the district's current infrastructure. */ 
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.1) then 'Yes'
+        else 'No' end as "able_to_meet_100_kbps",
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.1/ia_oversub_factor::numeric) then 'Yes'
+        else 'No' end as "able_to_meet_100_kbps_oversub",
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.2) then 'Yes'
+        else 'No' end as "able_to_meet_200_kbps", 
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.2/ia_oversub_factor::numeric) then 'Yes'
+        else 'No' end as "able_to_meet_200_kbps_oversub",
+        
+
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.5) then 'Yes'
+        else 'No' end as "able_to_meet_500_kbps",
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.5/ia_oversub_factor::numeric) then 'Yes'
+        else 'No' end as "able_to_meet_500_kbps_oversub",
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric*0.2) then 'Yes'
+        else 'No' end as "able_to_meet_1_mbps",
+        
+case when num_fiber_lines_received>0 
+        OR
+        ((num_fixed_wireless_connections_received*1000) +
+        (num_cable_lines_received*150) +
+        ("num_DSL_lines_received"*50) +
+        ("num_T1_lines_received"*1.5) +
+        ("num_T3_lines_received"*45) +
+        "bandwidth_other/uncategorized_connections_received")>=
+        (num_students::numeric/ia_oversub_factor::numeric) then 'Yes'
+        else 'No' end as "able_to_meet_1_mbps_oversub"
+
+
+from ia_summary),
+
+/*"State_calc" sub-query aggregates the results of the "ia_summary" sub-query to determine on a state-by-state
+basis the number of districts and students not meeting the 1 mbps per student goal, both with and without 
+the application of oversubscription factors.  The sub-query further subsets these totals to isolate the
+counts of districts and students that are unable to scale to meet the goal with their current infrastructure
+(see description of methodology in preceding comments).
+*/
+
+state_calc as (
+select state,
+count(district_esh_id) as "num_clean_districts",
+sum(num_students::numeric) as "num_clean_students",
+sum(case when ia_bandwidth_per_student<100 then 1 else 0 end) as "districts_not_meeting_100_kbps",
+sum(case when ia_bandwidth_per_student<200 then 1 else 0 end) as "districts_not_meeting_200_kbps",
+sum(case when ia_bandwidth_per_student<500 then 1 else 0 end) as "districts_not_meeting_500_kbps",
+sum(case when ia_bandwidth_per_student<1000 then 1 else 0 end) as "districts_not_meeting_1_mbps",
+
+sum(case when ia_bandwidth_per_student<100 then num_students::numeric else 0 end) as "students_not_meeting_100_kbps",
+sum(case when ia_bandwidth_per_student<200 then num_students::numeric else 0 end) as "students_not_meeting_200_kbps",
+sum(case when ia_bandwidth_per_student<500 then num_students::numeric else 0 end) as "students_not_meeting_500_kbps",
+sum(case when ia_bandwidth_per_student<1000 then num_students::numeric else 0 end) as "students_not_meeting_1_mbps",
+
+
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 
+then 1 else 0 end) as "districts_not_meeting_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 
+then 1 else 0 end) as "districts_not_meeting_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 
+then 1 else 0 end) as "districts_not_meeting_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 
+then 1 else 0 end) as "districts_not_meeting_1_mbps_oversub",
+
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 
+then num_students::numeric else 0 end) as "students_not_meeting_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 
+then num_students::numeric else 0 end) as "students_not_meeting_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 
+then num_students::numeric else 0 end) as "students_not_meeting_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 
+then num_students::numeric else 0 end) as "students_not_meeting_1_mbps_oversub",
+
+sum(case when ia_bandwidth_per_student<100 and "able_to_meet_100_kbps"='Yes' 
+then 1 else 0 end) as "additional_districts_able_to_meet_100_kbps",
+sum(case when ia_bandwidth_per_student<200 and "able_to_meet_200_kbps"='Yes' 
+then 1 else 0 end) as "additional_districts_able_to_meet_200_kbps",
+sum(case when ia_bandwidth_per_student<500 and "able_to_meet_500_kbps"='Yes' 
+then 1 else 0 end) as "additional_districts_able_to_meet_500_kbps",
+sum(case when ia_bandwidth_per_student<1000 and "able_to_meet_1_mbps"='Yes' 
+then 1 else 0 end) as "additional_districts_able_to_meet_1_mbps",
+
+sum(case when ia_bandwidth_per_student<100 and "able_to_meet_100_kbps"='Yes' 
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_100_kbps",
+sum(case when ia_bandwidth_per_student<200 and "able_to_meet_200_kbps"='Yes' 
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_200_kbps",
+sum(case when ia_bandwidth_per_student<500 and "able_to_meet_500_kbps"='Yes' 
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_500_kbps",
+sum(case when ia_bandwidth_per_student<1000 and "able_to_meet_1_mbps"='Yes' 
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_1_mbps",
+
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 and "able_to_meet_100_kbps_oversub"='Yes'
+then 1 else 0 end) as "additional_districts_able_to_meet_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 and "able_to_meet_200_kbps_oversub"='Yes'
+then 1 else 0 end) as "additional_districts_able_to_meet_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 and "able_to_meet_500_kbps_oversub"='Yes'
+then 1 else 0 end) as "additional_districts_able_to_meet_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 and "able_to_meet_1_mbps_oversub"='Yes'
+then 1 else 0 end) as "additional_districts_able_to_meet_1_mbps_oversub",
+
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<100 and "able_to_meet_100_kbps_oversub"='Yes'
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_100_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<200 and "able_to_meet_200_kbps_oversub"='Yes'
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_200_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<500 and "able_to_meet_500_kbps_oversub"='Yes'
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_500_kbps_oversub",
+sum(case when ia_bandwidth_per_student*ia_oversub_factor<1000 and "able_to_meet_1_mbps_oversub"='Yes'
+then num_students::numeric else 0 end) as "additional_students_able_to_meet_1_mbps_oversub"
+from scalable_technology
+
+GROUP BY state
+
+ORDER BY state)
+
+select state_calc.state,
+extrap.single_campus_districts,
+extrap.single_campus_districts::numeric/extrap.num_districts_state as "%_single_campus_districts",
+districts_not_meeting_100_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_100_kbps",
+districts_not_meeting_200_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_200_kbps",
+districts_not_meeting_500_kbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_500_kbps",
+districts_not_meeting_1_mbps::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_1_mbps",
+
+students_not_meeting_100_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_100_kbps",
+students_not_meeting_200_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_200_kbps",
+students_not_meeting_500_kbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_500_kbps",
+students_not_meeting_1_mbps::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_1_mbps",
+
+districts_not_meeting_100_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_100_kbps_oversub",
+districts_not_meeting_200_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_200_kbps_oversub",
+districts_not_meeting_500_kbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_500_kbps_oversub",
+districts_not_meeting_1_mbps_oversub::numeric/num_clean_districts::numeric as "%_clean_districts_not_meeting_1_mbps_oversub",
+
+students_not_meeting_100_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_100_kbps_oversub",
+students_not_meeting_200_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_200_kbps_oversub",
+students_not_meeting_500_kbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_500_kbps_oversub",
+students_not_meeting_1_mbps_oversub::numeric/num_clean_students::numeric as "%_clean_students_not_meeting_1_mbps_oversub",
+
+state_calc.*
+
+from state_calc
+
+--sub-query provides population N and sample n for the purposes of calculating proportions or projecting population-level values
+
+left join lateral(
+select postal_cd,
+sum(case when num_campuses=1 then 1 else 0 end) as "single_campus_districts",
+count(esh_id) as "num_districts_state",
+sum(case when "num_students"!='No data' then num_students::numeric
+else 0 end) as "num_students_state"
+
+from districts
+
+where include_in_universe_of_districts=true
+
+GROUP BY postal_cd) extrap
+on state_calc.state=extrap.postal_cd
+
+where state!='DC'
+
+ORDER BY postal_cd

@@ -9,8 +9,13 @@ shinyServer(function(input, output, session) {
   library(ggmap)
   
   ### Map ###
-  li <- read.csv("li_shiny_1_14.csv")
-  ddt <- read.csv("us_ddt.csv")
+  #Carson: 
+  #li <- read.csv("li_shiny_1_14.csv")
+  #ddt <- read.csv("us_ddt.csv")
+  
+  #Sujin: 
+  li <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/li_shiny_1_14.csv")
+  ddt <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/us_ddt.csv")
   
   ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
@@ -31,9 +36,9 @@ shinyServer(function(input, output, session) {
   ### New Variables for Sujin's Map
   ddt$exclude <- ifelse(ddt$exclude_from_analysis == "false", "Clean", "Dirty")
   ddt$meeting_2014_goal_no_oversub <- ifelse(ddt$meeting_2014_goal_no_oversub == "true", "Meeting 2014 Goals",
-                                             "Below 2014 Goals")
+                                             "Not Meeting 2014 Goals")
   ddt$meeting_2018_goal_no_oversub <- ifelse(ddt$meeting_2018_goal_no_oversub == "true", "Meeting 2018 Goals",
-                                             "Below 2018 Goals")
+                                             "Not Meeting 2018 Goals")
   ddt$meeting_2018_goal_no_oversub <- as.factor(ddt$meeting_2018_goal_no_oversub)
   ddt$meeting_2014_goal_no_oversub <- as.factor(ddt$meeting_2014_goal_no_oversub)
 
@@ -186,66 +191,197 @@ output$natComparison <- renderPlot({
 
 ############### Sujin's ####################
 ### Don't Update outside of here ###
+
 output$gen_map <- renderPlot({
+
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_size <- paste0('\"',input$size, '\"')
   selected_locale <- paste0('\"',input$locale, '\"')
   selected_connection <- paste0('\"',input$connection, '\"')
   selected_state <- paste0('\"',input$state, '\"')
-  
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
   
   ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
     filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
     filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
     filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
     filter(!postal_cd %in% c('AK', 'HI') )
                    
   validate(
     need(nrow(ddt_subset) > 0, "No districts in given subset")
   )
   
-  state_lookup <- data.frame(cbind(name = c('All', 'california', 'oregon', 'washington', 'nevada', 
-                                            'iowa', 'nebraska', 'new mexico', 'colorado', 
-                                            'montana' , 'minnesota', 'north dakota', 'south dakota', 
-                                            'illinois', 'wisconsin', 'indiana', 'pennsylvania','new york', 
-                                            'michigan', 'new jersey', 'florida', 'maine', 'new hampshire', 'massachusetts', 
-                                            'rhode island', 'delaware', 'maryland', 'montana', 'north carolina', 'south carolina',
-                                            'virginia', 'west virginia', 'louisiana', 'missouri', 'arkansas',
-                                            'mississippi', 'kansas', 'georgia', 'texas'), 
-                                   code = c('.', 'CA', 'OR', 'WA', 'NV', 
-                                            'IA', 'NE', 'NM', 'CO', 
-                                            'MT' , 'MN', 'ND', 'SD', 
-                                            'IL', 'WI', 'IN', 'PA','NY', 
-                                            'MI', 'NJ', 'FL', 'ME', 'NH', 'MA', 
-                                            'RI', 'DE', 'MD', 'MT', 'NC', 'SC',
-                                            'VA', 'WV', 'LS', 'MO', 'AR',
-                                            'MS', 'KS', 'GA', 'TX')), stringsAsFactors = F)
+  
+  state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
+                                       'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
+                                       'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
+                                       'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey',
+                                       'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon',
+                                       'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+                                       'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming'),
+                             
+                             code = c('.', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
+                                      "GA", 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+                                      'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+                                      'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+                                      'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_map <- map_data("state", region = state_name)
   #ddt_subset$meeting_2018_goal_no_oversub <- as.factor(ddt_subset$meeting_2018_goal_no_oversub)
   
   if(input$goals == '2014 Goals') {
-    colors <- c("dimgray", "darkolivegreen4")
+    colors <- c("#009296", "#CCCCCC")
     goals <- 'meeting_2014_goal_no_oversub'
+    colors2 = NULL
   }
-  else {
-    colors <- c("dimgray", "dodgerblue4")
+  else if(input$goals == '2018 Goals'){
+    colors <- c("#A3E5E6", "#CCCCCC")
     goals <- 'meeting_2018_goal_no_oversub'
   }
-  print(levels(ddt_subset$meeting_2018_goal_no_oversub))
-  print(colors)
   
-  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour=goals), alpha=0.5, size = 5, position = position_jitter(w = 0.05, h = 0.05)) +
-    scale_fill_manual(values=colors) +
-    scale_color_manual(values=colors) +
+  else {
+    #02/09: figure out better way to make all points one color
+    colors <- c("#0073B6","#0073B6")
+    goals <- 'meeting_2018_goal_no_oversub'
+    #goals <- NULL
+    
+  }
+  
+  
+  set.seed(123) #to control jitter
+  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour= goals), alpha=0.8, size = 8, position = position_jitter(w = 0.03, h = 0.03)) +
+    scale_fill_manual(values= colors) +
+    scale_color_manual(values= colors) +
     geom_polygon(data = state_map, aes(x = long, y= lat, group = group, fill=NA), colour='black') +
     theme_classic() + 
-    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
-          #legend.text = element_text(size=16), legend.position=c(1.6, 0.5)) #+
-  #labs(title = paste("N = ", toString(nrow(us_ddt_subset))))
-  print(q + coord_map()) 
+    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), legend.position = "none")
+
+  print(q + coord_map())
+  })
+
+
+#Show n's for maps
+output$n_observations_ddt <- renderText({
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
+  
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    filter(!postal_cd %in% c('AK', 'HI') )
+
+  paste("n =", toString(nrow(ddt_subset)))
 })
+
+#For downloadable subsets
+datasetInput <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_purpose <- paste0('\"',input$purpose, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
+  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  li_subset <- li %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("district_postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
+    filter(cost_per_line < 40000) %>%
+    mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
+    filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  
+  validate(
+    need(nrow(li_subset) > 0, "No districts in given subset")
+    )
+  
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    filter(!postal_cd %in% c('AK', 'HI') )
+  
+  validate(
+    need(nrow(ddt_subset) > 0, "No districts in given subset")
+    )
+
+  switch(input$subset,
+         "Line items" = li_subset,
+         "Deluxe districts" = ddt_subset)
+  })
+
+output$table <- renderTable({
+  datasetInput()
+  })
+
+output$downloadData <- downloadHandler(
+  filename = function(){
+    paste(input$subset, '.csv', sep = '')},
+  content = function(file){
+    write.csv(datasetInput(), file)
+    }
+  )
+
+#For density spread plot
+output$densPlot <- renderPlot({
+  
+  #using "exclude_from_analysis" column from li to filter for clean LI (instead of "exclude" column)
+  li$exclude_from_analysis <- ifelse(li$exclude_from_analysis == FALSE, "Clean", "Dirty")
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_purpose <- paste0('\"',input$purpose, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  li_subset <- li %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude_from_analysis ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("district_postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
+    filter(cost_per_line > 1000 & cost_per_line < 10000) %>% #limiting range to remove outliers
+    mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
+    filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  
+  validate(
+    need(nrow(li_subset) > 0, "No circuits in given subset")
+  )
+  
+  d_plot <- ggplot(li_subset, aes(x=band_factor, y=cost_per_line, colour = band_factor)) + geom_point(size=8, alpha=0.75) + 
+          scale_color_manual(values = c("#FDB913", "#F26B21", "#A3E5E6", "#009296", "#0073B6"))+
+          xlab("Bandwidth (Mbps)") + ylab("Monthly Cost Per Circuit ($)") + theme_classic() + theme(legend.position="none") 
+          #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          #      panel.background = element_blank(), axis.line = element_blank(), 
+          #      axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          #      axis.text.y=element_text(size=14, colour= "#899DA4"),
+          #      axis.ticks=element_blank(),
+          #      axis.title.x=element_blank(),
+          #      axis.title.y=element_blank()
+          #))
+  print(d_plot)
+  
+}) 
+
+
+
 ############### END ####################
 
 output$bwProjection <- renderPlot({

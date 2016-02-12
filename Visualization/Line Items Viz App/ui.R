@@ -40,6 +40,16 @@ shinyUI(fluidPage(
                     font-size: 12pt;
                     color: #899DA4;
       }
+
+      h3 {
+        font-family: 'Lato', sans-serif;
+                    font-weight: 300;
+                    line-height: 1.1;
+                    font-size: 8pt;
+                    color: #899DA4;
+
+      }
+
     shiny-plot-output {
         background-color: #00EFD1;
     }
@@ -79,8 +89,8 @@ shinyUI(fluidPage(
       }
     "))
   ),
-  title="Price Dispersion - EducationSuperHighway",
-  titlePanel(div(h1("Price Dispersion"))), #, img(src='esh-logo.png', align = "right", width='230px'))),
+  title="SHINY for CRs - EducationSuperHighway",
+  titlePanel(div(h1("SHINY for Connectivity Reports"))), #, img(src='esh-logo.png', align = "right", width='230px'))),
   sidebarLayout(
     conditionalPanel(condition="1==1",
       sidebarPanel(
@@ -90,7 +100,7 @@ shinyUI(fluidPage(
                     selected = c(50,100,500,1000,10000)),
       selectInput("dataset",
                   h2("Select Dataset"),
-                  choices = c('All', 'Clean', 'Dirty')),
+                  choices = c('All', 'Clean'), selected = "All"),
       selectInput("purpose", 
                   h2("Select Purpose"),
                   choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
@@ -105,9 +115,9 @@ shinyUI(fluidPage(
                   choices = c('All', 'Tiny', 'Small', 'Medium', 'Large', 'Mega'), selected="All"),
       selectInput("state", 
                   h2("Select State"), 
-                  choices = c('All', 'AK','AL','AR','AZ',
-                              'CA','CO','CT','DC',
-                              'DE','FL','GA','HI','IA',
+                  choices = c('All', 'AL','AR','AZ',
+                              'CA','CO','CT',
+                              'DE','FL','GA', 'IA',
                               'ID','IL','IN','KS',
                               'KY','LA','MA','MD',
                               'ME','MI','MN','MO',
@@ -118,23 +128,38 @@ shinyUI(fluidPage(
                               'SD','TN','TX','UT','VA',
                               'WA','WI','WV','WY'), selected="All"),
       selectInput("goals",
-                  h2("Select Goal Status"), 
-                  choices = c('2014 Goals', '2018 Goals'),
-                  selected = '2014 Goals'),
+               h2("Select Goal Status"), 
+                  choices = c('All', '2014 Goals', '2018 Goals'),
+                  selected = 'All'),
+      
+      selectInput("percfiber",
+                  h2("Select Percentage Fiber"),
+                  choices = c('Not applicable', 'No fiber', 'Some fiber', 'All fiber'),
+                  selected = 'Not applicable'),
+      
+      selectInput("subset", h2("Choose a dataset:"),
+                  choices = c("Line items", "Deluxe districts")),
+                  downloadButton('downloadData', 'Download'),
       width=3
     )),
     mainPanel(
-      tabsetPanel(
-        tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(),br() 
-                                              )), 
-                 width="300px"),
+      #tabsetPanel(
+        navbarPage("STRATEGIC ANALYSIS",
+        tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(),br())), width="300px"),
+        
+        navbarMenu("Cost",
         tabPanel("Cost - Box and Whiskers", imageOutput("distPlot", height="550px", width="1000px"),
                  div(id="test1", class="test", textOutput("n_observations"))),
+        tabPanel("Cost - Density Plots", column(12, align = "center", plotOutput("densPlot", height = "500px", width="700px"))),
+        #         div(id = "test1", class = "test", textOutput("n_observations"))),
         tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
-        tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px")),
+        tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px"))),
         tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
-        tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px")))),
+        tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px"))),
+                 div(id="test1", class="test", textOutput("n_observations_ddt"))),
+        tabPanel("Download Subsets", h3(tableOutput('table'))),
       id="condition_panel"
-  )
+        ) #navbarPage 
+  #)
 )
 )))
