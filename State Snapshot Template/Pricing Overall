@@ -112,9 +112,9 @@ wan_circuit_frequency as (
 select applicant_postal_cd,
 count(id) as "wan_circuits",
 count(distinct line_item_id) as "wan_line_items",
-min(circuit_cost::numeric) as "min_wan_cost_per_connection",
-avg(circuit_cost::numeric) as "mean_wan_cost_per_connection",
-max(circuit_cost::numeric) as "max_wan_cost_per_connection",
+min(circuit_cost::numeric/12) as "min_wan_cost_per_connection",
+avg(circuit_cost::numeric/12) as "mean_wan_cost_per_connection",
+max(circuit_cost::numeric/12) as "max_wan_cost_per_connection",
 sum(case when (circuit_cost::numeric/bandwidth_in_mbps::numeric)/12<=3.00 then 1 else 0 end)::numeric/
     count(id)::numeric as "%_wan_circuits_meeting_afford_target",
     
@@ -190,11 +190,11 @@ on icf.applicant_postal_cd=internet_percentiles.applicant_postal_cd
 
 left join lateral (
 select applicant_postal_cd, 
-PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "10th_percentile_wan_cost_per_connection",
-PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "25th_percentile_wan_cost_per_connection",
-PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "median_wan_cost_per_connection",
-PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "75th_percentile_wan_cost_per_connection",
-PERCENTILE_CONT (0.9) WITHIN GROUP (ORDER BY circuit_cost::numeric) AS "90th_percentile_wan_cost_per_connection"
+PERCENTILE_CONT (0.1) WITHIN GROUP (ORDER BY circuit_cost::numeric/12) AS "10th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY circuit_cost::numeric/12) AS "25th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.5) WITHIN GROUP (ORDER BY circuit_cost::numeric/12) AS "median_wan_cost_per_connection",
+PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY circuit_cost::numeric/12) AS "75th_percentile_wan_cost_per_connection",
+PERCENTILE_CONT (0.9) WITHIN GROUP (ORDER BY circuit_cost::numeric/12) AS "90th_percentile_wan_cost_per_connection"
 
 from circuit_list
 where wan_conditions_met=true
