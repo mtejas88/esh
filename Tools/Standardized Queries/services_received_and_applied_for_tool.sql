@@ -359,7 +359,7 @@ state:
 dirty_status:
   type: select
   default: 'All'
-  options: [['exclude dirty'],
+  options: [['include clean'],
             ['All']
            ]
 
