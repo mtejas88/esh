@@ -14,8 +14,8 @@ shinyServer(function(input, output, session) {
   #ddt <- read.csv("us_ddt.csv")
   
   #Sujin: 
-  li <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/li_shiny_1_14.csv")
-  ddt <- read.csv("~/Desktop/ficher/Visualization/Line Items Viz App/us_ddt.csv")
+  li <- read.csv("li_shiny_2_17.csv")
+  ddt <- read.csv("us_ddt.csv")
   
   ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
@@ -32,6 +32,8 @@ shinyServer(function(input, output, session) {
   li$new_purpose[li$wan_conditions_met == 'TRUE'] <- "WAN"
   li$new_purpose[li$isp_conditions_met == 'TRUE'] <- "ISP Only"
   li$new_purpose[li$upstream_conditions_met == 'TRUE'] <- "Upstream"
+  
+  ddt$ia_bandwidth_per_student <- as.numeric(as.character(ddt$ia_bandwidth_per_student))
   
   ### New Variables for Sujin's Map
   ddt$exclude <- ifelse(ddt$exclude_from_analysis == "false", "Clean", "Dirty")
@@ -67,7 +69,7 @@ shinyServer(function(input, output, session) {
     )
     
     p0 <- ggplot(li_subset, aes(x=band_factor, y=cost_per_line)) + geom_boxplot(fill="#009291", colour="#ABBFC6", 
-                                                                          outlier.colour="#009291", width=.5)
+                                                                          outlier.colour=NA, width=.5)
     ylim1 <- boxplot.stats(li_subset$cost_per_line)$stats[c(1, 5)]
   
     meds <- li_subset %>% group_by(band_factor) %>% summarise(medians = median(cost_per_line))
@@ -172,13 +174,16 @@ output$natComparison <- renderPlot({
     need(nrow(li_subset) > 0, "No circuits in given subset")
   )
   
+  p0 <- ggplot(li_subset, aes(x=district_postal_cd, y=cost_per_line)) + geom_boxplot(fill="#009291", colour="#ABBFC6", 
+                                                                                      outlier.colour=NA, width=.5)
+  ylim1 <- boxplot.stats(li_subset$cost_per_line)$stats[c(1, 5)]
+  
   meds <- li_subset %>% group_by(district_postal_cd) %>% summarise(medians = median(cost_per_line))
   dollar_format(largest_with_cents=1)
-  print(ggplot(li_subset, aes(x=district_postal_cd, y=cost_per_line)) + geom_boxplot(fill="#009291", colour="#ABBFC6", 
-                                                                              outlier.colour="#009291", width=.5) +
+  print(p0 + coord_cartesian(ylim = ylim1*1.05) +
           scale_y_continuous("",labels=dollar) +
           geom_text(data = meds, aes(x = district_postal_cd, y = medians, label = dollar(medians)), 
-                    size = 4, vjust = -2, colour= "#F26B21", hjust=2.1)+
+                    size = 4, vjust = 0, colour= "#F26B21", hjust=4)+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -187,6 +192,30 @@ output$natComparison <- renderPlot({
                 axis.title.x=element_blank(),
                 axis.title.y=element_blank()
           ))
+})
+
+output$n_observationsComparison <- renderText({
+  selected_purpose <- paste0('\"',input$purpose, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  li_subset <- li %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$purpose == 'All', "1==1", paste("new_purpose ==", selected_purpose))) %>%
+    mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
+    filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  
+  li_subset$district_postal_cd[li_subset$district_postal_cd != input$state] <- 'National'
+  print(unique(li_subset$district_postal_cd))
+  li_subset$district_postal_cd <- factor(li_subset$district_postal_cd, level=c('National', input$state))
+  print(unique(li_subset$district_postal_cd))
+  ns <- li_subset %>% group_by(district_postal_cd) %>% summarise(len = length(cost_per_line))
+  print(ns$len)
+  paste("N's =", ns[1,2], ns[2,2])
 })
 
 ############### Sujin's ####################
@@ -389,16 +418,16 @@ output$bwProjection <- renderPlot({
   selected_locale <- paste0('\"',input$locale, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
-  li_subset <- li %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_district_size ==", selected_size))) %>%
-    filter_(ifelse(input$locale == 'All', "1==1", paste("district_locale ==", selected_locale))) %>%
-    filter_(ifelse(input$state == 'All', "1==1", paste("district_postal_cd ==", selected_state))) %>%
-    filter(connect_category != 'Fiber')
+  ddt_subset <- ddt %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter(percentage_fiber != 'No fiber')
     
   validate(
-    need(nrow(li_subset) > 0, "No circuits in given subset")
+    need(nrow(ddt_subset) > 0, "No circuits in given subset")
   )
   
-  need_fiber <- li_subset %>% mutate(adj_bw = ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
+  need_fiber <- ddt_subset %>% mutate(adj_bw = ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
     mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000, 1, 0)) %>%
     mutate(bw2017 = bw2016 * 1.5) %>% mutate(f2017 = ifelse(bw2017 >= 100000, 1, 0)) %>%
     mutate(bw2018 = bw2017 * 1.5) %>% mutate(f2018 = ifelse(bw2018 >= 100000, 1, 0)) %>%

@@ -153,7 +153,9 @@ shinyUI(fluidPage(
         tabPanel("Cost - Density Plots", column(12, align = "center", plotOutput("densPlot", height = "500px", width="700px"))),
         #         div(id = "test1", class = "test", textOutput("n_observations"))),
         tabPanel("Cost - Histogram", plotOutput("histPlot", height="550px", width="1000px")),
-        tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px"))),
+        tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px"),
+                 div(id="test1", class="test", textOutput("n_observationsComparison"))
+        )),
         tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
         tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px"))),
                  div(id="test1", class="test", textOutput("n_observations_ddt"))),
