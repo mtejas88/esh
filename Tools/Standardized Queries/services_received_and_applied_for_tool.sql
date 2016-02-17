@@ -186,10 +186,13 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       on ldli.line_item_id=district_info_by_li.line_item_id
 
       where li.broadband=true  
+       
+       /*1) "li.consortium_shared=false" returns everything that is not consortium_shared;
+       2) "li_ia_conditions_met=true" adds consortium_shared IA, since non-consortium_shared IA is already captured in 1);
+       3) "'backbone'=any(li.open_flags)" adds anything flagged as backbone
+       These are the only services that factor into metrics, so these are the only services we want to show*/
        and (li.consortium_shared=false 
          OR li.ia_conditions_met=true 
-         OR li.wan_conditions_met=true 
-         OR li.upstream_conditions_met=true 
          OR 'backbone'=any(li.open_flags)
        )  
        and d.include_in_universe_of_districts=true 
