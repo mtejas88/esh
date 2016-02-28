@@ -38,7 +38,7 @@ lines_to_district_by_line_item as (
 /*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
 to add demographic data used in metric calculations*/
 services_received as (
-      select ldli.district_esh_id as recipient_esh_id,
+      select ldli.district_esh_id as recipient_id,
       d.name as recipient_name,
       d.postal_cd,
       ldli.line_item_id,
