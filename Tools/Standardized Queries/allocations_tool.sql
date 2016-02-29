@@ -41,8 +41,7 @@ left join districts d
 on district_lookup_incl_noned.district_esh_id=d.esh_id
 
 --where statement limits results to user-entered line_item_id or postal_cd
-
-where (a.line_item_id='{{line_item_id}}' or 'All' = '{{line_item_id}}')
+where (a.line_item_id::varchar='{{line_item_id}}' or 'All' = '{{line_item_id}}')
 and (d.postal_cd='{{state}}' or 'All' = '{{state}}')
 ORDER BY district_lookup_incl_noned.district_esh_id, d.include_in_universe_of_districts
 
