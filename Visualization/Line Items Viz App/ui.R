@@ -59,9 +59,10 @@ shinyUI(fluidPage(
                     font-weight: 100;
                     line-height: 1.1;
                     font-size: 18pt;
-                    margin-left: 500px;
+                    margin-left: 150px;
                     text-align: left;
                     color: #899DA4;
+                    white-space: pre
       }
 
       .well {

@@ -77,7 +77,7 @@ shinyServer(function(input, output, session) {
     print(p0 + coord_cartesian(ylim = ylim1*1.05) +
       scale_y_continuous("",labels=dollar) +
       geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
-                 size = 4, vjust = 0, colour= "#F26B21", hjust=2.1)+
+                 size = 5.5, vjust = -.3, colour= "#FFFFFF", hjust=.5)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -110,8 +110,16 @@ shinyServer(function(input, output, session) {
       mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%           
       filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
       ns <- li_subset %>% group_by(band_factor) %>% summarise(len = length(cost_per_line))
-      print(ns[,2])
-      paste("N's =", ns[1,2], ns[2,2], ns[3,2], ns[4,2], ns[5,2])
+      #formatted <- paste(c(sapply(ns[,2], function(x) toString(x))), collapse="ljsdfjklsdljes")
+      whitespace_size <- 180/(nrow(ns)^1.3)
+      whitespace <- paste(rep(" ", whitespace_size), collapse="")
+      formatted <- sapply(ns[,2], function(x) paste(x,collapse=whitespace))
+      leadspace_size <- 100/(nrow(ns)^2.6)
+      leadspace <- paste(rep(" ", leadspace_size), collapse="")
+      print(formatted)
+      paste("Number of circuits: \n\n", leadspace, formatted)
+      #paste("Number of circuits: \n\n", ns[1,2], "               ", ns[2,2], 
+       #     "               ", ns[3,2], "                ", ns[4,2], "                ", ns[5,2])
     })
   
   output$histPlot <- renderPlot({
@@ -183,7 +191,7 @@ output$natComparison <- renderPlot({
   print(p0 + coord_cartesian(ylim = ylim1*1.05) +
           scale_y_continuous("",labels=dollar) +
           geom_text(data = meds, aes(x = district_postal_cd, y = medians, label = dollar(medians)), 
-                    size = 4, vjust = 0, colour= "#F26B21", hjust=4)+
+                    size = 6, vjust = 0, colour= "#F26B21", hjust=4)+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -215,7 +223,7 @@ output$n_observationsComparison <- renderText({
   print(unique(li_subset$district_postal_cd))
   ns <- li_subset %>% group_by(district_postal_cd) %>% summarise(len = length(cost_per_line))
   print(ns$len)
-  paste("N's =", ns[1,2], ns[2,2])
+  paste("Number of circuits: ", ns[1,2], ns[2,2])
 })
 
 ############### Sujin's ####################
