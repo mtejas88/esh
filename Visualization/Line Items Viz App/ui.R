@@ -59,9 +59,10 @@ shinyUI(fluidPage(
                     font-weight: 100;
                     line-height: 1.1;
                     font-size: 18pt;
-                    margin-left: 500px;
+                    margin-left: 150px;
                     text-align: left;
                     color: #899DA4;
+                    white-space: pre
       }
 
       .well {
@@ -103,7 +104,7 @@ shinyUI(fluidPage(
                   choices = c('All', 'Clean'), selected = "All"),
       selectInput("purpose", 
                   h2("Select Purpose"),
-                  choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only')),
+                  choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only'), selected="All"),
       selectInput("connection", 
                   h2("Select Connection Type"),
                   choices = c("All", "Fiber", "Dark Fiber", "Copper", "Cable / DSL", "Fixed Wireless", "Other / Uncategorized")),
