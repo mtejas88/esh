@@ -437,17 +437,24 @@ output$bwProjection <- renderPlot({
     need(nrow(ddt_subset) > 0, "No circuits in given subset")
   )
   
-  need_fiber <- ddt_subset %>% mutate(adj_bw = ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
-    mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000, 1, 0)) %>%
-    mutate(bw2017 = bw2016 * 1.5) %>% mutate(f2017 = ifelse(bw2017 >= 100000, 1, 0)) %>%
-    mutate(bw2018 = bw2017 * 1.5) %>% mutate(f2018 = ifelse(bw2018 >= 100000, 1, 0)) %>%
-    mutate(bw2019 = bw2018 * 1.5) %>% mutate(f2019 = ifelse(bw2019 >= 100000, 1, 0)) %>%
-    mutate(bw2020 = bw2019 * 1.5) %>% mutate(f2020 = ifelse(bw2020 >= 100000, 1, 0)) %>%
-    mutate(bw2021 = bw2020 * 1.5) %>% mutate(f2021 = ifelse(bw2021 >= 100000, 1, 0)) %>%
-    mutate(bw2022 = bw2021 * 1.5) %>% mutate(f2022 = ifelse(bw2022 >= 100000, 1, 0)) %>%
-    mutate(bw2023 = bw2022 * 1.5) %>% mutate(f2023 = ifelse(bw2023 >= 100000, 1, 0)) %>%
-    mutate(bw2024 = bw2023 * 1.5) %>% mutate(f2024 = ifelse(bw2024 >= 100000, 1, 0)) %>%
-    mutate(bw2025 = bw2024 * 1.5) %>% mutate(f2025 = ifelse(bw2025 >= 100000, 1, 0)) %>%
+  bw_str <- c('25%','35%','50%','65%')
+  bw_num <- c(.25,.35,.5,.65)
+  bw_dict <- data.frame(cbind(bw_str, bw_num))
+  selected_bw <- as.numeric(as.character(bw_dict$bw_num[bw_dict$bw_str == input$bw_growth]))
+  print(selected_bw)
+  
+  need_fiber <- ddt_subset %>% mutate(adj_bw = ia_bandwidth_per_student) %>% #ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
+    mutate(is_unscale = ifelse(hierarchy_connect_category %in% c('Copper', 'DSL'), 1, 0)) %>%
+    mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000 | is_unscale == 1, 1, 0)) %>%
+    mutate(bw2017 = bw2016 * (1 + selected_bw)) %>% mutate(f2017 = ifelse(bw2017 >= 100000 | is_unscale == 1, 1, 0)) %>%
+    mutate(bw2018 = bw2017 * (1 + selected_bw)) %>% mutate(f2018 = ifelse(bw2018 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2019 = bw2018 * (1 + selected_bw)) %>% mutate(f2019 = ifelse(bw2019 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2020 = bw2019 * (1 + selected_bw)) %>% mutate(f2020 = ifelse(bw2020 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2021 = bw2020 * (1 + selected_bw)) %>% mutate(f2021 = ifelse(bw2021 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2022 = bw2021 * (1 + selected_bw)) %>% mutate(f2022 = ifelse(bw2022 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2023 = bw2022 * (1 + selected_bw)) %>% mutate(f2023 = ifelse(bw2023 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2024 = bw2023 * (1 + selected_bw)) %>% mutate(f2024 = ifelse(bw2024 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2025 = bw2024 * (1 + selected_bw)) %>% mutate(f2025 = ifelse(bw2025 >= 100000| is_unscale == 1, 1, 0)) %>%
     select(c(f2016, f2017, f2018, f2019, f2020, f2021, f2022, f2023, f2024, f2025)) %>%
     summarise_each(funs(mean(., na.rm = TRUE))) %>%
     t() %>% data.frame() %>% mutate(Year=as.factor(c(2016:2025)))

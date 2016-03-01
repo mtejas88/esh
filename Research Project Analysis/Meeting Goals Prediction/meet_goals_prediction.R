@@ -3,8 +3,8 @@ library(class)
 library(caret)
 library(dplyr)
 
-raw <- read.csv('raw_update.csv')
-ver <- read.csv('verified_update.csv')
+raw <- read.csv('raw_update.csv') # predictors
+ver <- read.csv('verified_update.csv') # outcome
 
 sort(raw$esh_id) == sort(ver$esh_id)
 
@@ -34,7 +34,6 @@ mean(joined$meets_goals, na.rm=T)
 colnames(joined)
 joined <- joined[!is.na(joined$meets_goals),]
 joined <- joined[!is.na(joined$ia_bandwidth_per_student.y),]
-table(joined$ia_bandwidth_per_student.y)
 nrow(joined)
 
 ### Validation Set ###
@@ -43,19 +42,22 @@ train.size <- round(data.size *.8, 0)
 dev.size <- data.size - train.size
 train_vector <- sample(data.size, train.size)
 
-table(joined$meets_goals)
-table(is.null(joined$meets_goals))
-colnames(joined)
-
 ### Model ###
 library(randomForest)
 connect.forest <- randomForest(as.factor(meets_goals) ~ ia_bandwidth_per_student.y + locale + num_students + num_schools + percentage_fiber, data=joined[train_vector,], importance=T, ntree=501)
+connect.forest <- randomForest(as.numeric(ia_bandwidth_per_student.x) ~ ia_bandwidth_per_student.y + locale + num_students + num_schools + percentage_fiber, data=joined[train_vector,], importance=T, ntree=501)
 summary(connect.forest)
 connect.forest$importance
 predict.forest <- predict(connect.forest, joined[-train_vector,])
+bw_predictions <- data.frame(cbind(predict.forest, joined[-train_vector, 2]))
+bw_predictions$diff <- bw_predictions$V2 - bw_predictions$predict.forest
+View(bw_predictions)
+options(scipen=100)
+hist(bw_predictions$diff, col="dodgerblue", xlim=c(-5000,5000), breaks=30)
 table(predict.forest)
 confusionMatrix(predict.forest, reference=joined[-train_vector, 43])
 connect.forest
+colnames(joined)
 
 ### All Districts ###
 dists <- dbGetQuery(con, '
