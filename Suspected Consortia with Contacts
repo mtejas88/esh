@@ -1,0 +1,185 @@
+/*
+Author: Greg Kurzhals
+Created On Date: 2/10/2016
+Last Modified Date:2/16/2016 
+Name of QAing Analyst(s):  
+Purpose: To identify known/suspected consortia serving K-12 districts within the ESH population, returning 
+relevant contact information and specifying the districts on whose behalf they procure 
+Methodology: This query leverages the applicant-provided information housed in the 
+"fy2015_basic_information_and_certifications" table to identify a list of relevant consortium applicants.  The 
+exact criteria used to distinguish potential consortia from other entities include: whether the entity files as 
+a "STATEWIDE" applicant, whether the applicant self-identifies as a public institution and/or a state agency, 
+and whether the user indicates that the entity conducts aggregated procurement on behalf of schools.
+*/
+
+
+
+with district_lookup as (
+  select esh_id, district_esh_id, postal_cd
+  from schools
+  union
+  select esh_id, esh_id as district_esh_id, postal_cd
+  from districts
+),
+
+ad as (
+  select district_esh_id,
+  a.* 
+  from allocations a
+  join district_lookup dl
+  on dl.esh_id = a.recipient_id
+),
+
+districts_served as (
+select ad.applicant_id,
+ad.district_esh_id
+
+from ad
+
+where ad.district_esh_id in (
+select d.esh_id
+from districts d
+where d.include_in_universe_of_districts=true)
+
+GROUP BY ad.applicant_id, ad.district_esh_id),
+
+district_data as (
+select districts_served.*,
+d.name as "district_name",
+case when d.num_students!='No data' then d.num_students::bigint else null end as "num_students",
+d.num_campuses,
+d.exclude_from_analysis,
+d.ia_bandwidth_per_student,
+d.ia_cost_per_mbps
+from districts_served
+
+left join districts d
+on districts_served.district_esh_id=d.esh_id
+
+where d.postal_cd!='DC'),
+
+consortia_data as (
+select district_data.applicant_id,
+max(c.name) as "consortium_name",
+max(c.postal_cd) as "consortium_state",
+sum(district_data.num_students) as "num_students_served",
+sum(district_data.num_students)::numeric/max(student_population.total_student_count)::numeric as "pct_state_students_served",
+count(distinct district_data.district_esh_id) as "num_districts_served",
+count(distinct district_data.district_esh_id)::numeric/max(student_population.total_district_count)::numeric as "pct_state_districts_served",
+array_agg(distinct district_data.district_name) as "districts_served",
+array_agg(distinct district_data.district_esh_id::varchar) as "component_district_esh_ids",
+sum(case when district_data.exclude_from_analysis=false then 1 else 0 end) as "num_clean_districts_served)
+
+from district_data
+
+left join consortia c
+on district_data.applicant_id=c.esh_id
+
+left join lateral (
+select postal_cd,
+sum(num_students::bigint) as "total_student_count",
+count(esh_id) as "total_district_count",
+sum(num_campuses) as "total_campus_count"
+
+from districts d
+
+where d.include_in_universe_of_districts=true
+
+GROUP BY postal_cd) student_population
+on c.postal_cd=student_population.postal_cd
+
+where district_data.applicant_id not in (
+select esh_id
+from districts
+union
+select esh_id
+from other_locations
+union 
+select esh_id
+from schools)
+
+GROUP BY district_data.applicant_id
+having sum(district_data.num_students) is not null
+ORDER BY sum(district_data.num_students) DESC),
+
+consortium_applicants as (
+select li.applicant_id
+
+from line_items li
+
+left join lateral(
+select "Application Number",
+sum(case when ("Public"::varchar='Y' or "State Agency"::varchar='Y')
+    and ("Consortium SCH"='Y' OR "App Type"='STATEWIDE') then 1 else 0 end) as "public_k12_status"
+
+from fy2015_basic_information_and_certifications fybic
+GROUP BY "Application Number") app_status
+on li.application_number=app_status."Application Number"
+
+where li.applicant_name NOT LIKE '%Charter%' and li.applicant_name NOT LIKE '%CHARTER%' and li.applicant_name NOT LIKE '%LIBRARY%'
+GROUP BY li.applicant_id
+
+having sum(public_k12_status)>0 
+and sum(case when ('charter_service'=any(li.open_flags)
+        or 'exclude'=any(li.open_flags)) and broadband=true then 1 else 0 end)<
+    sum(case when broadband=true then 1 else 0 end)
+),
+
+consortium_contacts as (
+select "BEN",
+array_agg(distinct "AP Sig") as "ap_name",
+array_agg(distinct"AP Email") as "ap_email",
+array_agg(distinct "AP=Consultant") as "consultant_as_ap?",
+array_agg(distinct "CP Name") as "cp_name",
+array_agg(distinct "CP Email") as "cp_email",
+array_agg(distinct "Consult=CP?") as "consultant_as_cp?",
+array_agg(distinct "Consult Person Name") as "consultant_name",
+array_agg(distinct "Consult Email") as "consultant_email",
+array_agg(distinct "Consult Co Name") as "consultant_company_name"
+
+from public.fy2015_basic_information_and_certifications fybic
+
+GROUP BY "BEN")
+
+
+select array_to_string(em."consortium_BENs",';') as "consortium_BENs",
+em.nces_code,
+cd.applicant_id as "consortium_esh_id",
+cd.consortium_name,
+cd.consortium_state,
+cd.num_districts_served,
+cd.pct_state_districts_served,
+cd.num_students_served,
+cd.pct_state_students_served,
+array_to_string(cc.ap_name,';') as "ap_name",
+array_to_string(cc.ap_email,';') as "ap_email",
+array_to_string(cc.cp_name,';') as "cp_name",
+array_to_string(cc.cp_email,';') as "cp_email",
+array_to_string(cc.consultant_name,';') as "consultant_name",
+array_to_string(cc.consultant_email,';') as "consultant_email",
+array_to_string(cc.consultant_company_name,';') as "consultant_company_name",
+array_to_string(cd.component_district_esh_ids,';') as "component_district_esh_ids",
+array_to_string(cd.districts_served,';') as "districts_served"
+
+from consortia_data cd
+
+left join lateral (
+select entity_id,
+max(nces_code) as "nces_code",
+array_agg(distinct ben) as "consortium_BENs"
+
+from esh_id_mappings
+
+GROUP BY entity_id) em
+
+on cd.applicant_id=em.entity_id
+
+left join consortium_contacts cc
+on cc."BEN"=any(em."consortium_BENs")
+
+where cd.applicant_id in
+(select *
+from consortium_applicants)
+and cd.consortium_state!='DC' and cd.num_districts_served>1
+
+ORDER BY consortium_state

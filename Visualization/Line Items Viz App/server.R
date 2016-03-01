@@ -39,9 +39,9 @@ shinyServer(function(input, output, session) {
   ddt$exclude <- ifelse(ddt$exclude_from_analysis == "false", "Clean", "Dirty")
   ddt$meeting_2014_goal_no_oversub <- ifelse(ddt$meeting_2014_goal_no_oversub == "true", "Meeting 2014 Goals",
                                              "Not Meeting 2014 Goals")
-  ddt$meeting_2018_goal_no_oversub <- ifelse(ddt$meeting_2018_goal_no_oversub == "true", "Meeting 2018 Goals",
+  ddt$meeting_2018_goal_oversub <- ifelse(ddt$meeting_2018_goal_oversub == "true", "Meeting 2018 Goals",
                                              "Not Meeting 2018 Goals")
-  ddt$meeting_2018_goal_no_oversub <- as.factor(ddt$meeting_2018_goal_no_oversub)
+  ddt$meeting_2018_goal_oversub <- as.factor(ddt$meeting_2018_goal_oversub)
   ddt$meeting_2014_goal_no_oversub <- as.factor(ddt$meeting_2014_goal_no_oversub)
 
    output$distPlot <- renderPlot({
@@ -274,26 +274,28 @@ output$gen_map <- renderPlot({
     colors2 = NULL
   }
   else if(input$goals == '2018 Goals'){
-    colors <- c("#A3E5E6", "#CCCCCC")
-    goals <- 'meeting_2018_goal_no_oversub'
+    #colors <- c("#A3E5E6", "#CCCCCC")
+    colors <- ifelse(length(levels('meeting_2018_goal_oversub')) == 2, c("#A3E5E6", "#CCCCCC"), c("#CCCCCC", "#CCCCCC"))
+    goals <- 'meeting_2018_goal_oversub'
   }
   
   else {
     #02/09: figure out better way to make all points one color
     colors <- c("#0073B6","#0073B6")
-    goals <- 'meeting_2018_goal_no_oversub'
+    goals <- 'meeting_2018_goal_oversub'
     #goals <- NULL
     
   }
   
   
   set.seed(123) #to control jitter
-  q <- ggplot() + geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill=goals, colour= goals), alpha=0.8, size = 8, position = position_jitter(w = 0.03, h = 0.03)) +
+  q <- ggplot() + 
+    geom_point(data = ddt_subset, aes_string(x = 'longitude', y = 'latitude',  fill = goals, colour = goals), alpha=0.8, size = 6, position = position_jitter(w = 0.03, h = 0.03)) +
     scale_fill_manual(values= colors) +
     scale_color_manual(values= colors) +
     geom_polygon(data = state_map, aes(x = long, y= lat, group = group, fill=NA), colour='black') +
     theme_classic() + 
-    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), legend.position = "none")
+    theme(line = element_blank(), title = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
 
   print(q + coord_map())
   })

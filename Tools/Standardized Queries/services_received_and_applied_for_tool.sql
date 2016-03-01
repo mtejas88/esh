@@ -1,7 +1,7 @@
 /*
 Author: Greg Kurzhals
 Created On Date: 11/01/2015
-Last Modified Date: 12/28/2015
+Last Modified Date: 02/27/2015
 Name of QAing Analyst(s): Justine Schott
 Purpose: To identify and display the broadband services (district-dedicated, shared IA, and backbone) received by each district, 
 or applied for by each entity
@@ -38,8 +38,8 @@ lines_to_district_by_line_item as (
 /*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
 to add demographic data used in metric calculations*/
 services_received as (
-      select ldli.district_esh_id as esh_id,
-      d.name,
+      select ldli.district_esh_id as recipient_id,
+      d.name as recipient_name,
       d.postal_cd,
       ldli.line_item_id,
       li.consortium_shared,
@@ -105,6 +105,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       li.rec_elig_cost as "line_item_recurring_elig_cost",
       li.one_time_eligible_cost as "line_item_one-time_cost",
       li.orig_r_months_of_service,
+      li.applicant_id,
       li.applicant_name,
       li.isp_conditions_met,
       li.internet_conditions_met,
@@ -186,10 +187,13 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       on ldli.line_item_id=district_info_by_li.line_item_id
 
       where li.broadband=true  
+       
+       /*1) "li.consortium_shared=false" returns everything that is not consortium_shared;
+       2) "li_ia_conditions_met=true" adds consortium_shared IA, since non-consortium_shared IA is already captured in 1);
+       3) "'backbone'=any(li.open_flags)" adds anything flagged as backbone
+       These are the only services that factor into metrics, so these are the only services we want to show*/
        and (li.consortium_shared=false 
          OR li.ia_conditions_met=true 
-         OR li.wan_conditions_met=true 
-         OR li.upstream_conditions_met=true 
          OR 'backbone'=any(li.open_flags)
        )  
        and d.include_in_universe_of_districts=true 
@@ -198,8 +202,8 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 /*Joins "line_items" table to add relevant cost, bandwidth, connection type, and purpose information; joins "districts" table
 to add demographic data used in metric calculations*/
 services_applied_for as (
-      select li.applicant_id as esh_id,
-      li.applicant_name,
+      select 'n/a 'as recipient_id,
+      'n/a' as recipient_name,
       li.postal_cd,
       li.id as line_item_id,
       li.consortium_shared,
@@ -246,6 +250,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       li.rec_elig_cost as "line_item_recurring_elig_cost",
       li.one_time_eligible_cost as "line_item_one-time_cost",
       li.orig_r_months_of_service,
+      li.applicant_id,
       li.applicant_name,
       li.isp_conditions_met,
       li.internet_conditions_met,
@@ -334,11 +339,8 @@ from services_applied_for svcs
     {% endif %}
 
 --Liquid parameters allow user to filter for district_esh_id, state, and clean status
-where (svcs.esh_id::varchar='{{esh_id}}' OR 'All'='{{esh_id}}') 
-  and (svcs.postal_cd='{{state}}' OR 'All'='{{state}}') 
+where (svcs.postal_cd='{{state}}' OR 'All'='{{state}}') 
   and (svcs.dirty_status='{{dirty_status}}' OR 'All'='{{dirty_status}}') 
-
-ORDER BY esh_id
 
 {% form %}
 received_or_applied_for:
@@ -347,10 +349,6 @@ received_or_applied_for:
   options: [['received'],
             ['applied_for']
            ]
-
-esh_id:
-  type: text
-  default: 'All'
   
 state:
   type: text
@@ -359,7 +357,7 @@ state:
 dirty_status:
   type: select
   default: 'All'
-  options: [['exclude dirty'],
+  options: [['include clean'],
             ['All']
            ]
 
