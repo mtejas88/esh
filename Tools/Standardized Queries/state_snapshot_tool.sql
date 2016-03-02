@@ -328,7 +328,7 @@ states_goals as (
 cd as (
 select dl.district_esh_id,
          c.line_item_id,
-         count(*) as allocation_lines
+         count(distinct circuit_id) as allocation_lines
         
   from entity_circuits ec
   join circuits c
