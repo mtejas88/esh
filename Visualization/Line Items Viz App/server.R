@@ -14,8 +14,8 @@ shinyServer(function(input, output, session) {
   #ddt <- read.csv("us_ddt.csv")
   
   #Sujin: 
-  li <- read.csv("li_shiny_2_17.csv")
-  ddt <- read.csv("us_ddt.csv")
+  li <- read.csv("SR_2_29.csv")
+  ddt <- read.csv("ddt_2_29.csv")
   #print(colnames(li))
   
   ### Carson's variables ###
@@ -24,7 +24,7 @@ shinyServer(function(input, output, session) {
   li$ia_bandwidth_per_student <- as.numeric(as.character(li$ia_bandwidth_per_student))
   li$district_locale <- as.factor(li$locale)
   li$district_district_size <- as.factor(li$district_size)
-  li$connect_category <- as.factor(li$li_connect_category)
+  li$connect_category <- as.factor(li$connect_category)
   li$district_postal_cd <- as.character(li$postal_cd)
   li$rec_elig_cost <- as.numeric(as.character(li$line_item_recurring_elig_cost))
   li$cost_per_line <- (li$rec_elig_cost / li$line_item_total_num_lines)
