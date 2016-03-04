@@ -16,6 +16,7 @@ shinyServer(function(input, output, session) {
   #Sujin: 
   li <- read.csv("li_shiny_2_17.csv")
   ddt <- read.csv("us_ddt.csv")
+  #print(colnames(li))
   
   ### Carson's variables ###
   li$num_students <- as.numeric(as.character(li$num_students))
@@ -228,9 +229,8 @@ output$n_observationsComparison <- renderText({
 
 ############### Sujin's ####################
 ### Don't Update outside of here ###
-
-output$gen_map <- renderPlot({
-
+#district_list <- unique(as.character(ddt$name))
+output$districtSelect <- renderUI({
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_size <- paste0('\"',input$size, '\"')
   selected_locale <- paste0('\"',input$locale, '\"')
@@ -244,6 +244,39 @@ output$gen_map <- renderPlot({
     filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
     filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    filter(!postal_cd %in% c('AK', 'HI') )
+  
+  validate(
+    need(nrow(ddt_subset) > 0, "No districts in given subset")
+  )
+  district_list <- c(unique(as.character(ddt_subset$name)))
+  
+#   checkboxGroupInput("district_list", 
+#                      h2("Select District"),
+#                      choices = as.list(district_list),
+#                      selected = c('All'))
+  selectInput("district_list", h2("Select District"), as.list(district_list), multiple = T) 
+})
+
+output$gen_map <- renderPlot({
+
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_connection <- paste0('\"',input$connection, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  selected_percfiber <- paste0('\"', input$percfiber, '\"')
+  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')
+  
+  print(selected_district_list)
+  ddt_subset <- ddt %>% filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$connection == 'All', "1==1", paste("hierarchy_connect_category ==", selected_connection))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter_(ifelse(input$percfiber == 'Not applicable', "1==1", paste("percentage_fiber ==", selected_percfiber))) %>% 
+    #filter_(ifelse(input$district_list == 'All', "1==1", paste("name %in% c(", selected_district_list))) %>% 
+    filter_(paste("name %in%", selected_district_list)) %>%
     filter(!postal_cd %in% c('AK', 'HI') )
                    
   validate(
@@ -403,6 +436,7 @@ output$densPlot <- renderPlot({
   validate(
     need(nrow(li_subset) > 0, "No circuits in given subset")
   )
+
   
   d_plot <- ggplot(li_subset, aes(x=band_factor, y=cost_per_line, colour = band_factor)) + geom_point(size=8, alpha=0.75) + 
           scale_color_manual(values = c("#FDB913", "#F26B21", "#A3E5E6", "#009296", "#0073B6"))+
@@ -431,8 +465,10 @@ output$bwProjection <- renderPlot({
   ddt_subset <- ddt %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
     filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-    filter(percentage_fiber != 'No fiber')
-    
+    filter(exclude_from_analysis == 'false') %>%
+    filter(hierarchy_connect_category != 'Fiber')
+    #unique(ddt$exclude_from_analysis)
+  print(nrow(ddt_subset))
   validate(
     need(nrow(ddt_subset) > 0, "No circuits in given subset")
   )
@@ -442,23 +478,42 @@ output$bwProjection <- renderPlot({
   bw_dict <- data.frame(cbind(bw_str, bw_num))
   selected_bw <- as.numeric(as.character(bw_dict$bw_num[bw_dict$bw_str == input$bw_growth]))
   print(selected_bw)
-  
+  unique(ddt$hierarchy_connect_category)
   need_fiber <- ddt_subset %>% mutate(adj_bw = ia_bandwidth_per_student) %>% #ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
-    mutate(is_unscale = ifelse(hierarchy_connect_category %in% c('Copper', 'DSL'), 1, 0)) %>%
-    mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000 | is_unscale == 1, 1, 0)) %>%
-    mutate(bw2017 = bw2016 * (1 + selected_bw)) %>% mutate(f2017 = ifelse(bw2017 >= 100000 | is_unscale == 1, 1, 0)) %>%
-    mutate(bw2018 = bw2017 * (1 + selected_bw)) %>% mutate(f2018 = ifelse(bw2018 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2019 = bw2018 * (1 + selected_bw)) %>% mutate(f2019 = ifelse(bw2019 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2020 = bw2019 * (1 + selected_bw)) %>% mutate(f2020 = ifelse(bw2020 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2021 = bw2020 * (1 + selected_bw)) %>% mutate(f2021 = ifelse(bw2021 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2022 = bw2021 * (1 + selected_bw)) %>% mutate(f2022 = ifelse(bw2022 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2023 = bw2022 * (1 + selected_bw)) %>% mutate(f2023 = ifelse(bw2023 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2024 = bw2023 * (1 + selected_bw)) %>% mutate(f2024 = ifelse(bw2024 >= 100000| is_unscale == 1, 1, 0)) %>%
-    mutate(bw2025 = bw2024 * (1 + selected_bw)) %>% mutate(f2025 = ifelse(bw2025 >= 100000| is_unscale == 1, 1, 0)) %>%
+    mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                       (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2016 >= 25000) |
+                                                                       (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2017 = adj_bw * num_students) %>% mutate(f2017 = ifelse(bw2017 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                       (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2017 >= 25000) |
+                                                                       (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2018 = bw2017 * (1 + selected_bw)) %>% mutate(f2018 = ifelse(bw2018 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2018 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2019 = bw2018 * (1 + selected_bw)) %>% mutate(f2019 = ifelse(bw2019 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2019 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2020 = bw2019 * (1 + selected_bw)) %>% mutate(f2020 = ifelse(bw2020 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2020 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2021 = bw2020 * (1 + selected_bw)) %>% mutate(f2021 = ifelse(bw2021 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2021 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2022 = bw2021 * (1 + selected_bw)) %>% mutate(f2022 = ifelse(bw2022 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2022 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2023 = bw2022 * (1 + selected_bw)) %>% mutate(f2023 = ifelse(bw2023 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2023 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2024 = bw2023 * (1 + selected_bw)) %>% mutate(f2024 = ifelse(bw2024 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2024 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2025 = bw2024 * (1 + selected_bw)) %>% mutate(f2025 = ifelse(bw2025 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2025 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
     select(c(f2016, f2017, f2018, f2019, f2020, f2021, f2022, f2023, f2024, f2025)) %>%
     summarise_each(funs(mean(., na.rm = TRUE))) %>%
     t() %>% data.frame() %>% mutate(Year=as.factor(c(2016:2025)))
-
+  
   colnames(need_fiber) <- c("Need_Fiber", "Year")
 
   ggplot(need_fiber, aes(x=Year, y=Need_Fiber, group=1)) + geom_line(colour="#F26B21") +
@@ -479,11 +534,66 @@ output$bwProjection <- renderPlot({
           plot.margin = unit(c(1,1,1,1), "cm")
     )
 },res=140)
+  
+output$bw_table <- renderTable({
+  selected_size <- paste0('\"',input$size, '\"')
+  selected_locale <- paste0('\"',input$locale, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  ddt_subset <- ddt %>% filter_(ifelse(input$size == 'All', "1==1", paste("district_size ==", selected_size))) %>%
+    filter_(ifelse(input$locale == 'All', "1==1", paste("locale ==", selected_locale))) %>%
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter(exclude_from_analysis == 'false') %>%
+    filter(hierarchy_connect_category != 'Fiber')
 
+  validate(
+    need(nrow(ddt_subset) > 0, "No circuits in given subset")
+  )
+  
+  bw_str <- c('25%','35%','50%','65%')
+  bw_num <- c(.25,.35,.5,.65)
+  bw_dict <- data.frame(cbind(bw_str, bw_num))
+  selected_bw <- as.numeric(as.character(bw_dict$bw_num[bw_dict$bw_str == input$bw_growth]))
+  print(selected_bw)
+  unique(ddt$hierarchy_connect_category)
+  need_fiber <- ddt_subset %>% mutate(adj_bw = ia_bandwidth_per_student) %>% #ifelse(ia_bandwidth_per_student < 100, 100, ia_bandwidth_per_student)) %>% 
+    mutate(bw2016 = adj_bw * num_students) %>% mutate(f2016 = ifelse(bw2016 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                       (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2016 >= 25000) |
+                                                                       (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2017 = bw2016 * (1 + selected_bw)) %>% mutate(f2017 = ifelse(bw2017 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                       (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2017 >= 25000) |
+                                                                       (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2018 = bw2017 * (1 + selected_bw)) %>% mutate(f2018 = ifelse(bw2018 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2018 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2019 = bw2018 * (1 + selected_bw)) %>% mutate(f2019 = ifelse(bw2019 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2019 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2020 = bw2019 * (1 + selected_bw)) %>% mutate(f2020 = ifelse(bw2020 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2020 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2021 = bw2020 * (1 + selected_bw)) %>% mutate(f2021 = ifelse(bw2021 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2021 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2022 = bw2021 * (1 + selected_bw)) %>% mutate(f2022 = ifelse(bw2022 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2022 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2023 = bw2022 * (1 + selected_bw)) %>% mutate(f2023 = ifelse(bw2023 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2023 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2024 = bw2023 * (1 + selected_bw)) %>% mutate(f2024 = ifelse(bw2024 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2024 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    mutate(bw2025 = bw2024 * (1 + selected_bw)) %>% mutate(f2025 = ifelse(bw2025 >= 100000 | hierarchy_connect_category=='Copper' |
+                                                                            (hierarchy_connect_category=='DSL' & num_students <= 25 & bw2025 >= 25000) |
+                                                                            (hierarchy_connect_category=='DSL' & num_students > 25), 1, 0)) %>%
+    select(c(f2016, f2017, f2018, f2019, f2020, f2021, f2022, f2023, f2024, f2025)) %>%
+    summarise_each(funs(mean(., na.rm = TRUE))) %>%
+    t() %>% data.frame() %>% mutate(Year=as.factor(c(2016:2025)))
+  
+  colnames(need_fiber) <- c("Need_Fiber", "Year")
+  need_fiber
 })
   
   
-  
-  
-  
-  
+})

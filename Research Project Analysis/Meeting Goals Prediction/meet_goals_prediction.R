@@ -5,9 +5,9 @@ library(dplyr)
 
 raw <- read.csv('raw_update.csv') # predictors
 ver <- read.csv('verified_update.csv') # outcome
-
+ver <- ver[!is.na(ver$ia_bandwidth_per_student),]
 sort(raw$esh_id) == sort(ver$esh_id)
-
+nrow(ver)
 raw <- raw %>% arrange(esh_id)
 ver <- ver %>% arrange(esh_id)
 
@@ -20,8 +20,6 @@ raw$ia_bandwidth_per_student <- as.numeric(as.character(raw$ia_bandwidth_per_stu
 ver$ia_bandwidth_per_student <- as.numeric(as.character(ver$ia_bandwidth_per_student))
 table(raw$ia_bandwidth_per_student == ver$ia_bandwidth_per_student)
 
-colnames(ver)
-colnames(raw)
 joined <- merge(ver[,c(1,5)], raw, by.x="esh_id", by.y="esh_id")
 joined$band_diff <- joined$ia_bandwidth_per_student.x - joined$ia_bandwidth_per_student.y
 diffs <- joined$band_diff[joined$band_diff != 0]
@@ -34,6 +32,9 @@ mean(joined$meets_goals, na.rm=T)
 colnames(joined)
 joined <- joined[!is.na(joined$meets_goals),]
 joined <- joined[!is.na(joined$ia_bandwidth_per_student.y),]
+#joined$meets_goals <- ifelse(joined$ia_bandwidth_per_student.x >= 100, 1, 0)
+#mean(joined$meets_goals, na.rm = T)
+View(joined)
 nrow(joined)
 
 ### Validation Set ###
@@ -44,18 +45,20 @@ train_vector <- sample(data.size, train.size)
 
 ### Model ###
 library(randomForest)
-connect.forest <- randomForest(as.factor(meets_goals) ~ ia_bandwidth_per_student.y + locale + num_students + num_schools + percentage_fiber, data=joined[train_vector,], importance=T, ntree=501)
-connect.forest <- randomForest(as.numeric(ia_bandwidth_per_student.x) ~ ia_bandwidth_per_student.y + locale + num_students + num_schools + percentage_fiber, data=joined[train_vector,], importance=T, ntree=501)
-summary(connect.forest)
+connect.forest <- randomForest(as.factor(meets_goals) ~ ia_bandwidth_per_student.y + locale + 
+                                 num_students + num_schools + percentage_fiber, 
+                                 data=joined[train_vector,], importance=T, ntree=501)
+
+#connect.forest <- randomForest(as.numeric(ia_bandwidth_per_student.x) ~ ia_bandwidth_per_student.y + locale + num_students + num_schools + percentage_fiber, data=joined[train_vector,], importance=T, ntree=501)
 connect.forest$importance
 predict.forest <- predict(connect.forest, joined[-train_vector,])
-bw_predictions <- data.frame(cbind(predict.forest, joined[-train_vector, 2]))
-bw_predictions$diff <- bw_predictions$V2 - bw_predictions$predict.forest
+#bw_predictions <- data.frame(cbind(predict.forest, joined[-train_vector, 2]))
+#bw_predictions$diff <- bw_predictions$V2 - bw_predictions$predict.forest
 View(bw_predictions)
 options(scipen=100)
-hist(bw_predictions$diff, col="dodgerblue", xlim=c(-5000,5000), breaks=30)
+#hist(bw_predictions$diff, col="dodgerblue", xlim=c(-5000,5000), breaks=30)
 table(predict.forest)
-confusionMatrix(predict.forest, reference=joined[-train_vector, 43])
+confusionMatrix(predict.forest, reference=joined[-train_vector, 42])
 connect.forest
 colnames(joined)
 

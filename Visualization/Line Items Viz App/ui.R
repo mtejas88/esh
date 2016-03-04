@@ -117,6 +117,7 @@ shinyUI(fluidPage(
       selectInput("bw_growth", 
                   h2("Estimate of Annual Bandwidth Growth"), 
                   choices = c('25%','35%','50%','65%'), selected='50%'),
+      uiOutput("districtSelect"),
       selectInput("state", 
                   h2("Select State"), 
                   choices = c('All', 'AL','AR','AZ',
@@ -163,7 +164,7 @@ shinyUI(fluidPage(
         tabPanel("Cost - National Comparison", plotOutput("natComparison", height="550px", width="1000px"),
                  div(id="test1", class="test", textOutput("n_observationsComparison")))
         ),
-        tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px")),
+        tabPanel("Bandwidth Projection", plotOutput("bwProjection", height="550px", width="1000px"), tableOutput("bw_table")),
         tabPanel("District Map", fluidRow(column(12, align = "center", plotOutput("gen_map", height="550px", width = "1000px"))),
                  div(id="test1", class="test", textOutput("n_observations_ddt"))),
         tabPanel("Download Subsets", h3(tableOutput('table'))),
