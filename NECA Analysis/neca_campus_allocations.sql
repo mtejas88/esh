@@ -277,7 +277,7 @@ state:
   
 exclude_from_analysis:
   type: select
-  default: 'All'
+  default: 'false'
   options:
             [['All'],
             ['true'],
