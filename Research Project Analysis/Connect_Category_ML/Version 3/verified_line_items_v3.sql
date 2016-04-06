@@ -66,7 +66,7 @@ consult_info as (
   select
       "BEN" as ben,
       "Consult Person Name" as consultant_name,
-      li.connect_category as consultants_category
+      true as consultant_applied
     from  public.fy2015_basic_information_and_certifications bi
     join public.line_items li
     on li.ben = bi."BEN"
@@ -96,21 +96,31 @@ li_ver as (
     linf.num_students,
     linf.connect_category,
     linf.providers_typical_category,
-    ci.consultants_category,
-    ci.consultant_name,
+    case when ci.consultant_applied is true
+      then true
+      else false
+    end as consultant_app,
+    case
+    when ci.consultant_applied is true
+     then linf.connect_category
+    else 'N/A'
+    end as consultants_cat, 
     linf.total_cost,
     linf.num_lines,
     linf.frn_complete,
     linf.copper_line,
     linf.postal_cd,
-    linf.copper_line,
     di.esh_id,
     di.district_name,
     di.ben,
     di.nces_cd,
     di.num_of_services,
     di.highest_connect_type,
-    di.free_and_reduced,
+    case
+      when di.free_and_reduced is null
+      then 0
+      else di.free_and_reduced
+    end as free_and_reduced,
     case
       when linf.total_cost > 0 and num_lines > 0 then
         total_cost / num_lines
