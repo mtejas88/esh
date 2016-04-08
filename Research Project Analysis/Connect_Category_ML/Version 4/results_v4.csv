@@ -1,0 +1,1305 @@
+"","verified_category","predicted_category","raw_category","test_data.frn_complete","guessed_correctly"
+"5","Fiber","Fiber","Fiber","2717922-1",TRUE
+"12","Fiber","Fiber","Fiber","2718083-1",TRUE
+"15","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2718105-1",TRUE
+"17","Fiber","Fiber","Fiber","2718134-1",TRUE
+"32","Other / Uncategorized","Other / Uncategorized","Fiber","2718376-2",TRUE
+"40","Fiber","Fiber","Fiber","2718490-1",TRUE
+"44","Cable / DSL","Cable / DSL","Other / Uncategorized","2718522-1",TRUE
+"47","Fiber","Fiber","Other / Uncategorized","2718551-3",TRUE
+"48","Other / Uncategorized","Fiber","Other / Uncategorized","2718551-4",FALSE
+"49","Fiber","Fiber","Other / Uncategorized","2718551-6",TRUE
+"53","Cable / DSL","Cable / DSL","Other / Uncategorized","2718647-1",TRUE
+"63","Fiber","Fiber","Fiber","2718841-1",TRUE
+"65","Fiber","Fiber","Fiber","2718854-1",TRUE
+"71","Fiber","Fiber","Other / Uncategorized","2718999-2",TRUE
+"75","Copper","Copper","Copper","2719186-1",TRUE
+"79","Fiber","Fiber","Fiber","2719315-1",TRUE
+"82","Cable / DSL","Cable / DSL","Cable / DSL","2719393-1",TRUE
+"115","Fiber","Fiber","Fiber","2719781-1",TRUE
+"118","Fiber","Fiber","Fiber","2719937-1",TRUE
+"120","Fiber","Fiber","Fiber","2719968-2",TRUE
+"128","Fiber","Fiber","Fiber","2720118-1",TRUE
+"140","Fiber","Fiber","Fiber","2720402-1",TRUE
+"142","Fiber","Fiber","Fiber","2720477-1",TRUE
+"143","Fiber","Fiber","Fiber","2720478-1",TRUE
+"152","Fiber","Fiber","Fiber","2720630-1",TRUE
+"155","Fiber","Fiber","Fiber","2720724-1",TRUE
+"163","Fiber","Fiber","Fiber","2720799-1",TRUE
+"167","Copper","Copper","Other / Uncategorized","2720917-2",TRUE
+"170","Cable / DSL","Cable / DSL","Other / Uncategorized","2720968-1",TRUE
+"180","Fiber","Fiber","Fiber","2721095-1",TRUE
+"183","Fiber","Fiber","Fiber","2721158-1",TRUE
+"189","Fiber","Fiber","Fiber","2721232-1",TRUE
+"195","Fiber","Fiber","Fiber","2721388-1",TRUE
+"196","Fiber","Fiber","Fiber","2721414-1",TRUE
+"202","Other / Uncategorized","Other / Uncategorized","Fiber","2721582-1",TRUE
+"211","Cable / DSL","Cable / DSL","Other / Uncategorized","2721635-1",TRUE
+"214","Fiber","Fiber","Fiber","2721657-1",TRUE
+"220","Fiber","Fiber","Other / Uncategorized","2721742-1",TRUE
+"225","Copper","Copper","Copper","2721837-1",TRUE
+"227","Fiber","Fiber","Fiber","2721874-1",TRUE
+"229","Cable / DSL","Cable / DSL","Other / Uncategorized","2721880-1",TRUE
+"234","Fiber","Fiber","Fiber","2721911-2",TRUE
+"236","Fiber","Fiber","Fiber","2721931-1",TRUE
+"246","Fiber","Fiber","Fiber","2722157-1",TRUE
+"248","Fiber","Fiber","Other / Uncategorized","2722172-1",TRUE
+"250","Fiber","Fiber","Other / Uncategorized","2722270-1",TRUE
+"252","Fiber","Fiber","Cable / DSL","2722283-1",TRUE
+"255","Fiber","Fiber","Other / Uncategorized","2722342-1",TRUE
+"259","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2722400-1",TRUE
+"267","Fiber","Fiber","Fiber","2722474-1",TRUE
+"271","Fiber","Fiber","Fiber","2722538-1",TRUE
+"273","Fiber","Fiber","Fiber","2722573-1",TRUE
+"275","Fiber","Fiber","Fiber","2722589-1",TRUE
+"284","Fiber","Fiber","Fiber","2722669-1",TRUE
+"304","Fiber","Fiber","Cable / DSL","2722856-1",TRUE
+"307","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2722877-1",TRUE
+"324","Cable / DSL","Cable / DSL","Fiber","2723062-1",TRUE
+"343","Fiber","Fiber","Other / Uncategorized","2723299-1",TRUE
+"344","Fiber","Fiber","Fiber","2723299-2",TRUE
+"350","Fiber","Fiber","Other / Uncategorized","2723340-1",TRUE
+"351","Fiber","Fiber","Other / Uncategorized","2723342-1",TRUE
+"377","Fiber","Fiber","Other / Uncategorized","2723561-1",TRUE
+"378","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2723573-1",TRUE
+"382","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2723636-1",TRUE
+"388","Fiber","Fiber","Fiber","2723677-1",TRUE
+"421","Cable / DSL","Cable / DSL","Cable / DSL","2724144-1",TRUE
+"428","Fiber","Fiber","Fiber","2724157-6",TRUE
+"431","Fixed Wireless","Fixed Wireless","Fixed Wireless","2724183-2",TRUE
+"436","Cable / DSL","Cable / DSL","Other / Uncategorized","2724207-1",TRUE
+"440","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2724272-1",TRUE
+"441","Fiber","Fiber","Cable / DSL","2724276-1",TRUE
+"443","Fiber","Fiber","Fiber","2724320-1",TRUE
+"450","Fiber","Fiber","Fiber","2724450-1",TRUE
+"471","Fiber","Fiber","Cable / DSL","2724926-1",TRUE
+"477","Fiber","Fiber","Other / Uncategorized","2724956-1",TRUE
+"487","Fiber","Fiber","Fiber","2725061-1",TRUE
+"496","Copper","Copper","Copper","2725248-1",TRUE
+"498","Fiber","Fiber","Fiber","2725276-1",TRUE
+"501","Fixed Wireless","Fixed Wireless","Fixed Wireless","2725299-1",TRUE
+"510","Cable / DSL","Cable / DSL","Cable / DSL","2725439-1",TRUE
+"529","Cable / DSL","Cable / DSL","Cable / DSL","2725704-1",TRUE
+"536","Fixed Wireless","Fixed Wireless","Fixed Wireless","2725773-1",TRUE
+"542","Fiber","Fiber","Fiber","2725873-1",TRUE
+"551","Cable / DSL","Cable / DSL","Cable / DSL","2725983-1",TRUE
+"553","Fiber","Fiber","Fiber","2726020-1",TRUE
+"555","Cable / DSL","Cable / DSL","Cable / DSL","2726035-1",TRUE
+"557","Fiber","Fiber","Other / Uncategorized","2726053-1",TRUE
+"559","Fiber","Fiber","Fiber","2726094-1",TRUE
+"561","Fiber","Fiber","Fiber","2726094-3",TRUE
+"564","Fiber","Fiber","Other / Uncategorized","2726126-1",TRUE
+"565","Fiber","Fiber","Fiber","2726137-1",TRUE
+"574","Fiber","Fiber","Fiber","2726275-1",TRUE
+"579","Fiber","Fiber","Other / Uncategorized","2726376-3",TRUE
+"583","Fiber","Fiber","Fiber","2726376-7",TRUE
+"588","Fixed Wireless","Fixed Wireless","Fixed Wireless","2726535-1",TRUE
+"589","Fiber","Fiber","Fiber","2726539-1",TRUE
+"592","Fiber","Fiber","Fiber","2726576-1",TRUE
+"599","Fiber","Fiber","Other / Uncategorized","2726655-2",TRUE
+"603","Cable / DSL","Cable / DSL","Cable / DSL","2726717-1",TRUE
+"614","Cable / DSL","Cable / DSL","Other / Uncategorized","2726811-1",TRUE
+"622","Fiber","Fiber","Fiber","2726874-1",TRUE
+"637","Other / Uncategorized","Other / Uncategorized","Fiber","2727096-1",TRUE
+"644","Cable / DSL","Cable / DSL","Cable / DSL","2727333-1",TRUE
+"649","Fiber","Fiber","Fiber","2727423-1",TRUE
+"657","Fiber","Cable / DSL","Fiber","2727498-1",FALSE
+"671","Other / Uncategorized","Other / Uncategorized","Fiber","2727759-1",TRUE
+"685","Fiber","Fiber","Fiber","2728083-1",TRUE
+"701","Fiber","Fiber","Other / Uncategorized","2728314-1",TRUE
+"706","Fiber","Fiber","Fiber","2728436-1",TRUE
+"708","Fiber","Fiber","Fiber","2728458-2",TRUE
+"710","Fiber","Fiber","Fiber","2728464-1",TRUE
+"718","Fiber","Fiber","Fiber","2728613-3",TRUE
+"720","Fixed Wireless","Fixed Wireless","Fixed Wireless","2728618-1",TRUE
+"721","Fiber","Fiber","Fiber","2728630-1",TRUE
+"728","Fiber","Fiber","Fiber","2728668-1",TRUE
+"735","Fiber","Fiber","Fiber","2728725-1",TRUE
+"736","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2728727-1",TRUE
+"737","Fiber","Fiber","Fiber","2728731-1",TRUE
+"738","Fiber","Fiber","Fiber","2728735-1",TRUE
+"747","Fiber","Fiber","Fiber","2728815-1",TRUE
+"752","Other / Uncategorized","Other / Uncategorized","Fiber","2728964-1",TRUE
+"765","Fiber","Fiber","Fiber","2729091-1",TRUE
+"767","Other / Uncategorized","Other / Uncategorized","Fiber","2729101-1",TRUE
+"769","Copper","Copper","Fiber","2729144-1",TRUE
+"780","Fiber","Fiber","Fiber","2729324-1",TRUE
+"787","Fiber","Fiber","Fiber","2729363-2",TRUE
+"796","Fiber","Fiber","Fiber","2729490-1",TRUE
+"806","Fiber","Fiber","Fiber","2729594-2",TRUE
+"824","Fiber","Fiber","Fiber","2729829-1",TRUE
+"835","Fiber","Fiber","Other / Uncategorized","2729901-1",TRUE
+"836","Fiber","Fiber","Fiber","2729954-1",TRUE
+"843","Fiber","Fiber","Fiber","2730048-2",TRUE
+"846","Fiber","Fiber","Other / Uncategorized","2730160-1",TRUE
+"852","Fiber","Fiber","Other / Uncategorized","2730203-1",TRUE
+"859","Fiber","Fiber","Fiber","2730324-1",TRUE
+"861","Fiber","Fiber","Fiber","2730330-1",TRUE
+"869","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2730511-1",TRUE
+"875","Cable / DSL","Cable / DSL","Other / Uncategorized","2730705-1",TRUE
+"881","Cable / DSL","Cable / DSL","Cable / DSL","2730787-1",TRUE
+"886","Fiber","Fiber","Other / Uncategorized","2730844-1",TRUE
+"897","Fiber","Fiber","Fiber","2731134-1",TRUE
+"900","Fixed Wireless","Fixed Wireless","Cable / DSL","2731158-1",TRUE
+"904","Cable / DSL","Cable / DSL","Cable / DSL","2731297-1",TRUE
+"910","Fiber","Fiber","Cable / DSL","2731593-1",TRUE
+"912","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2731627-1",TRUE
+"920","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2731750-1",TRUE
+"923","Fiber","Fiber","Fiber","2731813-2",TRUE
+"927","Fiber","Fiber","Other / Uncategorized","2731902-1",TRUE
+"928","Cable / DSL","Cable / DSL","Cable / DSL","2731915-1",TRUE
+"938","Fiber","Fiber","Fiber","2732133-1",TRUE
+"942","Fiber","Fiber","Fiber","2732204-1",TRUE
+"953","Fiber","Fiber","Other / Uncategorized","2732275-1",TRUE
+"959","Fiber","Fiber","Other / Uncategorized","2732319-1",TRUE
+"965","Fiber","Fiber","Fiber","2732431-1",TRUE
+"967","Fiber","Fiber","Fiber","2732504-1",TRUE
+"975","Fiber","Fiber","Fiber","2732578-1",TRUE
+"981","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2732707-1",TRUE
+"983","Copper","Copper","Copper","2732814-2",TRUE
+"984","Fiber","Fiber","Other / Uncategorized","2732824-1",TRUE
+"989","Fiber","Fiber","Fiber","2732960-4",TRUE
+"996","Fiber","Fiber","Other / Uncategorized","2733137-1",TRUE
+"1001","Copper","Copper","Copper","2733154-1",TRUE
+"1006","Fiber","Fiber","Fiber","2733175-1",TRUE
+"1016","Fiber","Fiber","Fiber","2733381-1",TRUE
+"1019","Fiber","Fiber","Fiber","2733531-2",TRUE
+"1023","Fiber","Fiber","Fiber","2733543-12",TRUE
+"1027","Fiber","Fiber","Fiber","2733543-2",TRUE
+"1031","Fiber","Fiber","Fiber","2733543-6",TRUE
+"1039","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2733593-1",TRUE
+"1040","Fiber","Fiber","Other / Uncategorized","2733602-1",TRUE
+"1044","Fiber","Fiber","Other / Uncategorized","2733621-1",TRUE
+"1045","Copper","Copper","Other / Uncategorized","2733653-1",TRUE
+"1047","Fiber","Fiber","Other / Uncategorized","2733692-1",TRUE
+"1051","Other / Uncategorized","Other / Uncategorized","Fiber","2733727-1",TRUE
+"1053","Fiber","Fiber","Fiber","2733781-1",TRUE
+"1054","Fiber","Fiber","Fiber","2733786-1",TRUE
+"1060","Fiber","Fiber","Fiber","2733906-1",TRUE
+"1082","Fiber","Fiber","Fiber","2734109-1",TRUE
+"1091","Fiber","Fiber","Fiber","2734255-1",TRUE
+"1093","Cable / DSL","Cable / DSL","Cable / DSL","2734264-1",TRUE
+"1097","Fiber","Fiber","Fiber","2734348-2",TRUE
+"1098","Fiber","Fiber","Fiber","2734395-1",TRUE
+"1116","Fiber","Fiber","Other / Uncategorized","2734611-1",TRUE
+"1123","Fiber","Fiber","Fiber","2734695-1",TRUE
+"1132","Fiber","Fiber","Fiber","2734779-2",TRUE
+"1137","Fiber","Fiber","Fiber","2734779-7",TRUE
+"1139","Other / Uncategorized","Other / Uncategorized","Fiber","2734786-1",TRUE
+"1145","Fiber","Cable / DSL","Fiber","2734854-1",FALSE
+"1165","Fiber","Fiber","Fiber","2734971-1",TRUE
+"1166","Other / Uncategorized","Other / Uncategorized","Fiber","2735003-1",TRUE
+"1168","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2735025-1",TRUE
+"1173","Fiber","Fiber","Fiber","2735114-3",TRUE
+"1178","Fiber","Fiber","Fiber","2735135-1",TRUE
+"1181","Fiber","Fiber","Fiber","2735159-1",TRUE
+"1190","Fiber","Fiber","Fiber","2735354-2",TRUE
+"1194","Copper","Copper","Copper","2735486-1",TRUE
+"1196","Fiber","Fiber","Other / Uncategorized","2735498-2",TRUE
+"1211","Fiber","Fiber","Other / Uncategorized","2735652-1",TRUE
+"1221","Cable / DSL","Cable / DSL","Other / Uncategorized","2735789-1",TRUE
+"1226","Fixed Wireless","Fixed Wireless","Fixed Wireless","2735846-1",TRUE
+"1229","Copper","Copper","Copper","2735917-1",TRUE
+"1246","Fiber","Fiber","Fiber","2736214-1",TRUE
+"1270","Fiber","Fiber","Fiber","2736564-1",TRUE
+"1273","Fiber","Fiber","Fiber","2736564-4",TRUE
+"1275","Cable / DSL","Cable / DSL","Cable / DSL","2736585-1",TRUE
+"1277","Fiber","Fiber","Other / Uncategorized","2736638-1",TRUE
+"1294","Fiber","Fiber","Fiber","2736861-1",TRUE
+"1320","Fiber","Fiber","Other / Uncategorized","2737310-2",TRUE
+"1322","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2737326-1",TRUE
+"1330","Fiber","Fiber","Fiber","2737438-1",TRUE
+"1336","Fiber","Fiber","Fiber","2737549-1",TRUE
+"1337","Fiber","Fiber","Fiber","2737566-1",TRUE
+"1340","Fiber","Fiber","Fiber","2737604-1",TRUE
+"1342","Fiber","Fiber","Fiber","2737642-1",TRUE
+"1345","Fiber","Fiber","Fiber","2737786-1",TRUE
+"1352","Fiber","Fiber","Fiber","2737844-1",TRUE
+"1355","Fiber","Fiber","Other / Uncategorized","2737990-1",TRUE
+"1356","Fiber","Fiber","Cable / DSL","2738001-1",TRUE
+"1357","Fiber","Fiber","Fiber","2738094-1",TRUE
+"1362","Fiber","Fiber","Cable / DSL","2738180-1",TRUE
+"1365","Fiber","Fiber","Cable / DSL","2738240-1",TRUE
+"1370","Fiber","Fiber","Fiber","2738301-1",TRUE
+"1375","Fiber","Fiber","Fiber","2738361-1",TRUE
+"1376","Cable / DSL","Cable / DSL","Other / Uncategorized","2738383-1",TRUE
+"1389","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2738558-1",TRUE
+"1391","Fiber","Fiber","Fiber","2738576-1",TRUE
+"1396","Fiber","Fiber","Other / Uncategorized","2738696-1",TRUE
+"1400","Fiber","Fiber","Fiber","2738776-1",TRUE
+"1402","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2738806-1",TRUE
+"1404","Cable / DSL","Cable / DSL","Cable / DSL","2738818-2",TRUE
+"1405","Fiber","Fiber","Fiber","2738822-1",TRUE
+"1422","Other / Uncategorized","Other / Uncategorized","Fiber","2739004-1",TRUE
+"1447","Fixed Wireless","Fixed Wireless","Fixed Wireless","2739431-1",TRUE
+"1455","Fiber","Fiber","Other / Uncategorized","2739591-1",TRUE
+"1466","Cable / DSL","Cable / DSL","Cable / DSL","2739708-1",TRUE
+"1485","Fiber","Fiber","Fiber","2739931-1",TRUE
+"1498","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2740044-4",TRUE
+"1516","Other / Uncategorized","Other / Uncategorized","Fiber","2740124-2",TRUE
+"1521","Other / Uncategorized","Other / Uncategorized","Fiber","2740222-1",TRUE
+"1524","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2740273-1",TRUE
+"1530","Fiber","Fiber","Fiber","2740316-1",TRUE
+"1534","Fiber","Fiber","Other / Uncategorized","2740380-1",TRUE
+"1552","Fiber","Fiber","Fiber","2740601-1",TRUE
+"1555","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2740732-1",TRUE
+"1557","Fiber","Fiber","Fiber","2740865-1",TRUE
+"1559","Fiber","Fiber","Fiber","2740875-1",TRUE
+"1563","Cable / DSL","Cable / DSL","Cable / DSL","2740902-1",TRUE
+"1565","Fiber","Fiber","Fiber","2740957-2",TRUE
+"1566","Copper","Copper","Copper","2740957-3",TRUE
+"1571","Fiber","Fiber","Other / Uncategorized","2741038-1",TRUE
+"1575","Fiber","Fiber","Fiber","2741061-1",TRUE
+"1576","Copper","Copper","Fiber","2741064-1",TRUE
+"1577","Fiber","Fiber","Fiber","2741067-1",TRUE
+"1578","Other / Uncategorized","Other / Uncategorized","Fiber","2741068-1",TRUE
+"1584","Copper","Copper","Copper","2741178-1",TRUE
+"1591","Fiber","Fiber","Fiber","2741245-2",TRUE
+"1594","Fiber","Fiber","Fiber","2741261-2",TRUE
+"1601","Fiber","Fiber","Other / Uncategorized","2741334-1",TRUE
+"1603","Fiber","Fiber","Fiber","2741368-1",TRUE
+"1619","Fiber","Fiber","Fiber","2741629-1",TRUE
+"1627","Fiber","Fiber","Fiber","2741696-2",TRUE
+"1629","Fiber","Fiber","Cable / DSL","2741707-2",TRUE
+"1633","Fiber","Fiber","Fiber","2741751-1",TRUE
+"1636","Fiber","Fiber","Fiber","2741780-1",TRUE
+"1639","Fiber","Fiber","Fiber","2741818-1",TRUE
+"1640","Fiber","Fiber","Fiber","2741822-1",TRUE
+"1649","Fiber","Fiber","Fiber","2741969-1",TRUE
+"1650","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2741972-1",TRUE
+"1653","Fiber","Fiber","Fiber","2742010-1",TRUE
+"1657","Fiber","Fiber","Fiber","2742070-1",TRUE
+"1664","Cable / DSL","Cable / DSL","Cable / DSL","2742095-1",TRUE
+"1667","Copper","Copper","Copper","2742131-1",TRUE
+"1693","Fiber","Fiber","Other / Uncategorized","2742448-2",TRUE
+"1697","Cable / DSL","Cable / DSL","Cable / DSL","2742628-1",TRUE
+"1710","Fixed Wireless","Fixed Wireless","Fixed Wireless","2742750-1",TRUE
+"1724","Fiber","Fiber","Fiber","2742848-3",TRUE
+"1726","Fiber","Fiber","Other / Uncategorized","2742859-1",TRUE
+"1742","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2743124-1",TRUE
+"1752","Cable / DSL","Cable / DSL","Cable / DSL","2743164-2",TRUE
+"1763","Fiber","Fiber","Other / Uncategorized","2743393-1",TRUE
+"1767","Cable / DSL","Cable / DSL","1","2743499-1",TRUE
+"1768","Fiber","Fiber","Fiber","2743544-1",TRUE
+"1769","Fiber","Fiber","Other / Uncategorized","2743553-1",TRUE
+"1771","Fiber","Fiber","Fiber","2743580-1",TRUE
+"1773","Fiber","Fiber","Fiber","2743624-1",TRUE
+"1774","Fiber","Fiber","Fiber","2743624-2",TRUE
+"1780","Fiber","Fiber","Fiber","2743687-1",TRUE
+"1787","Fiber","Fiber","Fiber","2743756-1",TRUE
+"1790","Fiber","Fiber","Fiber","2743813-1",TRUE
+"1799","Fiber","Fiber","Other / Uncategorized","2743959-1",TRUE
+"1802","Fiber","Fiber","Fiber","2744054-1",TRUE
+"1804","Fiber","Fiber","Fiber","2744054-3",TRUE
+"1821","Fiber","Fiber","Other / Uncategorized","2744315-1",TRUE
+"1828","Fiber","Fiber","Fiber","2744637-1",TRUE
+"1829","Fiber","Fiber","Fiber","2744668-1",TRUE
+"1837","Fiber","Fiber","Fiber","2744719-1",TRUE
+"1839","Fiber","Fiber","Fiber","2744730-1",TRUE
+"1852","Fiber","Fiber","Fiber","2744793-1",TRUE
+"1859","Fiber","Fiber","Other / Uncategorized","2744835-1",TRUE
+"1861","Fiber","Fiber","Other / Uncategorized","2744846-1",TRUE
+"1862","Fiber","Fiber","Fiber","2744846-2",TRUE
+"1883","Other / Uncategorized","Other / Uncategorized","1","2745283-1",TRUE
+"1888","Fiber","Fiber","Fiber","2745496-1",TRUE
+"1894","Fiber","Fiber","Fiber","2745541-1",TRUE
+"1896","Fiber","Fiber","Fiber","2745573-1",TRUE
+"1902","Fiber","Fiber","Fiber","2745619-1",TRUE
+"1912","Fiber","Fiber","Other / Uncategorized","2745849-1",TRUE
+"1914","Fiber","Fiber","Fiber","2745881-1",TRUE
+"1917","Fiber","Fiber","Fiber","2745881-4",TRUE
+"1931","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2746060-1",TRUE
+"1932","Fiber","Fiber","Fiber","2746061-1",TRUE
+"1936","Fiber","Fiber","Fiber","2746107-1",TRUE
+"1938","Fiber","Fiber","Fiber","2746208-1",TRUE
+"1944","Fiber","Fiber","Fiber","2746305-1",TRUE
+"1945","Fiber","Fiber","Fiber","2746315-1",TRUE
+"1952","Fiber","Fiber","Fiber","2746419-1",TRUE
+"1966","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2746533-2",TRUE
+"1972","Fiber","Fiber","Fiber","2746556-1",TRUE
+"1981","Fiber","Fiber","Fiber","2746665-1",TRUE
+"1983","Fiber","Fiber","Fiber","2746673-2",TRUE
+"1993","Fiber","Fiber","Fiber","2746808-1",TRUE
+"1999","Fiber","Fiber","Fiber","2746884-1",TRUE
+"2006","Fiber","Fiber","Fiber","2746935-1",TRUE
+"2008","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2746948-1",TRUE
+"2009","Fiber","Fiber","Fiber","2747039-1",TRUE
+"2016","Fiber","Fiber","Fiber","2747221-1",TRUE
+"2036","Fiber","Fiber","Other / Uncategorized","2747387-1",TRUE
+"2048","Fiber","Fiber","Fiber","2747569-1",TRUE
+"2057","Fiber","Fiber","Fiber","2747711-1",TRUE
+"2060","Copper","Copper","Other / Uncategorized","2747747-1",TRUE
+"2061","Fiber","Fiber","Fiber","2747753-1",TRUE
+"2062","Cable / DSL","Cable / DSL","Cable / DSL","2747757-1",TRUE
+"2063","Other / Uncategorized","Other / Uncategorized","Fiber","2747767-1",TRUE
+"2086","Fiber","Fiber","Fiber","2748225-1",TRUE
+"2091","Fiber","Cable / DSL","Fiber","2748480-1",FALSE
+"2094","Fiber","Fiber","Fiber","2748508-1",TRUE
+"2109","Cable / DSL","Cable / DSL","Cable / DSL","2748903-1",TRUE
+"2116","Copper","Copper","Copper","2749160-1",TRUE
+"2119","Fiber","Fiber","Fiber","2749296-1",TRUE
+"2126","Fiber","Fiber","Fiber","2749341-1",TRUE
+"2129","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2749433-1",TRUE
+"2130","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2749437-1",TRUE
+"2132","Fiber","Fiber","Fiber","2749475-1",TRUE
+"2138","Fiber","Fiber","Fiber","2749565-1",TRUE
+"2149","Fiber","Fiber","Fiber","2749666-4",TRUE
+"2151","Fiber","Fiber","Fiber","2749666-6",TRUE
+"2153","Fiber","Fiber","Fiber","2749705-2",TRUE
+"2155","Fiber","Fiber","Other / Uncategorized","2749705-4",TRUE
+"2156","Fiber","Fiber","Other / Uncategorized","2749734-1",TRUE
+"2223","Fiber","Fiber","Fiber","2749774-1",TRUE
+"2230","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2749813-1",TRUE
+"2233","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2749823-1",TRUE
+"2244","Copper","Copper","Copper","2750059-1",TRUE
+"2249","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2750117-1",TRUE
+"2259","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2750329-1",TRUE
+"2266","Fiber","Fiber","Fiber","2750425-1",TRUE
+"2276","Fiber","Fiber","Fiber","2750662-1",TRUE
+"2281","Fiber","Fiber","Fiber","2750732-1",TRUE
+"2283","Fiber","Fiber","Fiber","2750732-3",TRUE
+"2287","Fiber","Fiber","Fiber","2750800-1",TRUE
+"2290","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2750816-1",TRUE
+"2291","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2750828-1",TRUE
+"2300","Copper","Copper","Copper","2751037-1",TRUE
+"2303","Fiber","Fiber","Fiber","2751115-1",TRUE
+"2307","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2751280-1",TRUE
+"2314","Fiber","Fiber","Fiber","2751411-1",TRUE
+"2324","Cable / DSL","Cable / DSL","Cable / DSL","2751621-1",TRUE
+"2333","Fiber","Fiber","Other / Uncategorized","2751777-1",TRUE
+"2339","Cable / DSL","Cable / DSL","Other / Uncategorized","2751895-1",TRUE
+"2343","Fiber","Fiber","Other / Uncategorized","2751955-1",TRUE
+"2344","Fiber","Fiber","Other / Uncategorized","2751985-1",TRUE
+"2346","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2752015-1",TRUE
+"2357","Fiber","Fiber","Fiber","2752176-1",TRUE
+"2361","Other / Uncategorized","Other / Uncategorized","Fiber","2752338-1",TRUE
+"2366","Fiber","Fiber","Fiber","2752444-1",TRUE
+"2371","Fiber","Fiber","Fiber","2752505-1",TRUE
+"2380","Fiber","Fiber","Fiber","2752729-3",TRUE
+"2386","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2752806-1",TRUE
+"2400","Fiber","Fiber","Fiber","2752927-1",TRUE
+"2407","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2753125-3",TRUE
+"2411","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2753125-7",TRUE
+"2413","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2753154-1",TRUE
+"2415","Fiber","Fiber","Fiber","2753172-1",TRUE
+"2421","Fiber","Fiber","Fiber","2753281-1",TRUE
+"2422","Other / Uncategorized","Other / Uncategorized","Cable / DSL","2753285-1",TRUE
+"2428","Fiber","Fiber","Fiber","2753323-1",TRUE
+"2443","Copper","Copper","Copper","2753579-1",TRUE
+"2444","Fiber","Fiber","Fiber","2753631-1",TRUE
+"2448","Fiber","Fiber","Fiber","2753711-1",TRUE
+"2450","Fiber","Fiber","Fiber","2753711-3",TRUE
+"2453","Fiber","Fiber","Fiber","2753746-2",TRUE
+"2459","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2753759-1",TRUE
+"2466","Fiber","Fiber","Fiber","2753900-2",TRUE
+"2480","Fiber","Fiber","Fiber","2754287-1",TRUE
+"2485","Fiber","Fiber","Fiber","2754435-1",TRUE
+"2487","Fiber","Fiber","Other / Uncategorized","2754448-1",TRUE
+"2492","Cable / DSL","Cable / DSL","Cable / DSL","2754509-1",TRUE
+"2494","Fiber","Fiber","Fiber","2754563-1",TRUE
+"2507","Fiber","Fiber","Fiber","2754783-1",TRUE
+"2508","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2754793-1",TRUE
+"2512","Fiber","Fiber","Other / Uncategorized","2754916-1",TRUE
+"2514","Fiber","Fiber","Fiber","2754938-1",TRUE
+"2520","Copper","Copper","Copper","2755044-1",TRUE
+"2523","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2755069-2",TRUE
+"2527","Fiber","Fiber","Fiber","2755125-1",TRUE
+"2533","Fiber","Fiber","Fiber","2755153-4",TRUE
+"2534","Fiber","Fiber","Other / Uncategorized","2755153-5",TRUE
+"2535","Fixed Wireless","Fixed Wireless","Fiber","2755164-1",TRUE
+"2544","Fiber","Fiber","Fiber","2755363-1",TRUE
+"2574","Cable / DSL","Cable / DSL","Fiber","2755593-1",TRUE
+"2582","Fiber","Fiber","Other / Uncategorized","2755692-1",TRUE
+"2585","Fiber","Fiber","Fiber","2755732-1",TRUE
+"2586","Cable / DSL","Fiber","Cable / DSL","2755734-1",FALSE
+"2593","Fiber","Fiber","Fiber","2755911-3",TRUE
+"2595","Fiber","Fiber","Fiber","2755968-1",TRUE
+"2606","Fiber","Fiber","Fiber","2756212-1",TRUE
+"2607","Fiber","Fiber","Fiber","2756228-1",TRUE
+"2609","Fiber","Fiber","Fiber","2756284-1",TRUE
+"2622","Fiber","Fiber","Fiber","2756641-1",TRUE
+"2630","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2756716-1",TRUE
+"2638","Fiber","Fiber","Other / Uncategorized","2756953-1",TRUE
+"2639","Fiber","Fiber","Fiber","2756961-1",TRUE
+"2645","Fiber","Fiber","Fiber","2757087-2",TRUE
+"2647","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2757095-1",TRUE
+"2649","Fiber","Fiber","Fiber","2757112-1",TRUE
+"2654","Copper","Copper","Copper","2757234-1",TRUE
+"2664","Fiber","Fiber","Fiber","2757583-1",TRUE
+"2665","Cable / DSL","Cable / DSL","Cable / DSL","2757594-1",TRUE
+"2669","Fiber","Fiber","Cable / DSL","2757631-1",TRUE
+"2680","Fixed Wireless","Fixed Wireless","Fixed Wireless","2757755-1",TRUE
+"2683","Fiber","Fiber","Fiber","2757802-1",TRUE
+"2690","Fiber","Fiber","Fiber","2758075-1",TRUE
+"2694","Copper","Copper","Copper","2758225-1",TRUE
+"2699","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2758413-1",TRUE
+"2711","Other / Uncategorized","Fiber","Other / Uncategorized","2758727-1",FALSE
+"2717","Fiber","Fiber","Fiber","2758765-4",TRUE
+"2719","Fiber","Fiber","Other / Uncategorized","2758790-2",TRUE
+"2720","Fiber","Fiber","Fiber","2758799-1",TRUE
+"2726","Fiber","Fiber","Other / Uncategorized","2758861-1",TRUE
+"2733","Fiber","Fiber","Fiber","2758965-1",TRUE
+"2742","Fiber","Fiber","Fiber","2759172-1",TRUE
+"2747","Other / Uncategorized","Cable / DSL","Other / Uncategorized","2759249-1",FALSE
+"2753","Fiber","Fiber","Fiber","2759364-1",TRUE
+"2755","Fiber","Fiber","Fiber","2759444-2",TRUE
+"2756","Fiber","Fiber","Fiber","2759495-1",TRUE
+"2766","Fiber","Fiber","Other / Uncategorized","2759497-8",TRUE
+"2772","Fiber","Fiber","Fiber","2759589-1",TRUE
+"2774","Copper","Copper","Other / Uncategorized","2759632-1",TRUE
+"2778","Fiber","Fiber","Fiber","2759659-1",TRUE
+"2783","Fiber","Fiber","Other / Uncategorized","2759733-2",TRUE
+"2797","Fiber","Fiber","Fiber","2759823-3",TRUE
+"2803","Fiber","Fiber","Fiber","2759882-1",TRUE
+"2819","Fiber","Fiber","Fiber","2760165-1",TRUE
+"2821","Fiber","Fiber","Other / Uncategorized","2760190-1",TRUE
+"2834","Fiber","Fiber","Fiber","2760353-1",TRUE
+"2835","Fiber","Fiber","Fiber","2760379-1",TRUE
+"2847","Fiber","Fiber","Fiber","2760675-1",TRUE
+"2853","Fiber","Fiber","Fiber","2760871-2",TRUE
+"2860","Fiber","Fiber","Fiber","2760925-1",TRUE
+"2862","Fiber","Fiber","Fiber","2760982-1",TRUE
+"2864","Fiber","Fiber","Fiber","2761021-1",TRUE
+"2870","Fiber","Fiber","Other / Uncategorized","2761106-1",TRUE
+"2876","Fiber","Fiber","Fiber","2761152-1",TRUE
+"2881","Fiber","Fiber","Fiber","2761153-3",TRUE
+"2882","Cable / DSL","Cable / DSL","Other / Uncategorized","2761153-4",TRUE
+"2883","Fiber","Fiber","Fiber","2761153-5",TRUE
+"2893","Fiber","Fiber","Fiber","2761247-1",TRUE
+"2897","Fiber","Fiber","Other / Uncategorized","2761377-1",TRUE
+"2911","Fiber","Fiber","Other / Uncategorized","2761550-1",TRUE
+"2914","Cable / DSL","Cable / DSL","Cable / DSL","2761649-1",TRUE
+"2916","Other / Uncategorized","Other / Uncategorized","Fiber","2761722-1",TRUE
+"2926","Fiber","Fiber","Fiber","2761885-3",TRUE
+"2934","Other / Uncategorized","Other / Uncategorized","Fiber","2761975-1",TRUE
+"2936","Fiber","Fiber","Fiber","2762073-1",TRUE
+"2939","Fiber","Fiber","Fiber","2762136-2",TRUE
+"2941","Other / Uncategorized","Other / Uncategorized","Fiber","2762140-1",TRUE
+"2944","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2762217-1",TRUE
+"2945","Fiber","Fiber","Fiber","2762247-1",TRUE
+"2952","Fiber","Fiber","Fiber","2762337-1",TRUE
+"2954","Fiber","Fiber","Fiber","2762360-1",TRUE
+"2955","Fiber","Fiber","Fiber","2762360-2",TRUE
+"2964","Fiber","Fiber","Fiber","2762570-1",TRUE
+"2969","Fiber","Fiber","Fiber","2762638-1",TRUE
+"2970","Fiber","Fiber","Fiber","2762641-1",TRUE
+"2976","Cable / DSL","Cable / DSL","Other / Uncategorized","2762740-1",TRUE
+"2981","Copper","Copper","Copper","2762871-1",TRUE
+"2983","Fiber","Fiber","Fiber","2762877-1",TRUE
+"2992","Fiber","Fiber","Fiber","2763208-1",TRUE
+"3003","Fiber","Fiber","Fiber","2763369-1",TRUE
+"3005","Fiber","Fiber","Other / Uncategorized","2763369-3",TRUE
+"3009","Fiber","Fiber","Fiber","2763374-1",TRUE
+"3010","Fiber","Fiber","Fiber","2763380-1",TRUE
+"3013","Fiber","Fiber","Fiber","2763436-3",TRUE
+"3017","Fiber","Fiber","Fiber","2763454-1",TRUE
+"3020","Cable / DSL","Cable / DSL","Other / Uncategorized","2763487-1",TRUE
+"3024","Fiber","Fiber","Fiber","2763600-2",TRUE
+"3029","Fiber","Fiber","Fiber","2763687-1",TRUE
+"3040","Fiber","Fiber","Fiber","2763789-1",TRUE
+"3041","Fiber","Fiber","Fiber","2763828-1",TRUE
+"3055","Fiber","Fiber","Other / Uncategorized","2763941-2",TRUE
+"3069","Fiber","Fiber","Fiber","2764087-1",TRUE
+"3073","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2764124-1",TRUE
+"3074","Fiber","Fiber","Fiber","2764129-1",TRUE
+"3077","Fiber","Fiber","Other / Uncategorized","2764227-1",TRUE
+"3082","Fiber","Fiber","Fiber","2764284-2",TRUE
+"3084","Fiber","Fiber","Fiber","2764306-1",TRUE
+"3085","Fixed Wireless","Fixed Wireless","Fixed Wireless","2764313-1",TRUE
+"3093","Fiber","Fiber","Fiber","2764446-1",TRUE
+"3095","Fiber","Fiber","Fiber","2764456-1",TRUE
+"3107","Fiber","Fiber","Other / Uncategorized","2764566-1",TRUE
+"3225","Fiber","Fiber","Fiber","2764708-1",TRUE
+"3228","Fiber","Fiber","Fiber","2764781-1",TRUE
+"3241","Fiber","Fiber","Fiber","2764906-1",TRUE
+"3249","Fiber","Fiber","Fiber","2765072-1",TRUE
+"3252","Fiber","Fiber","Fiber","2765106-1",TRUE
+"3257","Fiber","Fiber","Fiber","2765209-1",TRUE
+"3266","Fiber","Fiber","Fiber","2765338-3",TRUE
+"3270","Cable / DSL","Cable / DSL","Cable / DSL","2765354-2",TRUE
+"3272","Fixed Wireless","Fixed Wireless","Fixed Wireless","2765363-1",TRUE
+"3275","Fiber","Fiber","Fiber","2765367-4",TRUE
+"3278","Fiber","Fiber","Fiber","2765367-7",TRUE
+"3283","Fiber","Fiber","Fiber","2765451-1",TRUE
+"3284","Cable / DSL","Cable / DSL","Cable / DSL","2765456-1",TRUE
+"3301","Fiber","Fiber","Fiber","2765884-1",TRUE
+"3306","Fiber","Fiber","Fiber","2766003-1",TRUE
+"3313","Fiber","Fiber","Fiber","2766105-1",TRUE
+"3315","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2766116-1",TRUE
+"3319","Fiber","Fiber","Fiber","2766161-3",TRUE
+"3320","Fiber","Fiber","Fiber","2766163-1",TRUE
+"3333","Fiber","Fiber","Fiber","2766290-1",TRUE
+"3336","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2766408-1",TRUE
+"3338","Fiber","Fiber","Other / Uncategorized","2766437-1",TRUE
+"3339","Fiber","Fiber","Fiber","2766437-2",TRUE
+"3340","Cable / DSL","Cable / DSL","Other / Uncategorized","2766495-1",TRUE
+"3350","Fiber","Fiber","Fiber","2766670-2",TRUE
+"3354","Copper","Copper","Copper","2766826-1",TRUE
+"3358","Fiber","Fiber","Fiber","2766927-1",TRUE
+"3359","Fiber","Fiber","Fiber","2766934-1",TRUE
+"3362","Fiber","Fiber","Other / Uncategorized","2766977-1",TRUE
+"3363","Fiber","Fiber","Other / Uncategorized","2767001-1",TRUE
+"3365","Cable / DSL","Cable / DSL","Cable / DSL","2767012-1",TRUE
+"3370","Fixed Wireless","Fixed Wireless","Fixed Wireless","2767118-1",TRUE
+"3372","Cable / DSL","Cable / DSL","Cable / DSL","2767160-1",TRUE
+"3373","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2767164-1",TRUE
+"3380","Fiber","Fiber","Fiber","2767364-1",TRUE
+"3386","Other / Uncategorized","Fiber","Fiber","2767443-1",FALSE
+"3393","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2767575-1",TRUE
+"3394","Fiber","Fiber","Fiber","2767583-1",TRUE
+"3397","Fiber","Fiber","Fiber","2767632-1",TRUE
+"3414","Cable / DSL","Cable / DSL","Cable / DSL","2767743-1",TRUE
+"3415","Fiber","Fiber","Fiber","2767767-1",TRUE
+"3423","Fiber","Fiber","Fiber","2767921-1",TRUE
+"3427","Fiber","Fiber","Fiber","2767997-1",TRUE
+"3428","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2767997-2",TRUE
+"3429","Fiber","Fiber","Other / Uncategorized","2768001-1",TRUE
+"3437","Fiber","Fiber","Fiber","2768086-1",TRUE
+"3443","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2768183-1",TRUE
+"3446","Fiber","Fiber","Fiber","2768199-1",TRUE
+"3450","Fiber","Fiber","Fiber","2768211-1",TRUE
+"3451","Fiber","Fiber","Fiber","2768232-1",TRUE
+"3459","Fiber","Fiber","Fiber","2768376-1",TRUE
+"3461","Fiber","Fiber","Fiber","2768407-1",TRUE
+"3478","Fiber","Fiber","Fiber","2768467-1",TRUE
+"3485","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2768540-1",TRUE
+"3490","Fiber","Fiber","Fiber","2768603-1",TRUE
+"3496","Fiber","Fiber","Fiber","2768701-1",TRUE
+"3508","Cable / DSL","Cable / DSL","Cable / DSL","2768904-1",TRUE
+"3512","Cable / DSL","Cable / DSL","Cable / DSL","2768995-1",TRUE
+"3515","Fiber","Fiber","Other / Uncategorized","2769073-1",TRUE
+"3520","Fiber","Fiber","Fiber","2769211-1",TRUE
+"3527","Fiber","Fiber","Fiber","2769323-1",TRUE
+"3529","Cable / DSL","Cable / DSL","Other / Uncategorized","2769339-1",TRUE
+"3530","Fixed Wireless","Fixed Wireless","Fiber","2769346-1",TRUE
+"3532","Cable / DSL","Cable / DSL","Cable / DSL","2769391-1",TRUE
+"3534","Fiber","Fiber","Fiber","2769397-1",TRUE
+"3551","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2769708-1",TRUE
+"3560","Fiber","Fiber","Fiber","2769870-1",TRUE
+"3567","Fiber","Fiber","Fiber","2769913-1",TRUE
+"3571","Fiber","Fiber","Fiber","2769968-1",TRUE
+"3580","Fiber","Fiber","Fiber","2770147-3",TRUE
+"3581","Fiber","Fiber","Other / Uncategorized","2770154-1",TRUE
+"3586","Fiber","Fiber","Other / Uncategorized","2770294-1",TRUE
+"3593","Fiber","Fiber","Fiber","2770374-1",TRUE
+"3594","Fiber","Fiber","Fiber","2770381-1",TRUE
+"3595","Fiber","Fiber","Fiber","2770388-1",TRUE
+"3601","Copper","Copper","Copper","2770482-1",TRUE
+"3618","Fixed Wireless","Fixed Wireless","Fixed Wireless","2770849-1",TRUE
+"3619","Fiber","Fiber","Fiber","2770858-1",TRUE
+"3628","Fixed Wireless","Fixed Wireless","Fixed Wireless","2771086-1",TRUE
+"3635","Fiber","Fiber","Fiber","2771189-2",TRUE
+"3638","Fiber","Fiber","Fiber","2771221-1",TRUE
+"3643","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2771307-1",TRUE
+"3645","Fiber","Fiber","Fiber","2771329-1",TRUE
+"3654","Fixed Wireless","Fixed Wireless","Fixed Wireless","2771522-1",TRUE
+"3657","Cable / DSL","Cable / DSL","Other / Uncategorized","2771545-1",TRUE
+"3659","Fiber","Fiber","Other / Uncategorized","2771594-1",TRUE
+"3664","Fiber","Fiber","Other / Uncategorized","2771683-2",TRUE
+"3670","Fiber","Fiber","Fiber","2771740-4",TRUE
+"3671","Fiber","Fiber","Fiber","2771740-5",TRUE
+"3672","Cable / DSL","Cable / DSL","Fiber","2771757-1",TRUE
+"3676","Fiber","Fiber","Fiber","2771786-1",TRUE
+"3680","Fiber","Fiber","Other / Uncategorized","2771845-1",TRUE
+"3681","Fiber","Fiber","Fiber","2771845-2",TRUE
+"3683","Fiber","Fiber","Fiber","2771845-4",TRUE
+"3685","Fiber","Fiber","Fiber","2771856-1",TRUE
+"3688","Fiber","Fiber","Other / Uncategorized","2771883-2",TRUE
+"3700","Fiber","Fiber","Fiber","2771952-1",TRUE
+"3709","Cable / DSL","Cable / DSL","Cable / DSL","2772102-1",TRUE
+"3715","Fiber","Fiber","Other / Uncategorized","2772235-1",TRUE
+"3726","Fiber","Fiber","Fiber","2772476-1",TRUE
+"3727","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2772503-1",TRUE
+"3728","Fiber","Fiber","Other / Uncategorized","2772503-2",TRUE
+"3730","Fiber","Fiber","Fiber","2772523-1",TRUE
+"3736","Other / Uncategorized","Other / Uncategorized","Fiber","2772643-1",TRUE
+"3737","Fiber","Fiber","Fiber","2772661-1",TRUE
+"3752","Fiber","Fiber","Other / Uncategorized","2772918-3",TRUE
+"3754","Fiber","Fiber","Fiber","2772945-2",TRUE
+"3761","Fiber","Fiber","Fiber","2773075-1",TRUE
+"3762","Fiber","Fiber","Fiber","2773121-1",TRUE
+"3764","Fiber","Fiber","Fiber","2773152-1",TRUE
+"3777","Fiber","Fiber","Other / Uncategorized","2773341-2",TRUE
+"3799","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2773654-1",TRUE
+"3806","Fiber","Fiber","Fiber","2773763-1",TRUE
+"3810","Fiber","Fiber","Fiber","2773827-1",TRUE
+"3822","Fiber","Fiber","Fiber","2773971-1",TRUE
+"3827","Fiber","Fiber","Other / Uncategorized","2774158-1",TRUE
+"3832","Fiber","Fiber","Fiber","2774282-1",TRUE
+"3837","Fiber","Fiber","Fiber","2774311-1",TRUE
+"3843","Fiber","Fiber","Fiber","2774398-1",TRUE
+"3847","Fiber","Fiber","Fiber","2774479-1",TRUE
+"3848","Fiber","Fiber","Fiber","2774494-1",TRUE
+"3852","Fiber","Fiber","Cable / DSL","2774610-1",TRUE
+"3854","Fiber","Fiber","Fiber","2774615-1",TRUE
+"3862","Fiber","Fiber","Fiber","2774803-1",TRUE
+"3864","Fiber","Fiber","Fiber","2774848-2",TRUE
+"3867","Fiber","Fiber","Fiber","2775056-1",TRUE
+"3875","Fiber","Fiber","Fiber","2775193-5",TRUE
+"3878","Fiber","Fiber","Fiber","2775270-1",TRUE
+"3880","Fiber","Fiber","Fiber","2775311-1",TRUE
+"3887","Fiber","Fiber","Other / Uncategorized","2775586-1",TRUE
+"3931","Fiber","Fiber","Fiber","2775767-1",TRUE
+"3938","Fiber","Fiber","Fiber","2775857-1",TRUE
+"3948","Fiber","Fiber","Fiber","2776022-1",TRUE
+"3952","Fiber","Fiber","Fiber","2776027-4",TRUE
+"3953","Fiber","Fiber","Fiber","2776028-1",TRUE
+"3954","Cable / DSL","Cable / DSL","Other / Uncategorized","2776068-1",TRUE
+"3956","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2776099-1",TRUE
+"3960","Fiber","Fiber","Fiber","2776224-1",TRUE
+"3972","Fiber","Fiber","Fiber","2776424-1",TRUE
+"3987","Fiber","Fiber","Other / Uncategorized","2776482-1",TRUE
+"3994","Fiber","Fiber","Fiber","2776520-1",TRUE
+"4009","Fiber","Fiber","Fiber","2776784-1",TRUE
+"4010","Fiber","Fiber","Fiber","2776804-1",TRUE
+"4015","Fiber","Fiber","Fiber","2776851-1",TRUE
+"4022","Fiber","Fiber","Fiber","2776947-1",TRUE
+"4034","Fiber","Fiber","Fiber","2777104-1",TRUE
+"4036","Fiber","Fiber","Other / Uncategorized","2777105-1",TRUE
+"4039","Fiber","Fiber","Other / Uncategorized","2777126-1",TRUE
+"4047","Fiber","Fiber","Fiber","2777269-1",TRUE
+"4049","Cable / DSL","Cable / DSL","Cable / DSL","2777271-1",TRUE
+"4120","Fiber","Fiber","Fiber","2777350-1",TRUE
+"4135","Fiber","Fiber","Fiber","2777369-1",TRUE
+"4136","Fiber","Fiber","Fiber","2777371-1",TRUE
+"4144","Fiber","Fiber","Fiber","2777547-1",TRUE
+"4146","Fiber","Fiber","Fiber","2777565-1",TRUE
+"4151","Fiber","Fiber","Fiber","2777610-1",TRUE
+"4155","Fiber","Fiber","Fiber","2777611-4",TRUE
+"4158","Fiber","Fiber","Fiber","2777620-1",TRUE
+"4161","Fiber","Fiber","Fiber","2777671-1",TRUE
+"4168","Fiber","Fiber","Fiber","2777726-1",TRUE
+"4172","Fiber","Fiber","Fiber","2777752-1",TRUE
+"4176","Other / Uncategorized","Other / Uncategorized","Fiber","2777788-1",TRUE
+"4185","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2777954-1",TRUE
+"4189","Cable / DSL","Cable / DSL","Cable / DSL","2777998-1",TRUE
+"4192","Fiber","Fiber","Fiber","2778040-1",TRUE
+"4193","Cable / DSL","Cable / DSL","Cable / DSL","2778055-1",TRUE
+"4207","Fiber","Fiber","Fiber","2778311-1",TRUE
+"4208","Fiber","Fiber","Fiber","2778322-1",TRUE
+"4210","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2778412-1",TRUE
+"4222","Other / Uncategorized","Other / Uncategorized","Fiber","2778734-1",TRUE
+"4234","Fiber","Fiber","Fiber","2779033-1",TRUE
+"4239","Fiber","Fiber","Fiber","2779328-1",TRUE
+"4249","Fiber","Fiber","Fiber","2779469-1",TRUE
+"4251","Fiber","Fiber","Fiber","2779552-1",TRUE
+"4253","Cable / DSL","Cable / DSL","Cable / DSL","2779568-1",TRUE
+"4265","Cable / DSL","Cable / DSL","Other / Uncategorized","2779899-1",TRUE
+"4268","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2779945-1",TRUE
+"4290","Fiber","Fiber","Other / Uncategorized","2780301-1",TRUE
+"4293","Fiber","Fiber","Fiber","2780322-1",TRUE
+"4300","Fiber","Fiber","Fiber","2780469-1",TRUE
+"4310","Fixed Wireless","Fixed Wireless","Fixed Wireless","2780730-1",TRUE
+"4314","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2780836-1",TRUE
+"4315","Fiber","Fiber","Fiber","2780842-1",TRUE
+"4319","Fiber","Fiber","Fiber","2780984-1",TRUE
+"4321","Fixed Wireless","Fixed Wireless","Fixed Wireless","2781006-1",TRUE
+"4326","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2781149-1",TRUE
+"4332","Fiber","Fiber","Fiber","2781262-1",TRUE
+"4333","Fiber","Fiber","Other / Uncategorized","2781284-1",TRUE
+"4343","Fiber","Fiber","Fiber","2781417-2",TRUE
+"4349","Fiber","Fiber","Other / Uncategorized","2781546-3",TRUE
+"4350","Other / Uncategorized","Other / Uncategorized","Fiber","2781553-1",TRUE
+"4351","Fiber","Fiber","Fiber","2781591-4",TRUE
+"4352","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2781632-1",TRUE
+"4359","Fiber","Fiber","Fiber","2781795-1",TRUE
+"4363","Fiber","Fiber","Fiber","2781846-1",TRUE
+"4373","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2782175-1",TRUE
+"4390","Fiber","Fiber","Cable / DSL","2782592-1",TRUE
+"4396","Fiber","Fiber","Fiber","2782690-3",TRUE
+"4401","Fiber","Fiber","Other / Uncategorized","2782852-1",TRUE
+"4403","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2782905-1",TRUE
+"4413","Fiber","Fiber","Fiber","2783121-1",TRUE
+"4421","Fiber","Fiber","Other / Uncategorized","2783220-1",TRUE
+"4425","Copper","Copper","Copper","2783309-1",TRUE
+"4427","Fiber","Fiber","Fiber","2783326-2",TRUE
+"4428","Fiber","Fiber","Fiber","2783346-1",TRUE
+"4435","Fiber","Fiber","Fiber","2783416-1",TRUE
+"4440","Fiber","Fiber","Fiber","2783488-1",TRUE
+"4448","Fiber","Fiber","Fiber","2783689-1",TRUE
+"4455","Fiber","Fiber","Other / Uncategorized","2783851-1",TRUE
+"4456","Fiber","Fiber","Fiber","2783882-1",TRUE
+"4460","Fiber","Fiber","Fiber","2783921-1",TRUE
+"4463","Fiber","Fiber","Fiber","2783966-1",TRUE
+"4472","Fiber","Fiber","Fiber","2784159-1",TRUE
+"4476","Fiber","Fiber","Fiber","2784265-1",TRUE
+"4477","Fiber","Fiber","Fiber","2784289-1",TRUE
+"4490","Fiber","Fiber","Fiber","2784366-1",TRUE
+"4493","Fiber","Fiber","Fiber","2784420-1",TRUE
+"4496","Fiber","Fiber","Fiber","2784559-1",TRUE
+"4498","Cable / DSL","Cable / DSL","Cable / DSL","2784605-1",TRUE
+"4509","Copper","Copper","Cable / DSL","2784901-1",TRUE
+"4510","Fixed Wireless","Fixed Wireless","Fixed Wireless","2784939-1",TRUE
+"4527","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2785370-1",TRUE
+"4534","Fiber","Fiber","Fiber","2785711-1",TRUE
+"4537","Fiber","Fiber","Other / Uncategorized","2785766-1",TRUE
+"4543","Fiber","Fiber","Fiber","2785792-1",TRUE
+"4545","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2785827-1",TRUE
+"4556","Fiber","Fiber","Fiber","2786051-1",TRUE
+"4560","Fiber","Fiber","Other / Uncategorized","2786060-1",TRUE
+"4565","Fiber","Fiber","Other / Uncategorized","2786089-1",TRUE
+"4566","Fiber","Fiber","Fiber","2786200-1",TRUE
+"4567","Fiber","Fiber","Fiber","2786208-1",TRUE
+"4570","Fiber","Fiber","Fiber","2786219-2",TRUE
+"4571","Fiber","Fiber","Fiber","2786219-3",TRUE
+"4586","Fiber","Fiber","Fiber","2786454-1",TRUE
+"4587","Fiber","Fiber","Fiber","2786471-1",TRUE
+"4593","Fiber","Fiber","Other / Uncategorized","2786640-1",TRUE
+"4597","Fiber","Fiber","Fiber","2786684-2",TRUE
+"4605","Cable / DSL","Cable / DSL","Cable / DSL","2786741-1",TRUE
+"4613","Fiber","Fiber","Other / Uncategorized","2786905-1",TRUE
+"4615","Fiber","Fiber","Fiber","2786933-1",TRUE
+"4621","Fiber","Fiber","Other / Uncategorized","2787030-1",TRUE
+"4635","Fiber","Fiber","Fiber","2787411-1",TRUE
+"4640","Fiber","Fiber","Fiber","2787533-1",TRUE
+"4644","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2787622-1",TRUE
+"4649","Fiber","Fiber","Fiber","2787756-1",TRUE
+"4650","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2787761-1",TRUE
+"4655","Fiber","Fiber","Fiber","2787890-1",TRUE
+"4662","Fixed Wireless","Fixed Wireless","Fixed Wireless","2788287-1",TRUE
+"4664","Fiber","Fiber","Fiber","2788422-1",TRUE
+"4679","Fiber","Fiber","Fiber","2788782-1",TRUE
+"4681","Fiber","Fiber","Fiber","2788798-1",TRUE
+"4688","Fiber","Fiber","Fiber","2788916-1",TRUE
+"4711","Fiber","Fiber","Other / Uncategorized","2789210-1",TRUE
+"4712","Cable / DSL","Fiber","Cable / DSL","2789303-1",FALSE
+"4725","Fiber","Fiber","Fiber","2789737-1",TRUE
+"4733","Fiber","Fiber","Fiber","2789843-1",TRUE
+"4737","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2789974-1",TRUE
+"4761","Fiber","Fiber","Fiber","2790365-1",TRUE
+"4766","Fiber","Fiber","Other / Uncategorized","2790581-1",TRUE
+"4770","Fiber","Fiber","Fiber","2790664-1",TRUE
+"4777","Cable / DSL","Cable / DSL","Cable / DSL","2790879-1",TRUE
+"4778","Fiber","Fiber","Fiber","2790944-3",TRUE
+"4782","Fiber","Fiber","Cable / DSL","2790991-1",TRUE
+"4783","Fiber","Fiber","Fiber","2791039-1",TRUE
+"4785","Fixed Wireless","Fixed Wireless","Fixed Wireless","2791057-1",TRUE
+"4787","Fiber","Fiber","Fiber","2791099-2",TRUE
+"4796","Fiber","Fiber","Fiber","2791258-1",TRUE
+"4802","Fiber","Fiber","Fiber","2791403-1",TRUE
+"4820","Fiber","Fiber","Fiber","2792017-1",TRUE
+"4825","Fiber","Fiber","Other / Uncategorized","2792060-3",TRUE
+"4827","Fiber","Fiber","Fiber","2792103-2",TRUE
+"4831","Fiber","Fiber","Fiber","2792154-1",TRUE
+"4834","Fiber","Fiber","Fiber","2792260-1",TRUE
+"4838","Fiber","Fiber","Fiber","2792447-1",TRUE
+"4840","Fiber","Fiber","Fiber","2792447-3",TRUE
+"4846","Cable / DSL","Cable / DSL","Cable / DSL","2792557-1",TRUE
+"4848","Fiber","Fiber","Fiber","2792604-1",TRUE
+"4849","Fiber","Fiber","Fiber","2792605-1",TRUE
+"4852","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2792630-1",TRUE
+"4863","Fiber","Fiber","Fiber","2792960-2",TRUE
+"4865","Fiber","Fiber","Fiber","2793063-1",TRUE
+"4872","Copper","Copper","Copper","2793244-1",TRUE
+"4875","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2793269-1",TRUE
+"4879","Fiber","Fiber","Fiber","2793278-2",TRUE
+"4881","Fiber","Fiber","Fiber","2793280-1",TRUE
+"4886","Cable / DSL","Cable / DSL","Fiber","2793360-1",TRUE
+"4903","Fiber","Fiber","Fiber","2793950-1",TRUE
+"4909","Fiber","Fiber","Other / Uncategorized","2794107-2",TRUE
+"4918","Fiber","Fiber","Fiber","2794253-1",TRUE
+"4919","Fiber","Fiber","Fiber","2794253-2",TRUE
+"4926","Fiber","Fiber","Other / Uncategorized","2794520-1",TRUE
+"4927","Other / Uncategorized","Other / Uncategorized","Fiber","2794552-1",TRUE
+"4930","Cable / DSL","Cable / DSL","Cable / DSL","2794594-1",TRUE
+"4933","Fiber","Fiber","Other / Uncategorized","2794710-1",TRUE
+"4943","Fiber","Fiber","Fiber","2794884-1",TRUE
+"4945","Fiber","Fiber","Fiber","2794999-1",TRUE
+"4954","Fiber","Fiber","Fiber","2795127-1",TRUE
+"4976","Fiber","Fiber","Fiber","2795398-1",TRUE
+"4985","Fiber","Fiber","Fiber","2795552-1",TRUE
+"4990","Fiber","Fiber","Other / Uncategorized","2795668-1",TRUE
+"4994","Fiber","Fiber","Fiber","2795735-1",TRUE
+"5004","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2796041-1",TRUE
+"5015","Fiber","Fiber","Fiber","2796331-1",TRUE
+"5020","Copper","Copper","Copper","2796469-4",TRUE
+"5024","Fiber","Fiber","Fiber","2796532-1",TRUE
+"5038","Fiber","Fiber","Fiber","2796745-1",TRUE
+"5041","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2796772-1",TRUE
+"5051","Fiber","Fiber","Fiber","2797174-1",TRUE
+"5053","Fiber","Fiber","Fiber","2797183-1",TRUE
+"5056","Cable / DSL","Cable / DSL","Cable / DSL","2797201-2",TRUE
+"5057","Fiber","Fiber","Fiber","2797222-2",TRUE
+"5058","Fiber","Fiber","Fiber","2797230-1",TRUE
+"5059","Fiber","Fiber","Fiber","2797259-1",TRUE
+"5060","Fiber","Fiber","Fiber","2797259-10",TRUE
+"5062","Fiber","Fiber","Fiber","2797259-12",TRUE
+"5075","Fiber","Fiber","Fiber","2797304-1",TRUE
+"5089","Copper","Copper","Copper","2797664-2",TRUE
+"5090","Fiber","Fiber","Fiber","2797698-1",TRUE
+"5092","Fiber","Fiber","Fiber","2797844-1",TRUE
+"5106","Fiber","Fiber","Other / Uncategorized","2798274-1",TRUE
+"5108","Fiber","Fiber","Fiber","2798305-1",TRUE
+"5109","Fiber","Fiber","Other / Uncategorized","2798308-1",TRUE
+"5112","Other / Uncategorized","Fiber","Other / Uncategorized","2798314-2",FALSE
+"5115","Fiber","Fiber","Fiber","2798367-1",TRUE
+"5118","Fiber","Fiber","Fiber","2798446-1",TRUE
+"5125","Fiber","Fiber","Fiber","2798641-1",TRUE
+"5132","Fixed Wireless","Fixed Wireless","Fiber","2798837-1",TRUE
+"5133","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2798837-10",TRUE
+"5135","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2798837-12",TRUE
+"5137","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2798837-14",TRUE
+"5141","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2798837-18",TRUE
+"5166","Fiber","Fiber","Fiber","2799079-1",TRUE
+"5171","Copper","Copper","Other / Uncategorized","2799443-1",TRUE
+"5173","Fiber","Fiber","Fiber","2799476-2",TRUE
+"5181","Fiber","Fiber","Fiber","2799745-1",TRUE
+"5182","Other / Uncategorized","Other / Uncategorized","Fiber","2799745-2",TRUE
+"5184","Other / Uncategorized","Other / Uncategorized","Fiber","2799745-4",TRUE
+"5187","Fiber","Fiber","Other / Uncategorized","2799910-1",TRUE
+"5211","Fiber","Fiber","Fiber","2800583-3",TRUE
+"5216","Fiber","Fiber","Fiber","2800675-2",TRUE
+"5224","Fiber","Fiber","Other / Uncategorized","2800740-3",TRUE
+"5228","Fiber","Fiber","Fiber","2800811-1",TRUE
+"5229","Fiber","Fiber","Other / Uncategorized","2800846-1",TRUE
+"5262","Fixed Wireless","Fixed Wireless","Fiber","2801706-1",TRUE
+"5274","Cable / DSL","Cable / DSL","Other / Uncategorized","2802111-1",TRUE
+"5282","Fiber","Fiber","Fiber","2802333-1",TRUE
+"5299","Copper","Copper","Copper","2803038-1",TRUE
+"5314","Fiber","Fiber","Fiber","2803313-2",TRUE
+"5325","Fiber","Fiber","Fiber","2803718-1",TRUE
+"5328","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2803724-1",TRUE
+"5331","Fiber","Fiber","Fiber","2803775-1",TRUE
+"5332","Fiber","Fiber","Fiber","2803777-1",TRUE
+"5341","Fiber","Fiber","Fiber","2803904-1",TRUE
+"5361","Fiber","Fiber","Fiber","2804184-1",TRUE
+"5363","Fixed Wireless","Fixed Wireless","Fixed Wireless","2804192-1",TRUE
+"5367","Other / Uncategorized","Other / Uncategorized","Fiber","2804333-1",TRUE
+"5372","Other / Uncategorized","Other / Uncategorized","Fiber","2804563-1",TRUE
+"5389","Fiber","Fiber","Fiber","2804924-1",TRUE
+"5390","Fiber","Fiber","Fiber","2804927-1",TRUE
+"5419","Fiber","Fiber","Fiber","2805936-1",TRUE
+"5434","Fiber","Fiber","Other / Uncategorized","2806508-1",TRUE
+"5437","Fiber","Fiber","Fiber","2806600-4",TRUE
+"5439","Fiber","Fiber","Fiber","2806622-1",TRUE
+"5449","Cable / DSL","Cable / DSL","Cable / DSL","2806735-1",TRUE
+"5450","Fiber","Fiber","Fiber","2806748-2",TRUE
+"5454","Fiber","Fiber","Fiber","2806789-1",TRUE
+"5461","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2806947-1",TRUE
+"5470","Fixed Wireless","Fixed Wireless","Fixed Wireless","2807250-1",TRUE
+"5475","Fiber","Fiber","Fiber","2807373-1",TRUE
+"5478","Fiber","Fiber","Fiber","2807412-1",TRUE
+"5488","Fiber","Fiber","Other / Uncategorized","2807874-3",TRUE
+"5504","Fiber","Fiber","Fiber","2808229-1",TRUE
+"5507","Other / Uncategorized","Other / Uncategorized","Fiber","2808390-1",TRUE
+"5509","Fiber","Fiber","Other / Uncategorized","2808410-5",TRUE
+"5514","Fiber","Fiber","Fiber","2808441-2",TRUE
+"5522","Fiber","Fiber","Fiber","2808587-1",TRUE
+"5524","Fiber","Fiber","Fiber","2808587-3",TRUE
+"5528","Fiber","Fiber","Fiber","2808607-3",TRUE
+"5533","Fiber","Fiber","Fiber","2808714-1",TRUE
+"5538","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2808893-1",TRUE
+"5540","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2809017-1",TRUE
+"5541","Fiber","Fiber","Other / Uncategorized","2809067-4",TRUE
+"5543","Fiber","Fiber","Fiber","2809131-1",TRUE
+"5560","Fiber","Fiber","Fiber","2809234-1",TRUE
+"5616","Fiber","Fiber","Fiber","2809837-1",TRUE
+"5651","Fiber","Fiber","Fiber","2810148-1",TRUE
+"5654","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2810193-1",TRUE
+"5655","Fiber","Fiber","Fiber","2810205-1",TRUE
+"5679","Cable / DSL","Cable / DSL","Cable / DSL","2810482-1",TRUE
+"5775","Fiber","Fiber","Fiber","2810677-1",TRUE
+"5782","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2810753-1",TRUE
+"5784","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2810775-2",TRUE
+"5796","Fiber","Fiber","Fiber","2810987-1",TRUE
+"5804","Fiber","Fiber","Fiber","2811075-1",TRUE
+"5809","Fiber","Fiber","Fiber","2811109-1",TRUE
+"5812","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2811140-1",TRUE
+"5813","Fiber","Fiber","Fiber","2811176-1",TRUE
+"5818","Cable / DSL","Cable / DSL","Cable / DSL","2811376-1",TRUE
+"5832","Fiber","Fiber","Fiber","2811675-1",TRUE
+"5899","Fiber","Fiber","Fiber","2812207-1",TRUE
+"5905","Fiber","Fiber","Other / Uncategorized","2812289-1",TRUE
+"5906","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2812327-1",TRUE
+"5913","Fiber","Fiber","Other / Uncategorized","2812454-1",TRUE
+"5917","Fiber","Fiber","Fiber","2812561-1",TRUE
+"5965","Fiber","Fiber","Fiber","2812694-1",TRUE
+"5966","Fiber","Fiber","Fiber","2812726-1",TRUE
+"5968","Cable / DSL","Cable / DSL","Cable / DSL","2812840-1",TRUE
+"5977","Fiber","Cable / DSL","Other / Uncategorized","2812998-1",FALSE
+"5978","Fiber","Fiber","Other / Uncategorized","2813042-1",TRUE
+"5988","Fiber","Fiber","Fiber","2813255-1",TRUE
+"5994","Fiber","Fiber","Fiber","2813287-1",TRUE
+"5996","Copper","Copper","Copper","2813302-1",TRUE
+"6003","Fiber","Fiber","Fiber","2813491-1",TRUE
+"6007","Fiber","Fiber","Fiber","2813712-1",TRUE
+"6022","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2813960-1",TRUE
+"6023","Fiber","Fiber","Fiber","2813964-2",TRUE
+"6026","Fiber","Fiber","Cable / DSL","2814006-1",TRUE
+"6028","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2814094-1",TRUE
+"6032","Copper","Copper","Copper","2814163-1",TRUE
+"6033","Fiber","Fiber","Fiber","2814176-1",TRUE
+"6035","Fiber","Fiber","Other / Uncategorized","2814239-1",TRUE
+"6040","Fiber","Fiber","Fiber","2814258-1",TRUE
+"6045","Fiber","Fiber","Fiber","2814499-1",TRUE
+"6054","Fiber","Fiber","Fiber","2814624-1",TRUE
+"6064","Fiber","Fiber","Fiber","2814776-1",TRUE
+"6073","Fiber","Fiber","Other / Uncategorized","2814912-1",TRUE
+"6075","Fiber","Fiber","Other / Uncategorized","2814912-3",TRUE
+"6078","Copper","Copper","Other / Uncategorized","2814997-1",TRUE
+"6079","Fiber","Fiber","Fiber","2814997-2",TRUE
+"6092","Other / Uncategorized","Fiber","Other / Uncategorized","2815194-2",FALSE
+"6093","Fiber","Fiber","Other / Uncategorized","2815194-3",TRUE
+"6097","Fiber","Fiber","Fiber","2815194-7",TRUE
+"6102","Fiber","Fiber","Fiber","2815384-1",TRUE
+"6107","Copper","Copper","Other / Uncategorized","2815487-1",TRUE
+"6109","Fiber","Fiber","Fiber","2815501-1",TRUE
+"6128","Fiber","Fiber","Fiber","2815869-1",TRUE
+"6136","Fixed Wireless","Fixed Wireless","Fixed Wireless","2816098-1",TRUE
+"6142","Fiber","Fiber","Other / Uncategorized","2816288-2",TRUE
+"6145","Fiber","Fiber","Fiber","2816296-1",TRUE
+"6169","Fiber","Fiber","Other / Uncategorized","2816680-1",TRUE
+"6174","Fiber","Fiber","Fiber","2816756-1",TRUE
+"6177","Other / Uncategorized","Other / Uncategorized","Fiber","2816814-1",TRUE
+"6178","Fiber","Fiber","Fiber","2816820-1",TRUE
+"6184","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2816898-1",TRUE
+"6190","Fiber","Fiber","Fiber","2817018-1",TRUE
+"6197","Fixed Wireless","Fixed Wireless","Fixed Wireless","2817185-1",TRUE
+"6230","Fiber","Fiber","Fiber","2817858-1",TRUE
+"6232","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2817909-1",TRUE
+"6233","Fiber","Fiber","Fiber","2817961-1",TRUE
+"6234","Fiber","Fiber","Fiber","2817961-2",TRUE
+"6244","Fiber","Fiber","Fiber","2818202-1",TRUE
+"6251","Fiber","Fiber","Fiber","2818282-1",TRUE
+"6257","Copper","Copper","Copper","2818395-1",TRUE
+"6261","Fiber","Fiber","Fiber","2818439-1",TRUE
+"6264","Fiber","Other / Uncategorized","Other / Uncategorized","2818449-1",FALSE
+"6272","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2818736-1",TRUE
+"6278","Fiber","Fiber","Fiber","2818973-1",TRUE
+"6285","Fiber","Fiber","Fiber","2819187-1",TRUE
+"6291","Copper","Copper","Copper","2819267-1",TRUE
+"6292","Fiber","Fiber","Fiber","2819276-1",TRUE
+"6297","Cable / DSL","Cable / DSL","Other / Uncategorized","2819277-4",TRUE
+"6298","Fiber","Fiber","Fiber","2819277-5",TRUE
+"6301","Cable / DSL","Cable / DSL","Other / Uncategorized","2819277-8",TRUE
+"6303","Copper","Copper","Other / Uncategorized","2819380-1",TRUE
+"6305","Fiber","Fiber","Fiber","2819388-1",TRUE
+"6308","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2819424-1",TRUE
+"6321","Fiber","Fiber","Fiber","2819642-1",TRUE
+"6330","Fiber","Fiber","Fiber","2819857-2",TRUE
+"6331","Cable / DSL","Cable / DSL","Cable / DSL","2819865-1",TRUE
+"6333","Fiber","Fiber","Other / Uncategorized","2819894-1",TRUE
+"6338","Fiber","Fiber","Fiber","2819992-1",TRUE
+"6351","Fiber","Fiber","Fiber","2820471-1",TRUE
+"6361","Fiber","Fiber","Fiber","2820782-1",TRUE
+"6363","Fiber","Fiber","Fiber","2820807-1",TRUE
+"6392","Fiber","Fiber","Fiber","2821485-1",TRUE
+"6396","Fiber","Fiber","Fiber","2821536-3",TRUE
+"6405","Fiber","Fiber","Fiber","2821750-1",TRUE
+"6416","Fiber","Fiber","Fiber","2821911-1",TRUE
+"6418","Fiber","Fiber","Fiber","2821952-1",TRUE
+"6419","Copper","Copper","Copper","2821953-1",TRUE
+"6422","Fiber","Fiber","Fiber","2822097-1",TRUE
+"6430","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2822237-1",TRUE
+"6440","Fiber","Fiber","Fiber","2822415-2",TRUE
+"6455","Cable / DSL","Cable / DSL","Cable / DSL","2822611-1",TRUE
+"6462","Fiber","Fiber","Fiber","2822711-3",TRUE
+"6463","Fiber","Fiber","Other / Uncategorized","2822711-4",TRUE
+"6466","Cable / DSL","Cable / DSL","Cable / DSL","2822716-1",TRUE
+"6467","Fiber","Fiber","Other / Uncategorized","2822725-1",TRUE
+"6471","Other / Uncategorized","Other / Uncategorized","Fiber","2822890-1",TRUE
+"6473","Fiber","Fiber","Other / Uncategorized","2822939-1",TRUE
+"6476","Fiber","Fiber","Fiber","2822989-1",TRUE
+"6480","Fiber","Fiber","Fiber","2822995-4",TRUE
+"6507","Fiber","Fiber","Fiber","2823562-1",TRUE
+"6512","Cable / DSL","Cable / DSL","Cable / DSL","2823657-1",TRUE
+"6513","Other / Uncategorized","Other / Uncategorized","Fiber","2823715-1",TRUE
+"6517","Fiber","Fiber","Fiber","2823885-1",TRUE
+"6518","Fiber","Fiber","Fiber","2823898-1",TRUE
+"6519","Other / Uncategorized","Other / Uncategorized","Fiber","2823961-1",TRUE
+"6528","Fiber","Fiber","Fiber","2824146-1",TRUE
+"6542","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2824815-1",TRUE
+"6543","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2824815-2",TRUE
+"6547","Fiber","Fiber","Fiber","2824929-1",TRUE
+"6563","Fiber","Fiber","Fiber","2825244-1",TRUE
+"6568","Fiber","Fiber","Fiber","2825313-1",TRUE
+"6580","Other / Uncategorized","Other / Uncategorized","Fiber","2825478-1",TRUE
+"6588","Fiber","Fiber","Fiber","2825582-2",TRUE
+"6594","Fiber","Fiber","Fiber","2825706-1",TRUE
+"6598","Other / Uncategorized","Other / Uncategorized","Fiber","2825762-1",TRUE
+"6615","Fiber","Fiber","Fiber","2826208-1",TRUE
+"6620","Fiber","Fiber","Fiber","2826353-1",TRUE
+"6631","Fiber","Fiber","Fiber","2826616-2",TRUE
+"6639","Fiber","Fiber","Fiber","2826777-1",TRUE
+"6655","Fiber","Fiber","Fiber","2827010-1",TRUE
+"6658","Fiber","Fiber","Fiber","2827041-1",TRUE
+"6659","Other / Uncategorized","Other / Uncategorized","Fiber","2827044-1",TRUE
+"6660","Fiber","Fiber","Fiber","2827048-1",TRUE
+"6673","Fiber","Fiber","Other / Uncategorized","2827169-1",TRUE
+"6676","Fiber","Cable / DSL","Other / Uncategorized","2827260-1",FALSE
+"6683","Fiber","Fiber","Fiber","2827501-1",TRUE
+"6691","Other / Uncategorized","Other / Uncategorized","Fiber","2827826-1",TRUE
+"6692","Fiber","Fiber","Fiber","2827840-3",TRUE
+"6703","Fiber","Fiber","Fiber","2828001-1",TRUE
+"6706","Fiber","Fiber","Fiber","2828111-1",TRUE
+"6710","Fiber","Fiber","Fiber","2828153-3",TRUE
+"6712","Fiber","Fiber","Fiber","2828154-1",TRUE
+"6725","Fiber","Fiber","Fiber","2828414-1",TRUE
+"6727","Fiber","Fiber","Fiber","2828428-1",TRUE
+"6728","Fiber","Fiber","Other / Uncategorized","2828429-1",TRUE
+"6729","Fiber","Fiber","Fiber","2828443-1",TRUE
+"6730","Fiber","Fiber","Fiber","2828457-1",TRUE
+"6739","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2828681-1",TRUE
+"6747","Fiber","Fiber","Fiber","2828782-1",TRUE
+"6752","Fiber","Fiber","Fiber","2828808-11",TRUE
+"6756","Fiber","Fiber","Fiber","2828808-15",TRUE
+"6759","Fiber","Fiber","Fiber","2828808-18",TRUE
+"6789","Fiber","Fiber","Other / Uncategorized","2828933-1",TRUE
+"6796","Fiber","Fiber","Fiber","2828987-1",TRUE
+"6814","Fiber","Fiber","Fiber","2829215-3",TRUE
+"6817","Fiber","Fiber","Fiber","2829238-1",TRUE
+"6831","Fiber","Fiber","Fiber","2829510-1",TRUE
+"6832","Fiber","Fiber","Fiber","2829536-1",TRUE
+"6836","Cable / DSL","Cable / DSL","Cable / DSL","2829607-2",TRUE
+"6838","Fiber","Fiber","Other / Uncategorized","2829639-2",TRUE
+"6844","Fiber","Fiber","Fiber","2829682-2",TRUE
+"6845","Fiber","Fiber","Fiber","2829687-1",TRUE
+"6849","Fiber","Fiber","Fiber","2829720-1",TRUE
+"6867","Fixed Wireless","Fixed Wireless","Fixed Wireless","2829982-1",TRUE
+"6879","Fiber","Fiber","Fiber","2830096-1",TRUE
+"6884","Fixed Wireless","Fixed Wireless","Fixed Wireless","2830299-1",TRUE
+"6886","Fiber","Fiber","Fiber","2830367-1",TRUE
+"6895","Fiber","Fiber","Fiber","2830507-1",TRUE
+"6911","Fiber","Fiber","Fiber","2830628-1",TRUE
+"6945","Cable / DSL","Cable / DSL","Cable / DSL","2831222-1",TRUE
+"6951","Fiber","Fiber","Fiber","2831289-1",TRUE
+"6953","Fiber","Fiber","Fiber","2831319-1",TRUE
+"6954","Other / Uncategorized","Other / Uncategorized","Fiber","2831321-1",TRUE
+"6956","Fiber","Fiber","Fiber","2831384-1",TRUE
+"6976","Fiber","Fiber","Fiber","2831857-1",TRUE
+"6982","Fiber","Fiber","Fiber","2831897-1",TRUE
+"6985","Fiber","Fiber","Fiber","2831931-1",TRUE
+"6991","Fiber","Fiber","Fiber","2832128-1",TRUE
+"6993","Fiber","Fiber","Other / Uncategorized","2832179-1",TRUE
+"7012","Fixed Wireless","Fixed Wireless","Fixed Wireless","2832455-2",TRUE
+"7031","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2832872-1",TRUE
+"7032","Fiber","Fiber","Fiber","2832876-1",TRUE
+"7040","Fiber","Fiber","Fiber","2832904-1",TRUE
+"7051","Cable / DSL","Cable / DSL","Other / Uncategorized","2833011-3",TRUE
+"7061","Cable / DSL","Cable / DSL","Other / Uncategorized","2833191-1",TRUE
+"7114","Fiber","Fiber","Fiber","2833868-1",TRUE
+"7121","Fiber","Fiber","Fiber","2834103-1",TRUE
+"7196","Fiber","Fiber","Other / Uncategorized","2834634-1",TRUE
+"7197","Fiber","Fiber","Fiber","2834640-1",TRUE
+"7205","Cable / DSL","Cable / DSL","Other / Uncategorized","2834748-1",TRUE
+"7209","Fiber","Fiber","Fiber","2834761-4",TRUE
+"7210","Other / Uncategorized","Other / Uncategorized","Fiber","2834761-5",TRUE
+"7236","Fiber","Fiber","Fiber","2835044-3",TRUE
+"7240","Fiber","Fiber","Fiber","2835162-1",TRUE
+"7245","Fiber","Fiber","Fiber","2835212-1",TRUE
+"7248","Fiber","Fiber","Fiber","2835231-1",TRUE
+"7249","Fiber","Fiber","Fiber","2835232-1",TRUE
+"7295","Fiber","Fiber","Fiber","2835860-2",TRUE
+"7296","Fiber","Fiber","Fiber","2835868-1",TRUE
+"7308","Fiber","Fiber","Fiber","2835985-1",TRUE
+"7310","Fiber","Fiber","Fiber","2836032-1",TRUE
+"7317","Fiber","Fiber","Fiber","2836190-1",TRUE
+"7319","Fiber","Fiber","Fiber","2836269-1",TRUE
+"7346","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2836464-1",TRUE
+"7412","Fiber","Fiber","Fiber","2836765-1",TRUE
+"7434","Fiber","Fiber","Other / Uncategorized","2837038-1",TRUE
+"7440","Fiber","Fiber","Fiber","2837095-1",TRUE
+"7446","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2837119-1",TRUE
+"7476","Fiber","Fiber","Fiber","2837347-1",TRUE
+"7485","Fiber","Fiber","Fiber","2837378-1",TRUE
+"7489","Fiber","Fiber","Fiber","2837390-2",TRUE
+"7496","Fiber","Fiber","Fiber","2837427-3",TRUE
+"7502","Fiber","Fiber","Fiber","2837550-1",TRUE
+"7511","Other / Uncategorized","Other / Uncategorized","Fiber","2837958-1",TRUE
+"7512","Fiber","Fiber","Fiber","2838036-1",TRUE
+"7516","Fiber","Fiber","Fiber","2838105-1",TRUE
+"7519","Fiber","Fiber","Fiber","2838237-1",TRUE
+"7520","Fiber","Fiber","Fiber","2838246-1",TRUE
+"7525","Copper","Copper","Copper","2838585-1",TRUE
+"7534","Fiber","Fiber","Fiber","2838681-1",TRUE
+"7540","Fiber","Fiber","Fiber","2838930-1",TRUE
+"7542","Fiber","Fiber","Fiber","2839120-1",TRUE
+"7553","Fiber","Fiber","Fiber","2839461-5",TRUE
+"7556","Fiber","Fiber","Fiber","2839497-1",TRUE
+"7570","Fiber","Fiber","Fiber","2839709-2",TRUE
+"7571","Cable / DSL","Cable / DSL","Cable / DSL","2839722-1",TRUE
+"7578","Fiber","Fiber","Fiber","2840223-1",TRUE
+"7581","Fiber","Fiber","Fiber","2840329-1",TRUE
+"7587","Copper","Copper","Copper","2840514-1",TRUE
+"7591","Fiber","Fiber","Fiber","2840525-1",TRUE
+"7594","Fiber","Fiber","Fiber","2840583-1",TRUE
+"7597","Fiber","Fiber","Fiber","2840583-4",TRUE
+"7610","Fiber","Fiber","Fiber","2840765-1",TRUE
+"7612","Fiber","Fiber","Other / Uncategorized","2840805-1",TRUE
+"7614","Fiber","Fiber","Fiber","2840849-1",TRUE
+"7616","Fiber","Fiber","Fiber","2840903-1",TRUE
+"7627","Fiber","Fiber","Fiber","2841028-1",TRUE
+"7635","Fiber","Fiber","Other / Uncategorized","2841085-1",TRUE
+"7641","Fiber","Fiber","Fiber","2841146-1",TRUE
+"7645","Fiber","Fiber","Other / Uncategorized","2841172-1",TRUE
+"7652","Fiber","Fiber","Fiber","2841258-1",TRUE
+"7658","Fiber","Fiber","Other / Uncategorized","2841288-1",TRUE
+"7683","Fiber","Fiber","Fiber","2841569-1",TRUE
+"7688","Fiber","Fiber","Fiber","2841697-1",TRUE
+"7697","Fiber","Fiber","Fiber","2841786-1",TRUE
+"7719","Fiber","Fiber","Fiber","2842070-1",TRUE
+"7724","Fiber","Fiber","Other / Uncategorized","2842248-2",TRUE
+"7745","Fiber","Fiber","Fiber","2842659-1",TRUE
+"7752","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2842899-1",TRUE
+"7753","Fiber","Fiber","Fiber","2842928-1",TRUE
+"7759","Fiber","Fiber","Other / Uncategorized","2843001-1",TRUE
+"7776","Fiber","Fiber","Fiber","2843176-1",TRUE
+"7779","Fiber","Fiber","Other / Uncategorized","2843224-1",TRUE
+"7781","Fixed Wireless","Fixed Wireless","Fixed Wireless","2843242-1",TRUE
+"7793","Fiber","Fiber","Fiber","2843577-1",TRUE
+"7799","Fiber","Fiber","Fiber","2843683-1",TRUE
+"7845","Fiber","Fiber","Fiber","2844299-1",TRUE
+"7855","Fiber","Fiber","Fiber","2844492-1",TRUE
+"7860","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2844520-1",TRUE
+"7885","Other / Uncategorized","Other / Uncategorized","Copper","2844909-1",TRUE
+"7886","Fiber","Fiber","Fiber","2844934-1",TRUE
+"7888","Fiber","Fiber","Fiber","2844995-1",TRUE
+"7891","Fiber","Fiber","Fiber","2845137-1",TRUE
+"7896","Fiber","Fiber","Fiber","2845457-2",TRUE
+"7912","Fiber","Fiber","Fiber","2846128-1",TRUE
+"7913","Fiber","Fiber","Other / Uncategorized","2846525-1",TRUE
+"7927","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2847076-1",TRUE
+"7931","Fiber","Fiber","Fiber","2847328-1",TRUE
+"7937","Fiber","Fiber","Fiber","2847460-1",TRUE
+"7944","Fiber","Fiber","Fiber","2847609-1",TRUE
+"7945","Fiber","Fiber","Fiber","2847609-2",TRUE
+"7955","Fiber","Fiber","Fiber","2847759-1",TRUE
+"7961","Fiber","Fiber","Fiber","2847905-1",TRUE
+"7964","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2848013-1",TRUE
+"7973","Fiber","Fiber","Fiber","2848182-1",TRUE
+"7978","Fixed Wireless","Fixed Wireless","Fiber","2848285-1",TRUE
+"7985","Fiber","Fiber","Other / Uncategorized","2848423-1",TRUE
+"7989","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2848485-1",TRUE
+"7991","Fiber","Fiber","Fiber","2848545-1",TRUE
+"7996","Cable / DSL","Cable / DSL","Other / Uncategorized","2848642-1",TRUE
+"8006","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2848967-1",TRUE
+"8017","Fiber","Fiber","Other / Uncategorized","2849137-1",TRUE
+"8026","Fiber","Fiber","Fiber","2849456-1",TRUE
+"8027","Fiber","Fiber","Fiber","2849456-2",TRUE
+"8048","Other / Uncategorized","Other / Uncategorized","Fiber","2850041-1",TRUE
+"8052","Fiber","Fiber","Fiber","2850102-1",TRUE
+"8059","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2850364-1",TRUE
+"8065","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2850400-4",TRUE
+"8077","Fiber","Fiber","Other / Uncategorized","2850621-2",TRUE
+"8080","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2850701-1",TRUE
+"8084","Fiber","Fiber","Fiber","2850819-1",TRUE
+"8086","Fiber","Fiber","Fiber","2850842-1",TRUE
+"8090","Fixed Wireless","Fixed Wireless","Fiber","2850900-1",TRUE
+"8093","Fiber","Fiber","Fiber","2851051-1",TRUE
+"8095","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2851104-1",TRUE
+"8104","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2851411-1",TRUE
+"8110","Fiber","Fiber","Fiber","2851509-1",TRUE
+"8112","Fiber","Fiber","Fiber","2851533-2",TRUE
+"8120","Cable / DSL","Cable / DSL","Other / Uncategorized","2851663-1",TRUE
+"8122","Fiber","Fiber","Other / Uncategorized","2851753-1",TRUE
+"8144","Copper","Copper","Copper","2852208-1",TRUE
+"8151","Fiber","Fiber","Fiber","2852457-3",TRUE
+"8156","Fiber","Fiber","Other / Uncategorized","2852660-1",TRUE
+"8165","Fiber","Fiber","Fiber","2852925-1",TRUE
+"8167","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2852957-1",TRUE
+"8169","Fiber","Fiber","Other / Uncategorized","2853015-1",TRUE
+"8182","Fiber","Fiber","Fiber","2853309-1",TRUE
+"8183","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2853338-1",TRUE
+"8184","Fiber","Fiber","Other / Uncategorized","2853389-1",TRUE
+"8185","Other / Uncategorized","Other / Uncategorized","Fiber","2853604-1",TRUE
+"8194","Fiber","Fiber","Fiber","2853857-1",TRUE
+"8199","Fiber","Fiber","Fiber","2853959-1",TRUE
+"8207","Fiber","Fiber","Fiber","2854001-1",TRUE
+"8215","Fiber","Fiber","Fiber","2854250-1",TRUE
+"8221","Other / Uncategorized","Other / Uncategorized","Fiber","2854357-1",TRUE
+"8231","Fiber","Fiber","Fiber","2854636-1",TRUE
+"8233","Other / Uncategorized","Other / Uncategorized","Fiber","2854674-1",TRUE
+"8242","Fiber","Fiber","Fiber","2854781-1",TRUE
+"8256","Fiber","Fiber","Fiber","2854977-1",TRUE
+"8257","Fiber","Fiber","Other / Uncategorized","2854986-1",TRUE
+"8264","Fiber","Fiber","Fiber","2855171-1",TRUE
+"8271","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2855281-1",TRUE
+"8272","Fiber","Fiber","Fiber","2855283-1",TRUE
+"8279","Fiber","Fiber","Fiber","2855430-1",TRUE
+"8282","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2855483-1",TRUE
+"8291","Fiber","Fiber","Fiber","2855700-1",TRUE
+"8299","Fixed Wireless","Fixed Wireless","Other / Uncategorized","2855933-1",TRUE
+"8308","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2856260-1",TRUE
+"8311","Fiber","Fiber","Fiber","2856286-3",TRUE
+"8329","Copper","Copper","Copper","2856612-1",TRUE
+"8340","Fiber","Fiber","Fiber","2856738-2",TRUE
+"8349","Fiber","Fiber","Fiber","2856947-1",TRUE
+"8355","Fiber","Fiber","Fiber","2857271-1",TRUE
+"8356","Cable / DSL","Cable / DSL","Cable / DSL","2857286-1",TRUE
+"8359","Fiber","Fiber","Fiber","2857289-3",TRUE
+"8364","Fiber","Fiber","Fiber","2857374-1",TRUE
+"8365","Fiber","Fiber","Fiber","2857393-1",TRUE
+"8378","Fiber","Fiber","Fiber","2857592-1",TRUE
+"8380","Other / Uncategorized","Fiber","Other / Uncategorized","2857662-1",FALSE
+"8384","Copper","Copper","Copper","2857766-1",TRUE
+"8392","Fiber","Fiber","Fiber","2858036-1",TRUE
+"8399","Fiber","Fiber","Fiber","2858441-1",TRUE
+"8402","Fiber","Fiber","Fiber","2858485-1",TRUE
+"8405","Fiber","Fiber","Fiber","2858523-1",TRUE
+"8415","Fiber","Fiber","Fiber","2858934-2",TRUE
+"8425","Fiber","Fiber","Fiber","2859301-1",TRUE
+"8428","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2859360-1",TRUE
+"8429","Fiber","Fiber","Fiber","2859411-1",TRUE
+"8436","Fiber","Fiber","Fiber","2859680-1",TRUE
+"8442","Cable / DSL","Cable / DSL","Cable / DSL","2860000-1",TRUE
+"8444","Fiber","Fiber","Fiber","2860082-1",TRUE
+"8470","Cable / DSL","Cable / DSL","Cable / DSL","2860686-1",TRUE
+"8471","Cable / DSL","Cable / DSL","Cable / DSL","2860763-1",TRUE
+"8473","Fixed Wireless","Fixed Wireless","Fixed Wireless","2860903-1",TRUE
+"8477","Fiber","Fiber","Fiber","2860973-1",TRUE
+"8487","Fiber","Fiber","Fiber","2861527-1",TRUE
+"8497","Fiber","Fiber","Fiber","2861831-1",TRUE
+"8501","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2862035-1",TRUE
+"8519","Fiber","Fiber","Fiber","2862791-1",TRUE
+"8522","Fiber","Fiber","Fiber","2862906-1",TRUE
+"8529","Fiber","Fiber","Fiber","2862977-13",TRUE
+"8539","Fiber","Fiber","Fiber","2863052-1",TRUE
+"8540","Fiber","Fiber","Fiber","2863099-1",TRUE
+"8543","Fiber","Fiber","Fiber","2863185-1",TRUE
+"8547","Fiber","Fiber","Fiber","2863235-1",TRUE
+"8549","Fiber","Fiber","Other / Uncategorized","2863332-1",TRUE
+"8554","Fiber","Fiber","Fiber","2863514-1",TRUE
+"8560","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2863813-1",TRUE
+"8564","Fiber","Fiber","Fiber","2863952-1",TRUE
+"8566","Fiber","Fiber","Fiber","2864003-1",TRUE
+"8574","Fiber","Fiber","Fiber","2864190-1",TRUE
+"8577","Fiber","Fiber","Fiber","2864192-1",TRUE
+"8582","Fiber","Fiber","Fiber","2864300-1",TRUE
+"8586","Fiber","Fiber","Fiber","2864414-1",TRUE
+"8591","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2864511-1",TRUE
+"8603","Fiber","Fiber","Fiber","2864760-1",TRUE
+"8607","Fiber","Fiber","Fiber","2864815-1",TRUE
+"8625","Fiber","Fiber","Fiber","2865274-1",TRUE
+"8640","Fiber","Fiber","Other / Uncategorized","2865477-1",TRUE
+"8649","Fiber","Fiber","Fiber","2865583-1",TRUE
+"8656","Fiber","Fiber","Fiber","2865818-1",TRUE
+"8675","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2866298-1",TRUE
+"8678","Fiber","Fiber","Fiber","2866304-3",TRUE
+"8679","Fiber","Fiber","Fiber","2866304-4",TRUE
+"8680","Fiber","Fiber","Fiber","2866304-5",TRUE
+"8681","Fiber","Fiber","Fiber","2866304-6",TRUE
+"8682","Fiber","Fiber","Fiber","2866315-1",TRUE
+"8686","Copper","Copper","Copper","2866370-1",TRUE
+"8693","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2866613-1",TRUE
+"8698","Fiber","Fiber","Fiber","2866798-1",TRUE
+"8712","Fiber","Fiber","Fiber","2867275-1",TRUE
+"8714","Fiber","Fiber","Other / Uncategorized","2867277-1",TRUE
+"8723","Fiber","Fiber","Fiber","2867597-1",TRUE
+"8729","Fiber","Fiber","Fiber","2867771-1",TRUE
+"8737","Fiber","Fiber","Fiber","2867995-1",TRUE
+"8749","Other / Uncategorized","Other / Uncategorized","Fiber","2868488-1",TRUE
+"8760","Fiber","Fiber","Fiber","2868665-1",TRUE
+"8762","Fiber","Fiber","Fiber","2868688-1",TRUE
+"8770","Fiber","Fiber","Fiber","2868875-1",TRUE
+"8797","Copper","Copper","Copper","2869696-1",TRUE
+"8804","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2869840-1",TRUE
+"8806","Copper","Copper","Copper","2869878-1",TRUE
+"8816","Copper","Copper","Copper","2869958-1",TRUE
+"8831","Fiber","Fiber","Fiber","2870575-1",TRUE
+"8837","Fiber","Fiber","Fiber","2870845-1",TRUE
+"8841","Fiber","Fiber","Fiber","2871105-1",TRUE
+"8850","Cable / DSL","Cable / DSL","Cable / DSL","2871550-2",TRUE
+"8870","Other / Uncategorized","Other / Uncategorized","Other / Uncategorized","2871952-1",TRUE
+"8872","Fixed Wireless","Fixed Wireless","Cable / DSL","2872081-1",TRUE
+"8879","Cable / DSL","Cable / DSL","Other / Uncategorized","2872451-1",TRUE
+"8883","Fiber","Fiber","Fiber","2872918-1",TRUE

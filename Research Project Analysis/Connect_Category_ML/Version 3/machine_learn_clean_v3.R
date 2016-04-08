@@ -10,9 +10,22 @@ library(randomForest)
 library(rfUtilities)
 # install.packages('randomForestSRC')
 library(randomForestSRC)
+# install.packages("RPostgreSQL")
+library("RPostgreSQL")
+
 # install.packages('caret')
 
 setwd("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 3")
+
+# drv <- dbDriver("PostgreSQL")
+
+
+# con <- dbConnect(drv, dbname = "pharaoh",
+                 host = "localhost", port = 5432,
+                 user = "", password = "")
+# dists <- dbGetQuery(con, paste0('select * from districts'))
+
+
 
 raw_lis <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 3/original_line_items_v3.csv")
 nrow(raw_lis)
@@ -76,8 +89,9 @@ results$guessed_correctly <- results$verified_category == results$predicted_cate
 # clean up factors issue
 # results$cleaned_line_item <- results$verified_category != results$raw_category
 
-
+nrow(results)
 View(results)
 confusionMatrix(predict.forest, reference=test_data$connect_category.y)
+# write.csv(results, file = "results_v3.csv")
 
 
