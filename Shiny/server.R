@@ -36,11 +36,11 @@ shinyServer(function(input, output, session) {
     selected_state <- paste0('\"',input$state, '\"')
     
     services %>% 
-      filter(band_factor %in% input$bandwidths, 
+      filter(band_factor %in% input$bandwidths,
              new_purpose %in% input$purpose,
-             connect_type %in% input$connection, 
              district_size %in% input$district_size,
              locale %in% input$locale) %>%
+                          #connect_type %in% input$connection  %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
 }) 
   
@@ -273,8 +273,6 @@ output$trad_nat_comparison <- renderPlot({
                 size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_blank(), 
-            #axis.text.x = element_blank(),
-            #axis.text.y = element_blank(),
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
             axis.text.y=element_text(size=14, colour= "#899DA4"),
             axis.ticks=element_blank(),

@@ -118,13 +118,12 @@ shinyUI(fluidPage(
       selectInput("dataset",
                   h2("Select Dataset (applicable for Maps only)"),
                   choices = c('All', 'Clean'), selected = 'All'),
-      
       checkboxGroupInput(inputId = "bandwidths", 
                          label = h2("Select Circuit Size(s) (applicable for B-W viz only)"),
-                         choices = c("50Mbps" = "50", "100Mbps" = "100", "500Mbps" = "500", 
-                                     "1Gbps" = "1000", "10Gbps" = "10000"),
-                         selected = c("50", "100", "500", "1000", "10000")),
-      
+                         choices = c("50Mbps" = 50, "100Mbps" = 100, "500Mbps" = 500, 
+                                     "1Gbps" = 1000, "10Gbps" = 10000),
+                         selected = c(50, 100, 500, 1000, 10000)),
+
       checkboxGroupInput(inputId = "purpose", 
                          label = h2("Select Purpose(s) (applicable for B-W viz only)"),
                          choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
