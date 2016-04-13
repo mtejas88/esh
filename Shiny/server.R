@@ -7,6 +7,10 @@ setwd(wd)
 services <- read.csv("services_received_shiny.csv", as.is = TRUE)
 districts <- read.csv("districts_shiny.csv", as.is = TRUE)
 
+# factorize
+services$band_factor <- as.factor(services$band_factor)
+
+
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -84,7 +88,7 @@ output$bw_plot <- renderPlot({
   
   dollar_format(largest_with_cents=1)
   
-  ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]
+  ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]   #column 1 and 5 are min and max
   
   p0 <- ggplot(data, aes(x = band_factor, y = monthly_cost_per_circuit)) + 
         geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) + 
@@ -104,7 +108,7 @@ output$bw_plot <- renderPlot({
               axis.title.y=element_blank())
     
      print(a)
-     print(nrow(li_bf()))
+     print(nrow(data))
 
 })
 
