@@ -179,7 +179,7 @@ shinyUI(fluidPage(
                  tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 03/08/16", br())), width="300px"),
                  navbarMenu("Cost",
                             tabPanel("Cost: Distribution of Bandwidths", plotOutput("plot")),
-                            tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table")),
+                            tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), textOutput("n_line_observations"), textOutput("n_circuit_observations"), tableOutput("counts_table")),
                             tabPanel("Comparison: Overall National", plotOutput("trad_nat_comparison")),
                             tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), textOutput("n_observations_comparison")),
                             tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))),
