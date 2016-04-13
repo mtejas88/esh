@@ -7,7 +7,7 @@ setwd(wd)
   sapply(lib, function(x) require(x, character.only = TRUE))
   
   services_check <- read.csv("services_received_shiny.csv", as.is = TRUE)
-  districts <- read.csv("districts_shiny.csv", as.is = TRUE)
+  districts_check <- read.csv("districts_shiny.csv", as.is = TRUE)
   # nrow(services) #83203
   # nrow(districts) #13025
   
@@ -29,4 +29,6 @@ print(sum(services_check$line_item_total_num_lines))
 
 services_check <- filter(services_check, postal_cd %in% c("CA"))
 print(sum(services_check$line_item_total_num_lines))
+
+table(services_check$connect_type)
 

@@ -43,9 +43,17 @@ services$new_purpose[services$isp_conditions_met == TRUE] <- "ISP Only"
 services$new_purpose[services$upstream_conditions_met == TRUE] <- "Upstream"
 # table(services$new_purpose)
 
-# Appending new column for monthly cost per circuit:
+# Create new column for monthly cost per circuit:
 services$monthly_cost_per_circuit <- services$line_item_total_monthly_cost / services$line_item_total_num_lines 
 services$monthly_cost_per_mbps <- services$monthly_cost_per_circuit / services$bandwidth_in_mbps
+
+# Create new column for connection types
+services$new_connect_type[services$connect_type %in% c("Cable Modem")] <- "Cable"
+services$new_connect_type[services$connect_type %in% c("Digital Subscriber Line (DSL)")] <- "DSL"
+services$new_connect_type[services$connect_type %in% c("Dark Fiber Service")] <- "Dark Fiber"
+services$new_connect_type[services$connect_type %in% c("Lit Fiber Service")] <- "Lit Fiber"
+services$new_connect_type[services$connect_type %in% c("DS-1 (T-1)", "DS-3 (T-3)")] <- "Copper"
+services$new_connect_type <- ifelse(is.na(services$new_connect_type), "Other / Uncategorized", services$new_connect_type)
 
 ##  SERVICES RECEIVED DATA: END ##
 
@@ -65,6 +73,14 @@ districts$meeting_2014_goal_no_oversub <- as.factor(districts$meeting_2014_goal_
 
 # create indicator for district having at least 1 unscalable campus
 districts$not_all_scalable <- ifelse(districts$nga_v2_known_unscalable_campuses + districts$nga_v2_assumed_unscalable_campuses > 0, 1, 0)
+
+# deluxe districts
+districts$new_connect_type <- ifelse(districts$highest_connect_type %in% c("Insufficient data", ""), 
+                                     "Other / Uncategorized", districts$highest_connect_type)
+
+## END
+
+
 
 wd <- "~/Google Drive/github/ficher/Shiny"
 setwd(wd)
