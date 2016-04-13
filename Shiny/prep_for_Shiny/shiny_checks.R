@@ -26,6 +26,12 @@ services_check <- filter(services_check, locale %in% c("Suburban"))
 nrow(services_check)
 print(sum(services_check$line_item_total_num_lines))
 
+services_check <- filter(services_check, !new_connect_type %in% c("Lit Fiber"))
+nrow(services_check)
+sum(services_check$line_item_total_num_lines)
+
+
+
 
 services_check <- filter(services_check, postal_cd %in% c("CA"))
 print(sum(services_check$line_item_total_num_lines))

@@ -24,7 +24,7 @@ shinyServer(function(input, output, session) {
 
     services %>% 
       filter(new_purpose %in% input$purpose,
-             connect_type %in% input$connection, 
+             new_connect_type %in% input$connection_services, 
              district_size %in% input$district_size,
              locale %in% input$locale)
   
@@ -39,8 +39,8 @@ shinyServer(function(input, output, session) {
       filter(band_factor %in% input$bandwidths,
              new_purpose %in% input$purpose,
              district_size %in% input$district_size,
-             locale %in% input$locale) %>%
-                          #connect_type %in% input$connection  %>%
+             locale %in% input$locale,
+             new_connect_type %in% input$connection_services) %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
 }) 
   
@@ -52,7 +52,7 @@ shinyServer(function(input, output, session) {
   districts %>% 
     filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(hierarchy_connect_category %in% input$connection, 
+    filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
            locale %in% input$locale,
            !(postal_cd %in% c('AK', 'HI')))

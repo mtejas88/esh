@@ -75,8 +75,8 @@ districts$meeting_2014_goal_no_oversub <- as.factor(districts$meeting_2014_goal_
 districts$not_all_scalable <- ifelse(districts$nga_v2_known_unscalable_campuses + districts$nga_v2_assumed_unscalable_campuses > 0, 1, 0)
 
 # deluxe districts
-districts$new_connect_type <- ifelse(districts$highest_connect_type %in% c("Insufficient data", ""), 
-                                     "Other / Uncategorized", districts$highest_connect_type)
+districts$new_connect_type <- ifelse(districts$hierarchy_connect_category %in% c("None - Error", "Other/Uncategorized"), 
+                                     "Other / Uncategorized", districts$hierarchy_connect_category)
 
 ## END
 
