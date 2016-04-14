@@ -157,13 +157,15 @@ shinyUI(fluidPage(
     
     mainPanel(
       navbarPage("",
-                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 03/08/16", br())), width="300px"),
+                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/14/16", br())), width="300px"),
                  navbarMenu("Cost",
-                            tabPanel("Cost: Distribution of Bandwidths", plotOutput("plot")),
+                            tabPanel("Cost: Frequency of Bandwidths by Line Item", plotOutput("plot")),
                             tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
-                            tabPanel("Comparison: Overall National", plotOutput("trad_nat_comparison")),
-                            tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), textOutput("n_observations_comparison")),
-                            tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))),
+                            tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
+                            tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
+                            #,
+                            #tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))
+                            ),
                  navbarMenu("Maps", 
                             tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
                             tabPanel("Gen. Population Map", plotOutput("pop_map"), textOutput("n_ddt")),

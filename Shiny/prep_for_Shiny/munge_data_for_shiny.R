@@ -51,9 +51,13 @@ services$monthly_cost_per_mbps <- services$monthly_cost_per_circuit / services$b
 services$new_connect_type[services$connect_type %in% c("Cable Modem")] <- "Cable"
 services$new_connect_type[services$connect_type %in% c("Digital Subscriber Line (DSL)")] <- "DSL"
 services$new_connect_type[services$connect_type %in% c("Dark Fiber Service")] <- "Dark Fiber"
+services$new_connect_type[services$connect_type %in% c("E.g., Microwave Service")] <- "Fixed Wireless"
 services$new_connect_type[services$connect_type %in% c("Lit Fiber Service")] <- "Lit Fiber"
 services$new_connect_type[services$connect_type %in% c("DS-1 (T-1)", "DS-3 (T-3)")] <- "Copper"
 services$new_connect_type <- ifelse(is.na(services$new_connect_type), "Other / Uncategorized", services$new_connect_type)
+
+# Create National column for overall national
+services$national <- rep("National", nrow(services))
 
 ##  SERVICES RECEIVED DATA: END ##
 
