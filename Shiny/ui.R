@@ -128,14 +128,6 @@ shinyUI(fluidPage(
                          label = h2("Select Purpose(s) (applicable for B-W viz only)"),
                          choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
                          selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
-      
-    #  checkboxGroupInput(inputId = "connection", 
-     #             h2("Select Connection Type(s)"),
-      #            choices = c("Fiber", "Dark Fiber Service", "Cable", "DSL", "Cable / DSL",  
-       #                       "Fixed Wireless", "Copper", "Other / Uncategorized", 
-        ##         selected = c("Fiber", "Dark Fiber Service", "Cable", "DSL", "Copper", 
-          #                       "Cable / DSL", "Fixed Wireless", "Other / Uncategorized", 
-           #                      "None - Error")),
      checkboxGroupInput(inputId = "connection_districts", 
                        h2("Select Connection Type(s) - map/district view only"),
                        choices = c("Fiber", "Cable", "DSL",
@@ -159,26 +151,6 @@ shinyUI(fluidPage(
                          selected = c("Rural", "Small Town", "Suburban", "Urban"))
 
       
-     # uiOutput("districtSelect"),
-      
-      #selectInput("dataset",
-      #            h2("Select Dataset (applicable for Maps only)"),
-      #            choices = c('All', 'Clean'), selected = 'All'),
-      #selectInput("purpose", 
-      #            h2("Select Purpose"),
-      #            choices = c('All', 'Internet', 'Upstream', 'WAN', 'ISP Only'), selected="All"),
-      #selectInput("connection", 
-      #            h2("Select Connection Type"),
-      #            choices = c("All", "Fiber", "Dark Fiber Service", "Cable", "DSL", "Copper", "Cable / DSL", "Fixed Wireless", "Other / Uncategorized", "None - Error"), selected = 'All'),
-      #selectInput("locale", 
-      #            h2("Select District Locale"), 
-      #           choices = c('All', 'Rural', 'Small Town', 'Suburban', 'Urban'), selected= 'All'),
-      #selectInput("size", 
-      #            h2("Select District Size"), 
-      #           choices = c('All', 'Tiny', 'Small', 'Medium', 'Large', 'Mega'), selected='All'),
-
-      
-      
     ),#closing sidebarPanel
     
     
@@ -188,7 +160,7 @@ shinyUI(fluidPage(
                  tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 03/08/16", br())), width="300px"),
                  navbarMenu("Cost",
                             tabPanel("Cost: Distribution of Bandwidths", plotOutput("plot")),
-                            tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), textOutput("n_line_observations"), textOutput("n_circuit_observations"), tableOutput("counts_table")),
+                            tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
                             tabPanel("Comparison: Overall National", plotOutput("trad_nat_comparison")),
                             tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), textOutput("n_observations_comparison")),
                             tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))),

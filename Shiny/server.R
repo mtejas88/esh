@@ -9,7 +9,7 @@ districts <- read.csv("districts_shiny.csv", as.is = TRUE)
 
 # factorize
 services$band_factor <- as.factor(services$band_factor)
-
+services$postal_cd <- as.factor(services$postal_cd)
 
 shinyServer(function(input, output, session) {
   
@@ -20,7 +20,7 @@ shinyServer(function(input, output, session) {
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
   
-  li_all <- reactive({
+li_all <- reactive({
 
     services %>% 
       filter(new_purpose %in% input$purpose,
@@ -30,8 +30,8 @@ shinyServer(function(input, output, session) {
   
 })
   
-  ## Line Items with filter that now includes banding circuits by most popular circuit speeds
-  li_bf <- reactive({
+## Line Items with filter that now includes banding circuits by most popular circuit speeds
+li_bf <- reactive({
     
     selected_state <- paste0('\"',input$state, '\"')
     
@@ -44,7 +44,7 @@ shinyServer(function(input, output, session) {
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
 }) 
   
-  district_subset <- reactive({
+district_subset <- reactive({
       
     selected_dataset <- paste0('\"', input$dataset, '\"')
     selected_state <- paste0('\"',input$state, '\"')
@@ -62,12 +62,15 @@ shinyServer(function(input, output, session) {
 ## Histogram for banded factors ##
 output$plot <- renderPlot({
   
-    validate(need(nrow(li_bf()) > 0, "No circuits in given subset"))  
-    p <- ggplot(data=li_bf()) + geom_histogram(aes(x=factor(band_factor)), alpha=0.5,position="identity", binwidth = 25) 
-    
-    print(p)
+  data <- li_bf()
   
-    })
+  validate(need(nrow(data) > 0, "No circuits in given subset"))  
+  p <- ggplot(data = data) + 
+       geom_histogram(aes(x = band_factor), alpha = 0.5, position = "identity", binwidth = 25) 
+    
+  print(p)
+  
+  })
 
 ## Box and Whiskers Plot
 ## use li_bf, only for selected circuit sizes
@@ -78,27 +81,28 @@ output$bw_plot <- renderPlot({
   validate(need(nrow(data) > 0, "No circuits in given subset"))
   
   give.n <- function(x){
-    return(c(y = median(x)*0.85, label = length(x))) 
+    return(c(y = median(x) * 0.85, label = length(x))) 
     # experiment with the multiplier to find the perfect position
   }
   
   meds <- data %>% 
           group_by(band_factor) %>% 
-          summarise(medians = median(monthly_cost_per_circuit))
+          summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
   
   dollar_format(largest_with_cents=1)
   
   ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]   #column 1 and 5 are min and max
   
   p0 <- ggplot(data, aes(x = band_factor, y = monthly_cost_per_circuit)) + 
-        geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) + 
-        stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
+        geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) 
+  #+ 
+   #     stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 5) 
       
   a <- p0 + 
        coord_cartesian(ylim = ylim1 * 2.0) + 
        scale_y_continuous("",labels=dollar) +
-       geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
-                 size = 4, vjust = -.3, colour= "#F26B21", hjust=.5)+
+    #   geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
+     #            size = 5, vjust = -.3, colour= "#F26B21", hjust=.5)+
        theme_classic() + 
        theme(axis.line = element_blank(), 
               axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -109,43 +113,6 @@ output$bw_plot <- renderPlot({
     
      print(a)
      print(nrow(data))
-
-})
-
-output$n_line_observations <- renderText({
-  
-  data <- li_bf()
-  #for num line items
-  ns <- data %>% 
-        group_by(band_factor) %>% 
-        summarise(n_line_items = n())
-  
-  # formatting stuff
-  #whitespace_size <- 180 / (nrow(ns)^1.3)
-  #whitespace <- paste(rep(" ", whitespace_size), collapse = "")
-  #formatted <- sapply(ns[,2], function(x) paste(x,collapse = whitespace))
-  #leadspace_size <- 100/(nrow(ns)^2.6)
-  #leadspace <- paste(rep(" ", leadspace_size), collapse = "")
-  
-  paste("Number of line items: ", sum(ns$n_line_items)) 
-  
-})  
-
-output$n_circuits_observations <- renderText({
-  
-  data <- li_bf()
-  #for num circuits
-  ns2 <- data %>% 
-         group_by(band_factor) %>% 
-         summarise(n_circuits = sum(line_item_total_num_lines))
-  
-  #whitespace_size2 <- 180 / (nrow(ns2)^1.3)
-  #whitespace2 <- paste(rep(" ", whitespace_size2), collapse = "")
-  #formatted2 <- sapply(ns2[,2], function(x) paste(x,collapse = whitespace2))
-  #leadspace_size2 <- 100 / (nrow(ns2)^2.6)
-  #leadspace2 <- paste(rep(" ", leadspace_size2), collapse = "")
-
-paste("Number of circuits: ", sum(ns2$n_circuits))
 
 })
 
@@ -160,6 +127,22 @@ output$counts_table <- renderTable({
   
 })
 
+output$prices_table <- renderTable({
+  
+  data <- li_bf()
+  
+  data %>% 
+    group_by(band_factor) %>% 
+    summarise(min_cost_per_mbps = round(min(monthly_cost_per_mbps, na.rm = TRUE)),
+              q25_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.25, na.rm = TRUE)),
+              median_cost_per_mbps = round(median(monthly_cost_per_mbps, na.rm = TRUE)),
+              q75_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.75, na.rm = TRUE)),
+              max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE)))
+  
+})
+
+
+
 ## Comparison: Specific State vs. All Other States 
 output$state_vs_rest_comparison <- renderPlot({
   
@@ -170,10 +153,6 @@ output$state_vs_rest_comparison <- renderPlot({
   li_all2$postal_cd[li_all2$postal_cd != input$state] <- "National"
   
   str(li_all2$postal_cd)
-  
-  #li_all2$postal_cd[li_all2$postal_cd != input$state] <- 'National'     #input$state used to previously be selected_state
-  #li_all2$postal_cd <-factor(li_all2$postal_cd, level=c('National', input$state)) #input$state used to previously be selected_state
-  
   
   ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
   validate(
