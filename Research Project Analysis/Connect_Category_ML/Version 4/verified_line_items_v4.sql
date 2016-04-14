@@ -14,7 +14,9 @@ district_info as (
     d.nces_cd,
     d.highest_connect_type,
     array_length(d.all_services_received_ids, 1) as num_of_services,
-    free_and_reduced
+    free_and_reduced,
+    num_students,
+    all_services_received_ids
   from public.districts d
   left join districts_wealth dw
   on dw."LEAID" = d.nces_cd
@@ -25,11 +27,37 @@ district_info as (
 ol as (
   select
     name as other_location_name,
-    ben,
-    true as other_location
+    eb.ben,
+    case
+      when ol.district_esh_id is null
+      then true
+      else false
+      end as other_location_no_district,
+      true as other_location,
+    di.num_students,
+    array_length(di.all_services_received_ids, 1) as num_of_services,
+    di.highest_connect_type,
+    free_and_reduced
   from public.other_locations ol
   left join public.entity_bens eb
   on ol.esh_id = eb.entity_id
+  left join district_info di
+  on di.esh_id = ol.district_esh_id
+),
+
+school_info as (
+  select
+    eb.ben,
+    di.num_students,
+    array_length(di.all_services_received_ids, 1) as num_of_services,
+    di.highest_connect_type,
+    free_and_reduced
+    from public.schools sc
+    left join
+    public.entity_bens eb
+    on sc.esh_id = eb.entity_id
+    left join district_info di
+    on di.esh_id = sc.district_esh_id
 ),
 
 sp_cat_freq as (select service_provider_name,
@@ -121,7 +149,7 @@ consult_info as (
     group by "BEN", consultant_name, connect_category
   ),
 
-li_ver as (
+  li_ver as (
   select
     fy2015_item21_services_and_cost_id as line_item_id,
     Row_number()
@@ -135,11 +163,20 @@ li_ver as (
   or
   user_id is not null ))
 
+
   select
     distinct on (linf.line_item_id) linf.line_item_id,
     linf.ben,
     linf.bandwidth_in_mbps,
-    linf.num_students,
+    case
+      when linf.num_students is not null
+      then linf.num_students::numeric
+      when scl.num_students is not null
+      then scl.num_students::numeric
+      when ol.num_students is not null
+      then ol.num_students::numeric
+      else 0
+      end as num_students,
     linf.connect_category,
     linf.providers_typical_category,
     case when ci.consultant_applied is true
@@ -171,15 +208,41 @@ li_ver as (
         then false
         else true
         end as other_location ,
+    case
+      when ol.other_location_no_district is null
+      then false
+      else ol.other_location_no_district
+    end as other_location_no_district,
     di.ben,
     di.nces_cd,
-    di.num_of_services,
-    di.highest_connect_type,
     case
-      when di.free_and_reduced is null
-      then 0
-      else di.free_and_reduced
+      when di.num_of_services is not null
+      then di.num_of_services
+      when scl.num_of_services is not null
+      then scl.num_of_services
+      when ol.num_of_services is not null
+      then ol.num_of_services
+      else 0
+      end as num_of_services,
+    case
+      when di.highest_connect_type is not null
+      then di.highest_connect_type
+      when scl.highest_connect_type is not null
+      then scl.highest_connect_type
+      when ol.highest_connect_type is not null
+      then ol.highest_connect_type
+      else 'unknown'
+    end as highest_connect_type,
+    case
+      when di.free_and_reduced is not null
+      then di.free_and_reduced
+      when ol.free_and_reduced is not null
+      then ol.free_and_reduced
+      when scl.free_and_reduced is not null
+      then scl.free_and_reduced
+      else 0
     end as free_and_reduced,
+    entity_type,
     case
       when linf.total_cost > 0 and num_lines > 0 then
         total_cost / num_lines
@@ -192,6 +255,10 @@ li_ver as (
   on di.ben = linf.ben
   left join ol
   on ol.ben = linf.ben
+  left join school_info as scl
+  on scl.ben = linf.ben
   left join consult_info ci
   on ci.ben = linf.ben
+  inner join public.entity_bens eb
+  on linf.ben = eb.ben
   where li_ver.row_num = 1
