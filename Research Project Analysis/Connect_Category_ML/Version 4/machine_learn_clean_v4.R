@@ -95,8 +95,13 @@ confusionMatrix(predict.forest, reference=test_data$connect_category.y)
 
 mo_nm_crimson <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/mo_nm_crimson.csv")
 
-# mo_nm_onyx <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/mo_nm_onyx.csv")
+mo_nm_onyx <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/mo_nm_onyx.csv")
+mo_nm_onyx <- mo_nm_onyx[, c('frn_complete', 'connect_category')]
 
+mo_nm_onyx$verified_connect_category <- mo_nm_onyx$verified_connect_category
+mo_nm_onyx$frn_complete <- as.character(mo_nm_onyx$frn_complete)
+
+summary(mo_nm_onyx)
 
 verified_lis <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/verified_line_items_v4.csv")
 summary(verified_lis)
@@ -106,17 +111,25 @@ compacted_joined <- verified_lis[, c('connect_category', 'frn_complete', 'bandwi
                                'consultant_app', 'cost_per_line', 'num_students',
                                'num_of_services', 'highest_connect_type', 'providers_typical_category',
                                'free_and_reduced', 'copper_line', 'consultants_cat',
-                               'upstream_conditions_met', 'isp_conditions_met', 'ia_circuit_only',
-                               'wireless_service', 'wan_fiber_3_lines', 'likely_wan_fiber', 'exception_not_fiber',
+                                'isp_conditions_met', 'ia_circuit_only',
+                               'wireless_service', 'wan_fiber_3_lines', 'likely_wan_fiber',
                                'likely_other_uncategorized', 'entity_type', 'other_location_no_district')]
+
+compacted_joined$frn_complete <- as.character(compacted_joined$frn_complete)
+
 
 mo_nm_crimson <- mo_nm_crimson[, c('connect_category', 'frn_complete', 'bandwidth_in_mbps',
                                      'consultant_app', 'cost_per_line', 'num_students',
                                      'num_of_services', 'highest_connect_type', 'providers_typical_category',
                                      'free_and_reduced', 'copper_line', 'consultants_cat',
-                                     'upstream_conditions_met', 'isp_conditions_met', 'ia_circuit_only',
-                                     'wireless_service', 'wan_fiber_3_lines', 'likely_wan_fiber', 'exception_not_fiber',
+                                      'isp_conditions_met', 'ia_circuit_only',
+                                     'wireless_service', 'wan_fiber_3_lines', 'likely_wan_fiber',
                                      'likely_other_uncategorized', 'entity_type', 'other_location_no_district')]
+
+mo_nm_crimson$frn_complete <- as.character(mo_nm_crimson$frn_complete)
+
+mo_nm_crimson <- mo_nm_crimson[mo_nm_crimson$other_location_no_district != 'true',]
+
 
 
 
@@ -137,7 +150,7 @@ connect.forest <- randomForest(as.factor(connect_category) ~ bandwidth_in_mbps +
                                + cost_per_line + num_students + num_of_services + highest_connect_type
                                + providers_typical_category + free_and_reduced + copper_line
                                + isp_conditions_met + ia_circuit_only + wireless_service + wan_fiber_3_lines
-                               + exception_not_fiber + likely_other_uncategorized + entity_type,
+                                + likely_other_uncategorized,
                                data=compacted_joined, importance=T, ntree=501)
 
 
@@ -146,19 +159,50 @@ varImpPlot(connect.forest)
 
 
 summary(mo_nm_crimson)
+sapply(mo_nm_crimson, class)
+sapply(compacted_joined, class)
+
 summary(compacted_joined)
+
+# sapply(connect.forest, levels)
 
 predict.forest <- predict(connect.forest, mo_nm_crimson)
 
 ### Showing results:
-results <- data.frame(predicted_category = predict.forest, raw_category = mo_nm_crimson$connect_category, mo_nm_crimson$frn_complete)
+results <- data.frame(predicted_category = predict.forest, raw_category = mo_nm_crimson$connect_category, frn_complete = mo_nm_crimson$frn_complete)
 
 results$guessed_differently <- results$raw_category != results$predicted_category
 
 # clean up factors issue
 
+results <- merge(x = results, y = mo_nm_onyx, by = 'frn_complete', all.x=TRUE)
+
 View(results)
-# confusionMatrix(predict.forest, reference=test_data$connect_category.y)
+
+final_results <- data.frame(verified_category = results$connect_category, predicted_category = results$predicted_category, raw_category = results$raw_category, frn_complete = results$frn_complete)
+
+nrow(final_results)
+final_results <- na.omit(final_results)
+nrow(final_results)
+
+final_results$guessed_correct <- final_results$verified_category == final_results$predicted_category
+final_results$cleaned_line_item <- (final_results$verified_category == final_results$predicted_category) & (final_results$raw_category != final_results$predicted_category)
+final_results$made_line_item_dirty <- (final_results$raw_category == final_results$verified_category) & (final_results$predicted_category != final_results$verified_category)
+
+final_results$dirty_line_item <- final_results$raw_category != final_results$predicted_category
+
+
+table(final_results$guessed_correct)
+table(final_results$dirty_line_item)
+table(final_results$cleaned_line_item)
+table(final_results$made_line_item_dirty)
+
+
+write.csv(final_results, file = "mo_nm_results.csv")
+
+View(final_results)
+
+
 
 
 
