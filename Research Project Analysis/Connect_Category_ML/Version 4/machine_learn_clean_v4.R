@@ -11,15 +11,24 @@ library(rfUtilities)
 # install.packages('randomForestSRC')
 library(randomForestSRC)
 # install.packages('caret')
+# install.packages("RPostgreSQL")
+# require("RPostgreSQL")
+
+
+# loads the PostgreSQL driver
+
+
 
 setwd("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4")
 
-raw_lis <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/original_line_items_v4.csv")
-nrow(raw_lis)
-# View(raw_lis)
+
 
 verified_lis <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/verified_line_items_v4.csv")
+
+raw_lis <- read.csv("~/Desktop/ESH/ficher/Research Project Analysis/Connect_Category_ML/Version 4/original_line_items_v4.csv")
+
 nrow(verified_lis)
+summary(verified_lis)
 # View(verified_lis)
 
 # left join both datasets
@@ -36,7 +45,12 @@ compacted_joined <- joined[, c('connect_category.y', 'connect_category.x', 'frn_
 # so we want to be careful here about how we handle missing values.)
 # View(compacted_joined)
 nrow(compacted_joined)
+ 
+summary(compacted_joined)
+
+
 compacted_joined <- na.omit(compacted_joined)
+
 
 nrow(compacted_joined) # 6519 Observations before splitting
 
