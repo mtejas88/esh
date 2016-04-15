@@ -94,6 +94,19 @@ services$bubble_size <- ifelse(services$monthly_cost_per_circuit < services$q10,
                               ifelse(services$monthly_cost_per_circuit < services$q50, 6,
                                     ifelse(services$monthly_cost_per_circuit < services$q90, 9, 12)))
 
+# the auto-update experiment kind of failed
+services$price_bucket_beta <- ifelse(services$monthly_cost_per_circuit < 1000, "less than $1,000",
+                                ifelse(services$monthly_cost_per_circuit < 2000, "$1,000 - less than $2,000",
+                                       ifelse(services$monthly_cost_per_circuit < 4000, "$2,000 - less than $4,000",
+                                              ifelse(services$monthly_cost_per_circuit < 6000, "$4,000 - less than $6,000", "more than $6,000"))))
+                                  
+services$bubble_size_beta <- ifelse(services$monthly_cost_per_circuit < 1000, 3,
+                                     ifelse(services$monthly_cost_per_circuit < 2000, 6,
+                                            ifelse(services$monthly_cost_per_circuit < 4000, 9,
+                                                   ifelse(services$monthly_cost_per_circuit < 6000, 12, 15))))
+
+
+
 # filter to relevant columns
 # names(services)
 
@@ -102,7 +115,8 @@ services <- dplyr::select(services, recipient_id, postal_cd,
                           num_students, num_schools, latitude, longitude,
                           locale, district_size, band_factor, new_purpose,
                           monthly_cost_per_circuit, monthly_cost_per_mbps,
-                          new_connect_type, national, q10, q50, q90, bubble_size, price_bucket)
+                          new_connect_type, national, q10, q50, q90, bubble_size,
+                          price_bucket, bubble_size_beta, price_bucket_beta)
 
 
 ### DELUXE DISTRICTS TABLE:  prepping the data to be the correct subset to use ###

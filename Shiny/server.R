@@ -54,12 +54,27 @@ li_map <- reactive({
   selected_state <- paste0('\"',input$state, '\"')
   
   services %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    filter(band_factor %in% input$bandwidths,
+           new_purpose %in% input$purpose,
+           district_size %in% input$district_size,
+           locale %in% input$locale,
+           new_connect_type %in% input$connection_services,
+           !(postal_cd %in% c('AK', 'HI')))
+  
+})
+
+li_map_litfiber <- reactive({
+  
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  services %>% 
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(band_factor %in% c(100),
+    filter(band_factor == 100,
            new_purpose %in% c("Internet"),
            new_connect_type %in% c("Lit Fiber"),
-           #district_size %in% input$district_size,
-           #locale %in% input$locale,
+           district_size %in% input$district_size,
+           locale %in% input$locale,
            !(postal_cd %in% c('AK', 'HI')))
   
 })
@@ -621,13 +636,69 @@ output$map_fiber_needs <- renderPlot({
 })  
 
 # Price Dispersion Map holding Circuit Size / Technology Constant
-# limit to lit fiber, 100 mbps, internet only 
-
-output$map_price_dispersion_testing <- renderPlot({
+# automatic update -- not quite working out
+output$map_price_dispersion_automatic <- renderPlot({
   
   data <- li_map()
-  data <- data[!is.na(data$bubble_size), ]   # remove those outside of common bandwidths
-          
+  # data <- data[!is.na(data$bubble_size_beta), ]   # remove those outside of common bandwidths
+  
+  validate(
+    need(nrow(data) > 0, "No districts in given subset")
+  )
+  
+  state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
+                                            'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
+                                            'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
+                                            'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey',
+                                            'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon',
+                                            'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+                                            'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming'),
+                                   
+                                   code = c('.', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
+                                            "GA", 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+                                            'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+                                            'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+                                            'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
+  
+  state_name <- state_lookup$name[state_lookup$code == input$state] 
+  state_df <- map_data("county", region = state_name)
+  
+  set.seed(123) #to control jitter
+  state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) + 
+    geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
+                 color = 'black', fill = NA) +
+    theme_classic() +
+    theme(line = element_blank(), title = element_blank(), 
+          axis.text.x = element_blank(), axis.text.y = element_blank())
+  #                      legend.text = element_text(size = 16), legend.position = "bottom") 
+  # guides(shape = guide_legend(override.aes = list(size = 7))) 
+  
+  q <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, 
+                                size = factor(bubble_size), 
+                                order = factor(price_bucket)),
+               colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
+    scale_size_manual(values = data$bubble_size, 
+                      limits = data$bubble_size, 
+                      label = data$price_bucket) + 
+    guides(col = guide_legend(nrow = 5)) 
+    #ggtitle("100 mbps Lit Fiber IA Price Dispersion\n(Filters are inactive in this view)\n\n\n")
+  #     theme(legend.position="bottom")
+  
+  print(q + coord_map())
+  
+  
+})  
+
+
+
+# limit to lit fiber, 100 mbps, internet only 
+
+output$map_price_dispersion_litfiber_ia_100mbps <- renderPlot({
+  
+  data <- li_map_litfiber()
+  # data <- data[!is.na(data$bubble_size_beta), ]   # remove those outside of common bandwidths
+  
   validate(
     need(nrow(data) > 0, "No districts in given subset")
   )
@@ -654,16 +725,25 @@ state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) +
                geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
                            color = 'black', fill = NA) +
                 theme_classic() +
-                theme(line = element_blank(), title = element_blank(), 
-                      axis.text.x = element_blank(), axis.text.y = element_blank())
+                theme(line = element_blank(), #title = element_blank(), 
+                      axis.text = element_blank())
 #                      legend.text = element_text(size = 16), legend.position = "bottom") 
-                #guides(shape = guide_legend(override.aes = list(size = 7))) 
+                # guides(shape = guide_legend(override.aes = list(size = 7))) 
 
 q <- state_base + 
-     geom_point(data = data, aes(x = longitude, y = latitude, group = price_bucket, size = factor(bubble_size)),
+     geom_point(data = data, aes(x = longitude, y = latitude, #group = price_bucket_beta, 
+                                 size = factor(bubble_size_beta), 
+                                 order = factor(price_bucket_beta, 
+                                                levels = c("less than $1,000", "$1,000 - less than $2,000",  "$2,000 - less than $4,000", "$4,000 - less than $6,000", "more than $6,000"))        ),
                 colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
-     scale_size_manual(values = data$bubble_size, limits = data$bubble_size, breaks = data$bubble_size, label = data$price_bucket) + 
-     guides(col = guide_legend(nrow = 4)) 
+     scale_size_manual(values = data$bubble_size_beta, 
+                       limits = data$bubble_size_beta, 
+                       label = data$price_bucket_beta) + 
+     guides(col = guide_legend(nrow = 5)) +
+     ggtitle("100 mbps Lit Fiber IA Price Dispersion\n(Filters are inactive in this view)\n\n\n") +
+     theme(line = element_blank(), #title = element_blank(), 
+           axis.text = element_blank(),
+           axis.title = element_blank())
 #     theme(legend.position="bottom")
 
 print(q + coord_map())

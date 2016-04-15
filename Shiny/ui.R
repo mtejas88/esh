@@ -173,7 +173,8 @@ shinyUI(fluidPage(
                             tabPanel("100k Goal Map (no oversub)", plotOutput("goals100k_map"), textOutput("n_ddt3")),
                             tabPanel("1Mbps Goal Map (w/ oversub)", plotOutput("goals1M_map"), textOutput("n_ddt4")),
                             tabPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")),
-                            tabPanel("testing", plotOutput("map_price_dispersion"))), #closing navbarMenu
+                            tabPanel("Price Dispersion: Automatic, in development", plotOutput("map_price_dispersion_automatic")), #closing navbarMenu
+                            tabPanel("Price Dispersion: Lit Fiber IA - 100 mbps", plotOutput("map_price_dispersion_litfiber_ia_100mbps"))), #closing navbarMenu
                  tabPanel("View Underlying Data", h3(tableOutput("table")))
       ) #closing navbarPage
     ) #closing mainPanel"
