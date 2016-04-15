@@ -8,7 +8,22 @@ sapply(lib, function(x) require(x, character.only = TRUE))
 
 services_check <- read.csv("services_received_shiny.csv", as.is = TRUE)
 districts_check <- read.csv("districts_shiny.csv", as.is = TRUE)
+
+
   
+data <- districts_check %>%
+        filter(exclude_from_analysis == FALSE) %>%
+        filter(not_all_scalable == 1) %>%
+        filter(postal_cd == "IL")
+
+data <- dplyr::select(data, esh_id, name, postal_cd, c1_discount_rate, not_all_scalable, 
+               nga_v2_known_unscalable_campuses, nga_v2_assumed_unscalable_campuses, zero_build_cost_to_district)
+
+#%>%
+        group_by(zero_build_cost_to_district) %>%
+        summarize(n = n())
+
+
 data <- services_check %>%
         filter(postal_cd == "PA") %>%
         filter(internet_conditions_met == TRUE) %>%

@@ -172,12 +172,10 @@ shinyUI(fluidPage(
                             tabPanel("Clean/Dirty Map", plotOutput("gen_map"), textOutput("n_ddt2")),
                             tabPanel("100k Goal Map (no oversub)", plotOutput("goals100k_map"), textOutput("n_ddt3")),
                             tabPanel("1Mbps Goal Map (w/ oversub)", plotOutput("goals1M_map"), textOutput("n_ddt4")),
-                            tabPanel("Districts s/ Min. 1 Unscalable School", plotOutput("unscalable"), textOutput("n_ddt5"))), #closing navbarMenu
+                            tabPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")),
+                            tabPanel("testing", plotOutput("map_price_dispersion"))), #closing navbarMenu
                  tabPanel("View Underlying Data", h3(tableOutput("table")))
       ) #closing navbarPage
     ) #closing mainPanel"
-    
-    
-    
   ) #closing sidebarLayout
     )) #closing shinyUI and fluidPage

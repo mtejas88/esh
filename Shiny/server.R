@@ -1,3 +1,8 @@
+# Clear the console
+cat("\014")
+# Remove every object in the environment
+rm(list = ls())
+
 lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
 sapply(lib, function(x) require(x, character.only = TRUE))
 
@@ -43,6 +48,22 @@ li_bf <- reactive({
              new_connect_type %in% input$connection_services) %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
 }) 
+
+li_map <- reactive({
+  
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  services %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(band_factor %in% c(100),
+           new_purpose %in% c("Internet"),
+           new_connect_type %in% c("Lit Fiber"),
+           #district_size %in% input$district_size,
+           #locale %in% input$locale,
+           !(postal_cd %in% c('AK', 'HI')))
+  
+})
+
   
 district_subset <- reactive({
       
@@ -109,7 +130,7 @@ output$bw_plot <- renderPlot({
       
   a <- p0 + 
        coord_cartesian(ylim = ylim1 * 2.0) + 
-       scale_y_continuous("",labels=dollar) +
+       scale_y_continuous("", labels = dollar) +
     #   geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
      #            size = 5, vjust = -.3, colour= "#F26B21", hjust=.5)+
        theme_classic() + 
@@ -169,12 +190,12 @@ output$state_vs_rest_comparison <- renderPlot({
   #####
   
   give.n <- function(x){
-    return(c(y = median(x)*0.85, label = length(x))) 
+    return(c(y = median(x) * 0.85, label = length(x))) 
     # experiment with the multiplier to find the perfect position
   }
   
   p0 <- ggplot(li_all2, aes(x=postal_cd, y = monthly_cost_per_circuit)) + 
-        geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) 
+        geom_boxplot(fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) 
      #   stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
       
   ylim1 <- boxplot.stats(li_all2$monthly_cost_per_circuit)$stats[c(1, 5)]
@@ -183,20 +204,20 @@ output$state_vs_rest_comparison <- renderPlot({
           group_by(postal_cd) %>% 
           summarise(medians = median(monthly_cost_per_circuit))
   
-  dollar_format(largest_with_cents=1)
+  dollar_format(largest_with_cents = 1)
   
   b <- p0 + 
-      coord_cartesian(ylim = ylim1*2.0) +
-      scale_y_continuous("",labels=dollar) +
+      coord_cartesian(ylim = ylim1 * 2.0) +
+      scale_y_continuous("",labels = dollar) +
       geom_text(data = meds, aes(x = postal_cd, y = medians, label = dollar(medians)), 
                 size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_blank(), 
-            axis.text.x=element_text(size=14, colour= "#899DA4"), 
-            axis.text.y=element_text(size=14, colour= "#899DA4"),
-            axis.ticks=element_blank(),
-            axis.title.x=element_blank(),
-            axis.title.y=element_blank())
+            axis.text.x = element_text(size = 14, colour = "#899DA4"), 
+            axis.text.y = element_text(size = 14, colour = "#899DA4"),
+            axis.ticks = element_blank(),
+            axis.title.x = element_blank(),
+            axis.title.y = element_blank())
     print(b)
   })
 
@@ -235,8 +256,8 @@ output$overall_national_comparison <- renderPlot({
         geom_boxplot(data = li_all2, aes(x = national, y = monthly_cost_per_circuit),
                      fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) +
         stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) +
-        geom_boxplot(data = li_all2[li_all2$postal_cd==input$state,], aes(x = postal_cd, y = monthly_cost_per_circuit), 
-                     fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) +
+        geom_boxplot(data = li_all2[li_all2$postal_cd == input$state,], aes(x = postal_cd, y = monthly_cost_per_circuit), 
+                     fill="#009291", colour = "#ABBFC6", outlier.colour=NA, width=.5) +
         stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
   
   ylim1 <- boxplot.stats(li_all2$monthly_cost_per_circuit)$stats[c(1, 5)]
@@ -246,7 +267,7 @@ output$overall_national_comparison <- renderPlot({
                      summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
   state_median <-    li_all2 %>% 
                      group_by(postal_cd) %>% 
-                     filter(postal_cd==input$state) %>% 
+                     filter(postal_cd == input$state) %>% 
                      summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
   dollar_format(largest_with_cents=1)
   
@@ -290,8 +311,6 @@ output$state_n_table <- renderTable({
     group_by(postal_cd) %>% 
     summarise(num_line_items = n(), 
               num_circuits = sum(line_item_total_num_lines))
-  
-  
   
 })
 
@@ -358,7 +377,7 @@ output$choose_district <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -383,11 +402,9 @@ output$choose_district <- renderPlot({
 
 output$pop_map <- renderPlot({
   
-  
   validate(
     need(nrow(district_subset()) > 0, "No districts in given subset")
   )
-  
   
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
                                             'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
@@ -404,7 +421,7 @@ output$pop_map <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -420,18 +437,15 @@ output$pop_map <- renderPlot({
                                alpha = 0.7, size = 6) #+ #, position = position_jitter(w = 0.07, h = 0.05)) +
   #scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
   #scale_color_manual(values = colors)
-  
   print(q + coord_map())
   
 })
 
 output$gen_map <- renderPlot({
   
-  
   validate(
     need(nrow(district_subset()) > 0, "No districts in given subset")
   )
-  
   
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
                                             'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
@@ -448,7 +462,7 @@ output$gen_map <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -463,7 +477,6 @@ output$gen_map <- renderPlot({
        geom_point(data = district_subset(), aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
                                alpha = 0.7, size = 6) + #, position = position_jitter(w = 0.07, h = 0.05)) +
        scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
-  #scale_color_manual(values = colors)
   
   print(q + coord_map())
   
@@ -493,7 +506,7 @@ output$goals100k_map <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
 
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -509,7 +522,6 @@ output$goals100k_map <- renderPlot({
                                                                                       "Does Not Meet 100k/student Goal"), values = c("#009296", "#CCCCCC"))
   
   print(q + coord_map())
-  
   
 })  
 
@@ -536,7 +548,7 @@ output$goals1M_map <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -558,11 +570,17 @@ output$goals1M_map <- renderPlot({
 })  
 
 # Map of Districts at least 1 Unscalable School
-output$unscalable <- renderPlot({
+output$map_fiber_needs <- renderPlot({
+  
+  data <- district_subset()
   
   validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
+    need(nrow(data) > 0, "No districts in given subset")
   )
+  
+  # limit to districts that have at least one unscalable campus
+  ddt_unscalable <- data %>% 
+                    filter(not_all_scalable == 1)
   
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
                                             'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
@@ -579,7 +597,7 @@ output$unscalable <- renderPlot({
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("state", region = state_name)
+  state_df <- map_data("county", region = state_name)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
@@ -587,54 +605,109 @@ output$unscalable <- renderPlot({
     theme_classic() +
     theme(line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position="bottom") +
-    guides(shape=guide_legend(override.aes=list(size=7))) 
+          legend.text = element_text(size = 16), legend.position = "bottom") +
+    guides(shape = guide_legend(override.aes=list(size = 7))) 
   
-  ddt_unscalable <- district_subset() %>% 
-                    filter(not_all_scalable == 1)
-  
-  q <- state_base + geom_point(data = ddt_unscalable, aes(x = longitude, y = latitude, colour = "Districts with at least \n one non-scalable school"), 
-                               alpha = 0.8, size = 6) + scale_color_manual(values = c("#0073B6")) 
-
-  
+  q <- state_base + 
+       geom_point(data = ddt_unscalable, 
+                  aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
+                 alpha = 0.8, size = 6) +
+       scale_color_manual(values = c("#A3E5E6", "#0073B6"), 
+                          breaks = c(0, 1), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"))
+    
   print(q + coord_map())
   
   
 })  
 
+# Price Dispersion Map holding Circuit Size / Technology Constant
+# limit to lit fiber, 100 mbps, internet only 
+
+output$map_price_dispersion_testing <- renderPlot({
+  
+  data <- li_map()
+  data <- data[!is.na(data$bubble_size), ]   # remove those outside of common bandwidths
+          
+  validate(
+    need(nrow(data) > 0, "No districts in given subset")
+  )
+  
+state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
+                                          'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
+                                          'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
+                                          'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey',
+                                          'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon',
+                                          'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+                                          'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming'),
+                                 
+                                 code = c('.', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
+                                          "GA", 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+                                          'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+                                          'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+                                          'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
+
+state_name <- state_lookup$name[state_lookup$code == input$state] 
+state_df <- map_data("county", region = state_name)
+
+set.seed(123) #to control jitter
+state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) + 
+               geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
+                           color = 'black', fill = NA) +
+                theme_classic() +
+                theme(line = element_blank(), title = element_blank(), 
+                      axis.text.x = element_blank(), axis.text.y = element_blank())
+#                      legend.text = element_text(size = 16), legend.position = "bottom") 
+                #guides(shape = guide_legend(override.aes = list(size = 7))) 
+
+q <- state_base + 
+     geom_point(data = data, aes(x = longitude, y = latitude, group = price_bucket, size = factor(bubble_size)),
+                colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
+     scale_size_manual(values = data$bubble_size, limits = data$bubble_size, breaks = data$bubble_size, label = data$price_bucket) + 
+     guides(col = guide_legend(nrow = 4)) 
+#     theme(legend.position="bottom")
+
+print(q + coord_map())
+
+
+})  
+
+
+
+
 
 output$n_ddt <- renderText({
   
-  district_subset <- district_subset()
-  paste("n =", toString(nrow(district_subset)))
+  data <- district_subset()
+  paste("n =", toString(nrow(data)))
   
 })
 
 output$n_ddt2 <- renderText({
   
-  district_subset <- district_subset()
-  paste("n =", toString(nrow(district_subset)))
+  data <- district_subset()
+  paste("n =", toString(nrow(data)))
   
 })
 
 output$n_ddt3 <- renderText({
   
-  district_subset <- district_subset()
-  paste("n =", toString(nrow(district_subset)))
+  data <- district_subset()
+  paste("n =", toString(nrow(data)))
   
 })
 
 output$n_ddt4 <- renderText({
   
-  district_subset <- district_subset()
-  paste("n =", toString(nrow(district_subset)))
+  data <- district_subset()
+  paste("n =", toString(nrow(data)))
   
 })
 
 output$n_ddt5 <- renderText({
   
-  district_unscalable <- district_subset() %>% filter(percent_scalable_ia != "All Scaleable IA")
-  paste("n =", toString(nrow(district_unscalable)))
+  data <- district_subset() %>% 
+          filter(not_all_scalable == 1)
+  paste("n =", toString(nrow(data)))
   
 })
 
