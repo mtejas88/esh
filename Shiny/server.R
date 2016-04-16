@@ -1,20 +1,20 @@
 # Clear the console
-cat("\014")
+#cat("\014")
 # Remove every object in the environment
-rm(list = ls())
+#rm(list = ls())
 
-lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
-sapply(lib, function(x) require(x, character.only = TRUE))
+#lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
+#sapply(lib, function(x) require(x, character.only = TRUE))
 
-wd <- "~/Google Drive/github/ficher/Shiny"
-setwd(wd)
+#wd <- "~/Desktop/ESH/ficher/Shiny"
+#setwd(wd)
 
-services <- read.csv("services_received_shiny.csv", as.is = TRUE)
-districts <- read.csv("districts_shiny.csv", as.is = TRUE)
+#services <- read.csv("services_received_shiny.csv", as.is = TRUE)
+#districts <- read.csv("districts_shiny.csv", as.is = TRUE)
 
 # factorize
-services$band_factor <- as.factor(services$band_factor)
-services$postal_cd <- as.factor(services$postal_cd)
+#services$band_factor <- as.factor(services$band_factor)
+#services$postal_cd <- as.factor(services$postal_cd)
 
 shinyServer(function(input, output, session) {
   
@@ -24,6 +24,21 @@ shinyServer(function(input, output, session) {
   
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
+  
+  
+  lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
+  sapply(lib, function(x) require(x, character.only = TRUE))
+  
+  services <- read.csv("services_received_shiny.csv", as.is = TRUE)
+  districts <- read.csv("districts_shiny.csv", as.is = TRUE)
+  
+  # factorize
+  services$band_factor <- as.factor(services$band_factor)
+  services$postal_cd <- as.factor(services$postal_cd)
+  
+  
+  
+  
   
 li_all <- reactive({
 
