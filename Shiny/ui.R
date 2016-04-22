@@ -159,7 +159,7 @@ shinyUI(fluidPage(
       navbarPage("",
                  tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/20/16", br())), width="300px"),
                  navbarMenu("ESH Sample",
-                            tabPanel("Sample vs. Population: Locale", plotOutput("locale_distribution")),
+                            tabPanel("Sample vs. Population: Locale", plotOutput("locale_distribution"), tableOutput("locale_table")),
                             tabPanel("Sample vs. Population: District Size", plotOutput("size_distribution"))),
                  navbarMenu("Affordability",
                             tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
@@ -171,10 +171,10 @@ shinyUI(fluidPage(
                             ),
                  navbarMenu("Maps", 
                             tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
-                            tabPanel("Gen. Population Map", plotOutput("pop_map"), textOutput("n_ddt")),
-                            tabPanel("Clean/Dirty Map", plotOutput("gen_map"), textOutput("n_ddt2")),
-                            tabPanel("100k Goal Map (no oversub)", plotOutput("goals100k_map"), textOutput("n_ddt3")),
-                            tabPanel("1Mbps Goal Map (w/ oversub)", plotOutput("goals1M_map"), textOutput("n_ddt4")),
+                            tabPanel("Districts in Population", plotOutput("map_population"), textOutput("n_ddt")),
+                            tabPanel("Clean/Dirty Districts", plotOutput("map_cleanliness"), textOutput("n_ddt2")),
+                            tabPanel("Districts Meeting 2014 IA Goal (no oversub)", plotOutput("map_2014_goals"), textOutput("n_ddt3")),
+                            tabPanel("Districts Meeting 2018 IA Goal (w/ oversub)", plotOutput("map_2018_goals"), textOutput("n_ddt4")),
                             tabPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")),
                             tabPanel("Price Dispersion: Automatic, in development", plotOutput("map_price_dispersion_automatic")), #closing navbarMenu
                             tabPanel("Price Dispersion: Lit Fiber IA - 100 mbps", plotOutput("map_price_dispersion_litfiber_ia_100mbps"))), #closing navbarMenu

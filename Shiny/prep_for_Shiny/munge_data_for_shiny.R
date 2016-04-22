@@ -182,9 +182,41 @@ districts$usac_c1_rural <- NULL
 districts$zero_build_cost_to_district <- ifelse(districts$c1_discount_rate >= 80, 1, 0)
 ## END
 
+## locale and district size cuts
+
+districts_clean <- districts %>%
+                   filter(exclude_from_analysis == FALSE)
+districts_clean$postal_cd <- paste0(districts_clean$postal_cd, " Clean")
+
+data <- rbind(districts, districts_clean)
+
+n_all <- data %>%
+         group_by(postal_cd) %>%
+         summarize(n = n())
+
+# by locale
+locale_cuts <- data %>%
+          group_by(postal_cd, locale) %>%
+          summarize(n_locale = n())
+
+locale_cuts <- left_join(cuts, n_all, by = c("postal_cd"))
+
+locale_cuts$percent <- round(100 * locale_cuts$n_locale / locale_cuts$n )
+
+# by districts
+size_cuts <- data %>%
+                  group_by(postal_cd, district_size) %>%
+                  summarize(n_locale = n())
+
+size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
+
+size_cuts$percent <- round(100 * size_cuts$n_locale / size_cuts$n )
+
 wd <- "~/Google Drive/github/ficher/Shiny"
 setwd(wd)
 
 # export
 write.csv(services, "services_received_shiny.csv", row.names = FALSE)
 write.csv(districts, "districts_shiny.csv", row.names = FALSE)
+write.csv(locale_cuts, "locale_cuts.cs\v", row.names = FALSE)
+write.csv(size_cuts, "size_cuts.csv", row.names = FALSE)

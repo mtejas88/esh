@@ -3,6 +3,10 @@
 # Remove every object in the environment
 #rm(list = ls())
 
+#wd <- "~/Google Drive/github/ficher/Shiny"
+#setwd(wd)
+
+
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -23,10 +27,15 @@ shinyServer(function(input, output, session) {
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
+  locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
+  size_cuts <- read.csv("size_cuts.csv", as.is = TRUE)
+  
   
   # factorize
   services$band_factor <- as.factor(services$band_factor)
   services$postal_cd <- as.factor(services$postal_cd)
+  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
   
   # state lookup
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
@@ -42,7 +51,6 @@ shinyServer(function(input, output, session) {
                                             'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
                                             'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
-  
   
   
 li_all <- reactive({
@@ -99,7 +107,6 @@ li_map_litfiber <- reactive({
   
 })
 
-  
 district_subset <- reactive({
       
     selected_dataset <- paste0('\"', input$dataset, '\"')
@@ -115,17 +122,71 @@ district_subset <- reactive({
 
   })
 
+state_subset_locale <- reactive({
+  
+  # only include options for state selection
+#  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  sample <- paste0(input$state, " Clean")
+  
+  locale_cuts %>% 
+    filter(postal_cd %in% c(input$state, sample))
+  
+})
+
+state_subset_size <- reactive({
+  
+  # only include options for state selection
+  #  selected_dataset <- paste0('\"', input$dataset, '\"')
+  sample <- paste0(input$state, " Clean")
+  
+  size_cuts %>% 
+    filter_(postal_cd %in% c(input$state, sample))
+})
+
 ######
 ## ESH Sample Dropdown
 ######
 output$locale_distribution <- renderPlot({
   
+  data <- state_subset_locale()
   
+  validate(
+    need(input$state != 'All', "Please select your state!")
+  )
+  
+  q <- ggplot(data = data) +
+       geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
+       theme_classic() + 
+       theme(axis.line = element_blank(), 
+             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.y=element_text(size=14, colour= "#899DA4"),
+             axis.ticks=element_blank(),
+             axis.title.x=element_blank(),
+             axis.title.y=element_blank()) 
+    #scale_x_discrete(breaks = c(50, 100, 500, 1000, 10000), labels = c("50 Mbps", "100 Mbps", "500 Mbps", "1 Gbps", "10 Gbps"), expand = c(0,0)) +
+    #scale_y_continuous(labels = scales::comma, expand = c(0,0))
+  
+  print(q)
   
 })
 
-output$size_distribution <- renderPlot({
+output$locale_table <- renderTable({
   
+  #data <- state_subset()
+  
+  #validate(
+   # need(input$state != 'All', "")
+  #)
+
+  
+})
+
+
+
+
+output$size_distribution <- renderPlot({
   
   
 })
@@ -378,27 +439,27 @@ output$state_n_table <- renderTable({
 ######
 output$districtSelect <- renderUI({
   
-  validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
-  )
-  district_list <- c(unique(as.character(district_subset()$name)))
+  data <- district_subset()
   
-  #   checkboxGroupInput("district_list", 
-  #                      h2("Select District"),
-  #                      choices = as.list(district_list),
-  #                      selected = c('All'))
+  validate(
+    need(nrow(data) > 0, "No districts in given subset")
+  )
+  
+  district_list <- c(unique(as.character(data$name)))
+  
   selectInput("district_list", h2("Select District"), as.list(district_list), multiple = T) 
 })
 
-
 output$choose_district <- renderPlot({
   
+  data <- district_subset()
+  
   selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
-  district_subset <- district_subset() %>% 
-                filter_(paste("name %in%", selected_district_list))
+  data <- data %>% 
+          filter_(paste("name %in%", selected_district_list))
   
   validate(
-    need(nrow(district_subset) > 0, "No districts in given subset")
+    need(nrow(data) > 0, "No districts in given subset")
   )
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
@@ -414,21 +475,21 @@ output$choose_district <- renderPlot({
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
-       geom_point(data = district_subset, aes(x = longitude, y = latitude), colour = c("#0073B6"),
-                               alpha = 0.7, size = 6) #+ #, position = position_jitter(w = 0.07, h = 0.05)) +
-  #scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
-  #scale_color_manual(values = colors)
+       geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
+                               alpha = 0.7, size = 6) 
   
   print(q + coord_map())
   
   
 })
 
-
-output$pop_map <- renderPlot({
+# map of districts in population 
+output$map_population <- renderPlot({
+  
+  data <- district_subset()
   
   validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
+    need(nrow(data) > 0, "No districts in given subset")
   )
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
@@ -444,7 +505,7 @@ output$pop_map <- renderPlot({
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
-       geom_point(data = district_subset(), aes(x = longitude, y = latitude), colour = c("#0073B6"),
+       geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
                                alpha = 0.7, size = 6) #+ #, position = position_jitter(w = 0.07, h = 0.05)) +
   #scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
   #scale_color_manual(values = colors)
@@ -452,10 +513,12 @@ output$pop_map <- renderPlot({
   
 })
 
-output$gen_map <- renderPlot({
+output$map_cleanliness <- renderPlot({
+  
+  data <- district_subset()
   
   validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
+    need(nrow(data) > 0, "No districts in given subset")
   )
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
@@ -471,7 +534,7 @@ output$gen_map <- renderPlot({
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
-       geom_point(data = district_subset(), aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
+       geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
                                alpha = 0.7, size = 6) + #, position = position_jitter(w = 0.07, h = 0.05)) +
        scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
   
@@ -480,8 +543,7 @@ output$gen_map <- renderPlot({
   
 })  
 
-
-output$goals100k_map <- renderPlot({
+output$map_2014_goals <- renderPlot({
   
   validate(
     need(nrow(district_subset()) > 0, "No districts in given subset")
@@ -507,8 +569,7 @@ output$goals100k_map <- renderPlot({
   
 })  
 
-
-output$goals1M_map <- renderPlot({
+output$map_2018_goals <- renderPlot({
   
   validate(
     need(nrow(district_subset()) > 0, "No districts in given subset")
@@ -532,7 +593,6 @@ output$goals1M_map <- renderPlot({
                                                                                       "Does Not Meet 1Mbps/student Goal"), values = c("#A3E5E6", "#CCCCCC")) #+
   
   print(q + coord_map())
-  
   
 })  
 
