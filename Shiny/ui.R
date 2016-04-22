@@ -159,10 +159,8 @@ shinyUI(fluidPage(
       navbarPage("",
                  tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/20/16", br())), width="300px"),
                  navbarMenu("ESH Sample",
-                            tabPanel("Sample vs. Population Locale Distribution", plotOutput("demography"))),
-                 navbarMenu("ESH Sample",
-                            tabPanel("Sample vs. Population Locale Distribution", plotOutput("demography"))),
-                 
+                            tabPanel("Sample vs. Population: Locale", plotOutput("locale_distribution")),
+                            tabPanel("Sample vs. Population: District Size", plotOutput("size_distribution"))),
                  navbarMenu("Affordability",
                             tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
                             tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
