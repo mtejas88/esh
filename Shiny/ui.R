@@ -157,10 +157,15 @@ shinyUI(fluidPage(
     
     mainPanel(
       navbarPage("",
-                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/14/16", br())), width="300px"),
-                 navbarMenu("Cost",
-                            tabPanel("Cost: Frequency of Bandwidths by Line Item", plotOutput("plot")),
-                            tabPanel("Cost: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
+                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/20/16", br())), width="300px"),
+                 navbarMenu("ESH Sample",
+                            tabPanel("Sample vs. Population Locale Distribution", plotOutput("demography"))),
+                 navbarMenu("ESH Sample",
+                            tabPanel("Sample vs. Population Locale Distribution", plotOutput("demography"))),
+                 
+                 navbarMenu("Affordability",
+                            tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
+                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
                             tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
                             tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             #,

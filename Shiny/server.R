@@ -25,9 +25,14 @@ shinyServer(function(input, output, session) {
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
   
-  
-  lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
-  sapply(lib, function(x) require(x, character.only = TRUE))
+  library("dplyr")
+  library("shiny")
+  library("tidyr")
+  library("ggplot2")
+  library("scales")
+  library("grid")
+  library("maps")
+  library("ggmap")
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
@@ -35,9 +40,6 @@ shinyServer(function(input, output, session) {
   # factorize
   services$band_factor <- as.factor(services$band_factor)
   services$postal_cd <- as.factor(services$postal_cd)
-  
-  
-  
   
   
 li_all <- reactive({
@@ -109,8 +111,30 @@ district_subset <- reactive({
            !(postal_cd %in% c('AK', 'HI')))
 
   })
+
+######
+## Demography Dropdown
+######
+output$demography <- renderPlot({
   
-## Histogram for banded factors ##
+  
+  
+})
+
+
+######
+## Goals Section
+######
+
+######
+## Fiber Section
+######
+
+######
+ ## Affordability Section
+######
+ 
+ ## Histogram for banded factors ##
 output$plot <- renderPlot({
   
   data <- li_bf()
@@ -132,8 +156,7 @@ output$plot <- renderPlot({
   
   })
 
-## Box and Whiskers Plot
-## use li_bf, only for selected circuit sizes
+## Box and Whiskers Plot - use li_bf, only for selected circuit sizes
 
 output$bw_plot <- renderPlot({
   
@@ -200,8 +223,6 @@ output$prices_table <- renderTable({
               max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE)))
   
 })
-
-
 
 ## Comparison: Specific State vs. the Rest of the States 
 output$state_vs_rest_comparison <- renderPlot({
@@ -344,29 +365,9 @@ output$state_n_table <- renderTable({
   
 })
 
-  
-#output$hist <- renderPlot({
-#  
- # data <- li_bf()
-  
-#  validate(need(nrow(data) > 0, "No circuits in given subset"))
-  
-#  ggplot(li_bf(), aes(x = monthly_cost_per_mbps)) + geom_histogram(fill="#009291", colour="#FFFFFF") +
-#    scale_x_continuous(labels=dollar) + xlab("Distribution of Monthly Cost per Mbps") +
-##    theme_classic() + 
-  #  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-   ##      axis.text.x=element_text(size=7, colour= "#899DA4"), 
-     #     axis.text.y=element_text(size=7, colour= "#899DA4"),
-      #    axis.ticks=element_blank(),
-       #   axis.title.x=element_text(size=9, colour= "#899DA4", vjust=-1),
-        #  axis.title.y=element_blank(),
-        #  panel.background = element_rect(colour = "#FFFFFF", fill ="#FFFFFF"),
-         # plot.background = element_rect(colour = "#FFFFFF", fill ="#FFFFFF"),
-        #  legend.background = element_rect(colour = "#FFFFFF", fill ="#FFFFFF"),
-         # plot.margin = unit(c(1,1,1,1), "cm"))
-  
-#},res=140)  
-
+###### 
+## Maps
+######
 output$districtSelect <- renderUI({
   
   validate(
