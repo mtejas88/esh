@@ -122,6 +122,9 @@ services <- dplyr::select(services, recipient_id, postal_cd,
 ### DELUXE DISTRICTS TABLE:  prepping the data to be the correct subset to use ###
 districts$ia_bandwidth_per_student <- as.numeric(districts$ia_bandwidth_per_student)
 
+## Keep original goals variables
+districts$meeting_goals_numeric <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 1, 0)
+
 # New Variables for mapping #
 districts$exclude <- ifelse(districts$exclude_from_analysis == "FALSE", "Clean", "Dirty")
 districts$meeting_2014_goal_no_oversub <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 
@@ -199,9 +202,12 @@ locale_cuts <- data %>%
           group_by(postal_cd, locale) %>%
           summarize(n_locale = n())
 
-locale_cuts <- left_join(cuts, n_all, by = c("postal_cd"))
+locale_cuts <- left_join(locale_cuts, n_all, by = c("postal_cd"))
 
 locale_cuts$percent <- round(100 * locale_cuts$n_locale / locale_cuts$n )
+
+locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+locale_cuts <- arrange(locale_cuts, postal_cd, locale)
 
 # by districts
 size_cuts <- data %>%
@@ -212,11 +218,14 @@ size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
 size_cuts$percent <- round(100 * size_cuts$n_locale / size_cuts$n )
 
+size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
+size_cuts <- arrange(size_cuts, postal_cd, district_size)
+
 wd <- "~/Google Drive/github/ficher/Shiny"
 setwd(wd)
 
 # export
 write.csv(services, "services_received_shiny.csv", row.names = FALSE)
 write.csv(districts, "districts_shiny.csv", row.names = FALSE)
-write.csv(locale_cuts, "locale_cuts.cs\v", row.names = FALSE)
+write.csv(locale_cuts, "locale_cuts.csv", row.names = FALSE)
 write.csv(size_cuts, "size_cuts.csv", row.names = FALSE)

@@ -35,7 +35,7 @@ shinyServer(function(input, output, session) {
   services$band_factor <- as.factor(services$band_factor)
   services$postal_cd <- as.factor(services$postal_cd)
   locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
-  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
+  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
   
   # state lookup
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
@@ -122,12 +122,15 @@ district_subset <- reactive({
 
   })
 
+######
+## reactive functions for ESH Sample section
+######
+
 state_subset_locale <- reactive({
   
   # only include options for state selection
-#  selected_dataset <- paste0('\"', input$dataset, '\"')
+  #  selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
-  
   sample <- paste0(input$state, " Clean")
   
   locale_cuts %>% 
@@ -139,21 +142,44 @@ state_subset_size <- reactive({
   
   # only include options for state selection
   #  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
   sample <- paste0(input$state, " Clean")
   
   size_cuts %>% 
-    filter_(postal_cd %in% c(input$state, sample))
+    filter(postal_cd %in% c(input$state, sample))
 })
+
+##### reactive functions for goals section
+district_goals <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(new_connect_type %in% input$connection_districts, 
+           district_size %in% input$district_size,
+           locale %in% input$locale)
+  
+})
+
+
+
+
+####### OUTPUTS
 
 ######
 ## ESH Sample Dropdown
 ######
-output$locale_distribution <- renderPlot({
+
+## locale distribution
+output$histogram_locale <- renderPlot({
   
   data <- state_subset_locale()
   
   validate(
-    need(input$state != 'All', "Please select your state!")
+    need(input$state != 'All', "Please select your state.")
   )
   
   q <- ggplot(data = data) +
@@ -161,39 +187,101 @@ output$locale_distribution <- renderPlot({
        theme_classic() + 
        theme(axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
-             axis.text.y=element_text(size=14, colour= "#899DA4"),
-             axis.ticks=element_blank(),
+             axis.text.y = element_blank(),
+             axis.ticks = element_blank(),
              axis.title.x=element_blank(),
              axis.title.y=element_blank()) 
-    #scale_x_discrete(breaks = c(50, 100, 500, 1000, 10000), labels = c("50 Mbps", "100 Mbps", "500 Mbps", "1 Gbps", "10 Gbps"), expand = c(0,0)) +
-    #scale_y_continuous(labels = scales::comma, expand = c(0,0))
-  
+    
   print(q)
   
 })
 
-output$locale_table <- renderTable({
+output$table_locale <- renderTable({
   
-  #data <- state_subset()
+  data <- state_subset_locale()
   
-  #validate(
-   # need(input$state != 'All', "")
-  #)
-
+  validate(
+    need(input$state != 'All', "")
+  )
+  
+  data
+  
+  })
+  
+## size distribution
+output$histogram_size <- renderPlot({
+  
+  data <- state_subset_size()
+  
+  validate(
+    need(input$state != 'All', "Please select your state.")
+  )
+  
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
   
 })
 
-
-
-
-output$size_distribution <- renderPlot({
+## size distribution table
+output$table_size <- renderTable({
   
+  data <- state_subset_size()
+  
+  validate(
+    need(input$state != 'All', "")
+  )
+  
+  data
   
 })
+
 
 ######
 ## Goals Section
 ######
+
+## Districts and Students Meeting Goals
+output$histogram_goals <- renderPlot({
+  
+  data <- district_goals()
+  
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+  
+})
+
+## Table of numbers in districts / students meeting goals
+output$table_goals <- renderTable({
+  
+  data <- state_subset_size()
+  
+  validate(
+    need(input$state != 'All', "")
+  )
+  
+  data
+  
+})
 
 ######
 ## Fiber Section
