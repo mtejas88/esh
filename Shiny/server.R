@@ -24,6 +24,7 @@ shinyServer(function(input, output, session) {
   library("grid")
   library("maps")
   library("ggmap")
+  library("reshape")
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
@@ -160,11 +161,11 @@ district_goals <- reactive({
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
-           locale %in% input$locale)
+           locale %in% input$locale) %>%
+    summarize(districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
 })
-
-
 
 
 ####### OUTPUTS
@@ -232,6 +233,7 @@ output$histogram_size <- renderPlot({
   
 })
 
+
 ## size distribution table
 output$table_size <- renderTable({
   
@@ -245,7 +247,6 @@ output$table_size <- renderTable({
   
 })
 
-
 ######
 ## Goals Section
 ######
@@ -255,33 +256,30 @@ output$histogram_goals <- renderPlot({
   
   data <- district_goals()
   
-  q <- ggplot(data = data) +
-    geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
-  
+  data <- melt(data)
+
+    q <- ggplot(data = data) +
+         geom_bar(aes(x = variable, y = value), stat = "identity") +
+         theme_classic() + 
+         theme(axis.line = element_blank(), 
+                axis.text.x=element_text(size=14, colour= "#899DA4"), 
+                axis.text.y = element_blank(),
+                axis.ticks = element_blank(),
+                axis.title.x=element_blank(),
+                axis.title.y=element_blank()) 
+      
   print(q)
-  
   
 })
 
 ## Table of numbers in districts / students meeting goals
 output$table_goals <- renderTable({
   
-  data <- state_subset_size()
+  data <- district_goals()
   
-  validate(
-    need(input$state != 'All', "")
-  )
-  
-  data
-  
+
 })
+
 
 ######
 ## Fiber Section

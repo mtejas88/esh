@@ -123,7 +123,9 @@ services <- dplyr::select(services, recipient_id, postal_cd,
 districts$ia_bandwidth_per_student <- as.numeric(districts$ia_bandwidth_per_student)
 
 ## Keep original goals variables
-districts$meeting_goals_numeric <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 1, 0)
+# District Meeting Goals: 1 if district is meeting goal
+districts$meeting_goals_district <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 1, 0)
+
 
 # New Variables for mapping #
 districts$exclude <- ifelse(districts$exclude_from_analysis == "FALSE", "Clean", "Dirty")
