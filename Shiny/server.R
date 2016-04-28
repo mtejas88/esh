@@ -162,10 +162,73 @@ district_goals <- reactive({
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
            locale %in% input$locale) %>%
-    summarize(districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
-              students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+    summarize(n = n(),
+              percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
 })
+
+##### districts (not) meeting goals by technology
+
+district_ia_meeting_goals <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(new_connect_type %in% input$connection_districts, 
+           district_size %in% input$district_size,
+           locale %in% input$locale) %>%
+    summarize(n = n(),
+              percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+  
+})
+
+##### reactive functions for fiber section
+
+### distribution of schools on fiber
+schools_on_fiber <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(new_connect_type %in% input$connection_districts, 
+           district_size %in% input$district_size,
+           locale %in% input$locale) %>%
+    summarize(num_schools = sum(num_campuses),
+              num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
+              num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses + nga_v2_assumed_unscalable_campuses),
+              percent_on_fiber = round(num_schools_on_fiber / sum(num_campuses), 2),
+              percent_need_upgrades = round(num_schools_need_upgrades / sum(num_campuses), 2))
+
+})
+
+### districts by c1 discount rates
+districts_erate_discounts <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(new_connect_type %in% input$connection_districts, 
+           district_size %in% input$district_size,
+           locale %in% input$locale,
+           !is.na(c1_discount_rate)) %>%
+    group_by(c1_discount_rate) %>%
+    summarize(n_districts_in_rate_category = n()) %>%
+    mutate(n_all_districts_in_calculation = sum(n_districts_in_rate_category),
+           percent_districts_in_rate_category = round(100 * n_districts_in_rate_category / n_all_districts_in_calculation, 2))
+
+})
+
 
 
 ####### OUTPUTS
@@ -256,10 +319,12 @@ output$histogram_goals <- renderPlot({
   
   data <- district_goals()
   
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
+  
   data <- melt(data)
 
-    q <- ggplot(data = data) +
-         geom_bar(aes(x = variable, y = value), stat = "identity") +
+  q <- ggplot(data = data[-which(data$variable == "n"), ]) +
+         geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
          theme_classic() + 
          theme(axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -280,16 +345,95 @@ output$table_goals <- renderTable({
 
 })
 
+## Districts Meeting Goals, by Technology
+
+output$histogram_districts_meeting_goals_ia <- renderPlot({
+  
+})
+
+output$table_districts_meeting_goals_ia <- renderPlot({
+  
+})
+
 
 ######
 ## Fiber Section
 ######
 
+## Districts and Students Meeting Goals
+output$histogram_schools_on_fiber <- renderPlot({
+  
+  
+  data <- schools_on_fiber()
+  
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
+  
+  data <- melt(data)
+  
+  q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_need_upgrades")), ]) +
+      geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
+      theme_classic() + 
+      theme(axis.line = element_blank(), 
+            axis.text.x=element_text(size=14, colour= "#899DA4"), 
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title.x=element_blank(),
+            axis.title.y=element_blank()) 
+    
+  print(q)
+  
+})
+
+## Table on distribution of schools by infrastructure type
+output$table_schools_on_fiber <- renderTable({
+  
+  data <- schools_on_fiber()
+  validate(need(nrow(data) > 0, ""))  
+  
+  data
+  
+})
+
+## Districts - E-rate Discount Rates
+
+output$histogram_districts_erate <- renderPlot({
+  
+  
+  data <- districts_erate_discounts()
+  
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
+
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = as.factor(c1_discount_rate), y = percent_districts_in_rate_category), fill="#009291", stat = "identity") +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+})
+
+## Table on distribution of schools by infrastructure type
+output$table_districts_erate <- renderTable({
+  
+  data <- districts_erate_discounts()
+  validate(need(nrow(data) > 0, ""))  
+  
+  data
+  
+})
+
+
+
 ######
  ## Affordability Section
 ######
  
- ## Histogram for banded factors ##
+## Histogram for banded factors ##
 output$plot <- renderPlot({
   
   data <- li_bf()
