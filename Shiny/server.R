@@ -7,6 +7,7 @@
 #setwd(wd)
 
 
+
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -28,6 +29,7 @@ shinyServer(function(input, output, session) {
 
   #library("reshape")
 
+  
   #lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
   library(shiny)
   library(tidyr)
