@@ -187,6 +187,28 @@ district_ia_meeting_goals <- reactive({
   
 })
 
+## WAN goals: current vs. projected needs
+
+projected_wan_needs <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(new_connect_type %in% input$connection_districts, 
+           district_size %in% input$district_size,
+           locale %in% input$locale) %>%
+    summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
+              n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
+              percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
+              n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
+              n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
+              percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
+      
+})
+
 ##### reactive functions for fiber section
 
 ### distribution of schools on fiber
@@ -210,7 +232,7 @@ schools_on_fiber <- reactive({
 })
 
 ### districts by c1 discount rates
-districts_erate_discounts <- reactive({
+by_erate_discounts <- reactive({
   
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
@@ -221,11 +243,12 @@ districts_erate_discounts <- reactive({
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
            locale %in% input$locale,
-           !is.na(c1_discount_rate)) %>%
+           !is.na(c1_discount_rate),
+           not_all_scalable == 1) %>% # only include districts that are unscalable
     group_by(c1_discount_rate) %>%
-    summarize(n_districts_in_rate_category = n()) %>%
-    mutate(n_all_districts_in_calculation = sum(n_districts_in_rate_category),
-           percent_districts_in_rate_category = round(100 * n_districts_in_rate_category / n_all_districts_in_calculation, 2))
+    summarize(n_unscalable_schools_in_rate_band = n()) %>%
+    mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
+           percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
 
 })
 
@@ -355,6 +378,40 @@ output$table_districts_meeting_goals_ia <- renderPlot({
   
 })
 
+## WAN Goals: Current vs. Projected Needs
+output$histogram_projected_wan_needs <- renderPlot({
+  
+  data <- projected_wan_needs()
+  
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
+  
+  data <- melt(data)
+  
+  q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")), ]) +
+    geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+  
+  
+})
+
+output$table_projected_wan_needs <- renderTable({
+  
+  data <- projected_wan_needs()
+  validate(need(nrow(data) > 0, ""))
+  
+  data
+  
+})
+
 
 ######
 ## Fiber Section
@@ -396,15 +453,15 @@ output$table_schools_on_fiber <- renderTable({
 
 ## Districts - E-rate Discount Rates
 
-output$histogram_districts_erate <- renderPlot({
+output$histogram_by_erate_discounts <- renderPlot({
   
   
-  data <- districts_erate_discounts()
+  data <- by_erate_discounts()
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
 
   q <- ggplot(data = data) +
-    geom_bar(aes(x = as.factor(c1_discount_rate), y = percent_districts_in_rate_category), fill="#009291", stat = "identity") +
+    geom_bar(aes(x = as.factor(c1_discount_rate), y = percent_unscalable_schools_in_rate_band), fill="#009291", stat = "identity") +
     theme_classic() + 
     theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -418,9 +475,9 @@ output$histogram_districts_erate <- renderPlot({
 })
 
 ## Table on distribution of schools by infrastructure type
-output$table_districts_erate <- renderTable({
+output$table_by_erate_discounts <- renderTable({
   
-  data <- districts_erate_discounts()
+  data <- by_erate_discounts()
   validate(need(nrow(data) > 0, ""))  
   
   data

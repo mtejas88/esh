@@ -13,10 +13,10 @@ setwd(wd)
 
 services <- read.csv("services_received_20160404.csv", as.is = TRUE)
 districts <- read.csv("deluxe_districts_20160404.csv", as.is = TRUE)
-# https://modeanalytics.com/educationsuperhighway889/reports/960fa62420ca
 discounts <- read.csv("district_discount_rates_20160414.csv", as.is = TRUE)
-# http://www.usac.org/_res/documents/sl/pdf/samples/Discount-Matrix.pdf
 usac_matrix <- read.csv("usac_discount_matrix.csv", as.is = TRUE)
+schools_needing_wan <- read.csv("schools_needing_wan_20160428.csv", as.is = TRUE)
+
 # nrow(services) #83196
 # nrow(districts) #13025
 
@@ -145,6 +145,15 @@ districts$not_all_scalable <- ifelse(districts$nga_v2_known_unscalable_campuses 
 districts$new_connect_type <- ifelse(districts$hierarchy_connect_category %in% c("None - Error", "Other/Uncategorized"), 
                                      "Other / Uncategorized", districts$hierarchy_connect_category)
 
+
+
+# unscalable ratio
+
+districts$unscalability_ratio <- (districts$nga_v2_assumed_unscalable_campuses + districts$nga_v2_known_unscalable_campuses) / districts$num_campuses
+districts$num_unscalable_schools <- districts$unscalability_ratio * districts$num_schools  
+
+
+
 # merge on discount rates
 
 # first, rid discounts query by any duplicates
@@ -185,6 +194,19 @@ districts$usac_c1_rural <- NULL
 
 # no cost to district - district discount rate is at least 80%
 districts$zero_build_cost_to_district <- ifelse(districts$c1_discount_rate >= 80, 1, 0)
+
+# calculate % of schools that have > 100 students
+
+schools_needing_wan$need_wan <- ifelse(schools_needing_wan$MEMBER > 100, 1, 0)
+
+data <- schools_needing_wan %>%
+        group_by(esh_id) %>%
+        summarize(n_schools_wan_needs = sum(need_wan, na.rm = TRUE),
+                  n_schools_in_wan_needs_calculation = n())
+
+districts <- left_join(districts, data, by = c("esh_id"))
+
+
 ## END
 
 ## locale and district size cuts
