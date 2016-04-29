@@ -1,8 +1,14 @@
 name: Shiny_0415
 account: educationsuperhighway
 server: shinyapps.io
+<<<<<<< Updated upstream
 bundleId: 429722
 url: https://educationsuperhighway.shinyapps.io/shiny_0415/
 when: 1461343745.21394
+=======
+bundleId: 423722
+url: https://educationsuperhighway.shinyapps.io/shiny_0415/
+when: 1460999155.2051
+>>>>>>> Stashed changes
 asMultiple: FALSE
 asStatic: FALSE

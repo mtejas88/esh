@@ -16,16 +16,32 @@ shinyServer(function(input, output, session) {
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
   
-  library("dplyr")
-  library("shiny")
-  library("tidyr")
-  library("ggplot2")
-  library("scales")
-  library("grid")
-  library("maps")
-  library("ggmap")
-  library("reshape")
-  
+
+  #library("dplyr")
+  #library("shiny")
+  #library("tidyr")
+  #library("ggplot2")
+  #library("scales")
+  #library("grid")
+  #library("maps")
+  #library("ggmap")
+
+  #library("reshape")
+
+  #lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
+  library(shiny)
+  library(tidyr)
+  library(dplyr)
+  library(ggplot2)
+  library(scales)
+  library(grid)
+  library(maps)
+  library(ggmap)
+  library(reshape)
+  library(leaflet)
+
+  #sapply(lib, function(x) library(x, character.only = TRUE))
+
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
   locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
@@ -724,6 +740,7 @@ output$state_n_table <- renderTable({
 ###### 
 ## Maps
 ######
+
 output$districtSelect <- renderUI({
   
   data <- district_subset()
@@ -740,8 +757,8 @@ output$districtSelect <- renderUI({
 output$choose_district <- renderPlot({
   
   data <- district_subset()
-  
   selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
+  
   data <- data %>% 
           filter_(paste("name %in%", selected_district_list))
   
@@ -1008,6 +1025,68 @@ print(q + coord_map())
 
 })  
 
+
+# Function for generating tooltip text
+
+#district_tooltip <- function(x) {
+#  if (is.null(x)) return(NULL)
+#  #if (is.null(x$districtSelect)) return(NULL)
+#  all_districts <- isolate(district_subset())
+#  district <- all_districts[all_districts$name == x$name,]
+
+###  paste0("<b>", "District Name: ", district$name, "</b><br>",
+#         "# of students:", format(district$num_students, big.mark = ",", scientific = FALSE),"<br>",
+#         "IA Connect Type: ", district$hierarchy_connect_category)
+#}
+
+#vis <- reactive({
+#  maine <- readOGR("data/maine.geojson", "OGRGeoJSON")
+  
+#  map <- ggplot2::fortify(maine, region="name")
+  
+#  map %>%
+#    group_by(group, id) %>%
+#    ggvis(~long, ~lat) %>%
+##    layer_paths(strokeOpacity := 0.5, strokeWidth := 0.5) %>%
+#    ggvis(data = district_subset, x = ~longitude, y= ~latitude) %>% 
+#    layer_points(size := 50, size.hover := 200,
+#                 fillOpacity := 0.2, fillOpacity.hover := 0.5,
+#                 key := ~name) %>% 
+#    add_tooltip(district_tooltip, "hover")  %>%
+#   hide_axis("x") %>% hide_axis("y") %>% 
+ #   set_options(width = 500, height = 500)
+  
+  
+#})
+
+
+
+#vis %>% bind_shiny("plot1")
+
+
+##Trying leaflet: 
+
+output$testing_leaflet <- renderLeaflet({
+  #d <- district_subset() %>% select(name, longitude, latitude)
+  
+  data <- district_subset()
+  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
+  
+  d <- data %>% 
+    filter_(paste("name %in%", selected_district_list))
+  
+  content <- paste0("<b>", d$name, "</b><br>",
+                   "# of students:", format(d$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                   "IA Connection: ", d$hierarchy_connect_category, "<br>",
+                   "Total IA monthly cost: $", format(d$total_ia_monthly_cost, big.mark = ",", scientific = FALSE)
+  )
+  
+  leaflet() %>% 
+    addTiles() %>% 
+    addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~paste(content)) 
+    #addCircleMarkers(data = d, lng = ~longitude, lat = ~latitude, content)
+  
+})
 
 
 
