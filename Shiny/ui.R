@@ -158,7 +158,7 @@ shinyUI(fluidPage(
     
     mainPanel(
       navbarPage("",
-                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Pull Date: 04/20/16", br())), width="300px"),
+                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Data Pull Date: 04/04/16", br())), width="300px"),
                  navbarMenu("ESH Sample",
                             tabPanel("Sample vs. Population: Locale", plotOutput("histogram_locale"), tableOutput("table_locale")),
                             tabPanel("Sample vs. Population: District Size", plotOutput("histogram_size"), tableOutput("table_size"))),
