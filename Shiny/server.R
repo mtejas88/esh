@@ -509,26 +509,25 @@ output$table_by_erate_discounts <- renderTable({
 ######
  
 ## Histogram for banded factors ##
-output$plot <- renderPlot({
+#output$plot <- renderPlot({
+ # 
+#  data <- li_bf()
   
-  data <- li_bf()
-  
-  validate(need(nrow(data) > 0, "No circuits in given subset"))  
-  p <- ggplot(data = data) + 
-       geom_histogram(aes(x = band_factor), fill="#009291", alpha = 0.5, position = "identity", binwidth = 25) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
-              axis.text.x=element_text(size=14, colour= "#899DA4"), 
-              axis.text.y=element_text(size=14, colour= "#899DA4"),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank()) +
-       scale_x_discrete(breaks = c(50, 100, 500, 1000, 10000), labels = c("50 Mbps", "100 Mbps", "500 Mbps", "1 Gbps", "10 Gbps"), expand = c(0,0)) +
-       scale_y_continuous(labels = scales::comma, expand = c(0,0))
+#  validate(need(nrow(data) > 0, "No circuits in given subset"))  
+ # p <- ggplot(data = data) + 
+  #     geom_histogram(aes(x = band_factor), fill="#009291", alpha = 0.5, position = "identity", binwidth = 25) +
+   #    theme_classic() + 
+       #theme(axis.line = element_blank(), 
+       #       axis.text.x=element_text(size=14, colour= "#899DA4"), 
+      #        axis.text.y=element_text(size=14, colour= "#899DA4"),
+     #         axis.ticks=element_blank(),
+    #          axis.title.x=element_blank(),
+   #           axis.title.y=element_blank()) +
+  #     scale_x_discrete(breaks = c(50, 100, 500, 1000, 10000), labels = c("50 Mbps", "100 Mbps", "500 Mbps", "1 Gbps", "10 Gbps"), expand = c(0,0)) +
+ #      scale_y_continuous(labels = scales::comma, expand = c(0,0))
 
-  print(p)
-  
-  })
+#  print(p)
+  #  })
 
 ## Box and Whiskers Plot - use li_bf, only for selected circuit sizes
 
@@ -544,7 +543,7 @@ output$bw_plot <- renderPlot({
   
   meds <- data %>% 
           group_by(band_factor) %>% 
-          summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
+          summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
   
   dollar_format(largest_with_cents=1)
   
@@ -590,154 +589,154 @@ output$prices_table <- renderTable({
   
   data %>% 
     group_by(band_factor) %>% 
-    summarise(min_cost_per_mbps = round(min(monthly_cost_per_mbps, na.rm = TRUE)),
-              q25_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.25, na.rm = TRUE)),
-              median_cost_per_mbps = round(median(monthly_cost_per_mbps, na.rm = TRUE)),
-              q75_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.75, na.rm = TRUE)),
-              max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE)))
+    summarise(min_cost_per_mbps = round(min(monthly_cost_per_mbps, na.rm = TRUE), 2),
+              q25_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.25, na.rm = TRUE), 2),
+              median_cost_per_mbps = round(median(monthly_cost_per_mbps, na.rm = TRUE), 2),
+              q75_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.75, na.rm = TRUE), 2),
+              max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE), 2))
   
 })
 
 ## Comparison: Specific State vs. the Rest of the States 
-output$state_vs_rest_comparison <- renderPlot({
+#output$state_vs_rest_comparison <- renderPlot({
   
   #excluding the state that is specifically being compared to rest of the nation
-  li_all2 <- li_all() 
+ # data <- li_all() 
   
-  levels(li_all2$postal_cd) <- c(levels(li_all2$postal_cd), "National Excluding Selected State")
-  li_all2$postal_cd[li_all2$postal_cd != input$state] <- "National Excluding Selected State"
+  #levels(data$postal_cd) <- c(levels(data$postal_cd), "National Excluding Selected State")
+  #data$postal_cd[data$postal_cd != input$state] <- "National Excluding Selected State"
   
  
   ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
-  validate(
-    need(nrow(li_all2 > 0), "No circuits in given subset")
-  )
+  #validate(
+  #  need(nrow(data > 0), "No circuits in given subset")
+  #)
   #####
   
-  give.n <- function(x){
-    return(c(y = median(x) * 0.85, label = length(x))) 
+  #give.n <- function(x){
+  #  return(c(y = median(x) * 0.85, label = length(x))) 
     # experiment with the multiplier to find the perfect position
-  }
+  #}
   
-  p0 <- ggplot(li_all2, aes(x=postal_cd, y = monthly_cost_per_circuit)) + 
-        geom_boxplot(fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) 
+  #p0 <- ggplot(data, aes(x=postal_cd, y = monthly_cost_per_circuit)) + 
+   #     geom_boxplot(fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) 
      #   stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
       
-  ylim1 <- boxplot.stats(li_all2$monthly_cost_per_circuit)$stats[c(1, 5)]
+  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]
 
-  meds <- li_all2 %>% 
-          group_by(postal_cd) %>% 
-          summarise(medians = median(monthly_cost_per_circuit))
+#  meds <- data %>% 
+ #         group_by(postal_cd) %>% 
+  #        summarise(medians = median(monthly_cost_per_circuit))
   
-  dollar_format(largest_with_cents = 1)
+  #dollar_format(largest_with_cents = 1)
   
-  b <- p0 + 
-      coord_cartesian(ylim = ylim1 * 2.0) +
-      scale_y_continuous("",labels = dollar) +
-      geom_text(data = meds, aes(x = postal_cd, y = medians, label = dollar(medians)), 
-                size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) +
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-            panel.background = element_blank(), axis.line = element_blank(), 
-            axis.text.x = element_text(size = 14, colour = "#899DA4"), 
-            axis.text.y = element_text(size = 14, colour = "#899DA4"),
-            axis.ticks = element_blank(),
-            axis.title.x = element_blank(),
-            axis.title.y = element_blank())
-    print(b)
-  })
+  #b <- p0 + 
+   #   coord_cartesian(ylim = ylim1 * 2.0) +
+    #  scale_y_continuous("",labels = dollar) +
+     # geom_text(data = meds, aes(x = postal_cd, y = medians, label = dollar(medians)), 
+      #          size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) +
+      #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+       #     panel.background = element_blank(), axis.line = element_blank(), 
+        #    axis.text.x = element_text(size = 14, colour = "#899DA4"), 
+         #   axis.text.y = element_text(size = 14, colour = "#899DA4"),
+          #  axis.ticks = element_blank(),
+           # axis.title.x = element_blank(),
+            #axis.title.y = element_blank())
+    #print(b)
+  #)
 
 
-output$n_observations_comparison <- renderTable({
+#output$n_observations_comparison <- renderTable({
   
-  data <- li_all() 
+ # data <- li_all() 
   
-  data$postal_cd[data$postal_cd != input$state] <- c('National Excluding Selected State')
-  data$postal_cd <- as.factor(data$postal_cd)
+  #data$postal_cd[data$postal_cd != input$state] <- c('National Excluding Selected State')
+  #data$postal_cd <- as.factor(data$postal_cd)
   
-  ns <- data %>% 
-        group_by(postal_cd) %>% 
-        summarise(num_line_items = n(),
-                  num_circuits = sum(line_item_total_num_lines))
-})
+#  ns <- data %>% 
+ #       group_by(postal_cd) %>% 
+  #      summarise(num_line_items = n(),
+   #               num_circuits = sum(line_item_total_num_lines))
+#})
 
 # Overall National Comparison
-output$overall_national_comparison <- renderPlot({
+#output$overall_national_comparison <- renderPlot({
   
   #excluding the state that is specifically being compared to rest of the nation
-  li_all2 <- li_all()
+ # data <- li_all()
   
   ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
-  validate(
-    need(nrow(li_all2 > 0), "No circuits in given subset")
-  )
+#  validate(
+ #   need(nrow(data > 0), "No circuits in given subset")
+#  )
   #####
   
-  give.n <- function(x){
-    return(c(y = median(x) * 0.85, label = length(x))) 
+ # give.n <- function(x){
+#    return(c(y = median(x) * 0.85, label = length(x))) 
     # experiment with the multiplier to find the perfect position
-  }
+  #}
+ # 
+ # p0 <- ggplot() + #changed x = postal_cd to x="All"
+  #      geom_boxplot(data = data, aes(x = national, y = monthly_cost_per_circuit),
+   #                  fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) +
+    #    stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) +
+     #   geom_boxplot(data = data[data$postal_cd == input$state,], aes(x = postal_cd, y = monthly_cost_per_circuit), 
+                     #fill="#009291", colour = "#ABBFC6", outlier.colour=NA, width=.5) +
+        #stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
   
-  p0 <- ggplot() + #changed x = postal_cd to x="All"
-        geom_boxplot(data = li_all2, aes(x = national, y = monthly_cost_per_circuit),
-                     fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) +
-        stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) +
-        geom_boxplot(data = li_all2[li_all2$postal_cd == input$state,], aes(x = postal_cd, y = monthly_cost_per_circuit), 
-                     fill="#009291", colour = "#ABBFC6", outlier.colour=NA, width=.5) +
-        stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
+  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]
   
-  ylim1 <- boxplot.stats(li_all2$monthly_cost_per_circuit)$stats[c(1, 5)]
+  #national_median <- data %>% 
+   #                  group_by(national) %>%  
+    #                 summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
+  #state_median <-    data %>% 
+   #                  group_by(postal_cd) %>% 
+    #                 filter(postal_cd == input$state) %>% 
+     #                summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
+  #dollar_format(largest_with_cents=1)
   
-  national_median <- li_all2 %>% 
-                     group_by(national) %>%  
-                     summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
-  state_median <-    li_all2 %>% 
-                     group_by(postal_cd) %>% 
-                     filter(postal_cd == input$state) %>% 
-                     summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
-  dollar_format(largest_with_cents=1)
-  
-  b <- p0 + 
-       coord_cartesian(ylim = ylim1 * 1.05) +
-       scale_y_continuous("", labels = dollar) +
-       geom_text(data = national_median, aes(x = national, y = medians, label = dollar(medians)), 
-                 size = 6, vjust = 0, colour = "#F26B21", hjust=0.5) + 
-       geom_text(data = state_median, aes(x = postal_cd, y = medians, label = dollar(medians)), 
-                 size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) + 
-       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-             panel.background = element_blank(), axis.line = element_blank(), 
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
-             axis.text.y=element_text(size=14, colour= "#899DA4"),
-             axis.ticks=element_blank(),
-             axis.title.x=element_blank(),
-             axis.title.y=element_blank())
-       print(b)
-  })
+  #b <- p0 + 
+   #    coord_cartesian(ylim = ylim1 * 1.05) +
+    #   scale_y_continuous("", labels = dollar) +
+     #  geom_text(data = national_median, aes(x = national, y = medians, label = dollar(medians)), 
+      #           size = 6, vjust = 0, colour = "#F26B21", hjust=0.5) + 
+      # geom_text(data = state_median, aes(x = postal_cd, y = medians, label = dollar(medians)), 
+        #         size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) + 
+       #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+         #    panel.background = element_blank(), axis.line = element_blank(), 
+          #   axis.text.x=element_text(size=14, colour= "#899DA4"), 
+           #  axis.text.y=element_text(size=14, colour= "#899DA4"),
+            # axis.ticks=element_blank(),
+             #axis.title.x=element_blank(),
+             #axis.title.y=element_blank())
+       #print(b)
+  #})
 
 ## n's for overall national comparison
-output$national_n_table <- renderTable({
+#output$national_n_table <- renderTable({
   
-  data <- li_all() 
+ # data <- li_all() 
   
-  data %>% 
-    group_by(national) %>% 
-    summarise(num_line_items = n(), 
-              num_circuits = sum(line_item_total_num_lines))
+  #data %>% 
+   # group_by(national) %>% 
+    #summarise(num_line_items = n(), 
+     #         num_circuits = sum(line_item_total_num_lines))
   
-})
+#})
 
-output$state_n_table <- renderTable({
+#output$state_n_table <- renderTable({
   
-  selected_state <- paste0('\"',input$state, '\"')
+ # selected_state <- paste0('\"',input$state, '\"')
   
-  data <- li_all() %>%
-          filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
+#  data <- li_all() %>%
+  #        filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
   
-  data %>% 
-    group_by(postal_cd) %>% 
-    summarise(num_line_items = n(), 
-              num_circuits = sum(line_item_total_num_lines))
+  #data %>% 
+   # group_by(postal_cd) %>% 
+    #summarise(num_line_items = n(), 
+     #         num_circuits = sum(line_item_total_num_lines))
   
-})
+#})
 
 ###### 
 ## Maps

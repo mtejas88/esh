@@ -170,10 +170,10 @@ shinyUI(fluidPage(
                             tabPanel("Distribution of Schools by Infrastructure Type", plotOutput("histogram_schools_on_fiber"), tableOutput("table_schools_on_fiber")),
                             tabPanel("Distribution of Schools by E-Rate Discount Rates", plotOutput("histogram_by_erate_discounts"), tableOutput("table_by_erate_discounts"))),
                  navbarMenu("Affordability",
-                            tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
-                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
-                            tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
-                            tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
+                            #tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
+                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table"))
+                            #tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
+                            #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             #,
                             #tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))
                             ),
