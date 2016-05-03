@@ -11,8 +11,8 @@ sapply(lib, function(x) require(x, character.only = TRUE))
 wd <- "~/Google Drive/github/ficher/Shiny/prep_for_Shiny"
 setwd(wd)
 
-services <- read.csv("services_received_20160404.csv", as.is = TRUE)
-districts <- read.csv("deluxe_districts_20160404.csv", as.is = TRUE)
+services <- read.csv("services_received_20160502.csv", as.is = TRUE)
+districts <- read.csv("deluxe_districts_20160502.csv", as.is = TRUE)
 discounts <- read.csv("district_discount_rates_20160414.csv", as.is = TRUE)
 usac_matrix <- read.csv("usac_discount_matrix.csv", as.is = TRUE)
 schools_needing_wan <- read.csv("schools_needing_wan_20160428.csv", as.is = TRUE)
@@ -36,6 +36,7 @@ services <- services[!grepl("exclude_for_cost_only", services$open_flags),]
 # nrow(services) #12,939
 
 # Convert variables to relevant types
+
 services$ia_bandwidth_per_student <- as.numeric(services$ia_bandwidth_per_student)
 services$postal_cd <- as.character(services$postal_cd)
 services$band_factor <- as.factor(services$bandwidth_in_mbps)
@@ -121,7 +122,7 @@ services <- dplyr::select(services, recipient_id, postal_cd,
 
 ### DELUXE DISTRICTS TABLE:  prepping the data to be the correct subset to use ###
 districts$ia_bandwidth_per_student <- as.numeric(districts$ia_bandwidth_per_student)
-
+districts$monthly_ia_cost_per_mbps <- as.numeric(districts$monthly_ia_cost_per_mbps)
 ## Keep original goals variables
 # District Meeting Goals: 1 if district is meeting goal
 districts$meeting_goals_district <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 1, 0)
@@ -205,6 +206,7 @@ data <- schools_needing_wan %>%
                   n_schools_in_wan_needs_calculation = n())
 
 districts <- left_join(districts, data, by = c("esh_id"))
+rm(data)
 
 
 ## END

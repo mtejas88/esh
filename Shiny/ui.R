@@ -164,14 +164,18 @@ shinyUI(fluidPage(
                             tabPanel("Sample vs. Population: District Size", plotOutput("histogram_size"), tableOutput("table_size"))),
                  navbarMenu("Goals",
                             tabPanel("Districts / Students Meeting IA Goals", plotOutput("histogram_goals"), tableOutput("table_goals")),
-                            tabPanel("Districts Meeting Goals, by IA Technology", plotOutput("histogram_districts_meeting_goals_ia"), tableOutput("table_districts_meeting_goals_ia")),
+                            tabPanel("Districts Meeting Goals, by IA Technology", plotOutput("histogram_meeting_goals_ia"), tableOutput("table_meeting_goals_ia")),
+                            tabPanel("Districts Not Meeting Goals, by IA Technology", plotOutput("histogram_not_meeting_goals_ia"), tableOutput("table_not_meeting_goals_ia")),
                             tabPanel("Current WAN Goal Percentage vs. Projected WAN Needs", plotOutput("histogram_projected_wan_needs"), tableOutput("table_projected_wan_needs"))),
                  navbarMenu("Fiber",
                             tabPanel("Distribution of Schools by Infrastructure Type", plotOutput("histogram_schools_on_fiber"), tableOutput("table_schools_on_fiber")),
                             tabPanel("Distribution of Schools by E-Rate Discount Rates", plotOutput("histogram_by_erate_discounts"), tableOutput("table_by_erate_discounts"))),
                  navbarMenu("Affordability",
                             #tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
-                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table"))
+                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
+                            tabPanel("State-by-State Comparison: Median Cost per Circuit", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state")),
+                            tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", plotOutput("histogram_hypothetical_median_cost"), tableOutput("table_hypothetical_median_cost")),
+                            tabPanel("Current vs. Ideal Pricing: % Districts Meeting Goals", plotOutput("histogram_hypothetical_ia_goal"), tableOutput("table_hypothetical_ia_goal"), tableOutput("table_hypothetical_median_cost2"))
                             #tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
                             #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             #,
