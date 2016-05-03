@@ -141,7 +141,6 @@ district_subset <- reactive({
 
   })
 
-
 ######
 ## reactive functions for ESH Sample section
 ######
@@ -187,7 +186,7 @@ district_goals <- reactive({
   
 })
 
-##### districts (not) meeting goals by technology
+##### districts meeting goals (% districts, students)
 
 district_ia_meeting_goals <- reactive({
   
@@ -205,6 +204,45 @@ district_ia_meeting_goals <- reactive({
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
 })
+
+### Districts Meeting Goals by IA Technology
+
+meeting_goals_ia_technology <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(meeting_goals_district == 1,
+           hierarchy_connect_category != ("None - Error")) %>%
+    group_by(hierarchy_connect_category) %>%
+    summarize(n_districts = n()) %>%
+    mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
+           n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
+  
+})
+
+### Districts Not Meeting Goals by IA Technology
+
+not_meeting_goals_ia_technology <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    filter(meeting_goals_district == 0,
+           hierarchy_connect_category != ("None - Error")) %>%
+    group_by(hierarchy_connect_category) %>%
+    summarize(n_districts = n()) %>%
+    mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
+           n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
+    
+})
+
 
 
 ## WAN goals: current vs. projected needs
@@ -416,11 +454,59 @@ output$table_goals <- renderTable({
 
 ## Districts Meeting Goals, by Technology
 
-output$histogram_districts_meeting_goals_ia <- renderPlot({
+output$histogram_meeting_goals_ia <- renderPlot({
+  
+  data <- meeting_goals_ia_technology()
+
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = hierarchy_connect_category, y = n_percent_districts), fill="#009291", stat = "identity") +
+    scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
   
 })
 
-output$table_districts_meeting_goals_ia <- renderPlot({
+output$table_meeting_goals_ia <- renderTable({
+  
+  data <- meeting_goals_ia_technology()
+  
+  
+})
+
+## Districts Not Meeting Goals, by Technology
+
+output$histogram_not_meeting_goals_ia <- renderPlot({
+  
+  data <- not_meeting_goals_ia_technology()
+  
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = hierarchy_connect_category, y = n_percent_districts), fill="#009291", stat = "identity") +
+    scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+  
+})
+
+output$table_not_meeting_goals_ia <- renderTable({
+  
+  data <- not_meeting_goals_ia_technology()
+  
   
 })
 
