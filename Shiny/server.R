@@ -72,15 +72,15 @@ shinyServer(function(input, output, session) {
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
   
   
-li_all <- reactive({
+#li_all <- reactive({
 
-    services %>% 
-      filter(new_purpose %in% input$purpose,
-             new_connect_type %in% input$connection_services, 
-             district_size %in% input$district_size,
-             locale %in% input$locale)
+ #   services %>% 
+  #    filter(new_purpose %in% input$purpose,
+   #          new_connect_type %in% input$connection_services, 
+    #         district_size %in% input$district_size,
+     #        locale %in% input$locale)
   
-})
+#})
   
 ## Line Items with filter that now includes banding circuits by most popular circuit speeds
 li_bf <- reactive({
@@ -140,6 +140,7 @@ district_subset <- reactive({
            !(postal_cd %in% c('AK', 'HI')))
 
   })
+
 
 ######
 ## reactive functions for ESH Sample section
@@ -204,6 +205,7 @@ district_ia_meeting_goals <- reactive({
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
 })
+
 
 ## WAN goals: current vs. projected needs
 
@@ -270,7 +272,33 @@ by_erate_discounts <- reactive({
 
 })
 
+### reactive function for affordability section
 
+# districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
+hypothetical_median_cost <- reactive({
+  
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+  
+  districts %>% 
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+    group_by(meeting_2014_goal_no_oversub) %>%
+    summarize(n_districts = n(),
+              median_monthly_ia_cost_per_mbps = median(monthly_ia_cost_per_mbps, na.rm = TRUE))
+  
+})
+
+hypothetical_ia_goal <- reactive({
+
+  selected_dataset <- paste0('\"', input$dataset, '\"')
+  selected_state <- paste0('\"',input$state, '\"')
+
+  districts %>%
+    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state)))
+  
+})
 
 ####### OUTPUTS
 
@@ -430,6 +458,103 @@ output$table_projected_wan_needs <- renderTable({
   
 })
 
+## Median Pricing Districts Not Meeting vs. Meeting Goals
+output$histogram_hypothetical_median_cost <- renderPlot({
+  
+  data <- hypothetical_median_cost()
+  
+  
+  q <- ggplot(data = data) +
+       geom_bar(aes(x = meeting_2014_goal_no_oversub, y = median_monthly_ia_cost_per_mbps), fill="#009291", stat = "identity") +
+       scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+       theme_classic() + 
+       theme(axis.line = element_blank(), 
+             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+})
+
+output$table_hypothetical_median_cost <- renderTable({
+  
+  data <- hypothetical_median_cost()
+  
+})
+
+output$table_hypothetical_median_cost2 <- renderTable({
+  
+  data <- hypothetical_median_cost()
+  
+})
+
+
+## Median Pricing Districts Not Meeting vs. Meeting Goals
+output$histogram_hypothetical_ia_goal <- renderPlot({
+  
+  cost <- hypothetical_median_cost()
+  data <- hypothetical_ia_goal()
+  
+  hypothetical_cost <- cost[cost$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
+  
+  current_pricing_percent_district_meeting_goals <- mean(data$meeting_goals_district, na.rm = TRUE)
+  
+  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+  
+  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
+  
+  # for districts not meeting goals, replace their current bw with the hypothetical number
+  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
+  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
+  
+  hypothetical_pricing_percent_district_meeting_goals <- mean(data$new_meeting_goals_district, na.rm = TRUE)
+  
+  plot_data <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
+  plot_data <- melt(plot_data)
+  
+  q <- ggplot(data = plot_data) +
+    geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
+  #  scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(q)
+  
+})
+
+
+output$table_hypothetical_ia_goal <- renderTable({
+  
+    cost <- hypothetical_median_cost()
+    data <- hypothetical_ia_goal()
+    
+    hypothetical_cost <- cost[cost$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
+    
+    current_pricing_percent_district_meeting_goals <- round(100 * mean(data$meeting_goals_district, na.rm = TRUE), 2)
+    
+    not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+    
+    data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
+    
+    # for districts not meeting goals, replace their current bw with the hypothetical number
+    data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
+    data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
+    
+    hypothetical_pricing_percent_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
+    
+    plot_data <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
+    plot_data <- melt(plot_data)
+    
+  
+})
 
 ######
 ## Fiber Section
@@ -529,7 +654,7 @@ output$table_by_erate_discounts <- renderTable({
 #  print(p)
   #  })
 
-## Box and Whiskers Plot - use li_bf, only for selected circuit sizes
+## Box and Whiskers Plots
 
 output$bw_plot <- renderPlot({
   
@@ -594,6 +719,55 @@ output$prices_table <- renderTable({
               median_cost_per_mbps = round(median(monthly_cost_per_mbps, na.rm = TRUE), 2),
               q75_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.75, na.rm = TRUE), 2),
               max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE), 2))
+  
+})
+
+
+output$histogram_cost_comparison_by_state <- renderPlot({
+  
+  data <- li_bf()
+  
+  plot_data <- data %>%
+               group_by(postal_cd) %>%
+               summarize(median_cost = median(monthly_cost_per_circuit, na.rm = TRUE))
+        
+  validate(
+    need(nrow(data) > 0, "No district in given subset; please adjust your selection")
+  )
+  
+  validate(
+    need(input$state == 'All', "Please adjust your state selection to 'All.'")
+  )
+  
+  q <- ggplot(data = plot_data) +
+      geom_bar(aes(x = reorder(factor(postal_cd), median_cost), y = median_cost), 
+               fill="#009291", stat = "identity") +
+      theme_classic() + 
+      theme(axis.line = element_blank(), 
+            axis.text.x=element_text(size=14, colour= "#899DA4"), 
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title.x=element_blank(),
+            axis.title.y=element_blank()) 
+    
+  print(q)
+  
+  
+})
+
+output$table_cost_comparison_by_state <- renderTable({
+  
+  data <- li_bf()
+  
+  plot_data <- data %>%
+    group_by(postal_cd) %>%
+    summarize(median_cost = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
+  
+  validate(
+    need(nrow(data) > 0, "")
+  )
+  
+  plot_data ## 
   
 })
 
