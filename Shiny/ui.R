@@ -1,4 +1,5 @@
 library(leaflet)
+library(ggvis)
 
 shinyUI(fluidPage(
   tags$head(
@@ -95,7 +96,7 @@ shinyUI(fluidPage(
   titlePanel(div(h1("SHINY for Connectivity Reports"))),
   
   sidebarLayout(
-    sidebarPanel(
+    sidebarPanel(width = 3,
       #helpText("Making Shiny more efficient with reactive datasets"),
       
     
@@ -115,6 +116,8 @@ shinyUI(fluidPage(
                               'WA','WI','WV','WY'), selected='All'),
       
       uiOutput("districtSelect"),
+      
+      uiOutput("bandwidthSelect"),
       
       selectInput("dataset",
                   h2("Select Dataset (applicable for Maps only)"),
@@ -171,7 +174,9 @@ shinyUI(fluidPage(
                             tabPanel("Distribution of Schools by E-Rate Discount Rates", plotOutput("histogram_by_erate_discounts"), tableOutput("table_by_erate_discounts"))),
                  navbarMenu("Affordability",
                             #tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
-                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table"))
+                            tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
+                            tabPanel("Histogram: Monthly Cost Per Circuit", ggvisOutput("gen_m_cpm"), align = "center"),
+                            tabPanel("Scatterplot: Monthly Cost Per Circuit", ggvisOutput("plot1"), align = "center")
                             #tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
                             #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             #,
