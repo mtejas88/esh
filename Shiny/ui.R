@@ -1,4 +1,5 @@
 library(leaflet)
+library(ggvis)
 
 shinyUI(fluidPage(
   tags$head(
@@ -95,7 +96,7 @@ shinyUI(fluidPage(
   titlePanel(div(h1("SHINY for Connectivity Reports"))),
   
   sidebarLayout(
-    sidebarPanel(
+    sidebarPanel(width = 3,
       #helpText("Making Shiny more efficient with reactive datasets"),
       
     
@@ -114,21 +115,31 @@ shinyUI(fluidPage(
                               'SD','TN','TX','UT','VA',
                               'WA','WI','WV','WY'), selected='All'),
       
-      uiOutput("districtSelect"),
+      
+      checkboxInput("select_districts", "Select District(s)"),
+      conditionalPanel(
+        condition = "input.select_districts == true",
+      uiOutput("districtSelect")),
+      
+      checkboxInput("select_bandwidths", "Select Bandwidth(s)"),
+      conditionalPanel(
+        condition = "input.select_bandwidths == true",
+      uiOutput("bandwidthSelect")),
       
       selectInput("dataset",
                   h2("Select Dataset (applicable for Maps only)"),
                   choices = c('All', 'Clean'), selected = 'All'),
-      checkboxGroupInput(inputId = "bandwidths", 
-                         label = h2("Select Circuit Size(s) (applicable for B-W viz only)"),
-                         choices = c("50Mbps" = 50, "100Mbps" = 100, "500Mbps" = 500, 
-                                     "1Gbps" = 1000, "10Gbps" = 10000),
-                         selected = c(50, 100, 500, 1000, 10000)),
+      #checkboxGroupInput(inputId = "bandwidths", 
+      #                   label = h2("Select Circuit Size(s) (applicable for B-W viz only)"),
+      #                   choices = c("50Mbps" = 50, "100Mbps" = 100, "500Mbps" = 500, 
+      #                               "1Gbps" = 1000, "10Gbps" = 10000),
+      #                   selected = c(50, 100, 500, 1000, 10000)),
 
-      checkboxGroupInput(inputId = "purpose", 
+     checkboxGroupInput(inputId = "purpose", 
                          label = h2("Select Purpose(s) (applicable for B-W viz only)"),
                          choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
                          selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
+    
      checkboxGroupInput(inputId = "connection_districts", 
                        h2("Select Connection Type(s) - map/district view only"),
                        choices = c("Fiber", "Cable", "DSL",
@@ -173,6 +184,9 @@ shinyUI(fluidPage(
                  navbarMenu("Affordability",
                             #tabPanel("Frequency of Bandwidths by Line Item", plotOutput("plot")),
                             tabPanel("Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
+                            tabPanel("Price Dispersion: Monthly Cost Per Circuit", ggvisOutput("price_disp_cpc"), align = "center"),
+                            tabPanel("Price Dispersion: Monthly Cost Per Mbps", ggvisOutput("price_disp_cpm"), align = "center"),
+                            tabPanel("Scatterplot: Monthly Cost Per Circuit", ggvisOutput("plot1"), align = "center"),
                             tabPanel("State-by-State Comparison: Median Cost per Circuit", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state")),
                             tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", plotOutput("histogram_hypothetical_median_cost"), tableOutput("table_hypothetical_median_cost")),
                             tabPanel("Current vs. Ideal Pricing: % Districts Meeting Goals", plotOutput("histogram_hypothetical_ia_goal"), tableOutput("table_hypothetical_ia_goal"), tableOutput("table_hypothetical_median_cost2"))
