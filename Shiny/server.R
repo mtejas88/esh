@@ -6,8 +6,6 @@
 #wd <- "~/Google Drive/github/ficher/Shiny"
 #setwd(wd)
 
-
-
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -17,7 +15,6 @@ shinyServer(function(input, output, session) {
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
   
-
   #library("dplyr")
   #library("shiny")
   #library("tidyr")
@@ -96,60 +93,57 @@ shinyServer(function(input, output, session) {
   })  
 
 #can probably remove this   
-li_all <- reactive({
+#li_all <- reactive({
 
-    services %>% 
-      filter(new_purpose %in% input$purpose,
-             new_connect_type %in% input$connection_services, 
-             district_size %in% input$district_size,
-             locale %in% input$locale)
-})
+ #   services %>% 
+  #    filter(new_purpose %in% input$purpose,
+   #          new_connect_type %in% input$connection_services, 
+    #         district_size %in% input$district_size,
+     #        locale %in% input$locale)
+#})
   
 ## Line Items with filter that now includes banding circuits by most popular circuit speeds
-## we can probably removve this
-li_bf <- reactive({
+## we can probably remove this
+#li_bf <- reactive({
     
-    selected_state <- paste0('\"',input$state, '\"')
+ #   selected_state <- paste0('\"',input$state, '\"')
     
-    services %>% 
-      filter(band_factor %in% input$bandwidths,
-             new_purpose %in% input$purpose,
-             district_size %in% input$district_size,
-             locale %in% input$locale,
-             new_connect_type %in% input$connection_services) %>%
-      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
-}) 
+  #  services %>% 
+   #   filter(band_factor %in% input$bandwidths,
+    #         new_purpose %in% input$purpose,
+     #        district_size %in% input$district_size,
+      #       locale %in% input$locale,
+       #      new_connect_type %in% input$connection_services) %>%
+      #filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
+#}) 
 
 ##we can remove this as well and within the specific map we're using services data for, add condition for !(postal_cd....)
-li_map <- reactive({
+#li_map <- reactive({
   
-  selected_state <- paste0('\"',input$state, '\"')
+ # selected_state <- paste0('\"',input$state, '\"')
   
-  services %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-    filter(band_factor %in% input$bandwidths,
-           new_purpose %in% input$purpose,
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-           new_connect_type %in% input$connection_services,
-           !(postal_cd %in% c('AK', 'HI')))
-  
-})
+#  services %>% 
+ #   filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+  #  filter(band_factor %in% input$bandwidths,
+   #        new_purpose %in% input$purpose,
+    ##      locale %in% input$locale,
+      #     new_connect_type %in% input$connection_services,
+       #    !(postal_cd %in% c('AK', 'HI')))
+#})
 
-li_map_litfiber <- reactive({
+#li_map_litfiber <- reactive({
   
-  selected_state <- paste0('\"',input$state, '\"')
+ # selected_state <- paste0('\"',input$state, '\"')
   
-  services %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(band_factor == 100,
-           new_purpose %in% c("Internet"),
-           new_connect_type %in% c("Lit Fiber"),
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-           !(postal_cd %in% c('AK', 'HI')))
-  
-})
+  #services %>% 
+   # filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    #filter(band_factor == 100,
+     #      new_purpose %in% c("Internet"),
+      #     new_connect_type %in% c("Lit Fiber"),
+       #    district_size %in% input$district_size,
+        #   locale %in% input$locale,
+         #  !(postal_cd %in% c('AK', 'HI')))
+#})
 
 ##Keep as main reactive function using district deluxe table
 district_subset <- reactive({
@@ -162,8 +156,8 @@ district_subset <- reactive({
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
-           locale %in% input$locale,
-           !(postal_cd %in% c('AK', 'HI')))
+           locale %in% input$locale)#,
+           #!(postal_cd %in% c('AK', 'HI')))
 
   })
 
@@ -195,6 +189,8 @@ state_subset_size <- reactive({
 })
 
 ##### reactive functions for goals section
+
+# use the main reactive function, and create columns later!
 district_goals <- reactive({
   
   selected_dataset <- paste0('\"', input$dataset, '\"')
@@ -215,7 +211,7 @@ district_goals <- reactive({
 ##### districts meeting goals (% districts, students)
 
 district_ia_meeting_goals <- reactive({
-  
+# identical to district_goals, consolidate 
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -234,6 +230,8 @@ district_ia_meeting_goals <- reactive({
 ### Districts Meeting Goals by IA Technology
 
 meeting_goals_ia_technology <- reactive({
+  # use the main reactive but do the groupby statements later 
+  # i would create a sidebar checkbox for meeting_goals
   
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
@@ -253,7 +251,7 @@ meeting_goals_ia_technology <- reactive({
 ### Districts Not Meeting Goals by IA Technology
 
 not_meeting_goals_ia_technology <- reactive({
-  
+  # same goes here
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -274,7 +272,7 @@ not_meeting_goals_ia_technology <- reactive({
 ## WAN goals: current vs. projected needs
 
 projected_wan_needs <- reactive({
-  
+  # use main and then summarize later 
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -297,7 +295,7 @@ projected_wan_needs <- reactive({
 
 ### distribution of schools on fiber
 schools_on_fiber <- reactive({
-  
+  # same
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -327,7 +325,8 @@ by_erate_discounts <- reactive({
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
            locale %in% input$locale,
-           !is.na(c1_discount_rate),
+          # from here, i can do outside of the reactive 
+            !is.na(c1_discount_rate),
            not_all_scalable == 1) %>% # only include districts that are unscalable
     group_by(c1_discount_rate) %>%
     summarize(n_unscalable_schools_in_rate_band = n()) %>%
@@ -340,7 +339,7 @@ by_erate_discounts <- reactive({
 
 # districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
 hypothetical_median_cost <- reactive({
-  
+  # same idea
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -354,7 +353,7 @@ hypothetical_median_cost <- reactive({
 })
 
 hypothetical_ia_goal <- reactive({
-
+# same idea
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
 
@@ -894,7 +893,7 @@ output$table_cost_comparison_by_state <- renderTable({
   #data$postal_cd[data$postal_cd != input$state] <- "National Excluding Selected State"
   
  
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
+  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
   #validate(
   #  need(nrow(data > 0), "No circuits in given subset")
   #)
@@ -952,7 +951,7 @@ output$table_cost_comparison_by_state <- renderTable({
   #excluding the state that is specifically being compared to rest of the nation
  # data <- li_all()
   
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
+  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
 #  validate(
  #   need(nrow(data > 0), "No circuits in given subset")
 #  )

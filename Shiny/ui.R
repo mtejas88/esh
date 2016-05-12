@@ -203,7 +203,7 @@ shinyUI(fluidPage(
                             tabPanel("Districts Meeting 2018 IA Goal (w/ oversub)", plotOutput("map_2018_goals"), textOutput("n_ddt4")),
                             tabPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")),
                             tabPanel("Price Dispersion: Automatic, in development", plotOutput("map_price_dispersion_automatic")), 
-                            tabPanel("Price Dispersion: Lit Fiber IA - 100 mbps", plotOutput("map_price_dispersion_litfiber_ia_100mbps")),
+                            #tabPanel("Price Dispersion: Lit Fiber IA - 100 mbps", plotOutput("map_price_dispersion_litfiber_ia_100mbps")),
                             tabPanel("District Lookup", leafletOutput("testing_leaflet"), p(), actionButton("districtSelect", "New points"))), #closing navbarMenu
                  tabPanel("View Underlying Data", h3(tableOutput("table")))
       ) #closing navbarPage
