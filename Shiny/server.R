@@ -144,7 +144,33 @@ shinyServer(function(input, output, session) {
         #   locale %in% input$locale,
          #  !(postal_cd %in% c('AK', 'HI')))
 #})
-
+  ######
+  ## reactive functions for ESH Sample section
+  ######
+  
+  state_subset_locale <- reactive({
+    
+    # only include options for state selection
+    #  selected_dataset <- paste0('\"', input$dataset, '\"')
+    selected_state <- paste0('\"',input$state, '\"')
+    sample <- paste0(input$state, " Clean")
+    
+    locale_cuts %>% 
+      filter(postal_cd %in% c(input$state, sample))
+    
+  })
+  
+  state_subset_size <- reactive({
+    
+    # only include options for state selection
+    #  selected_dataset <- paste0('\"', input$dataset, '\"')
+    selected_state <- paste0('\"',input$state, '\"')
+    sample <- paste0(input$state, " Clean")
+    
+    size_cuts %>% 
+      filter(postal_cd %in% c(input$state, sample))
+  })
+  
 ##Keep as main reactive function using district deluxe table
 district_subset <- reactive({
       
@@ -161,52 +187,6 @@ district_subset <- reactive({
 
   })
 
-######
-## reactive functions for ESH Sample section
-######
-
-state_subset_locale <- reactive({
-  
-  # only include options for state selection
-  #  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  sample <- paste0(input$state, " Clean")
-  
-  locale_cuts %>% 
-    filter(postal_cd %in% c(input$state, sample))
-  
-})
-
-state_subset_size <- reactive({
-  
-  # only include options for state selection
-  #  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  sample <- paste0(input$state, " Clean")
-  
-  size_cuts %>% 
-    filter(postal_cd %in% c(input$state, sample))
-})
-
-##### reactive functions for goals section
-
-# use the main reactive function, and create columns later!
-district_goals <- reactive({
-  
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(new_connect_type %in% input$connection_districts, 
-           district_size %in% input$district_size,
-           locale %in% input$locale) %>%
-    summarize(n = n(),
-              percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
-              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
-  
-})
 
 ##### districts meeting goals (% districts, students)
 
@@ -449,14 +429,19 @@ output$table_size <- renderTable({
 ## Districts and Students Meeting Goals
 output$histogram_goals <- renderPlot({
   
-  data <- district_goals()
+  data <- district_subset() %>%
+            summarize(n = n(),
+                      percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+                      percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   data <- melt(data)
 
   q <- ggplot(data = data[-which(data$variable == "n"), ]) +
-         geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
+         geom_bar(aes(x = variable, y = value), fill="#fdb913", stat = "identity") +
+         geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust =-1, size = 8) +
+         scale_y_continuous(limits = c(0, 100)) +
          theme_classic() + 
          theme(axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -472,8 +457,13 @@ output$histogram_goals <- renderPlot({
 ## Table of numbers in districts / students meeting goals
 output$table_goals <- renderTable({
   
-  data <- district_goals()
+  data <- district_subset() %>%
+           summarize(n = n(),
+              percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
+  validate(need(nrow(data) > 0, ""))  
+  data
 
 })
 
