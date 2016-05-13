@@ -68,15 +68,14 @@ shinyServer(function(input, output, session) {
                                             'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
                                             'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
-##Main data set to use to any Services Recieved related work: 
+
+  ##Main data set to use to any Services Recieved related work: 
   output$bandwidthSelect <- renderUI({
     #sr_data <- sr_all()
     sr_data <- services
     bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
     selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
   })
-  
-  
   
   sr_all <- reactive({
     selected_state <- paste0('\"',input$state, '\"')
@@ -92,58 +91,6 @@ shinyServer(function(input, output, session) {
       filter(bandwidth_in_mbps %in% selected_bandwidth_list)
   })  
 
-#can probably remove this   
-#li_all <- reactive({
-
- #   services %>% 
-  #    filter(new_purpose %in% input$purpose,
-   #          new_connect_type %in% input$connection_services, 
-    #         district_size %in% input$district_size,
-     #        locale %in% input$locale)
-#})
-  
-## Line Items with filter that now includes banding circuits by most popular circuit speeds
-## we can probably remove this
-#li_bf <- reactive({
-    
- #   selected_state <- paste0('\"',input$state, '\"')
-    
-  #  services %>% 
-   #   filter(band_factor %in% input$bandwidths,
-    #         new_purpose %in% input$purpose,
-     #        district_size %in% input$district_size,
-      #       locale %in% input$locale,
-       #      new_connect_type %in% input$connection_services) %>%
-      #filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
-#}) 
-
-##we can remove this as well and within the specific map we're using services data for, add condition for !(postal_cd....)
-#li_map <- reactive({
-  
- # selected_state <- paste0('\"',input$state, '\"')
-  
-#  services %>% 
- #   filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-  #  filter(band_factor %in% input$bandwidths,
-   #        new_purpose %in% input$purpose,
-    ##      locale %in% input$locale,
-      #     new_connect_type %in% input$connection_services,
-       #    !(postal_cd %in% c('AK', 'HI')))
-#})
-
-#li_map_litfiber <- reactive({
-  
- # selected_state <- paste0('\"',input$state, '\"')
-  
-  #services %>% 
-   # filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    #filter(band_factor == 100,
-     #      new_purpose %in% c("Internet"),
-      #     new_connect_type %in% c("Lit Fiber"),
-       #    district_size %in% input$district_size,
-        #   locale %in% input$locale,
-         #  !(postal_cd %in% c('AK', 'HI')))
-#})
   ######
   ## reactive functions for ESH Sample section
   ######
@@ -177,84 +124,15 @@ district_subset <- reactive({
     selected_dataset <- paste0('\"', input$dataset, '\"')
     selected_state <- paste0('\"',input$state, '\"')
 
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(new_connect_type %in% input$connection_districts, 
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-           meeting_2014_goal_no_oversub %in% input$meeting_goals)#,
-           #!(postal_cd %in% c('AK', 'HI')))
-
+    districts %>% 
+      filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
+      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+      filter(new_connect_type %in% input$connection_districts, 
+             district_size %in% input$district_size,
+             locale %in% input$locale,
+             meeting_2014_goal_no_oversub %in% input$meeting_goals)#,
+             
   })
-
-## WAN goals: current vs. projected needs
-
-projected_wan_needs <- reactive({
-  # use main and then summarize later 
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(new_connect_type %in% input$connection_districts, 
-           district_size %in% input$district_size,
-           locale %in% input$locale) %>%
-    summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
-              n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
-              percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
-              n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
-              n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
-              percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
-      
-})
-
-##### reactive functions for fiber section
-
-### distribution of schools on fiber
-schools_on_fiber <- reactive({
-  # same
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(new_connect_type %in% input$connection_districts, 
-           district_size %in% input$district_size,
-           locale %in% input$locale) %>%
-    summarize(num_schools = sum(num_campuses),
-              num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
-              num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses + nga_v2_assumed_unscalable_campuses),
-              percent_on_fiber = round(num_schools_on_fiber / sum(num_campuses), 2),
-              percent_need_upgrades = round(num_schools_need_upgrades / sum(num_campuses), 2))
-
-})
-
-### districts by c1 discount rates
-by_erate_discounts <- reactive({
-  
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(new_connect_type %in% input$connection_districts, 
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-          # from here, i can do outside of the reactive 
-            !is.na(c1_discount_rate),
-           not_all_scalable == 1) %>% # only include districts that are unscalable
-    group_by(c1_discount_rate) %>%
-    summarize(n_unscalable_schools_in_rate_band = n()) %>%
-    mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
-           percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
-
-})
-
-### reactive function for affordability section
 
 # districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
 hypothetical_median_cost <- reactive({
@@ -418,11 +296,10 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
-  q <- ggplot(data = data) +
-       geom_bar(aes(x = hierarchy_connect_category, y = n_percent_districts), 
-                    fill = "#fdb913", stat = "identity") +
-       geom_text(aes(label = paste0(n_percent_districts, "%"), x = hierarchy_connect_category, y = n_percent_districts), 
-                 vjust =-1, size = 6) +
+  q <- ggplot(data = data, aes(x = hierarchy_connect_category, y = n_percent_districts)) +
+       geom_bar(fill = "#fdb913", stat = "identity") +
+       geom_text(aes(label = paste0(n_percent_districts, "%")), 
+                 vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 100)) +
        scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        theme_classic() + 
@@ -453,31 +330,47 @@ output$table_districts_ia_technology <- renderTable({
 ## WAN Goals: Current vs. Projected Needs
 output$histogram_projected_wan_needs <- renderPlot({
   
-  data <- projected_wan_needs()
+  data <- district_subset() %>%
+          summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
+                    n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
+                    percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
+                    n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
+                    n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
+                    percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   data <- melt(data)
   
-  q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")), ]) +
-    geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
-  
+  q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),],
+              aes(x = variable, y = value)) +
+       geom_bar(fill="#fdb913", stat = "identity") +
+        geom_text(aes(label = paste0(value, "%")), 
+                  vjust =-1, size = 6) +
+        scale_y_continuous(limits = c(0, 100)) +
+        theme_classic() + 
+        theme(axis.line = element_blank(), 
+              axis.text.x=element_text(size=14, colour= "#899DA4"), 
+              axis.text.y = element_blank(),
+              axis.ticks = element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank()) 
+      
   print(q)
-  
-  
   
 })
 
 output$table_projected_wan_needs <- renderTable({
   
-  data <- projected_wan_needs()
+  data <- district_subset() %>%
+          summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
+                    n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
+                    percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
+                    n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
+                    n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
+                    percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
+        
+  
   validate(need(nrow(data) > 0, ""))
   
   data
@@ -589,17 +482,24 @@ output$table_hypothetical_ia_goal <- renderTable({
 ## Districts and Students Meeting Goals
 output$histogram_schools_on_fiber <- renderPlot({
   
-  
-  data <- schools_on_fiber()
+  data <- district_subset() %>%
+          summarize(num_schools = sum(num_campuses),
+                    num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
+                    num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses + nga_v2_assumed_unscalable_campuses),
+                    percent_on_fiber = round(100 * num_schools_on_fiber / sum(num_campuses), 2),
+                    percent_need_upgrades = round(100 * num_schools_need_upgrades / sum(num_campuses), 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   data <- melt(data)
   
-  q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_need_upgrades")), ]) +
-      geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
-      theme_classic() + 
-      theme(axis.line = element_blank(), 
+  q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_need_upgrades")), ],
+              aes(x = variable, y = value)) +
+       geom_bar(fill="#009291", stat = "identity") +
+       geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
+       scale_y_continuous(limits = c(0, 100)) +
+       theme_classic() + 
+       theme(axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
             axis.text.y = element_blank(),
             axis.ticks = element_blank(),
@@ -613,7 +513,12 @@ output$histogram_schools_on_fiber <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_schools_on_fiber <- renderTable({
   
-  data <- schools_on_fiber()
+  data <- district_subset() %>%
+          summarize(num_schools = sum(num_campuses),
+                    num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
+                    num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses + nga_v2_assumed_unscalable_campuses),
+                    percent_on_fiber = round(100 * num_schools_on_fiber / sum(num_campuses), 2),
+                    percent_need_upgrades = round(100 * num_schools_need_upgrades / sum(num_campuses), 2))
   validate(need(nrow(data) > 0, ""))  
   
   data
@@ -625,14 +530,22 @@ output$table_schools_on_fiber <- renderTable({
 output$histogram_by_erate_discounts <- renderPlot({
   
   
-  data <- by_erate_discounts()
-  
+  data <- district_subset() %>%
+          filter(!is.na(c1_discount_rate),
+                 not_all_scalable == 1) %>% # only include districts that are unscalable
+          group_by(c1_discount_rate) %>%
+          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
+                 percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
+
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
 
-  q <- ggplot(data = data) +
-    geom_bar(aes(x = as.factor(c1_discount_rate), y = percent_unscalable_schools_in_rate_band), fill="#009291", stat = "identity") +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
+  q <- ggplot(data = data, aes(x = as.factor(c1_discount_rate), y = percent_unscalable_schools_in_rate_band)) +
+       geom_bar(fill="#009291", stat = "identity") +
+       geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust =-1, size = 6) +
+       scale_y_continuous(limits = c(0, 100)) +
+       theme_classic() + 
+       theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
@@ -646,9 +559,15 @@ output$histogram_by_erate_discounts <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_by_erate_discounts <- renderTable({
   
-  data <- by_erate_discounts()
+  data <- district_subset() %>%
+          filter(!is.na(c1_discount_rate),
+                 not_all_scalable == 1) %>% # only include districts that are unscalable
+          group_by(c1_discount_rate) %>%
+          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
+                 percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
+        
   validate(need(nrow(data) > 0, ""))  
-  
   data
   
 })
@@ -726,7 +645,7 @@ output$bw_plot <- renderPlot({
 
 output$counts_table <- renderTable({
   
-  data <- li_bf()
+  data <- sr_all()
   
   data %>% 
     group_by(band_factor) %>% 
@@ -737,7 +656,7 @@ output$counts_table <- renderTable({
 
 output$prices_table <- renderTable({
   
-  data <- li_bf()
+  data <- sr_all()
   
   data %>% 
     group_by(band_factor) %>% 
@@ -752,7 +671,7 @@ output$prices_table <- renderTable({
 
 output$histogram_cost_comparison_by_state <- renderPlot({
   
-  data <- li_bf()
+  data <- sr_all()
   
   plot_data <- data %>%
                group_by(postal_cd) %>%
@@ -784,7 +703,7 @@ output$histogram_cost_comparison_by_state <- renderPlot({
 
 output$table_cost_comparison_by_state <- renderTable({
   
-  data <- li_bf()
+  data <- sr_all()
   
   plot_data <- data %>%
     group_by(postal_cd) %>%
@@ -946,7 +865,8 @@ output$table_cost_comparison_by_state <- renderTable({
 
 output$districtSelect <- renderUI({
   
-  data <- district_subset()
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
     need(nrow(data) > 0, "No districts in given subset")
@@ -959,7 +879,9 @@ output$districtSelect <- renderUI({
 
 output$choose_district <- renderPlot({
   
-  data <- district_subset()
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
+  
   selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
   
   data <- data %>% 
@@ -993,7 +915,8 @@ output$choose_district <- renderPlot({
 # map of districts in population 
 output$map_population <- renderPlot({
   
-  data <- district_subset()
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
     need(nrow(data) > 0, "No districts in given subset")
@@ -1022,7 +945,8 @@ output$map_population <- renderPlot({
 
 output$map_cleanliness <- renderPlot({
   
-  data <- district_subset()
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
     need(nrow(data) > 0, "No districts in given subset")
@@ -1052,9 +976,10 @@ output$map_cleanliness <- renderPlot({
 
 output$map_2014_goals <- renderPlot({
   
-  validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
-  )
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
+  
+  validate(need(nrow(data) > 0, "No districts in given subset"))
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_df <- map_data("county", region = state_name)
@@ -1078,9 +1003,10 @@ output$map_2014_goals <- renderPlot({
 
 output$map_2018_goals <- renderPlot({
   
-  validate(
-    need(nrow(district_subset()) > 0, "No districts in given subset")
-  )
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
+  
+  validate(need(nrow(data) > 0, "No districts in given subset"))
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_df <- map_data("county", region = state_name)
@@ -1095,7 +1021,7 @@ output$map_2018_goals <- renderPlot({
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
-       geom_point(data = district_subset(), aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
+       geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
                                alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 1Mbps/student Goal", 
                                                                                       "Does Not Meet 1Mbps/student Goal"), values = c("#A3E5E6", "#CCCCCC")) #+
   
@@ -1106,7 +1032,8 @@ output$map_2018_goals <- renderPlot({
 # Map of Districts at least 1 Unscalable School
 output$map_fiber_needs <- renderPlot({
   
-  data <- district_subset()
+  data <- district_subset() %>%
+          filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
     need(nrow(data) > 0, "No districts in given subset")
@@ -1142,89 +1069,42 @@ output$map_fiber_needs <- renderPlot({
 
 # Price Dispersion Map holding Circuit Size / Technology Constant
 # automatic update -- not quite working out
-output$map_price_dispersion_automatic <- renderPlot({
+#output$map_price_dispersion_automatic <- renderPlot({
   
-  data <- li_map()
+ # data <- li_map()
   # data <- data[!is.na(data$bubble_size_beta), ]   # remove those outside of common bandwidths
   
-  validate(
-    need(nrow(data) > 0, "No districts in given subset")
-  )
+  #validate(
+   # need(nrow(data) > 0, "No districts in given subset")
+  #)
 
-  state_name <- state_lookup$name[state_lookup$code == input$state] 
-  state_df <- map_data("county", region = state_name)
+  #state_name <- state_lookup$name[state_lookup$code == input$state] 
+  #state_df <- map_data("county", region = state_name)
   
-  set.seed(123) #to control jitter
-  state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
-                 color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank())
+  #set.seed(123) #to control jitter
+  #state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) + 
+  #  geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
+   #              color = 'black', fill = NA) +
+  #  theme_classic() +
+  #  theme(line = element_blank(), title = element_blank(), 
+   #       axis.text.x = element_blank(), axis.text.y = element_blank())
   #                      legend.text = element_text(size = 16), legend.position = "bottom") 
   # guides(shape = guide_legend(override.aes = list(size = 7))) 
   
-  q <- state_base + 
-    geom_point(data = data, aes(x = longitude, y = latitude, 
-                                size = factor(bubble_size), 
-                                order = factor(price_bucket)),
-               colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
-    scale_size_manual(values = data$bubble_size, 
-                      limits = data$bubble_size, 
-                      label = data$price_bucket) + 
-    guides(col = guide_legend(nrow = 5)) 
+  #q <- state_base + 
+  #  geom_point(data = data, aes(x = longitude, y = latitude, 
+   #                             size = factor(bubble_size), 
+    #                            order = factor(price_bucket)),
+     #          colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
+    #scale_size_manual(values = data$bubble_size, 
+     #                 limits = data$bubble_size, 
+      #                label = data$price_bucket) + 
+    #guides(col = guide_legend(nrow = 5)) 
     #ggtitle("100 mbps Lit Fiber IA Price Dispersion\n(Filters are inactive in this view)\n\n\n")
   #     theme(legend.position="bottom")
   
-  print(q + coord_map())
-  
-  
-})  
-
-# limit to lit fiber, 100 mbps, internet only 
-output$map_price_dispersion_litfiber_ia_100mbps <- renderPlot({
-  
-  data <- li_map_litfiber()
-  # data <- data[!is.na(data$bubble_size_beta), ]   # remove those outside of common bandwidths
-  
-  validate(
-    need(nrow(data) > 0, "No districts in given subset")
-  )
-  
-state_name <- state_lookup$name[state_lookup$code == input$state] 
-state_df <- map_data("county", region = state_name)
-
-set.seed(123) #to control jitter
-state_base <-  ggplot(data = state_df, aes(x = long, y = lat)) + 
-               geom_polygon(data = state_df, aes(x = long, y = lat, group = group),
-                           color = 'black', fill = NA) +
-                theme_classic() +
-                theme(line = element_blank(), #title = element_blank(), 
-                      axis.text = element_blank())
-#                      legend.text = element_text(size = 16), legend.position = "bottom") 
-                # guides(shape = guide_legend(override.aes = list(size = 7))) 
-
-q <- state_base + 
-     geom_point(data = data, aes(x = longitude, y = latitude, #group = price_bucket_beta, 
-                                 size = factor(bubble_size_beta), 
-                                 order = factor(price_bucket_beta, 
-                                                levels = c("less than $1,000", "$1,000 - less than $2,000",  "$2,000 - less than $4,000", "$4,000 - less than $6,000", "more than $6,000"))        ),
-                colour = "#009692", alpha = 0.7,  position = position_jitter(w = 0.07, h = 0.05)) +
-     scale_size_manual(values = data$bubble_size_beta, 
-                       limits = data$bubble_size_beta, 
-                       label = data$price_bucket_beta) + 
-     guides(col = guide_legend(nrow = 5)) +
-     ggtitle("100 mbps Lit Fiber IA Price Dispersion\n(Filters are inactive in this view)\n\n\n") +
-     theme(line = element_blank(), #title = element_blank(), 
-           axis.text = element_blank(),
-           axis.title = element_blank())
-#     theme(legend.position="bottom")
-
-print(q + coord_map())
-
-
-})  
-
+  #print(q + coord_map())
+  #})  
 
 
 general_monthly_cpm <- reactive({
@@ -1393,10 +1273,10 @@ datasetInput <- reactive({
   selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
   
   
-  li_bf <- li_bf() %>% 
+  li_bf <- li_bfsr_all() %>% 
            filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
   
-  li_all2 <- li_all()
+  #li_all2 <- li_all()
   #li_subset <- li2() %>% mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%    
   #  filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
   #  filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
