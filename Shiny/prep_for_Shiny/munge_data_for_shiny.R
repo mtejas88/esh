@@ -11,8 +11,8 @@ sapply(lib, function(x) require(x, character.only = TRUE))
 wd <- "~/Google Drive/github/ficher/Shiny/prep_for_Shiny"
 setwd(wd)
 
-services <- read.csv("services_received_20160502.csv", as.is = TRUE)
-districts <- read.csv("deluxe_districts_20160502.csv", as.is = TRUE)
+services <- read.csv("services_received_20160517.csv", as.is = TRUE)
+districts <- read.csv("deluxe_districts_20160517.csv", as.is = TRUE)
 discounts <- read.csv("district_discount_rates_20160414.csv", as.is = TRUE)
 usac_matrix <- read.csv("usac_discount_matrix.csv", as.is = TRUE)
 schools_needing_wan <- read.csv("schools_needing_wan_20160428.csv", as.is = TRUE)
@@ -207,7 +207,12 @@ data <- schools_needing_wan %>%
                   n_schools_in_wan_needs_calculation = n())
 
 districts <- left_join(districts, data, by = c("esh_id"))
-rm(data)
+
+missing_n <- which(is.na(districts$n_schools_in_wan_needs_calculation))
+districts[missing_n, ]$n_schools_wan_needs <- 0
+districts[missing_n, ]$n_schools_in_wan_needs_calculation <- 0
+
+rm(data, missing_n)
 
 
 ## END
