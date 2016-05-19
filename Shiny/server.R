@@ -6,8 +6,6 @@
 #wd <- "~/Google Drive/github/ficher/Shiny"
 #setwd(wd)
 
-
-
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -17,7 +15,6 @@ shinyServer(function(input, output, session) {
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
   
-
   #library("dplyr")
   #library("shiny")
   #library("tidyr")
@@ -41,6 +38,7 @@ shinyServer(function(input, output, session) {
   library(ggmap)
   library(reshape)
   library(leaflet)
+  library(ggvis)
 
   #sapply(lib, function(x) library(x, character.only = TRUE))
 
@@ -48,8 +46,8 @@ shinyServer(function(input, output, session) {
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
   locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
   size_cuts <- read.csv("size_cuts.csv", as.is = TRUE)
-  
-  
+
+
   # factorize
   services$band_factor <- as.factor(services$band_factor)
   services$postal_cd <- as.factor(services$postal_cd)
@@ -70,8 +68,31 @@ shinyServer(function(input, output, session) {
                                             'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
                                             'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
+##Main data set to use to any Services Recieved related work: 
+  output$bandwidthSelect <- renderUI({
+    #sr_data <- sr_all()
+    sr_data <- services
+    bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
+    selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
+  })
   
   
+  
+  sr_all <- reactive({
+    selected_state <- paste0('\"',input$state, '\"')
+    selected_bandwidth_list <- paste0(input$bandwidth_list)
+    selected_bandwidth_list <- as.numeric(selected_bandwidth_list)
+    
+    services %>% 
+      filter(new_purpose %in% input$purpose,
+             new_connect_type %in% input$connection_services,
+             district_size %in% input$district_size,
+             locale %in% input$locale) %>%
+      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+      filter(bandwidth_in_mbps %in% selected_bandwidth_list)
+  })  
+
+#can probably remove this   
 #li_all <- reactive({
 
  #   services %>% 
@@ -79,53 +100,52 @@ shinyServer(function(input, output, session) {
    #          new_connect_type %in% input$connection_services, 
     #         district_size %in% input$district_size,
      #        locale %in% input$locale)
-  
 #})
   
 ## Line Items with filter that now includes banding circuits by most popular circuit speeds
-li_bf <- reactive({
+## we can probably remove this
+#li_bf <- reactive({
     
-    selected_state <- paste0('\"',input$state, '\"')
+ #   selected_state <- paste0('\"',input$state, '\"')
     
-    services %>% 
-      filter(band_factor %in% input$bandwidths,
-             new_purpose %in% input$purpose,
-             district_size %in% input$district_size,
-             locale %in% input$locale,
-             new_connect_type %in% input$connection_services) %>%
-      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
-}) 
+  #  services %>% 
+   #   filter(band_factor %in% input$bandwidths,
+    #         new_purpose %in% input$purpose,
+     #        district_size %in% input$district_size,
+      #       locale %in% input$locale,
+       #      new_connect_type %in% input$connection_services) %>%
+      #filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
+#}) 
 
-li_map <- reactive({
+##we can remove this as well and within the specific map we're using services data for, add condition for !(postal_cd....)
+#li_map <- reactive({
   
-  selected_state <- paste0('\"',input$state, '\"')
+ # selected_state <- paste0('\"',input$state, '\"')
   
-  services %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-    filter(band_factor %in% input$bandwidths,
-           new_purpose %in% input$purpose,
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-           new_connect_type %in% input$connection_services,
-           !(postal_cd %in% c('AK', 'HI')))
-  
-})
+#  services %>% 
+ #   filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
+  #  filter(band_factor %in% input$bandwidths,
+   #        new_purpose %in% input$purpose,
+    ##      locale %in% input$locale,
+      #     new_connect_type %in% input$connection_services,
+       #    !(postal_cd %in% c('AK', 'HI')))
+#})
 
-li_map_litfiber <- reactive({
+#li_map_litfiber <- reactive({
   
-  selected_state <- paste0('\"',input$state, '\"')
+ # selected_state <- paste0('\"',input$state, '\"')
   
-  services %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-    filter(band_factor == 100,
-           new_purpose %in% c("Internet"),
-           new_connect_type %in% c("Lit Fiber"),
-           district_size %in% input$district_size,
-           locale %in% input$locale,
-           !(postal_cd %in% c('AK', 'HI')))
-  
-})
+  #services %>% 
+   # filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
+    #filter(band_factor == 100,
+     #      new_purpose %in% c("Internet"),
+      #     new_connect_type %in% c("Lit Fiber"),
+       #    district_size %in% input$district_size,
+        #   locale %in% input$locale,
+         #  !(postal_cd %in% c('AK', 'HI')))
+#})
 
+##Keep as main reactive function using district deluxe table
 district_subset <- reactive({
       
     selected_dataset <- paste0('\"', input$dataset, '\"')
@@ -136,8 +156,8 @@ district_subset <- reactive({
     filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
-           locale %in% input$locale,
-           !(postal_cd %in% c('AK', 'HI')))
+           locale %in% input$locale)#,
+           #!(postal_cd %in% c('AK', 'HI')))
 
   })
 
@@ -169,6 +189,8 @@ state_subset_size <- reactive({
 })
 
 ##### reactive functions for goals section
+
+# use the main reactive function, and create columns later!
 district_goals <- reactive({
   
   selected_dataset <- paste0('\"', input$dataset, '\"')
@@ -189,7 +211,7 @@ district_goals <- reactive({
 ##### districts meeting goals (% districts, students)
 
 district_ia_meeting_goals <- reactive({
-  
+# identical to district_goals, consolidate 
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -208,6 +230,8 @@ district_ia_meeting_goals <- reactive({
 ### Districts Meeting Goals by IA Technology
 
 meeting_goals_ia_technology <- reactive({
+  # use the main reactive but do the groupby statements later 
+  # i would create a sidebar checkbox for meeting_goals
   
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
@@ -227,7 +251,7 @@ meeting_goals_ia_technology <- reactive({
 ### Districts Not Meeting Goals by IA Technology
 
 not_meeting_goals_ia_technology <- reactive({
-  
+  # same goes here
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -248,7 +272,7 @@ not_meeting_goals_ia_technology <- reactive({
 ## WAN goals: current vs. projected needs
 
 projected_wan_needs <- reactive({
-  
+  # use main and then summarize later 
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -271,7 +295,7 @@ projected_wan_needs <- reactive({
 
 ### distribution of schools on fiber
 schools_on_fiber <- reactive({
-  
+  # same
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -301,7 +325,8 @@ by_erate_discounts <- reactive({
     filter(new_connect_type %in% input$connection_districts, 
            district_size %in% input$district_size,
            locale %in% input$locale,
-           !is.na(c1_discount_rate),
+          # from here, i can do outside of the reactive 
+            !is.na(c1_discount_rate),
            not_all_scalable == 1) %>% # only include districts that are unscalable
     group_by(c1_discount_rate) %>%
     summarize(n_unscalable_schools_in_rate_band = n()) %>%
@@ -314,7 +339,7 @@ by_erate_discounts <- reactive({
 
 # districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
 hypothetical_median_cost <- reactive({
-  
+  # same idea
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
   
@@ -328,7 +353,7 @@ hypothetical_median_cost <- reactive({
 })
 
 hypothetical_ia_goal <- reactive({
-
+# same idea
   selected_dataset <- paste0('\"', input$dataset, '\"')
   selected_state <- paste0('\"',input$state, '\"')
 
@@ -744,31 +769,32 @@ output$table_by_erate_discounts <- renderTable({
 
 output$bw_plot <- renderPlot({
   
-  data <- li_bf()
-  validate(need(nrow(data) > 0, "No circuits in given subset"))
+  #data <- li_bf()
+  #validate(need(nrow(data) > 0, "No circuits in given subset"))
   
-  give.n <- function(x){
-    return(c(y = median(x) * 0.85, label = length(x))) 
-    # experiment with the multiplier to find the perfect position
-  }
+  data <- sr_all()
   
-  meds <- data %>% 
-          group_by(band_factor) %>% 
-          summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
+  #give.n <- function(x){
+  #  return(c(y = median(x) * 0.85, label = length(x))) 
+  #  # experiment with the multiplier to find the perfect position
+  #}
   
-  dollar_format(largest_with_cents=1)
+  #meds <- data %>% 
+  #        group_by(band_factor) %>% 
+  #        summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
   
-  ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]   #column 1 and 5 are min and max
+  #dollar_format(largest_with_cents=1)
   
-  p0 <- ggplot(data, aes(x = band_factor, y = monthly_cost_per_circuit)) + 
+  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]   #column 1 and 5 are min and max
+  
+  p0 <- ggplot(data, aes(x = factor(bandwidth_in_mbps), y = monthly_cost_per_circuit)) + 
         geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) 
-  #+ 
-   #     stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 5) 
+  #+ stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 5) 
       
   a <- p0 + 
-       coord_cartesian(ylim = ylim1 * 2.0) + 
-       scale_y_continuous("", labels = dollar) +
-    #   geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
+     #  coord_cartesian(ylim = ylim1 * 2.0) + 
+     # scale_y_continuous("", labels = dollar) +
+     # geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
      #            size = 5, vjust = -.3, colour= "#F26B21", hjust=.5)+
        theme_classic() + 
        theme(axis.line = element_blank(), 
@@ -867,7 +893,7 @@ output$table_cost_comparison_by_state <- renderTable({
   #data$postal_cd[data$postal_cd != input$state] <- "National Excluding Selected State"
   
  
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
+  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
   #validate(
   #  need(nrow(data > 0), "No circuits in given subset")
   #)
@@ -925,7 +951,7 @@ output$table_cost_comparison_by_state <- renderTable({
   #excluding the state that is specifically being compared to rest of the nation
  # data <- li_all()
   
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ‘>’ not meaningful for factors"
+  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
 #  validate(
  #   need(nrow(data > 0), "No circuits in given subset")
 #  )
@@ -1001,6 +1027,7 @@ output$table_cost_comparison_by_state <- renderTable({
 ###### 
 ## Maps
 ######
+
 
 output$districtSelect <- renderUI({
   
@@ -1239,10 +1266,7 @@ output$map_price_dispersion_automatic <- renderPlot({
   
 })  
 
-
-
 # limit to lit fiber, 100 mbps, internet only 
-
 output$map_price_dispersion_litfiber_ia_100mbps <- renderPlot({
   
   data <- li_map_litfiber()
@@ -1287,48 +1311,109 @@ print(q + coord_map())
 })  
 
 
+
+general_monthly_cpm <- reactive({
+  sr_all() %>% 
+    ggvis(~monthly_cost_per_mbps) %>% 
+    layer_histograms(width = 50, fill := "#009296", fillOpacity := 0.4)
+  
+})
+
+general_monthly_cpm %>% bind_shiny("gen_m_cpm")
+
+
+
+price_disp_cpc <- reactive({
+
+    data <- sr_all()
+    data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
+    percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
+    perc_tab <- as.data.frame(percentiles)  
+    add_perc <- c("25th","Median", "75th")
+    perc_tab <- cbind(perc_tab, add_perc)
+    perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+ 
+    print(str(perc_tab))
+  
+    perc_tab %>% 
+    ggvis(x = ~add_perc, y = ~percentiles, fill := "#FDB913", fillOpacity := 0.6) %>% 
+    layer_bars(strokeWidth := 0) %>%    
+    layer_rects(fill:="white") %>%
+    add_axis("x", title = "Percentile", title_offset = 50) %>% 
+    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75)
+    #hide_axis("y")
+  
+})
+
+price_disp_cpc %>% bind_shiny("price_disp_cpc")
+
+
+price_disp_cpm <- reactive({
+  
+  data <- sr_all()
+  data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
+  percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
+  perc_tab <- as.data.frame(percentiles)  
+  add_perc <- c("25th","Median", "75th")
+  perc_tab <- cbind(perc_tab, add_perc)
+  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+  
+  print(str(perc_tab))
+  
+  perc_tab %>% 
+    ggvis(x = ~add_perc, y = ~percentiles, fill := "#009296", fillOpacity := 0.6) %>% 
+    layer_bars(strokeWidth := 0) %>%    
+    layer_rects(fill:="white") %>%
+    add_axis("x", title = "Percentile", title_offset = 50) %>% 
+    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75)
+  #hide_axis("y")
+  
+})
+
+price_disp_cpm %>% bind_shiny("price_disp_cpm")
+
+
+
 # Function for generating tooltip text
-
-#district_tooltip <- function(x) {
-#  if (is.null(x)) return(NULL)
-#  #if (is.null(x$districtSelect)) return(NULL)
-#  all_districts <- isolate(district_subset())
-#  district <- all_districts[all_districts$name == x$name,]
-
-###  paste0("<b>", "District Name: ", district$name, "</b><br>",
-#         "# of students:", format(district$num_students, big.mark = ",", scientific = FALSE),"<br>",
-#         "IA Connect Type: ", district$hierarchy_connect_category)
-#}
-
-#vis <- reactive({
-#  maine <- readOGR("data/maine.geojson", "OGRGeoJSON")
-  
-#  map <- ggplot2::fortify(maine, region="name")
-  
-#  map %>%
-#    group_by(group, id) %>%
-#    ggvis(~long, ~lat) %>%
-##    layer_paths(strokeOpacity := 0.5, strokeWidth := 0.5) %>%
-#    ggvis(data = district_subset, x = ~longitude, y= ~latitude) %>% 
-#    layer_points(size := 50, size.hover := 200,
-#                 fillOpacity := 0.2, fillOpacity.hover := 0.5,
-#                 key := ~name) %>% 
-#    add_tooltip(district_tooltip, "hover")  %>%
-#   hide_axis("x") %>% hide_axis("y") %>% 
- #   set_options(width = 500, height = 500)
-  
-  
+#output$bandwidthSelect <- renderUI({
+#  sr_data <- sr_all()
+#  bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
+#  selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
 #})
 
 
+district_tooltip <- function(x) {
+  if (is.null(x)) return(NULL)
+  if (is.null(x$recipient_name)) return(NULL)
+  all_sr <- isolate(sr_all())
+  services_rec <- all_sr[all_sr$recipient_name == x$recipient_name,]
+  
+  paste0("<b>", "District Name: ", services_rec$recipient_name, "</b><br>",
+         "Monthly Cost per Circuit: $", format(services_rec$monthly_cost_per_circuit, big.mark = ",", scientific = FALSE),"<br>",
+         "# of Circuits: ", services_rec$quantity_of_lines_received_by_district, "<br>",
+         "Connect Type: ", services_rec$connect_type, "<br>")
+}
 
-#vis %>% bind_shiny("plot1")
+vis <- reactive({
+
+    sr_all() %>% 
+    ggvis(x = ~bandwidth_in_mbps, y = ~monthly_cost_per_circuit) %>% 
+    layer_points(size := 100, size.hover := 200, fill = ~factor(bandwidth_in_mbps),
+               fillOpacity := 0.4, fillOpacity.hover := 0.75,
+                key := ~recipient_name) %>% 
+    add_tooltip(district_tooltip, "hover")  %>%
+    add_axis("x", title = "Bandwidth in Mbps", title_offset = 50) %>% 
+    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75) %>% 
+    set_options(width = 800, height = 500)
+
+  
+})
+
+vis %>% bind_shiny("plot1")
 
 
 ##Trying leaflet: 
-
 output$testing_leaflet <- renderLeaflet({
-  #d <- district_subset() %>% select(name, longitude, latitude)
   
   data <- district_subset()
   selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
@@ -1345,8 +1430,7 @@ output$testing_leaflet <- renderLeaflet({
   leaflet() %>% 
     addTiles() %>% 
     addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~paste(content)) 
-    #addCircleMarkers(data = d, lng = ~longitude, lat = ~latitude, content)
-  
+
 })
 
 
