@@ -121,46 +121,76 @@ shinyUI(fluidPage(
         condition = "input.select_districts == true",
       uiOutput("districtSelect")),
       
-      checkboxInput("select_bandwidths", "Select Bandwidth(s)"),
+      checkboxInput("sr_filters", "Filters Tailored To Services Received Table Only"),
       conditionalPanel(
-        condition = "input.select_bandwidths == true",
-      uiOutput("bandwidthSelect")),
+        condition = "input.sr_filters == true",
+      uiOutput("bandwidthSelect"),
       
-      selectInput("dataset",
+      checkboxGroupInput(inputId = "purpose", 
+                         label = h2("Select Purpose(s) (applicable for B-W viz only)"),
+                         choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
+                         selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
+      
+      checkboxGroupInput(inputId = "connection_services", 
+                         h2("Select Connection Type(s) - line item view only"),
+                         choices = c("Dark Fiber", "Lit Fiber",
+                                     "Cable", "DSL", "Copper", "Other / Uncategorized"),
+                         selected = c("Dark Fiber", "Lit Fiber",
+                                      "Cable", "DSL", "Copper", "Other / Uncategorized"))),
+      
+      checkboxInput("district_filters", "Filters Tailored To Deluxe Districts Table Only"),
+      conditionalPanel(condition = "input.district_filters == true",
+          selectInput("dataset",
                   h2("Select Dataset (applicable for Maps only)"),
                   choices = c('All', 'Clean'), selected = 'All'),
+      
+          checkboxGroupInput(inputId = "connection_districts", 
+                         h2("Select Connection Type(s) - map/district view only"),
+                         choices = c("Fiber", "Cable", "DSL",
+                                     "Fixed Wireless", "Copper", "Other / Uncategorized"), 
+                         selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
+                                      "Copper", "Other / Uncategorized"))), 
+      
+      
+      
       #checkboxGroupInput(inputId = "bandwidths", 
       #                   label = h2("Select Circuit Size(s) (applicable for B-W viz only)"),
       #                   choices = c("50Mbps" = 50, "100Mbps" = 100, "500Mbps" = 500, 
       #                               "1Gbps" = 1000, "10Gbps" = 10000),
       #                   selected = c(50, 100, 500, 1000, 10000)),
 
-     checkboxGroupInput(inputId = "purpose", 
-                         label = h2("Select Purpose(s) (applicable for B-W viz only)"),
-                         choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
-                         selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
+     #checkboxGroupInput(inputId = "purpose", 
+      #                   label = h2("Select Purpose(s) (applicable for B-W viz only)"),
+      #                   choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
+      #                   selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
     
-     checkboxGroupInput(inputId = "connection_districts", 
-                       h2("Select Connection Type(s) - map/district view only"),
-                       choices = c("Fiber", "Cable", "DSL",
-                                   "Fixed Wireless", "Copper", "Other / Uncategorized"), 
-                       selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
-                                    "Copper", "Other / Uncategorized")), 
-     checkboxGroupInput(inputId = "connection_services", 
-                       h2("Select Connection Type(s) - line item view only"),
-                       choices = c("Dark Fiber", "Lit Fiber",
-                                   "Cable", "DSL", "Copper", "Other / Uncategorized"),
-                       selected = c("Dark Fiber", "Lit Fiber",
-                                    "Cable", "DSL", "Copper", "Other / Uncategorized")), 
+     #checkboxGroupInput(inputId = "connection_districts", 
+     #                   h2("Select Connection Type(s) - map/district view only"),
+    #                   choices = c("Fiber", "Cable", "DSL",
+    #                               "Fixed Wireless", "Copper", "Other / Uncategorized"), 
+    #                   selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
+    #                                "Copper", "Other / Uncategorized")), 
+     
+    #checkboxGroupInput(inputId = "connection_services", 
+    #                   h2("Select Connection Type(s) - line item view only"),
+    #                   choices = c("Dark Fiber", "Lit Fiber",
+    #                               "Cable", "DSL", "Copper", "Other / Uncategorized"),
+    #                   selected = c("Dark Fiber", "Lit Fiber",
+    #                                "Cable", "DSL", "Copper", "Other / Uncategorized")), 
+    
+    checkboxInput("district_size", "Select District Size"),
+    conditionalPanel(condition = "input.district_size == true",
       checkboxGroupInput(inputId = "district_size", 
                          label = h2("Select District Size(s)"),
                          choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                         selected = c("Tiny", "Small", "Medium", "Large", "Mega")),
-      
+                         selected = c("Tiny", "Small", "Medium", "Large", "Mega"))),
+    
+    checkboxInput("district_locale", "Select District Locale"),
+    conditionalPanel(condition = "input.district_locale == true",
       checkboxGroupInput(inputId = "locale", 
                          label = h2("Select Locale(s)"),
                          choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                         selected = c("Rural", "Small Town", "Suburban", "Urban"))
+                         selected = c("Rural", "Small Town", "Suburban", "Urban")))
 
       
     ),#closing sidebarPanel
