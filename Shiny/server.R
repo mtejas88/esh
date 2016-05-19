@@ -73,7 +73,7 @@ shinyServer(function(input, output, session) {
     #sr_data <- sr_all()
     sr_data <- services
     bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
-    selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
+    selectizeInput("bandwidth_list", h2("Input Bandwidth Circuit Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
   
@@ -811,7 +811,8 @@ output$bw_plot <- renderPlot({
 
 output$counts_table <- renderTable({
   
-  data <- li_bf()
+  #data <- li_bf()
+  data <- sr_all()
   
   data %>% 
     group_by(band_factor) %>% 
@@ -822,7 +823,8 @@ output$counts_table <- renderTable({
 
 output$prices_table <- renderTable({
   
-  data <- li_bf()
+  #data <- li_bf()
+  data <- sr_all()
   
   data %>% 
     group_by(band_factor) %>% 
@@ -1039,7 +1041,7 @@ output$districtSelect <- renderUI({
   
   district_list <- c(unique(as.character(data$name)))
   
-  selectInput("district_list", h2("Select District"), as.list(district_list), multiple = T) 
+  selectizeInput("district_list", h2("Input District Name"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 })
 
 output$choose_district <- renderPlot({
