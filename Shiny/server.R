@@ -14,20 +14,9 @@ shinyServer(function(input, output, session) {
   
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
-  
-  #library("dplyr")
-  #library("shiny")
-  #library("tidyr")
-  #library("ggplot2")
-  #library("scales")
-  #library("grid")
-  #library("maps")
-  #library("ggmap")
-
-  #library("reshape")
-
-  
-  #lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "maps", "ggmap", "ggvis")
+  #dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
+  #library(rJava)
+  #library(RJDBC)
   library(shiny)
   library(tidyr)
   library(dplyr)
@@ -38,10 +27,12 @@ shinyServer(function(input, output, session) {
   library(ggmap)
   library(reshape)
   library(leaflet)
+  library(DT)
   library(ggvis)
-
+  
   #sapply(lib, function(x) library(x, character.only = TRUE))
-
+  #services <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/services_received.SQL")
+  #districts <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/deluxe_districts.SQL")
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
   locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
@@ -135,27 +126,10 @@ district_subset <- reactive({
 
 # districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
 hypothetical_median_cost <- reactive({
-  # same idea
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-  
+
   districts %>% 
     filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-    group_by(meeting_2014_goal_no_oversub) %>%
-    summarize(n_districts = n(),
-              median_monthly_ia_cost_per_mbps = median(monthly_ia_cost_per_mbps, na.rm = TRUE))
-  
-})
-
-hypothetical_ia_goal <- reactive({
-# same idea
-  selected_dataset <- paste0('\"', input$dataset, '\"')
-  selected_state <- paste0('\"',input$state, '\"')
-
-  districts %>%
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state)))
+    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
   
 })
 
@@ -256,7 +230,7 @@ output$histogram_goals <- renderPlot({
 
   q <- ggplot(data = data[-which(data$variable == "n"), ]) +
          geom_bar(aes(x = variable, y = value), fill="#fdb913", stat = "identity") +
-         geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust =-1, size = 6) +
+         geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 100)) +
          theme_classic() + 
          theme(axis.line = element_blank(), 
@@ -391,10 +365,37 @@ output$table_projected_wan_needs <- renderTable({
 ## Median Pricing Districts Not Meeting vs. Meeting Goals
 output$histogram_hypothetical_median_cost <- renderPlot({
   
-  data <- hypothetical_median_cost()
+  data <- district_subset() 
   
+  cost_data <- data %>%
+               group_by(meeting_2014_goal_no_oversub) %>%
+               summarize(n_districts = n(),
+                         median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
   
-  q <- ggplot(data = data) +
+  current_pricing_percent_district_meeting_goals <- round(mean(100 *data$meeting_goals_district, na.rm = TRUE), 2)
+  
+  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
+  
+  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+  
+  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
+  
+  # for districts not meeting goals, replace their current bw with the hypothetical number
+  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
+  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
+  
+  hypothetical_pricing_percent_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
+  
+  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
+  plot_data1 <- melt(plot_data1)
+  plot_data1$label <- paste0(plot_data1$value, "%")
+  
+  plot_data2 <- cost_data[, c(1,3)]
+  names(plot_data2) <- c("variable", "value")
+  plot_data2$label <- paste0(plot_data2$value, "$")
+  plot_data <- rbind(plot_data2, plot_data1)
+  
+    q <- ggplot(data = data) +
        geom_bar(aes(x = meeting_2014_goal_no_oversub, y = median_monthly_ia_cost_per_mbps), fill="#009291", stat = "identity") +
        scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
        theme_classic() + 
@@ -425,25 +426,6 @@ output$table_hypothetical_median_cost2 <- renderTable({
 ## Median Pricing Districts Not Meeting vs. Meeting Goals
 output$histogram_hypothetical_ia_goal <- renderPlot({
   
-  cost <- hypothetical_median_cost()
-  data <- hypothetical_ia_goal()
-  
-  hypothetical_cost <- cost[cost$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
-  
-  current_pricing_percent_district_meeting_goals <- mean(data$meeting_goals_district, na.rm = TRUE)
-  
-  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
-  
-  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
-  
-  # for districts not meeting goals, replace their current bw with the hypothetical number
-  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
-  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
-  
-  hypothetical_pricing_percent_district_meeting_goals <- mean(data$new_meeting_goals_district, na.rm = TRUE)
-  
-  plot_data <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
-  plot_data <- melt(plot_data)
   
   q <- ggplot(data = plot_data) +
     geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
@@ -1184,6 +1166,10 @@ output$helptext_price_cpm <- renderUI({
              to clean data, relevant state, connection types, and bandwidth in mbps."))
 })
 
+output$helptext_price_cpm_scatter <- renderUI({
+  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
+             to clean data, relevant state, connection types, and bandwidth in mbps."))
+})
 
 # Function for generating tooltip text
 #output$bandwidthSelect <- renderUI({
@@ -1296,41 +1282,32 @@ output$n_ddt5 <- renderText({
 })
 
 #For downloadable subsets
+
 datasetInput <- reactive({
-  selected_state <- paste0('\"',input$state, '\"')
-  selected_bandwidths <- paste0("c(",toString(input$bandwidths), ')')
+  
+  district_data <- district_subset()
+  line_data <- sr_all()               
+  
+ #validate(
+#  need(nrow(district_subset()) > 0, "No districts in given subset")
+# )
+  
+#  validate(
+ #  need(nrow(sr_all()) > 0, "No line items in given subset")
+ # )
   
   
-  li_bf <- li_bfsr_all() %>% 
-           filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
+  #selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
+  #district_subset_specific <- district_subset() %>% filter_(paste("name %in%", selected_district_list))
   
-  #li_all2 <- li_all()
-  #li_subset <- li2() %>% mutate(band_factor = as.factor(bandwidth_in_mbps)) %>%    
-  #  filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>%
-  #  filter_(paste("bandwidth_in_mbps %in%", selected_bandwidths)) 
+  #validate(
+   # need(nrow(district_subset_specific) > 0, "No districts in given subset")
+  #)
   
-  validate(
-    need(nrow(li_bf) > 0, "No districts in given subset")
-  )
+  switch(input$download_dataset,
+         "districts_table" = district_data,
+         "line_items_table" = line_data)
   
-  #li_subset2 <- li2() %>% 
-  #              filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state)))
-  
-  validate(
-    need(nrow(li_all2) > 0, "No districts in given subset")
-  )
-  
-  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
-  district_subset_specific <- district_subset() %>% filter_(paste("name %in%", selected_district_list))
-  
-  validate(
-    need(nrow(district_subset_specific) > 0, "No districts in given subset")
-  )
-  
-  switch(input$subset,
-         "Line items for B-W" = li_bf,
-         "Line items for Comparisons" = li_all,
-         "Deluxe districts for Selected Districts" = district_subset_specific)
 })
 
 output$table <- renderTable({
@@ -1341,7 +1318,7 @@ output$table <- renderTable({
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$subset, '.csv', sep = '')},
+    paste(input$download_dataset, '_', Sys.Date(), '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput(), file)
   }

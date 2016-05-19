@@ -99,7 +99,7 @@ shinyUI(fluidPage(
     sidebarPanel(width = 3,
       #helpText("Making Shiny more efficient with reactive datasets"),
       
-    
+      
       selectInput("state", 
                   h2("Select State"), 
                   choices = c('All', 'AL','AR','AZ',
@@ -163,9 +163,13 @@ shinyUI(fluidPage(
       checkboxGroupInput(inputId = "locale", 
                          label = h2("Select Locale(s)"),
                          choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                         selected = c("Rural", "Small Town", "Suburban", "Urban"))
+                         selected = c("Rural", "Small Town", "Suburban", "Urban")),
 
-      
+     selectInput(inputId = "download_dataset", 
+                 label = h2("Choose a dataset:"),
+                 choices = c("districts_table", 
+                             "line_items_table")),
+     downloadButton('downloadData', 'Download')    
     ),#closing sidebarPanel
     
     
@@ -185,9 +189,9 @@ shinyUI(fluidPage(
                             tabPanel("Distribution of Schools by E-Rate Discount Rates", htmlOutput("helptext_by_erate_discounts"), plotOutput("histogram_by_erate_discounts"), tableOutput("table_by_erate_discounts"))),
                  navbarMenu("Affordability",
                             #tabPanel("Box and Whiskers: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
-                            tabPanel("Histogram: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpc"), ggvisOutput("price_disp_cpc"), align = "center"),
-                            tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), ggvisOutput("price_disp_cpm"), align = "center"),
-                            tabPanel("Scatterplot: Monthly Cost Per Circuit", ggvisOutput("plot1"), align = "center")
+                            tabPanel("Histogram: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpc"), align = "left", ggvisOutput("price_disp_cpc"), align = "center"),
+                            tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
+                            tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                             #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
                             #tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", plotOutput("histogram_hypothetical_median_cost"), tableOutput("table_hypothetical_median_cost")),
                             #tabPanel("Current vs. Ideal Pricing: % Districts Meeting Goals", plotOutput("histogram_hypothetical_ia_goal"), tableOutput("table_hypothetical_ia_goal"), tableOutput("table_hypothetical_median_cost2"))
