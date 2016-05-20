@@ -27,26 +27,26 @@
 "AZ","Suburban",24,208,12
 "AZ","Small Town",45,208,22
 "AZ","Rural",102,208,49
-"AZ Clean","Urban",32,147,22
-"AZ Clean","Suburban",20,147,14
-"AZ Clean","Small Town",30,147,20
-"AZ Clean","Rural",65,147,44
+"AZ Clean","Urban",34,161,21
+"AZ Clean","Suburban",21,161,13
+"AZ Clean","Small Town",33,161,20
+"AZ Clean","Rural",73,161,45
 "CA","Urban",146,944,15
 "CA","Suburban",306,944,32
 "CA","Small Town",157,944,17
 "CA","Rural",335,944,35
-"CA Clean","Urban",59,362,16
-"CA Clean","Suburban",127,362,35
-"CA Clean","Small Town",55,362,15
-"CA Clean","Rural",121,362,33
+"CA Clean","Urban",59,365,16
+"CA Clean","Suburban",129,365,35
+"CA Clean","Small Town",55,365,15
+"CA Clean","Rural",122,365,33
 "CO","Urban",11,178,6
 "CO","Suburban",20,178,11
 "CO","Small Town",35,178,20
 "CO","Rural",112,178,63
-"CO Clean","Urban",5,84,6
-"CO Clean","Suburban",14,84,17
-"CO Clean","Small Town",20,84,24
-"CO Clean","Rural",45,84,54
+"CO Clean","Urban",5,86,6
+"CO Clean","Suburban",14,86,16
+"CO Clean","Small Town",20,86,23
+"CO Clean","Rural",47,86,55
 "CT","Urban",14,169,8
 "CT","Suburban",83,169,49
 "CT","Small Town",8,169,5
@@ -119,10 +119,10 @@
 "KS","Suburban",13,285,5
 "KS","Small Town",68,285,24
 "KS","Rural",196,285,69
-"KS Clean","Urban",4,126,3
-"KS Clean","Suburban",6,126,5
-"KS Clean","Small Town",33,126,26
-"KS Clean","Rural",83,126,66
+"KS Clean","Urban",5,150,3
+"KS Clean","Suburban",6,150,4
+"KS Clean","Small Town",37,150,25
+"KS Clean","Rural",102,150,68
 "KY","Urban",6,174,3
 "KY","Suburban",25,174,14
 "KY","Small Town",55,174,32
@@ -135,18 +135,18 @@
 "LA","Suburban",18,69,26
 "LA","Small Town",17,69,25
 "LA","Rural",25,69,36
-"LA Clean","Urban",7,49,14
-"LA Clean","Suburban",15,49,31
-"LA Clean","Small Town",11,49,22
-"LA Clean","Rural",16,49,33
+"LA Clean","Urban",7,55,13
+"LA Clean","Suburban",16,55,29
+"LA Clean","Small Town",13,55,24
+"LA Clean","Rural",19,55,35
 "MA","Urban",10,295,3
 "MA","Suburban",194,295,66
 "MA","Small Town",19,295,6
 "MA","Rural",72,295,24
-"MA Clean","Urban",6,179,3
-"MA Clean","Suburban",118,179,66
-"MA Clean","Small Town",12,179,7
-"MA Clean","Rural",43,179,24
+"MA Clean","Urban",7,191,4
+"MA Clean","Suburban",128,191,67
+"MA Clean","Small Town",12,191,6
+"MA Clean","Rural",44,191,23
 "MD","Urban",4,24,17
 "MD","Suburban",9,24,38
 "MD","Small Town",4,24,17
@@ -199,10 +199,10 @@
 "MT","Suburban",5,309,2
 "MT","Small Town",31,309,10
 "MT","Rural",269,309,87
-"MT Clean","Urban",4,185,2
-"MT Clean","Suburban",5,185,3
-"MT Clean","Small Town",20,185,11
-"MT Clean","Rural",156,185,84
+"MT Clean","Urban",4,187,2
+"MT Clean","Suburban",5,187,3
+"MT Clean","Small Town",21,187,11
+"MT Clean","Rural",157,187,84
 "NC","Urban",12,115,10
 "NC","Suburban",15,115,13
 "NC","Small Town",14,115,12
@@ -229,10 +229,10 @@
 "NH","Suburban",36,165,22
 "NH","Small Town",17,165,10
 "NH","Rural",110,165,67
-"NH Clean","Urban",2,81,2
-"NH Clean","Suburban",20,81,25
-"NH Clean","Small Town",7,81,9
-"NH Clean","Rural",52,81,64
+"NH Clean","Urban",2,83,2
+"NH Clean","Suburban",20,83,24
+"NH Clean","Small Town",8,83,10
+"NH Clean","Rural",53,83,64
 "NJ","Urban",9,547,2
 "NJ","Suburban",421,547,77
 "NJ","Small Town",23,547,4
@@ -275,10 +275,10 @@
 "OK","Suburban",23,520,4
 "OK","Small Town",93,520,18
 "OK","Rural",397,520,76
-"OK Clean","Urban",7,243,3
-"OK Clean","Suburban",14,243,6
-"OK Clean","Small Town",52,243,21
-"OK Clean","Rural",170,243,70
+"OK Clean","Urban",7,308,2
+"OK Clean","Suburban",14,308,5
+"OK Clean","Small Town",51,308,17
+"OK Clean","Rural",236,308,77
 "OR","Urban",13,180,7
 "OR","Suburban",20,180,11
 "OR","Small Town",60,180,33
@@ -291,10 +291,10 @@
 "PA","Suburban",234,499,47
 "PA","Small Town",77,499,15
 "PA","Rural",168,499,34
-"PA Clean","Urban",10,249,4
-"PA Clean","Suburban",125,249,50
-"PA Clean","Small Town",37,249,15
-"PA Clean","Rural",77,249,31
+"PA Clean","Urban",11,250,4
+"PA Clean","Suburban",125,250,50
+"PA Clean","Small Town",37,250,15
+"PA Clean","Rural",77,250,31
 "RI","Urban",2,36,6
 "RI","Suburban",25,36,69
 "RI","Rural",9,36,25
@@ -329,10 +329,10 @@
 "TX","Suburban",107,1026,10
 "TX","Small Town",212,1026,21
 "TX","Rural",632,1026,62
-"TX Clean","Urban",51,702,7
-"TX Clean","Suburban",67,702,10
-"TX Clean","Small Town",144,702,21
-"TX Clean","Rural",440,702,63
+"TX Clean","Urban",58,763,8
+"TX Clean","Suburban",68,763,9
+"TX Clean","Small Town",155,763,20
+"TX Clean","Rural",482,763,63
 "UT","Urban",5,41,12
 "UT","Suburban",10,41,24
 "UT","Small Town",14,41,34
@@ -345,10 +345,10 @@
 "VA","Suburban",23,130,18
 "VA","Small Town",23,130,18
 "VA","Rural",66,130,51
-"VA Clean","Urban",14,111,13
-"VA Clean","Suburban",20,111,18
-"VA Clean","Small Town",22,111,20
-"VA Clean","Rural",55,111,50
+"VA Clean","Urban",15,116,13
+"VA Clean","Suburban",20,116,17
+"VA Clean","Small Town",22,116,19
+"VA Clean","Rural",59,116,51
 "VT","Urban",2,58,3
 "VT","Suburban",3,58,5
 "VT","Small Town",20,58,34

@@ -28,31 +28,31 @@
 "AZ","Medium",50,208,24
 "AZ","Small",77,208,37
 "AZ","Tiny",59,208,28
-"AZ Clean","Mega",1,147,1
-"AZ Clean","Large",17,147,12
-"AZ Clean","Medium",39,147,27
-"AZ Clean","Small",54,147,37
-"AZ Clean","Tiny",36,147,24
+"AZ Clean","Mega",2,161,1
+"AZ Clean","Large",19,161,12
+"AZ Clean","Medium",42,161,26
+"AZ Clean","Small",60,161,37
+"AZ Clean","Tiny",38,161,24
 "CA","Mega",16,944,2
 "CA","Large",131,944,14
 "CA","Medium",276,944,29
 "CA","Small",278,944,29
 "CA","Tiny",243,944,26
-"CA Clean","Mega",6,362,2
-"CA Clean","Large",57,362,16
-"CA Clean","Medium",100,362,28
-"CA Clean","Small",102,362,28
-"CA Clean","Tiny",97,362,27
+"CA Clean","Mega",6,365,2
+"CA Clean","Large",58,365,16
+"CA Clean","Medium",101,365,28
+"CA Clean","Small",102,365,28
+"CA Clean","Tiny",98,365,27
 "CO","Mega",6,178,3
 "CO","Large",18,178,10
 "CO","Medium",19,178,11
 "CO","Small",133,178,75
 "CO","Tiny",2,178,1
-"CO Clean","Mega",4,84,5
-"CO Clean","Large",7,84,8
-"CO Clean","Medium",15,84,18
-"CO Clean","Small",57,84,68
-"CO Clean","Tiny",1,84,1
+"CO Clean","Mega",4,86,5
+"CO Clean","Large",7,86,8
+"CO Clean","Medium",15,86,17
+"CO Clean","Small",59,86,69
+"CO Clean","Tiny",1,86,1
 "CT","Large",11,169,7
 "CT","Medium",47,169,28
 "CT","Small",74,169,44
@@ -135,11 +135,11 @@
 "KS","Medium",39,285,14
 "KS","Small",231,285,81
 "KS","Tiny",6,285,2
-"KS Clean","Mega",1,126,1
-"KS Clean","Large",4,126,3
-"KS Clean","Medium",18,126,14
-"KS Clean","Small",101,126,80
-"KS Clean","Tiny",2,126,2
+"KS Clean","Mega",1,150,1
+"KS Clean","Large",6,150,4
+"KS Clean","Medium",19,150,13
+"KS Clean","Small",121,150,81
+"KS Clean","Tiny",3,150,2
 "KY","Mega",2,174,1
 "KY","Large",15,174,9
 "KY","Medium",75,174,43
@@ -154,20 +154,20 @@
 "LA","Large",20,69,29
 "LA","Medium",33,69,48
 "LA","Small",11,69,16
-"LA Clean","Mega",4,49,8
-"LA Clean","Large",17,49,35
-"LA Clean","Medium",21,49,43
-"LA Clean","Small",7,49,14
+"LA Clean","Mega",4,55,7
+"LA Clean","Large",17,55,31
+"LA Clean","Medium",27,55,49
+"LA Clean","Small",7,55,13
 "MA","Mega",2,295,1
 "MA","Large",10,295,3
 "MA","Medium",95,295,32
 "MA","Small",130,295,44
 "MA","Tiny",58,295,20
-"MA Clean","Mega",2,179,1
-"MA Clean","Large",8,179,4
-"MA Clean","Medium",53,179,30
-"MA Clean","Small",80,179,45
-"MA Clean","Tiny",36,179,20
+"MA Clean","Mega",2,191,1
+"MA Clean","Large",8,191,4
+"MA Clean","Medium",59,191,31
+"MA Clean","Small",85,191,45
+"MA Clean","Tiny",37,191,19
 "MD","Mega",8,24,33
 "MD","Large",8,24,33
 "MD","Medium",8,24,33
@@ -225,10 +225,10 @@
 "MT","Medium",9,309,3
 "MT","Small",197,309,64
 "MT","Tiny",100,309,32
-"MT Clean","Large",3,185,2
-"MT Clean","Medium",3,185,2
-"MT Clean","Small",155,185,84
-"MT Clean","Tiny",24,185,13
+"MT Clean","Large",3,187,2
+"MT Clean","Medium",4,187,2
+"MT Clean","Small",156,187,83
+"MT Clean","Tiny",24,187,13
 "NC","Mega",8,115,7
 "NC","Large",46,115,40
 "NC","Medium",42,115,37
@@ -255,10 +255,10 @@
 "NH","Medium",16,165,10
 "NH","Small",65,165,39
 "NH","Tiny",82,165,50
-"NH Clean","Large",2,81,2
-"NH Clean","Medium",6,81,7
-"NH Clean","Small",38,81,47
-"NH Clean","Tiny",35,81,43
+"NH Clean","Large",2,83,2
+"NH Clean","Medium",6,83,7
+"NH Clean","Small",39,83,47
+"NH Clean","Tiny",36,83,43
 "NJ","Mega",1,547,0
 "NJ","Large",14,547,3
 "NJ","Medium",112,547,20
@@ -310,11 +310,11 @@
 "OK","Medium",35,520,7
 "OK","Small",376,520,72
 "OK","Tiny",99,520,19
-"OK Clean","Mega",2,243,1
-"OK Clean","Large",7,243,3
-"OK Clean","Medium",22,243,9
-"OK Clean","Small",172,243,71
-"OK Clean","Tiny",40,243,16
+"OK Clean","Mega",2,308,1
+"OK Clean","Large",7,308,2
+"OK Clean","Medium",22,308,7
+"OK Clean","Small",216,308,70
+"OK Clean","Tiny",61,308,20
 "OR","Mega",3,180,2
 "OR","Large",11,180,6
 "OR","Medium",44,180,24
@@ -330,11 +330,11 @@
 "PA","Medium",160,499,32
 "PA","Small",321,499,64
 "PA","Tiny",3,499,1
-"PA Clean","Mega",1,249,0
-"PA Clean","Large",8,249,3
-"PA Clean","Medium",73,249,29
-"PA Clean","Small",165,249,66
-"PA Clean","Tiny",2,249,1
+"PA Clean","Mega",2,250,1
+"PA Clean","Large",8,250,3
+"PA Clean","Medium",73,250,29
+"PA Clean","Small",165,250,66
+"PA Clean","Tiny",2,250,1
 "RI","Large",4,36,11
 "RI","Medium",17,36,47
 "RI","Small",12,36,33
@@ -374,11 +374,11 @@
 "TX","Medium",212,1026,21
 "TX","Small",571,1026,56
 "TX","Tiny",138,1026,13
-"TX Clean","Mega",16,702,2
-"TX Clean","Large",58,702,8
-"TX Clean","Medium",138,702,20
-"TX Clean","Small",396,702,56
-"TX Clean","Tiny",94,702,13
+"TX Clean","Mega",18,763,2
+"TX Clean","Large",60,763,8
+"TX Clean","Medium",145,763,19
+"TX Clean","Small",437,763,57
+"TX Clean","Tiny",103,763,13
 "UT","Mega",4,41,10
 "UT","Large",11,41,27
 "UT","Medium",17,41,41
@@ -391,10 +391,10 @@
 "VA","Large",27,130,21
 "VA","Medium",49,130,38
 "VA","Small",47,130,36
-"VA Clean","Mega",6,111,5
-"VA Clean","Large",19,111,17
-"VA Clean","Medium",43,111,39
-"VA Clean","Small",43,111,39
+"VA Clean","Mega",6,116,5
+"VA Clean","Large",21,116,18
+"VA Clean","Medium",45,116,39
+"VA Clean","Small",44,116,38
 "VT","Medium",24,58,41
 "VT","Small",31,58,53
 "VT","Tiny",3,58,5
