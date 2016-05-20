@@ -60,7 +60,7 @@ shinyServer(function(input, output, session) {
     #sr_data <- sr_all()
     sr_data <- services
     bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
-    selectizeInput("bandwidth_list", h2("Input Bandwidth Circuit Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
+    selectizeInput("bandwidth_list", h2("Input Bandwidth Circuit Speed(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
   sr_all <- reactive({
@@ -861,7 +861,7 @@ output$districtSelect <- renderUI({
   
   district_list <- c(unique(as.character(data$name)))
   
-  selectizeInput("district_list", h2("Input District Name"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
+  selectizeInput("district_list", h2("Input District Name(s)"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 })
 
 output$choose_district <- renderPlot({
