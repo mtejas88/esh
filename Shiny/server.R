@@ -14,9 +14,6 @@ shinyServer(function(input, output, session) {
   
   ## General Line Items for national comparison (national vs. state) and
   ## also one state vs. all other states
-  #dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
-  #library(rJava)
-  #library(RJDBC)
   library(shiny)
   library(tidyr)
   library(dplyr)
@@ -27,7 +24,6 @@ shinyServer(function(input, output, session) {
   library(ggmap)
   library(reshape)
   library(leaflet)
-  library(DT)
   library(ggvis)
   
   #sapply(lib, function(x) library(x, character.only = TRUE))
@@ -64,7 +60,7 @@ shinyServer(function(input, output, session) {
     #sr_data <- sr_all()
     sr_data <- services
     bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
-    selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
+    selectizeInput("bandwidth_list", h2("Input Bandwidth Circuit Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
   sr_all <- reactive({
@@ -634,7 +630,7 @@ output$bw_plot <- renderPlot({
 })
 
 output$counts_table <- renderTable({
-  
+
   data <- sr_all()
   
   data %>% 
@@ -646,6 +642,7 @@ output$counts_table <- renderTable({
 
 output$prices_table <- renderTable({
   
+
   data <- sr_all()
   
   data %>% 
@@ -864,7 +861,7 @@ output$districtSelect <- renderUI({
   
   district_list <- c(unique(as.character(data$name)))
   
-  selectInput("district_list", h2("Select District"), as.list(district_list), multiple = T) 
+  selectizeInput("district_list", h2("Input District Name"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 })
 
 output$choose_district <- renderPlot({
