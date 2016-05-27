@@ -3,7 +3,7 @@
 # Remove every object in the environment
 #rm(list = ls())
 
-#wd <- "~/Google Drive/github/ficher/Shiny"
+#wd <- "~/Desktop/ficher/Shiny"
 #setwd(wd)
 
 shinyServer(function(input, output, session) {
@@ -119,15 +119,6 @@ district_subset <- reactive({
              meeting_2014_goal_no_oversub %in% input$meeting_goals)#,
              
   })
-
-# districts not meeting vs. meeting goals:  hypothetical median cost / student goal meeting percentage
-hypothetical_median_cost <- reactive({
-
-  districts %>% 
-    filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-    filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
-  
-})
 
 ####### OUTPUTS
 
@@ -359,16 +350,50 @@ output$table_projected_wan_needs <- renderTable({
 })
 
 ## Median Pricing Districts Not Meeting vs. Meeting Goals
-output$histogram_hypothetical_median_cost <- renderPlot({
+output$hypothetical_ia_price  <- renderPlot({
   
   data <- district_subset() 
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   cost_data <- data %>%
                group_by(meeting_2014_goal_no_oversub) %>%
                summarize(n_districts = n(),
                          median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
   
-  current_pricing_percent_district_meeting_goals <- round(mean(100 *data$meeting_goals_district, na.rm = TRUE), 2)
+  # Price
+  plot_data <- cost_data[, c(1,3)]
+  names(plot_data) <- c("variable", "value")
+  plot_data$label <- paste0("$", plot_data$value)
+  
+  #plot_data <- rbind(plot_data2, plot_data1)
+  
+  q <- ggplot(data = plot_data) +
+         geom_bar(aes(x = variable, y = value), fill = "#009291", width = .5, stat = "identity") +
+         geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
+         scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
+         scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+         theme_classic() + 
+         theme(axis.line = element_blank(), 
+              axis.text.x = element_text(size=14, colour= "#899DA4"), 
+             axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+
+  print(q)
+})
+
+output$hypothetical_ia_goal <- renderPlot({
+  
+  data <- district_subset() 
+  validate(need(nrow(data) > 0, ""))
+  
+  cost_data <- data %>%
+    group_by(meeting_2014_goal_no_oversub) %>%
+    summarize(n_districts = n(),
+              median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
+  
+  current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
   
   hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
   
@@ -380,88 +405,64 @@ output$histogram_hypothetical_median_cost <- renderPlot({
   data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
   data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
   
-  hypothetical_pricing_percent_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
+  hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
   
-  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
+  # Goal %
+  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
-  plot_data2 <- cost_data[, c(1,3)]
-  names(plot_data2) <- c("variable", "value")
-  plot_data2$label <- paste0(plot_data2$value, "$")
-  plot_data <- rbind(plot_data2, plot_data1)
-  
-    q <- ggplot(data = data) +
-       geom_bar(aes(x = meeting_2014_goal_no_oversub, y = median_monthly_ia_cost_per_mbps), fill="#009291", stat = "identity") +
-       scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
-             axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
-  
-  print(q)
-  
-})
-
-output$table_hypothetical_median_cost <- renderTable({
-  
-  data <- hypothetical_median_cost()
-  
-})
-
-output$table_hypothetical_median_cost2 <- renderTable({
-  
-  data <- hypothetical_median_cost()
-  
-})
-
-
-## Median Pricing Districts Not Meeting vs. Meeting Goals
-output$histogram_hypothetical_ia_goal <- renderPlot({
-  
-  
-  q <- ggplot(data = plot_data) +
-    geom_bar(aes(x = variable, y = value), fill="#009291", stat = "identity") +
-  #  scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+  goals <- ggplot(data = plot_data1) +
+    geom_bar(aes(x = variable, y = value), fill = "#009291", width = .5, stat = "identity") +
+    geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
+    scale_y_continuous(limits = c(0, 1.1 * 100)) +
+    scale_x_discrete(limits = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.x = element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank()) 
-  
-  print(q)
-  
+  print(goals)
 })
-
 
 output$table_hypothetical_ia_goal <- renderTable({
   
-    cost <- hypothetical_median_cost()
-    data <- hypothetical_ia_goal()
-    
-    hypothetical_cost <- cost[cost$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
-    
-    current_pricing_percent_district_meeting_goals <- round(100 * mean(data$meeting_goals_district, na.rm = TRUE), 2)
-    
-    not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
-    
-    data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
-    
-    # for districts not meeting goals, replace their current bw with the hypothetical number
-    data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
-    data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
-    
-    hypothetical_pricing_percent_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
-    
-    plot_data <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_pricing_percent_district_meeting_goals))
-    plot_data <- melt(plot_data)
-    
+  data <- district_subset() 
+  validate(need(nrow(data) > 0, ""))  
   
+  cost_data <- data %>%
+    group_by(meeting_2014_goal_no_oversub) %>%
+    summarize(n_districts = n(),
+              median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
+  
+  current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
+  
+  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
+  
+  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+  
+  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
+  
+  # for districts not meeting goals, replace their current bw with the hypothetical number
+  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
+  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
+  
+  hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
+  
+  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")
+  plot_data1 <- melt(plot_data1)
+  plot_data1$label <- paste0(plot_data1$value, "%")
+  
+  plot_data <- cost_data[, c(1,3)]
+  names(plot_data) <- c("variable", "value")
+  plot_data$label <- paste0("$", plot_data$value)
+  
+  table_data <- rbind(plot_data, plot_data1)
+  print(table_data)
 })
 
 ######
@@ -477,8 +478,11 @@ output$helptext_schools_on_fiber <- renderUI({
 ## Districts and Students Meeting Goals
 output$histogram_schools_on_fiber <- renderPlot({
   
-  data <- district_subset() %>%
-          summarize(num_schools = sum(num_campuses),
+  data <- district_subset() 
+  
+  
+  data %>%
+      summarize(num_schools = sum(num_schools),
                     num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
                     num_schools_may_need_upgrades = sum(nga_v2_assumed_unscalable_campuses),
                     num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses),
