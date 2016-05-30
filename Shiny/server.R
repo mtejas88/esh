@@ -137,6 +137,8 @@ output$histogram_locale <- renderPlot({
   
   q <- ggplot(data = data) +
        geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
+       scale_fill_manual(labels = c("Rural", "Small Town", "Suburban", "Urban"), 
+                          values = c("#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -172,6 +174,8 @@ output$histogram_size <- renderPlot({
   
   q <- ggplot(data = data) +
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
+    scale_fill_manual(labels = c("Tiny", "Small", "Medium", "Large", "Mega"), 
+                       values = c("#a1887f", "#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -207,15 +211,14 @@ output$table_size <- renderTable({
 output$histogram_goals <- renderPlot({
   
   data <- district_subset() %>%
-            summarize(n = n(),
-                      percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+            summarize(percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
                       percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   data <- melt(data)
 
-  q <- ggplot(data = data[-which(data$variable == "n"), ]) +
+  q <- ggplot(data = data) +
          geom_bar(aes(x = variable, y = value), fill="#fdb913", stat = "identity") +
          geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 100)) +
@@ -243,9 +246,10 @@ set to ", "<b>", "clean", "</b>", "data, relevant", "<b>", "state", "</b>", ",an
 output$table_goals <- renderTable({
   
   data <- district_subset() %>%
-           summarize(n = n(),
-              percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
-              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+           summarize(n_districts = n(),
+                     n_students = sum(num_students),
+                    percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+                    percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
   validate(need(nrow(data) > 0, ""))  
   data
@@ -478,17 +482,16 @@ output$helptext_schools_on_fiber <- renderUI({
 ## Districts and Students Meeting Goals
 output$histogram_schools_on_fiber <- renderPlot({
   
-  data <- district_subset() 
+  data1 <- district_subset() 
   
-  
-  data %>%
-      summarize(num_schools = sum(num_schools),
-                    num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
-                    num_schools_may_need_upgrades = sum(nga_v2_assumed_unscalable_campuses),
-                    num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses),
-                    percent_on_fiber = round(100 * num_schools_on_fiber / sum(num_campuses), 2),
-                    percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / sum(num_campuses), 2),
-                    percent_need_upgrades = round(100 * num_schools_need_upgrades / sum(num_campuses), 2))
+  data <- data1 %>%
+          summarize(num_all_schools = sum(num_schools),
+                    num_schools_on_fiber = sum(schools_on_fiber),
+                    num_schools_may_need_upgrades = sum(schools_may_need_upgrades),
+                    num_schools_need_upgrades = sum(schools_need_upgrades),
+                    percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
+                    percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
+                    percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
@@ -496,7 +499,7 @@ output$histogram_schools_on_fiber <- renderPlot({
   
   q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades")), ],
               aes(x = variable, y = value)) +
-       geom_bar(fill="#009291", stat = "identity") +
+       geom_bar(fill="#009291", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
        scale_y_continuous(limits = c(0, 100)) +
        theme_classic() + 
@@ -1132,6 +1135,21 @@ price_disp_cpc <- reactive({
 
 price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
+output$table_price_disp_cpc <- renderTable({
+
+  data <- sr_all()
+  
+  table_data <- data %>%
+                summarize(n_circuits = n(),
+                          percentile_25 = round(quantile(data$monthly_cost_per_circuit, c(.25), na.rm = TRUE), 2),
+                          median = round(quantile(data$monthly_cost_per_circuit, c(.50), na.rm = TRUE), 2),
+                          percentile_75 = round(quantile(data$monthly_cost_per_circuit, c(.75), na.rm = TRUE), 2))
+
+  table_data  
+})
+
+
+
 
 price_disp_cpm <- reactive({
   
@@ -1156,6 +1174,36 @@ price_disp_cpm <- reactive({
 })
 
 price_disp_cpm %>% bind_shiny("price_disp_cpm")
+
+output$table_price_disp_cpm <- renderTable({
+  
+  data <- sr_all()
+  
+  table_data <- data %>%
+    summarize(n_circuits = n(),
+              percentile_25 = round(quantile(data$monthly_cost_per_mbps, c(.25), na.rm = TRUE), 2),
+              median = round(quantile(data$monthly_cost_per_mbps, c(.50), na.rm = TRUE), 2),
+              percentile_75 = round(quantile(data$monthly_cost_per_mbps, c(.75), na.rm = TRUE), 2))
+  
+  table_data  
+})
+
+output$table_price_cpm_scatter <- renderTable({
+  
+  data <- sr_all()
+  
+  table_data <- data %>%
+    summarize(n_circuits = n(),
+              percentile_10 = round(quantile(data$monthly_cost_per_circuit, c(.10), na.rm = TRUE), 2),
+              percentile_25 = round(quantile(data$monthly_cost_per_circuit, c(.25), na.rm = TRUE), 2),
+              median = round(quantile(data$monthly_cost_per_circuit, c(.50), na.rm = TRUE), 2),
+              percentile_75 = round(quantile(data$monthly_cost_per_circuit, c(.75), na.rm = TRUE), 2),
+              percentile_90 = round(quantile(data$monthly_cost_per_circuit, c(.90), na.rm = TRUE), 2))
+  
+  table_data  
+})
+
+
 
 output$helptext_price_cpc <- renderUI({
   HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set

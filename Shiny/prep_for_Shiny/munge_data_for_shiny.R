@@ -8,7 +8,7 @@ lib <- c("dplyr", "shiny", "shinyBS", "tidyr", "ggplot2", "scales", "grid", "map
 sapply(lib, function(x) require(x, character.only = TRUE))
 
 
-wd <- "~/Google Drive/github/ficher/Shiny/prep_for_Shiny"
+wd <- "~/Desktop/ficher/Shiny/prep_for_Shiny"
 setwd(wd)
 
 services <- read.csv("services_received_20160517.csv", as.is = TRUE)
@@ -213,6 +213,10 @@ districts[missing_n, ]$n_schools_wan_needs <- 0
 districts[missing_n, ]$n_schools_in_wan_needs_calculation <- 0
 
 rm(data, missing_n)
+
+districts$schools_on_fiber <- ((districts$nga_v2_known_scalable_campuses + districts$nga_v2_assumed_scalable_campuses)  / districts$num_campuses) * districts$num_schools
+districts$schools_may_need_upgrades <- (districts$nga_v2_assumed_unscalable_campuses / districts$num_campuses) * districts$num_schools
+districts$schools_need_upgrades <- (districts$nga_v2_known_unscalable_campuses / districts$num_campuses) * districts$num_schools
 
 
 ## END

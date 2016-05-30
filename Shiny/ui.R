@@ -195,9 +195,9 @@ shinyUI(fluidPage(
                             tabPanel("Distribution of Schools by E-Rate Discount Rates", htmlOutput("helptext_by_erate_discounts"), plotOutput("histogram_by_erate_discounts"), tableOutput("table_by_erate_discounts"))),
                  navbarMenu("Affordability",
                             #tabPanel("Box and Whiskers: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
-                            tabPanel("Bar Graph: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpc"), align = "left", ggvisOutput("price_disp_cpc"), align = "center"),
-                            tabPanel("Bar Graph: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
-                            tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center"),
+                            tabPanel("Bar Graph: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpc"), align = "left", ggvisOutput("price_disp_cpc"), align = "center", tableOutput("table_price_disp_cpc"), align = "left"),
+                            tabPanel("Bar Graph: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center", tableOutput("table_price_disp_cpm"), align = "left"),
+                            tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center", tableOutput("table_price_cpm_scatter"), align = "left"),
                             #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
                             tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", fluidRow(
                                                                                                                 column(8, plotOutput("hypothetical_ia_price")),
