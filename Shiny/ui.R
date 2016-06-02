@@ -216,7 +216,14 @@ shinyUI(fluidPage(
                                                downloadButton('ia_tech_downloadData', 'Download'), br(),
                                                
                                                plotOutput("histogram_districts_ia_technology"), br(), dataTableOutput("table_districts_ia_technology")),
-                                     wellPanel("Current WAN Goal Percentage vs. Projected WAN Needs", br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs")))),
+                                     wellPanel("Current WAN Goal Percentage vs. Projected WAN Needs", br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs")),
+                                     wellPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", br(),
+                                     fluidRow(
+                                       column(12, plotOutput("hypothetical_ia_price")),
+                                       column(12, plotOutput("hypothetical_ia_goal"))
+                                     ), br(), dataTableOutput("table_hypothetical_ia_goal"))  
+                                     
+                                     )),
 
                  navbarMenu("Fiber",
                             tabPanel("Fiber Charts", br(), htmlOutput("helptext_schools_on_fiber"), br(), br(), 
@@ -270,26 +277,22 @@ shinyUI(fluidPage(
                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized"),
                                                         selected = c("Dark Fiber", "Lit Fiber",
                                                                      "Cable", "DSL", "Copper", "Other / Uncategorized"))), br(),
-                                       downloadButton('affordability_downloadData', 'Download')),
+                                       downloadButton('affordability_downloadData', 'Download')), # closing sidebar panel,
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
                                        
                                      "Price Dispersion: Monthly Cost per Circuit", br(), br(), ggvisOutput("price_disp_cpc"), br(), dataTableOutput("disp_cpc_table"), br(), br(),
                                      "Price Dispersion: Monthly Cost per Mbps", br(), br(), ggvisOutput("price_disp_cpm"), br(), dataTableOutput("disp_cpm_table"), br(), br(),
-                                     "Scatterplot: Monthly Cost per Circuit", br(), br(), ggvisOutput("plot1"), br(), dataTableOutput("plot1_table"), br(), br(), br(), br())),
+                                     "Scatterplot: Monthly Cost per Circuit", br(), br(), ggvisOutput("plot1"), br(), dataTableOutput("plot1_table"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
-                            tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", fluidRow(
-                                                                                                                column(8, plotOutput("hypothetical_ia_price")),
-                                                                                                                column(8, plotOutput("hypothetical_ia_goal"))
-                                                                                                              ), tableOutput("table_hypothetical_ia_goal"))
                             #tabPanel("Current vs. Ideal Pricing: % Districts Meeting Goals", plotOutput("histogram_hypothetical_ia_goal"), tableOutput("table_hypothetical_ia_goal"), tableOutput("table_hypothetical_median_cost2"))
                             #tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
                             #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
-                            #,
-                            #tabPanel("Cost: Monthly Cost Per Mbps", plotOutput("hist"))
+                            
+                                     ))
                             )),#),
                  navbarMenu("Maps", 
                            # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),

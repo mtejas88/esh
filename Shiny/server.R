@@ -380,7 +380,7 @@ output$hypothetical_ia_price  <- renderPlot({
   #plot_data <- rbind(plot_data2, plot_data1)
   
   q <- ggplot(data = plot_data) +
-         geom_bar(aes(x = variable, y = value), fill = "#009291", width = .5, stat = "identity") +
+         geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
          geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
          scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
@@ -421,15 +421,15 @@ output$hypothetical_ia_goal <- renderPlot({
   
   # Goal %
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
   goals <- ggplot(data = plot_data1) +
-    geom_bar(aes(x = variable, y = value), fill = "#009291", width = .5, stat = "identity") +
+    geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
     geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
     scale_y_continuous(limits = c(0, 1.1 * 100)) +
-    scale_x_discrete(limits = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")) +
+    scale_x_discrete(limits = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
           axis.text.x = element_text(size=14, colour= "#899DA4"), 
@@ -440,22 +440,17 @@ output$hypothetical_ia_goal <- renderPlot({
   print(goals)
 })
 
-output$table_hypothetical_ia_goal <- renderTable({
+output$table_hypothetical_ia_goal <- renderDataTable({
   
   data <- district_subset() 
-  validate(need(nrow(data) > 0, ""))  
-  
   cost_data <- data %>%
     group_by(meeting_2014_goal_no_oversub) %>%
     summarize(n_districts = n(),
               median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
   
   current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
-  
   hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
-  
   not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
-  
   data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
   
   # for districts not meeting goals, replace their current bw with the hypothetical number
@@ -465,7 +460,7 @@ output$table_hypothetical_ia_goal <- renderTable({
   hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
   
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Hypothetical Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -473,8 +468,12 @@ output$table_hypothetical_ia_goal <- renderTable({
   names(plot_data) <- c("variable", "value")
   plot_data$label <- paste0("$", plot_data$value)
   
-  table_data <- rbind(plot_data, plot_data1)
-  print(table_data)
+  table_data <- as.data.frame(rbind(plot_data, plot_data1))
+  table_data[which(table_data$variable == "Meeting 2014 Goals"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
+  table_data[which(table_data$variable == "Not Meeting 2014 Goals"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
+  table_data$value <- NULL
+  datatable(table_data, options = list(paging = FALSE, searching = FALSE))
+  
 })
 
 ######
