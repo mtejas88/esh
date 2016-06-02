@@ -25,6 +25,7 @@ shinyServer(function(input, output, session) {
   library(reshape)
   library(leaflet)
   library(ggvis)
+  library(DT)
   
   #sapply(lib, function(x) library(x, character.only = TRUE))
   #services <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/services_received.SQL")
@@ -158,15 +159,16 @@ output$histogram_locale <- renderPlot({
   
 })
 
-output$table_locale <- renderTable({
+output$table_locale <- renderDataTable({
   
   data <- state_subset_locale()
+  colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   validate(
     need(input$state != 'All', "")
   )
   
-  data
+  datatable(data, options = list(paging = FALSE))
   
   })
   
@@ -196,15 +198,16 @@ output$histogram_size <- renderPlot({
 
 
 ## size distribution table
-output$table_size <- renderTable({
+output$table_size <- renderDataTable({
   
   data <- state_subset_size()
+  
   
   validate(
     need(input$state != 'All', "")
   )
   
-  data
+  datatable(data, options = list(paging = FALSE))
   
 })
 
@@ -249,16 +252,17 @@ set to ", "<b>", "clean", "</b>", "data, relevant", "<b>", "state", "</b>", ",an
               "inclusive", "</b>", "of all connection types, locales, and district sizes."))
 })
 
-output$table_goals <- renderTable({
+output$table_goals <- renderDataTable({
   
   data <- district_subset() %>%
            summarize(n = n(),
               percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+  colnames(data) <- c("# of districts", "% of districts meeting goals", "percent of students meeting goals")
   
   validate(need(nrow(data) > 0, ""))  
-  data
-
+  datatable(data, options = list(paging = FALSE, searching = FALSE))
+  
 })
 
 ## Districts Meeting Goals, by Technology
@@ -293,9 +297,11 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   print(q)
   
+  districts_ia_tech <<- district_subset()
+  
 })
 
-output$table_districts_ia_technology <- renderTable({
+output$table_districts_ia_technology <- renderDataTable({
   
   data <- district_subset() %>%
               group_by(hierarchy_connect_category) %>%
@@ -303,8 +309,10 @@ output$table_districts_ia_technology <- renderTable({
               mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
               n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
   
+  colnames(data) <- c("Hierarchy Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
+  
   validate(need(nrow(data) > 0, ""))  
-  data
+  datatable(data, options = list(paging = FALSE))
   
 })
 
@@ -341,7 +349,7 @@ output$histogram_projected_wan_needs <- renderPlot({
   
 })
 
-output$table_projected_wan_needs <- renderTable({
+output$table_projected_wan_needs <- renderDataTable({
   
   data <- district_subset() %>%
           summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
@@ -350,11 +358,12 @@ output$table_projected_wan_needs <- renderTable({
                     n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
                     n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
                     percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
-        
+  colnames(data) <- c("# of >=1G WAN circuits", "# of <1G WAN circuits", "current WAN goals %", "# of schools w/ projected WAN need", "# of schools in WAN need calculation", "% of schools w/ projected WAN need")
+  #print(names(data))
   
   validate(need(nrow(data) > 0, ""))
   
-  data
+  datatable(data, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -508,7 +517,7 @@ output$histogram_schools_on_fiber <- renderPlot({
 })
 
 ## Table on distribution of schools by infrastructure type
-output$table_schools_on_fiber <- renderTable({
+output$table_schools_on_fiber <- renderDataTable({
   
   data <- district_subset() %>%
           summarize(num_schools = sum(num_campuses),
@@ -518,10 +527,12 @@ output$table_schools_on_fiber <- renderTable({
                     percent_on_fiber = round(100 * num_schools_on_fiber / sum(num_campuses), 2),
                     percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / sum(num_campuses), 2),
                     percent_need_upgrades = round(100 * num_schools_need_upgrades / sum(num_campuses), 2))
+  colnames(data) <- c("# of Schools", "# of Schools on Fiber", "# of Schools That May Need Upgrades", 
+                      "# of Schools That Need Upgrades", "% of Schools on Fiber", "% of Schools That May Need Upgrades", "% of Schools That Need Upgrades")
         
   validate(need(nrow(data) > 0, ""))  
   
-  data
+  datatable(data, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -564,7 +575,7 @@ output$histogram_by_erate_discounts <- renderPlot({
 })
 
 ## Table on distribution of schools by infrastructure type
-output$table_by_erate_discounts <- renderTable({
+output$table_by_erate_discounts <- renderDataTable({
   
   data <- district_subset() %>%
           filter(!is.na(c1_discount_rate),
@@ -573,9 +584,10 @@ output$table_by_erate_discounts <- renderTable({
           summarize(n_unscalable_schools_in_rate_band = n()) %>%
           mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
                  percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
-        
+  colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
+    
   validate(need(nrow(data) > 0, ""))  
-  data
+  datatable(data, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -918,7 +930,7 @@ output$map_population <- renderPlot({
     theme_classic() +
     theme(line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position=c(0.5, 0.5)) +
+          legend.text = element_text(size=16), legend.position= "bottom") +
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
@@ -926,7 +938,49 @@ output$map_population <- renderPlot({
                                alpha = 0.7, size = 6) #+ #, position = position_jitter(w = 0.07, h = 0.05)) +
   #scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
   #scale_color_manual(values = colors)
-  print(q + coord_map())
+  
+  
+  #print(q + coord_map())
+  qq <- q + coord_map()
+  
+  r <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
+               alpha = 0.7, size = 6) + #, position = position_jitter(w = 0.07, h = 0.05)) +
+    scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC"))
+  rr <- r + coord_map()
+  
+  
+  s <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
+               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 100k/student Goal", 
+                                                                      "Does Not Meet 100k/student Goal"), values = c("#009296", "#CCCCCC"))
+  ss <- s + coord_map()
+  
+  t <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
+               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 1Mbps/student Goal", 
+                                                                      "Does Not Meet 1Mbps/student Goal"), values = c("#A3E5E6", "#CCCCCC")) #+
+  
+  tt <- t + coord_map()
+  
+  ddt_unscalable <- data %>% 
+    filter(not_all_scalable == 1)
+  
+  u <- state_base + 
+    geom_point(data = ddt_unscalable, 
+               aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
+               alpha = 0.8, size = 6) +
+    scale_color_manual(values = c("#A3E5E6", "#0073B6"), 
+                       breaks = c(0, 1), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"))
+  
+  uu <- u + coord_map()
+  
+  switch(input$map_view,
+         "General" = print(qq),
+         "Clean/Dirty" = print(rr),
+         'Goals: 100kbps/Student' = print(ss),
+         'Goals: 1Mbps/Student' = print(tt),
+         'Fiber Build Cost to Districts' = print(uu))
   
 })
 
@@ -1104,6 +1158,8 @@ general_monthly_cpm <- reactive({
 
 general_monthly_cpm %>% bind_shiny("gen_m_cpm")
 
+
+
 price_disp_cpc <- reactive({
 
     data <- sr_all()
@@ -1113,20 +1169,44 @@ price_disp_cpc <- reactive({
     add_perc <- c("25th","Median", "75th")
     perc_tab <- cbind(perc_tab, add_perc)
     perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
- 
+    #perc_tab_cpc <<- perc_tab
+    #print(perc_tab_cpc)
+      
     print(str(perc_tab))
   
     perc_tab %>% 
     ggvis(x = ~add_perc, y = ~percentiles, fill := "#FDB913", fillOpacity := 0.6) %>% 
     layer_bars(strokeWidth := 0) %>%    
     layer_rects(fill:="white") %>%
-    add_axis("x", title = "Percentile", title_offset = 50) %>% 
-    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75)
+    add_axis("x", title = "Percentile", title_offset = 50, grid=FALSE) %>% 
+    add_axis("x", orient = "top", title = "Price Dispersion: Monthly Cost Per Circuit",
+               properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
+               grid=FALSE)  %>% 
+    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE)
     #hide_axis("y")
   
 })
 
 price_disp_cpc %>% bind_shiny("price_disp_cpc")
+
+
+
+output$disp_cpc_table <- renderDataTable({
+  
+  data <- sr_all()
+  data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
+  percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
+  perc_tab <- as.data.frame(percentiles)  
+  add_perc <- c("25th","Median", "75th")
+  perc_tab <- cbind(add_perc, perc_tab)
+  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+  colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Circuit ($)")
+  print(dim(perc_tab))
+  
+  datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
+
+})
+
 
 
 price_disp_cpm <- reactive({
@@ -1145,13 +1225,26 @@ price_disp_cpm <- reactive({
     ggvis(x = ~add_perc, y = ~percentiles, fill := "#009296", fillOpacity := 0.6) %>% 
     layer_bars(strokeWidth := 0) %>%    
     layer_rects(fill:="white") %>%
-    add_axis("x", title = "Percentile", title_offset = 50) %>% 
-    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75)
+    add_axis("x", title = "Percentile", title_offset = 50, grid = FALSE) %>% 
+    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75, grid = FALSE)
   #hide_axis("y")
   
 })
 
 price_disp_cpm %>% bind_shiny("price_disp_cpm")
+
+output$disp_cpm_table <- renderDataTable({
+data <- sr_all()
+data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
+percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
+perc_tab <- as.data.frame(percentiles)  
+add_perc <- c("25th","Median", "75th")
+perc_tab <- cbind(add_perc, perc_tab)
+perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Mbps ($)")
+
+datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
+})
 
 output$helptext_price_cpc <- renderUI({
   HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
@@ -1196,8 +1289,8 @@ vis <- reactive({
                fillOpacity := 0.4, fillOpacity.hover := 0.75,
                 key := ~recipient_name) %>% 
     add_tooltip(district_tooltip, "hover")  %>%
-    add_axis("x", title = "Bandwidth in Mbps", title_offset = 50) %>% 
-    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75) %>% 
+    add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
+    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
     set_options(width = 800, height = 500)
 
   
@@ -1205,9 +1298,22 @@ vis <- reactive({
 
 vis %>% bind_shiny("plot1")
 
+
+output$plot1_table <- renderDataTable({
+  
+  datatable(sr_all())
+  
+})
+
+
+
+
+
 # District Lookup
 
-
+output$helptext_leaflet_map <- renderUI({
+  HTML(paste("User Note: Useful for District Callouts. Type in your districts of interest."))
+})
 
 ##Trying leaflet: 
 output$testing_leaflet <- renderLeaflet({
@@ -1236,9 +1342,20 @@ output$testing_leaflet <- renderLeaflet({
 output$n_ddt <- renderText({
   
   data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
+    filter(!(postal_cd %in% c('AK', 'HI')))
   
-  paste("n(districts) =", toString(nrow(data)))
+
+    data2 <- data %>%
+      filter(not_all_scalable == 1)
+
+
+  switch(input$map_view,
+         "General" =  paste("n(districts) =", toString(nrow(data))),
+         "Clean/Dirty" =  paste("n(districts) =", toString(nrow(data))),
+         'Goals: 100kbps/Student' =  paste("n(districts) =", toString(nrow(data))),
+         'Goals: 1Mbps/Student' =  paste("n(districts) =", toString(nrow(data))),
+         'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
+  
   
 })
 
@@ -1280,6 +1397,35 @@ output$n_ddt5 <- renderText({
 
 #For downloadable subsets
 
+
+output$ia_tech_downloadData <- downloadHandler(
+  filename = function(){
+    paste('districts_by_ia_tech_dataset', '_', Sys.Date(), '.csv', sep = '')},
+  content = function(file){
+    write.csv(districts_ia_tech, file)
+  }
+)
+
+
+output$affordability_downloadData <- downloadHandler(
+  filename = function(){
+    paste('affordability_dataset', '_', Sys.Date(), '.csv', sep = '')},
+  content = function(file){
+    write.csv(sr_all(), file)
+  }
+)
+
+
+output$map_downloadData <- downloadHandler(
+  filename = function(){
+    paste('map_dataset', '_', Sys.Date(), '.csv', sep = '')},
+  content = function(file){
+    write.csv(district_subset(), file)
+  }
+)
+
+
+
 datasetInput <- reactive({
   
   district_data <- district_subset()
@@ -1308,7 +1454,6 @@ datasetInput <- reactive({
 })
 
 output$table <- renderTable({
-  
   datasetInput()
   
 })
@@ -1320,5 +1465,6 @@ output$downloadData <- downloadHandler(
     write.csv(datasetInput(), file)
   }
 )
+
 
 }) #closing shiny server function
