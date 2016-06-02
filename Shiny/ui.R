@@ -277,11 +277,10 @@ shinyUI(fluidPage(
                                        
                                      "Price Dispersion: Monthly Cost per Circuit", br(), br(), ggvisOutput("price_disp_cpc"), br(), dataTableOutput("disp_cpc_table"), br(), br(),
                                      "Price Dispersion: Monthly Cost per Mbps", br(), br(), ggvisOutput("price_disp_cpm"), br(), dataTableOutput("disp_cpm_table"), br(), br(),
-                                     "Scatterplot: Monthly Cost per Circuit", br(), br(), ggvisOutput("plot1"), br(), dataTableOutput("plot1_table"), br(), br(), br(), br()))
+                                     "Scatterplot: Monthly Cost per Circuit", br(), br(), ggvisOutput("plot1"), br(), dataTableOutput("plot1_table"), br(), br(), br(), br())),
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
-                     
-                            #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
+                             #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
                             tabPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", fluidRow(
                                                                                                                 column(8, plotOutput("hypothetical_ia_price")),
                                                                                                                 column(8, plotOutput("hypothetical_ia_goal"))
