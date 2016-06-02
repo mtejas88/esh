@@ -8,9 +8,6 @@ on ec.circuit_id = c.id
 join district_lookup_2015 dl
 on ec.entity_id = dl.esh_id
 
-where entity_type in ('School', 'District')
-and exclude_from_reporting = false
-
 group by  district_esh_id,
           line_item_id
 
@@ -19,6 +16,6 @@ Author:                       Justine Schott
 Created On Date:              03/03/2016
 Last Modified Date: 		  06/02/2016
 Name of QAing Analyst(s):  
-Purpose:                      To aggregate services received by all instructional facilities to the appropriate district; excludes dirty line items
+Purpose:                      To aggregate services received by all instructional facilities to the appropriate district. Excludes dirty line items
                               and normal line item exclusions, such as consortium_shared line items
 */
