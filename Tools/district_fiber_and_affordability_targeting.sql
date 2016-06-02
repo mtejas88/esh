@@ -849,10 +849,8 @@ select  esh_id__c,
         case
           when right(priority_status__c_a,1) in ('1','2','3')
             then 'Target'
-          when right(priority_status__c_a,1) = '4'
+          when right(priority_status__c_a,1) in ('4','5','6','7','8')
             then 'Potential Target'
-          when right(priority_status__c_a,1) in ('5','6','7','8')
-            then 'Future Potential Target'
           else null
         end as status__c_a,
         case
@@ -864,13 +862,49 @@ select  esh_id__c,
             then 'Contract not expiring but need to verify'
           else null
         end as afford_external_communications,
-        null as contract_expiring__c,
-        null as opportunity_name,
-        null as recordtypeid,
-        null as closedate,
-        null as stagename,
-        null as reason__c,
-        null as reason_explanation__c,
+        case
+          when priority_status__c_a is null
+            then null
+          when contract_expiring__c = true
+          or (contract_expiring__c = false
+              and clean_status = 'clean'
+              and priority_status__c_f is not null
+            )
+            then '012E0000000NJE4'
+          else
+            '012E000000066Rk' 
+        end as "RecordTypeID_A",
+        '012E0000000VjCc' as "RecordTypeID_F",
+        case
+          when priority_status__c_a is not null
+            then concat('2016 Affordability [',account_name,']') 
+        end as "Opportunity Name_A",
+        concat('2016 Target Fiber [',account_name,']') as "Opportunity Name_F",
+        to_timestamp('06/01/2017', 'MM/DD/YYYY') as "CloseDate",
+        case
+          when priority_status__c_f is null
+            then 'Closed Lost' 
+        end as "StageName_F",
+        case
+          when priority_status__c_f is null
+            then 'Already on Fiber' 
+        end as "Reason__c",
+        case
+          when priority_status__c_f is null
+            then 'determined already on fiber pre-import' 
+        end as "Reason_explanation__c",
+        case
+          when priority_status__c_a is null
+            then null
+          when contract_expiring__c = true
+          or (contract_expiring__c = false
+              and clean_status = 'clean'
+              and priority_status__c_f is not null
+            )
+            then 'Open'
+          else
+            'DQT Review Needed' 
+        end as "StageName_A",
         null as ownerid,
         null as batch__c
 
