@@ -1,6 +1,7 @@
 library(leaflet)
 library(ggvis)
 library(shinydashboard)
+library(DT)
 
 shinyUI(fluidPage(
   tags$head(
