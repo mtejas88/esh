@@ -95,7 +95,7 @@ shinyUI(fluidPage(
                     "))
     ),
   
-  titlePanel(div(h1("SHINY for Connectivity Reports"))),
+  titlePanel(div(h1("SHINY for EducationSuperHighway"))),
   
   #sidebarLayout(
     #sidebarPanel(width = 3,
@@ -158,11 +158,14 @@ shinyUI(fluidPage(
       #navbarPage("",
                 tabsetPanel(
                   id="panels",
-                 tabPanel("About", div(p(br(), "For Internal Use Only By EducationSuperHighway.",br(), "Last Data Pull Date: 05/17/16", br())), width="300px", br(),
-                          "Before you toggle over to the other tabs, please select your state of interest and data cleanliness!", br(),
-                          wellPanel(width = 2,
+                 tabPanel("About", 
+                          
+                          fluidRow(
+                            column(12,
+                            wellPanel(width = 2,
                                     selectInput("state", 
-                                                h2("Select State"), 
+                                                h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
+                                                    "Select State"), 
                                                 choices = c('All', 'AL','AR','AZ',
                                                             'CA','CO','CT',
                                                             'DE','FL','GA', 'IA',
@@ -192,7 +195,15 @@ shinyUI(fluidPage(
                                     #                                    label = h2("Select Locale(s)"),
                                     #                                    choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                     #                                    selected = c("Rural", "Small Town", "Suburban", "Urban")))#
-                                    )),
+                                    ) # Close WellPanel
+                            ), # close colunmn
+                          column(12,
+                                 includeHTML("include.html")
+                          )
+                          
+                          ) # close fluid row
+                          
+                          ),
                 
                  
                  navbarMenu("ESH Sample",

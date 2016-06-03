@@ -1185,9 +1185,10 @@ price_disp_cpc <- reactive({
     layer_bars(strokeWidth := 0) %>%    
     layer_rects(fill:="white") %>%
     add_axis("x", title = "Percentile", title_offset = 50, grid=FALSE) %>% 
-    add_axis("x", orient = "top", title = "Price Dispersion: Monthly Cost Per Circuit",
-               properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
-               grid=FALSE)  %>% 
+      # commented out title fyi
+    #add_axis("x", orient = "top", title = "Price Dispersion: Monthly Cost Per Circuit",
+     #          properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
+      #         grid=FALSE)  %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE)
     #hide_axis("y")
   
