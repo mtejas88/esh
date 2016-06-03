@@ -785,21 +785,21 @@ before_status as (
       when goal_status = 'Meeting'
         then null
       when contract_expiration = 'true' and similar_priced_service_for_more_bw = 'true' and goal_status = 'Not meeting'
-        then 'Priority 1'
+        then 'A1'
       when contract_expiration = 'true' and similar_priced_service_for_more_bw = 'true' and goal_status = 'Unknown for 2015'
-        then 'Priority 2'
+        then 'A2'
       when contract_expiration = 'true' and similar_priced_service_for_more_bw != 'true' and goal_status = 'Not meeting'
-        then 'Priority 3'
+        then 'A3'
       when contract_expiration = 'true' and similar_priced_service_for_more_bw != 'true' and goal_status = 'Unknown for 2015'
-        then 'Priority 4'
+        then 'A4'
       when contract_expiration != 'true' and similar_priced_service_for_more_bw = 'true' and goal_status = 'Not meeting'
-        then 'Priority 5'
+        then 'A5'
       when contract_expiration != 'true' and similar_priced_service_for_more_bw = 'true' and goal_status = 'Unknown for 2015'
-        then 'Priority 6'
+        then 'A6'
       when contract_expiration != 'true' and similar_priced_service_for_more_bw != 'true' and goal_status = 'Not meeting'
-        then 'Priority 7'
+        then 'A7'
       when contract_expiration != 'true' and similar_priced_service_for_more_bw != 'true' and goal_status = 'Unknown for 2015'
-        then 'Priority 8'
+        then 'A8'
     end as priority_status__c_a,
     case
       when contract_expiration = 'true'
@@ -861,6 +861,7 @@ select  esh_id__c,
             then 'Contract not expiring but need to verify'
           else null
         end as afford_external_communications,
+        contract_expiring__c,
         case
           when priority_status__c_a is null
             then null
