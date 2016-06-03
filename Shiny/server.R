@@ -26,6 +26,7 @@ shinyServer(function(input, output, session) {
   library(leaflet)
   library(ggvis)
   library(DT)
+  library(shinydashboard)
   
   #sapply(lib, function(x) library(x, character.only = TRUE))
   #services <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/services_received.SQL")
@@ -222,9 +223,9 @@ output$histogram_goals <- renderPlot({
   data <- melt(data)
 
   q <- ggplot(data = data) +
-         geom_bar(aes(x = variable, y = value), fill="#fdb913", stat = "identity") +
+         geom_bar(aes(x = variable, y = value), width = .5, fill="#fdb913", stat = "identity") +
          geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
-         scale_y_continuous(limits = c(0, 100)) +
+         scale_y_continuous(limits = c(0, 110)) +
          theme_classic() + 
          theme(axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -276,10 +277,10 @@ output$histogram_districts_ia_technology <- renderPlot({
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   q <- ggplot(data = data, aes(x = hierarchy_connect_category, y = n_percent_districts)) +
-       geom_bar(fill = "#fdb913", stat = "identity") +
+       geom_bar(fill = "#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(n_percent_districts, "%")), 
                  vjust = -1, size = 6) +
-       scale_y_continuous(limits = c(0, 100)) +
+       scale_y_continuous(limits = c(0, 110)) +
        scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
@@ -327,10 +328,10 @@ output$histogram_projected_wan_needs <- renderPlot({
   
   q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),],
               aes(x = variable, y = value)) +
-       geom_bar(fill="#fdb913", stat = "identity") +
+       geom_bar(fill="#fdb913", stat = "identity", width = .5) +
         geom_text(aes(label = paste0(value, "%")), 
                   vjust =-1, size = 6) +
-        scale_y_continuous(limits = c(0, 100)) +
+        scale_y_continuous(limits = c(0, 110)) +
         theme_classic() + 
         theme(axis.line = element_blank(), 
               axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -428,7 +429,7 @@ output$hypothetical_ia_goal <- renderPlot({
   goals <- ggplot(data = plot_data1) +
     geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
     geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
-    scale_y_continuous(limits = c(0, 1.1 * 100)) +
+    scale_y_continuous(limits = c(0, 110)) +
     scale_x_discrete(limits = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
@@ -508,7 +509,7 @@ output$histogram_schools_on_fiber <- renderPlot({
               aes(x = variable, y = value)) +
        geom_bar(fill="#009291", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
-       scale_y_continuous(limits = c(0, 100)) +
+       scale_y_continuous(limits = c(0, 110)) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -564,9 +565,9 @@ output$histogram_by_erate_discounts <- renderPlot({
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
 
   q <- ggplot(data = data, aes(x = as.factor(c1_discount_rate), y = percent_unscalable_schools_in_rate_band)) +
-       geom_bar(fill="#009291", stat = "identity") +
-       geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust =-1, size = 6) +
-       scale_y_continuous(limits = c(0, 100)) +
+       geom_bar(fill="#009291", stat = "identity", width = .5) +
+       geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust = -1, size = 6) +
+       scale_y_continuous(limits = c(0, 110)) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -691,7 +692,7 @@ output$histogram_cost_comparison_by_state <- renderPlot({
   
   q <- ggplot(data = plot_data) +
       geom_bar(aes(x = reorder(factor(postal_cd), median_cost), y = median_cost), 
-               fill="#009291", stat = "identity") +
+               fill="#009291", stat = "identity", width = .5) +
       theme_classic() + 
       theme(axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
