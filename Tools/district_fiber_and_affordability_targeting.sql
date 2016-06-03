@@ -1,4 +1,3 @@
-
 /*
 Author: Justine Schott
 Created On Date: 6/1/2016
@@ -701,7 +700,7 @@ before_prior as (
           criteria.postal_cd as billingstatecode,
           null as billingstate,
           criteria.city,
-          criteria.district_nces as nces_id__c,
+          criteria.district_nces as ncesid__c,
           criteria.num_campuses,
           criteria.num_all_schools,
           criteria.num_charter_schools,
@@ -817,7 +816,7 @@ select  esh_id__c,
         billingstatecode,
         billingstate,
         city,
-        nces_id__c,
+        ncesid__c,
         num_campuses,
         num_all_schools,
         num_charter_schools,
@@ -877,10 +876,10 @@ select  esh_id__c,
         '012E0000000VjCc' as "RecordTypeID_F",
         case
           when priority_status__c_a is not null
-            then concat('2016 Affordability [',account_name,']') 
+            then concat('2016 Affordability ',account_name) 
         end as "Opportunity Name_A",
-        concat('2016 Target Fiber [',account_name,']') as "Opportunity Name_F",
-        to_timestamp('06/01/2017', 'MM/DD/YYYY') as "CloseDate",
+        concat('2016 Target Fiber ',account_name) as "Opportunity Name_F",
+        '06/01/2017' as "CloseDate",
         case
           when priority_status__c_f is null
             then 'Closed Lost' 
