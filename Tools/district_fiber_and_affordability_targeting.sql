@@ -2,8 +2,8 @@
 /*
 Author: Justine Schott
 Created On Date: 6/1/2016
-Last Modified Date: 
-Name of QAing Analyst(s): 
+Last Modified Date: 6/3/2016
+Name of QAing Analyst(s): Greg Kurzhals
 Purpose: To classify districts in our universe to the district team's fiber and affordability prioritizations:
 https://docs.google.com/presentation/d/1_Qddumhi2lnYRXzL5QYHYgqFLqA4ZeVUMPP4EczL0f4/edit#slide=id.p4
 Methodology: Use services received by districts, charter and BIE districts. Using 2012-2013 NCES data, as well
@@ -181,7 +181,7 @@ district_line_items as (
           ) as fiber_lines,
           sum(case
               when li.connect_category = 'Fiber'
-              and exclude = false
+              and number_of_dirty_line_item_flags = 0
                 then ldli.allocation_lines
                 else 0
             end
@@ -235,7 +235,7 @@ district_line_items as (
             end
           ) as dirty_conn_type,
           array_to_string(array_agg(distinct li.applicant_name),',') as "applicants",
-          min(extract(year from to_timestamp(contract_end_date, 'MM/DD/YYYY HH:MI:SS AM'))) as soonest_contract_end_year
+          min(to_timestamp(contract_end_date, 'MM/DD/YYYY HH:MI:SS AM')) as soonest_contract_end_date
 
   from combo_ldli ldli
   join line_items li
@@ -635,7 +635,7 @@ criteria as (
           lowfiber_wan_circuit_count,
           dirty_isp,
           dirty_conn_type,
-          soonest_contract_end_year,
+          soonest_contract_end_date,
           ia_service_providers.*,
           wan_service_providers.*,
           district_line_items.applicants,
@@ -736,9 +736,9 @@ before_prior as (
             else 'Not meeting'
           end as goal_status,
           case
-            when soonest_contract_end_year is null
+            when soonest_contract_end_date is null
               then 'Unknown for 2015'
-            when soonest_contract_end_year <= 2017
+            when soonest_contract_end_date <= to_timestamp('06/30/2017', 'MM/DD/YYYY')
               then 'true'
             else 'false'
           end as contract_expiration,
