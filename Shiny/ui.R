@@ -1,9 +1,13 @@
 library(leaflet)
 library(ggvis)
 library(shinydashboard)
-library(DT)
+library(DT) #for datatables
+library(shinyjs) #for reset button
+
 
 shinyUI(fluidPage(
+  useShinyjs(),
+  
   tags$head(
     tags$style(HTML("
                     @import url('//fonts.googleapis.com/css?family=Roboto+Slab');
@@ -53,6 +57,17 @@ shinyUI(fluidPage(
                     color: #899DA4;
                     
                     }
+
+                    h4 {
+                    background-color: #FFFFFF;
+                    font-family: 'Lato', sans-serif;
+                    font-weight: 500;
+                    line-height: 1.1;
+                    font-size: 16pt;
+                    display: inline-block;
+                    margin-top: 0px;
+
+                    }
                     
                     shiny-plot-output {
                     background-color: #00EFD1;
@@ -94,75 +109,20 @@ shinyUI(fluidPage(
                     }
                     "))
     ),
+
   
   titlePanel(div(h1("SHINY for EducationSuperHighway"))),
-  
-  #sidebarLayout(
-    #sidebarPanel(width = 3,
-      ##helpText("Making Shiny more efficient with reactive datasets"),
-      
-      
-     # selectInput("state", 
-     #              h2("Select State"), 
-     #             choices = c('All', 'AL','AR','AZ',
-    #                          'CA','CO','CT',
-    #                          'DE','FL','GA', 'IA',
-    #                          'ID','IL','IN','KS',
-    #                          'KY','LA','MA','MD',
-    #                          'ME','MI','MN','MO',
-    #                          'MS','MT','NC','ND',
-    #                          'NE','NH','NJ','NM',
-    #                          'NV','NY','OH','OK',
-    #                          'OR','PA','RI','SC',
-     #                         'SD','TN','TX','UT','VA',
-    #                          'WA','WI','WV','WY'), selected='All'),
-      
-      
-      #checkboxInput("select_districts", "Select District(s)"),
-      #conditionalPanel(
-      #  condition = "input.select_districts == true",
-      #uiOutput("districtSelect")),
-      
-      #checkboxInput("sr_filters", "Filters Tailored To Services Received Table Only"),
-      #conditionalPanel(
-      #  condition = "input.sr_filters == true",
-        #uiOutput("bandwidthSelect"),
-
-      #checkboxGroupInput(inputId = "purpose", 
-      #                   label = h2("Select Purpose(s) (applicable for B-W viz only)"),
-      #                   choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
-      #                   selected = c('Internet', 'Upstream', 'WAN', 'ISP Only')),
-      
-      #checkboxGroupInput(inputId = "connection_services", 
-      #                   h2("Select Connection Type(s) - line item view only"),
-      #                   choices = c("Dark Fiber", "Lit Fiber",
-      #                               "Cable", "DSL", "Copper", "Other / Uncategorized"),
-      #                   selected = c("Dark Fiber", "Lit Fiber",
-      #                               "Cable", "DSL", "Copper", "Other / Uncategorized")),#),
-
-      
-
-
-
     
-    #selectInput(inputId = "download_dataset", 
-    #            label = h2("Choose a dataset:"),
-    #            choices = c("districts_table", 
-    #                        "line_items_table"))#,
-     
-     #downloadButton('downloadData', 'Download')    
-    #),#closing sidebarPanel
-    
-    
-    mainPanel(
+    mainPanel(width = 12,
       #navbarPage("",
                 tabsetPanel(
                   id="panels",
-                 tabPanel("About", 
+                 
+                tabPanel("About", 
                           
                           fluidRow(
                             column(12,
-                            wellPanel(width = 2,
+                            wellPanel(#width = 2,
                                     selectInput("state", 
                                                 h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
                                                     "Select State"), 
@@ -207,16 +167,40 @@ shinyUI(fluidPage(
                 
                  
                  navbarMenu("ESH Sample",
-                            tabPanel("Sample vs. Population Bar Charts", 
+                            tabPanel("Population vs. Sample Bar Charts", 
                                      
-                            wellPanel("Sample vs. Population: Locale", br(), plotOutput("histogram_locale"), br(), br(), dataTableOutput("table_locale")), br(), br(),
-                            wellPanel("Sample vs. Population: District Size", br(), plotOutput("histogram_size"), br(), br(), dataTableOutput("table_size")))),
+                            wellPanel(h4("Population vs. Sample: Locale"), br(), plotOutput("histogram_locale", width = "50%"), align = "center", br(), br(), dataTableOutput("table_locale")), br(), br(),
+                            wellPanel(h4("Population vs. Sample: District Size"), br(), plotOutput("histogram_size", width = "50%"), align = "center", br(), br(), dataTableOutput("table_size")))),
 
                  navbarMenu("Goals",
                             tabPanel("Goals Breakdown", br(), htmlOutput("helptext_goals"), br(), br(), 
-
-                                     wellPanel("Districts / Students Meeting IA Goals", br(), plotOutput("histogram_goals"), br(), dataTableOutput("table_goals")),
-                                     wellPanel("Districts by IA Technology", br(), 
+                                     sidebarLayout(
+                                       sidebarPanel(width = 3,
+                                       div(id = "goals_filters", 
+                                         checkboxGroupInput(inputId = "connection_districts_goals", 
+                                                            h2("Select Connection Type(s)"),
+                                                            choices = c("Fiber", "Cable", "DSL",
+                                                                        "Fixed Wireless", "Copper", "Other / Uncategorized"), 
+                                                            selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
+                                                                         "Copper", "Other / Uncategorized")), 
+                                         #checkboxInput("district_size2", "Select District Size"),
+                                         #conditionalPanel(condition = "input.district_size2 == true",
+                                         checkboxGroupInput(inputId = "district_size_goals", 
+                                                            label = h2("Select District Size(s)"),
+                                                            choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                                                            selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
+                                         
+                                         #checkboxInput("district_locale", "Select District Locale"),
+                                         #conditionalPanel(condition = "input.district_locale == true",
+                                         checkboxGroupInput(inputId = "locale_goals", 
+                                                            label = h2("Select Locale(s)"),
+                                                            choices = c("Rural", "Small Town", "Suburban", "Urban"),
+                                                            selected = c("Rural", "Small Town", "Suburban", "Urban"))),
+                                         actionButton("goals_reset_all", "Reset All Filters")#
+                                         ),
+                                  mainPanel(
+                                     h4("Districts / Students Meeting IA Goals"), br(), plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
+                                     h4("Districts by IA Technology"), br(), 
 
                                                checkboxInput("district_filters", "Filter for Meeting Goals Status"),
                                                conditionalPanel(condition = "input.district_filters == true",
@@ -227,13 +211,13 @@ shinyUI(fluidPage(
                                                                                    selected = c("Meeting 2014 Goals", "Not Meeting 2014 Goals"))), br(),
                                                downloadButton('ia_tech_downloadData', 'Download'), br(),
                                                
-                                               plotOutput("histogram_districts_ia_technology"), br(), dataTableOutput("table_districts_ia_technology")),
-                                     wellPanel("Current WAN Goal Percentage vs. Projected WAN Needs", br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs")),
-                                     wellPanel("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps", br(),
+                                               plotOutput("histogram_districts_ia_technology"), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
+                                     h4("Current WAN Goal Percentage vs. Projected WAN Needs"), br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
+                                     h4("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps"), br(),
                                      fluidRow(
                                        column(12, plotOutput("hypothetical_ia_price")),
                                        column(12, plotOutput("hypothetical_ia_goal"))
-                                     ), br(), dataTableOutput("table_hypothetical_ia_goal"))  
+                                     ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br()))#close mainPanel and sidebarLayout
                                      
                                      )),
 
@@ -241,28 +225,29 @@ shinyUI(fluidPage(
                             tabPanel("Fiber Charts", br(), htmlOutput("helptext_schools_on_fiber"), br(), br(), 
                                     
                                      
-                                     sidebarLayout( sidebarPanel(#tags$style(type="text/css", '#topPanel { width:200px; float:top;}'),
-                                       #id = "topPanel",
-                                       tags$div(class = "row",
+                                     sidebarLayout( sidebarPanel(width = 3,
+                                                div(id = "fiber_filters", 
                                                 #checkboxInput("district_size2", "Select District Size"),
                                                 #conditionalPanel(condition = "input.district_size2 == true",
-                                                                 checkboxGroupInput(inputId = "district_size", 
+                                                                 checkboxGroupInput(inputId = "district_size_fiber", 
                                                                                     label = h2("Select District Size(s)"),
                                                                                     choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                                                     selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
                                                 
                                                 #checkboxInput("district_locale", "Select District Locale"),
                                                 #conditionalPanel(condition = "input.district_locale == true",
-                                                                 checkboxGroupInput(inputId = "locale", 
+                                                                 checkboxGroupInput(inputId = "locale_fiber", 
                                                                                     label = h2("Select Locale(s)"),
                                                                                     choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                                                                                    selected = c("Rural", "Small Town", "Suburban", "Urban"))#)
+                                                                                    selected = c("Rural", "Small Town", "Suburban", "Urban")),#,
+                                                actionButton("fiber_reset_all", "Reset All Filters")
                                        )),
+                                       
                                      
                                      
                                     mainPanel( 
-                                    "Distribution of Schools by Infrastructure Type", br(), plotOutput("histogram_schools_on_fiber"), br(), dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
-                                    "Distribution of Schools by E-Rate Discount Rates", br(), plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
+                                    h4("Distribution of Schools by Infrastructure Type"), br(), plotOutput("histogram_schools_on_fiber"), br(), dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
+                                    h4("Distribution of Schools by E-Rate Discount Rates"), br(), plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
                                      
                                     
                                     ))),
@@ -272,9 +257,8 @@ shinyUI(fluidPage(
                             #tabPanel("Box and Whiskers: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
                             tabPanel("Bar Charts + Scatterplot: Price Dispersion", br(), htmlOutput("helptext_price_cpc"), br(), align = "left", br() , 
                                      
-                                  sidebarLayout( sidebarPanel(#tags$style(type="text/css", '#topPanel { width:300px; float:top;}'),
-                                                         #id = "topPanel",
-                                       tags$div(class = "row",
+                                  sidebarLayout( sidebarPanel(width = 3,
+                                  div(id = "affordability_filters", 
                                         uiOutput("bandwidthSelect"), 
                                        
                                         
@@ -288,15 +272,28 @@ shinyUI(fluidPage(
                                                         choices = c("Dark Fiber", "Lit Fiber",
                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized"),
                                                         selected = c("Dark Fiber", "Lit Fiber",
-                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized"))), br(),
+                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized")),
+                                        
+                                        checkboxGroupInput(inputId = "district_size_affordability", 
+                                                           label = h2("Select District Size(s)"),
+                                                           choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                                                           selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
+                                        
+                                        #checkboxInput("district_locale", "Select District Locale"),
+                                        #conditionalPanel(condition = "input.district_locale == true",
+                                        checkboxGroupInput(inputId = "locale_affordability", 
+                                                           label = h2("Select Locale(s)"),
+                                                           choices = c("Rural", "Small Town", "Suburban", "Urban"),
+                                                           selected = c("Rural", "Small Town", "Suburban", "Urban"))),#
+                                       
+                                       actionButton("affordability_reset_all", "Reset All Filters"),  
                                        downloadButton('affordability_downloadData', 'Download')), # closing sidebar panel,
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                       
-                                     "Price Dispersion: Monthly Cost per Circuit", br(), br(), ggvisOutput("price_disp_cpc"), br(), dataTableOutput("disp_cpc_table"), br(), br(),
-                                     "Price Dispersion: Monthly Cost per Mbps", br(), br(), ggvisOutput("price_disp_cpm"), br(), dataTableOutput("disp_cpm_table"), br(), br(),
-                                     "Scatterplot: Monthly Cost per Circuit", br(), br(), ggvisOutput("plot1"), br(), dataTableOutput("plot1_table"), br(), br() 
+                                     h4("Price Dispersion: Monthly Cost per Circuit"), br(), br(), ggvisOutput("price_disp_cpc"), br(), br(), textOutput("n_sr"), br(), textOutput("n_circuits"), br(), dataTableOutput("disp_cpc_table"), br(), br(),
+                                     h4("Price Dispersion: Monthly Cost per Mbps"), br(), br(), ggvisOutput("price_disp_cpm"), br(), dataTableOutput("disp_cpm_table"), br(), br(),
+                                     h4("Scatterplot: Monthly Cost per Circuit"), br(), br(), ggvisOutput("plot1"), br(), div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
@@ -310,36 +307,55 @@ shinyUI(fluidPage(
                            # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
                             tabPanel("District Lookup", br(), htmlOutput("helptext_leaflet_map"), br(), br(),
                                      sidebarLayout(
-                                        sidebarPanel( uiOutput("districtSelect")),
-                                     mainPanel(leafletOutput("testing_leaflet"))
-                                     #fluidRow(wellPanel(#tags$style(type="text/css", '#topPanel { width:300px; float:top;}'),
-                                       #id = "topPanel",
-                                       #))#,
-                                     #br(), br(), p(),
-                                     #wellPanel(leafletOutput("testing_leaflet"))
-                                     )), #end of sidebarPanel and tabPanel()
+                                       sidebarPanel(wellPanel(uiOutput("districtSelect"))),
+                                     #tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                     mainPanel(leafletOutput("testing_leaflet"),
+                                     #absolutePanel( uiOutput("districtSelect"), fixed = TRUE,
+                                    #               draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                    #               width = 330, height = "auto"),
+                                     actionButton("districtSelect", "New Points"))
+                                     
+                                     )), #end of sidebarLayout and tabPanel()
 
                                       #actionButton("districtSelect", "New points")),
                          
                            tabPanel("District Population Maps", br(),  
                            sidebarLayout(
-                                    sidebarPanel(
+                                    sidebarPanel(width = 3,
+                                    div(id = "map_filters", 
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
                                                  choices = c("General", "Clean/Dirty", 
                                                              "Goals: 100kbps/Student", "Goals: 1Mbps/Student",
                                                              "Fiber Build Cost to Districts"),
                                                  selected = "General"),
+                                      
+            
                                       checkboxGroupInput(inputId = "connection_districts", 
                                                         h2("Select Connection Type(s) - map/district view only"),
                                                         choices = c("Fiber", "Cable", "DSL",
                                                                     "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                         selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
-                                                                     "Copper", "Other / Uncategorized")), br(), br(),
-                                                 downloadButton('map_downloadData', 'Download')),
+                                                                     "Copper", "Other / Uncategorized")), 
+                                      #checkboxInput("district_size2", "Select District Size"),
+                                      #conditionalPanel(condition = "input.district_size2 == true",
+                                      checkboxGroupInput(inputId = "district_size_maps", 
+                                                         label = h2("Select District Size(s)"),
+                                                         choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                                                         selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
+                                      
+                                      #checkboxInput("district_locale", "Select District Locale"),
+                                      #conditionalPanel(condition = "input.district_locale == true",
+                                      checkboxGroupInput(inputId = "locale_maps", 
+                                                         label = h2("Select Locale(s)"),
+                                                         choices = c("Rural", "Small Town", "Suburban", "Urban"),
+                                                         selected = c("Rural", "Small Town", "Suburban", "Urban"))),
+                                                 actionButton("map_reset_all", "Reset All Filters"),#
+                                                 downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
                                      
-                                     "District Maps", br(), plotOutput("map_population"), textOutput("n_ddt"))#,
+                                     h4("District Maps"), br(), plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
+                                     div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),

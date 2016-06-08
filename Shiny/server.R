@@ -73,8 +73,8 @@ shinyServer(function(input, output, session) {
     services %>% 
       filter(new_purpose %in% input$purpose,
              new_connect_type %in% input$connection_services,
-             district_size %in% input$district_size,
-             locale %in% input$locale) %>%
+             district_size %in% input$district_size_affordability,
+             locale %in% input$locale_affordability) %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
       filter(bandwidth_in_mbps %in% selected_bandwidth_list)
   })  
@@ -111,14 +111,26 @@ district_subset <- reactive({
       
     selected_dataset <- paste0('\"', input$dataset, '\"')
     selected_state <- paste0('\"',input$state, '\"')
-
+    
+    #to create independent filters for goals section
+    districts$new_connect_type_goals <- districts$new_connect_type
+    districts$district_size2 <- districts$district_size
+    districts$locale2 <- districts$locale
+    
+    #to create independent filters for fiber section
+    districts$district_size3 <- districts$district_size
+    districts$locale3 <- districts$locale
+    
+    #to create independent filters for maps section
+    districts$new_connect_type_map <- districts$new_connect_type
+    
     districts %>% 
       filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
-      filter(new_connect_type %in% input$connection_districts, 
-             district_size %in% input$district_size,
-             locale %in% input$locale,
-             meeting_2014_goal_no_oversub %in% input$meeting_goals)#,
+      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) #%>% 
+      #filter(#new_connect_type %in% input$connection_districts, 
+             #district_size %in% input$district_size,
+             #locale %in% input$locale,
+            # meeting_2014_goal_no_oversub %in% input$meeting_goals)
              
   })
 
@@ -141,8 +153,10 @@ output$histogram_locale <- renderPlot({
        geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
        scale_fill_manual(labels = c("Rural", "Small Town", "Suburban", "Urban"), 
                           values = c("#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
+       geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
+             axis.line.x = element_blank(),
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
@@ -179,6 +193,7 @@ output$histogram_size <- renderPlot({
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
     scale_fill_manual(labels = c("Tiny", "Small", "Medium", "Large", "Mega"), 
                        values = c("#a1887f", "#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
+    geom_hline(yintercept = 0) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -214,18 +229,22 @@ output$table_size <- renderDataTable({
 ## Districts and Students Meeting Goals
 output$histogram_goals <- renderPlot({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
             summarize(percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
                       percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
-  
+      
   data <- melt(data)
 
   q <- ggplot(data = data) +
          geom_bar(aes(x = variable, y = value), width = .5, fill="#fdb913", stat = "identity") +
          geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
+         scale_x_discrete(breaks=c("percent_districts_meeting_goals", "percent_students_meeting_goals"),
+                     labels=c("Districts", "Students")) +
          scale_y_continuous(limits = c(0, 110)) +
+         geom_hline(yintercept = 0) +
          theme_classic() + 
          theme(axis.line = element_blank(), 
                 axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -249,11 +268,12 @@ set to ", "<b>", "clean", "</b>", "data, relevant", "<b>", "state", "</b>", ",an
 
 output$table_goals <- renderDataTable({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                           district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n = n(),
               percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
-  colnames(data) <- c("# of districts", "% of districts meeting goals", "percent of students meeting goals")
+  colnames(data) <- c("# of districts", "% of districts meeting goals", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
   datatable(data, options = list(paging = FALSE, searching = FALSE))
@@ -268,20 +288,22 @@ output$helptext_ia_technology <- renderUI({
 
 output$histogram_districts_ia_technology <- renderPlot({
   
-  data <- district_subset() %>%
-            group_by(hierarchy_connect_category) %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+            district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
+            group_by(new_connect_type_goals) %>%
             summarize(n_districts = n()) %>%
             mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
             n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
-  q <- ggplot(data = data, aes(x = hierarchy_connect_category, y = n_percent_districts)) +
+  q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
        geom_bar(fill = "#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(n_percent_districts, "%")), 
                  vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
        scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+       geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -298,7 +320,8 @@ output$histogram_districts_ia_technology <- renderPlot({
 
 output$table_districts_ia_technology <- renderDataTable({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+              district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
               group_by(hierarchy_connect_category) %>%
               summarize(n_districts = n()) %>%
               mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
@@ -314,7 +337,8 @@ output$table_districts_ia_technology <- renderDataTable({
 ## WAN Goals: Current vs. Projected Needs
 output$histogram_projected_wan_needs <- renderPlot({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+          district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
                     n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
                     percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
@@ -331,7 +355,10 @@ output$histogram_projected_wan_needs <- renderPlot({
        geom_bar(fill="#fdb913", stat = "identity", width = .5) +
         geom_text(aes(label = paste0(value, "%")), 
                   vjust =-1, size = 6) +
+        scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
+                     labels=c("Schools with >= 1G WAN", "Schools w/ Projected Need of >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
+        geom_hline(yintercept = 0) +
         theme_classic() + 
         theme(axis.line = element_blank(), 
               axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -346,7 +373,8 @@ output$histogram_projected_wan_needs <- renderPlot({
 
 output$table_projected_wan_needs <- renderDataTable({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                   district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
                     n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
                     percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
@@ -365,7 +393,10 @@ output$table_projected_wan_needs <- renderDataTable({
 ## Median Pricing Districts Not Meeting vs. Meeting Goals
 output$hypothetical_ia_price  <- renderPlot({
   
-  data <- district_subset() 
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                       district_size2 %in% input$district_size_goals, 
+                                       locale2 %in% input$locale_goals)
+  
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   cost_data <- data %>%
@@ -381,14 +412,17 @@ output$hypothetical_ia_price  <- renderPlot({
   #plot_data <- rbind(plot_data2, plot_data1)
   
   q <- ggplot(data = plot_data) +
-         geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
+         geom_bar(aes(x = variable, y = value, fill = variable),  width = .5, stat = "identity") +
          geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
          scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+         scale_fill_manual(values = c("#fdb913", "grey")) + 
+         geom_hline(yintercept = 0) +
          theme_classic() + 
-         theme(axis.line = element_blank(), 
-              axis.text.x = element_text(size=14, colour= "#899DA4"), 
-             axis.text.y = element_blank(),
+         theme(legend.position = "none",
+           axis.line = element_blank(), 
+            axis.text.x = element_text(size=14, colour= "#899DA4"), 
+            axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank()) 
@@ -398,7 +432,9 @@ output$hypothetical_ia_price  <- renderPlot({
 
 output$hypothetical_ia_goal <- renderPlot({
   
-  data <- district_subset() 
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
+  
   validate(need(nrow(data) > 0, ""))
   
   cost_data <- data %>%
@@ -422,7 +458,7 @@ output$hypothetical_ia_goal <- renderPlot({
   
   # Goal %
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Ideal Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -430,7 +466,9 @@ output$hypothetical_ia_goal <- renderPlot({
     geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
     geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
     scale_y_continuous(limits = c(0, 110)) +
-    scale_x_discrete(limits = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")) +
+    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Ideal Pricing"), 
+                     labels = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")) +
+    geom_hline(yintercept = 0) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
           axis.text.x = element_text(size=14, colour= "#899DA4"), 
@@ -443,7 +481,8 @@ output$hypothetical_ia_goal <- renderPlot({
 
 output$table_hypothetical_ia_goal <- renderDataTable({
   
-  data <- district_subset() 
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
   cost_data <- data %>%
     group_by(meeting_2014_goal_no_oversub) %>%
     summarize(n_districts = n(),
@@ -461,7 +500,7 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
   
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nunder Ideal Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals Under Median Meeting 2014 Goals Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -488,18 +527,20 @@ output$helptext_schools_on_fiber <- renderUI({
 
 
 ## Districts and Students Meeting Goals
+
 output$histogram_schools_on_fiber <- renderPlot({
   
-  data1 <- district_subset() 
+  data1 <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+                                        locale3 %in% input$locale_fiber)
   
-  data <- data1 %>%
+  data <- data1 %>% 
           summarize(num_all_schools = sum(num_schools),
-                    num_schools_on_fiber = sum(schools_on_fiber),
-                    num_schools_may_need_upgrades = sum(schools_may_need_upgrades),
-                    num_schools_need_upgrades = sum(schools_need_upgrades),
-                    percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
-                    percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
-                    percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2))
+                   num_schools_on_fiber = sum(schools_on_fiber),
+                   num_schools_may_need_upgrades = sum(schools_may_need_upgrades),
+                   num_schools_need_upgrades = sum(schools_need_upgrades),
+                   percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
+                   percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
+                   percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
@@ -509,7 +550,10 @@ output$histogram_schools_on_fiber <- renderPlot({
               aes(x = variable, y = value)) +
        geom_bar(fill="#009291", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
+       scale_x_discrete(breaks=c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades"),
+                     labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
        scale_y_continuous(limits = c(0, 110)) +
+       geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
             axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -525,7 +569,8 @@ output$histogram_schools_on_fiber <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_schools_on_fiber <- renderDataTable({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+                                           locale3 %in% input$locale_fiber) %>% 
           summarize(num_schools = sum(num_campuses),
                     num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
                     num_schools_may_need_upgrades = sum(nga_v2_assumed_unscalable_campuses),
@@ -554,7 +599,8 @@ output$helptext_by_erate_discounts <- renderUI({
 output$histogram_by_erate_discounts <- renderPlot({
   
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+                                 locale3 %in% input$locale_fiber) %>% 
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
@@ -568,6 +614,7 @@ output$histogram_by_erate_discounts <- renderPlot({
        geom_bar(fill="#009291", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
+       geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -583,7 +630,8 @@ output$histogram_by_erate_discounts <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_by_erate_discounts <- renderDataTable({
   
-  data <- district_subset() %>%
+  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+                                           locale3 %in% input$locale_fiber) %>% 
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
@@ -606,9 +654,6 @@ output$table_by_erate_discounts <- renderDataTable({
 ## Box and Whiskers Plots
 
 output$bw_plot <- renderPlot({
-  
-  #data <- li_bf()
-  #validate(need(nrow(data) > 0, "No circuits in given subset"))
   
   data <- sr_all()
   
@@ -870,30 +915,32 @@ output$table_cost_comparison_by_state <- renderTable({
 
 output$districtSelect <- renderUI({
   
-  data <- district_subset() %>%
+  districtSelect_data <- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
-    need(nrow(data) > 0, "No districts in given subset")
+    need(nrow(districtSelect_data) > 0, "No districts in given subset")
   )
   
-  district_list <- c(unique(as.character(data$name)))
+  district_list <- c(unique(as.character(districtSelect_data$name)))
   
   selectizeInput("district_list", h2("Input District Name(s)"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 })
 
+
+
 output$choose_district <- renderPlot({
   
-  data <- district_subset() %>%
+  choose_district_data <- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')))
   
   selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
   
-  data <- data %>% 
+  choose_district_data <- choose_district_data %>% 
           filter_(paste("name %in%", selected_district_list))
   
   validate(
-    need(nrow(data) > 0, "No districts in given subset")
+    need(nrow(choose_district_data) > 0, "No districts in given subset")
   )
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
@@ -909,7 +956,7 @@ output$choose_district <- renderPlot({
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
   q <- state_base + 
-       geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
+       geom_point(data = choose_district_data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
                                alpha = 0.7, size = 6) 
   
   print(q + coord_map())
@@ -921,7 +968,10 @@ output$choose_district <- renderPlot({
 output$map_population <- renderPlot({
   
   data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
+          filter(!(postal_cd %in% c('AK', 'HI')), 
+                 new_connect_type_map %in% input$connection_districts,
+                 district_size %in% input$district_size_maps,
+                 locale %in% input$locale_maps)
   
   validate(
     need(nrow(data) > 0, "No districts in given subset")
@@ -941,31 +991,27 @@ output$map_population <- renderPlot({
   
   q <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
-                               alpha = 0.7, size = 6) #+ #, position = position_jitter(w = 0.07, h = 0.05)) +
-  #scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
-  #scale_color_manual(values = colors)
+                               alpha = 0.7, size = 4)
   
-  
-  #print(q + coord_map())
+    
   qq <- q + coord_map()
   
   r <- state_base + 
     geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
-               alpha = 0.7, size = 6) + #, position = position_jitter(w = 0.07, h = 0.05)) +
-    scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC"))
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC"))
   rr <- r + coord_map()
   
   
   s <- state_base + 
     geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
-               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 100k/student Goal", 
-                                                                      "Does Not Meet 100k/student Goal"), values = c("#009296", "#CCCCCC"))
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 100kbps/Student Goal", 
+                                                                      "Does Not Meet 100kbps/Student Goal"), values = c("#CCCCCC", "#CB2027"))
   ss <- s + coord_map()
   
   t <- state_base + 
     geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
-               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 1Mbps/student Goal", 
-                                                                      "Does Not Meet 1Mbps/student Goal"), values = c("#A3E5E6", "#CCCCCC")) #+
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
+                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#CCCCCC", "#CB2027")) #+
   
   tt <- t + coord_map()
   
@@ -975,7 +1021,7 @@ output$map_population <- renderPlot({
   u <- state_base + 
     geom_point(data = ddt_unscalable, 
                aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
-               alpha = 0.8, size = 6) +
+               alpha = 0.8, size = 4) +
     scale_color_manual(values = c("#A3E5E6", "#0073B6"), 
                        breaks = c(0, 1), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"))
   
@@ -990,130 +1036,6 @@ output$map_population <- renderPlot({
   
 })
 
-output$map_cleanliness <- renderPlot({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  validate(
-    need(nrow(data) > 0, "No districts in given subset")
-  )
-  
-  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("county", region = state_name)
-  
-  set.seed(123) #to control jitter
-  state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position="bottom") +
-    guides(shape=guide_legend(override.aes=list(size=7))) 
-  
-  q <- state_base + 
-       geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
-                               alpha = 0.7, size = 6) + #, position = position_jitter(w = 0.07, h = 0.05)) +
-       scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC")) #+
-  
-  print(q + coord_map())
-  
-  
-})  
-
-output$map_2014_goals <- renderPlot({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  validate(need(nrow(data) > 0, "No districts in given subset"))
-  
-  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("county", region = state_name)
-
-  set.seed(123) #to control jitter
-  state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position="bottom") +
-    guides(shape=guide_legend(override.aes=list(size=7))) 
-  
-  q <- state_base + 
-       geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
-                               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 100k/student Goal", 
-                                                                                      "Does Not Meet 100k/student Goal"), values = c("#009296", "#CCCCCC"))
-  
-  print(q + coord_map())
-  
-})  
-
-output$map_2018_goals <- renderPlot({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  validate(need(nrow(data) > 0, "No districts in given subset"))
-  
-  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("county", region = state_name)
-  
-  set.seed(123) #to control jitter
-  state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position="bottom") +
-    guides(shape=guide_legend(override.aes=list(size=7))) 
-  
-  q <- state_base + 
-       geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
-                               alpha = 0.7, size = 6) + scale_color_manual(labels = c("Meets 1Mbps/student Goal", 
-                                                                                      "Does Not Meet 1Mbps/student Goal"), values = c("#A3E5E6", "#CCCCCC")) #+
-  
-  print(q + coord_map())
-  
-})  
-
-# Map of Districts at least 1 Unscalable School
-output$map_fiber_needs <- renderPlot({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  validate(
-    need(nrow(data) > 0, "No districts in given subset")
-  )
-  
-  # limit to districts that have at least one unscalable campus
-  ddt_unscalable <- data %>% 
-                    filter(not_all_scalable == 1)
-
-  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
-  state_df <- map_data("county", region = state_name)
-  
-  set.seed(123) #to control jitter
-  state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
-          axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size = 16), legend.position = "bottom") +
-    guides(shape = guide_legend(override.aes=list(size = 7))) 
-  
-  q <- state_base + 
-       geom_point(data = ddt_unscalable, 
-                  aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
-                 alpha = 0.8, size = 6) +
-       scale_color_manual(values = c("#A3E5E6", "#0073B6"), 
-                          breaks = c(0, 1), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"))
-    
-  print(q + coord_map())
-  
-  
-})  
 
 # Price Dispersion Map holding Circuit Size / Technology Constant
 # automatic update -- not quite working out
@@ -1196,22 +1118,23 @@ price_disp_cpc <- reactive({
 
 price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
-output$table_price_disp_cpc <- renderTable({
 
-  data <- sr_all()
+
+output$n_sr <- renderText({
   
-  table_data <- data %>%
-                summarize(n_circuits = n(),
-                          percentile_25 = round(quantile(data$monthly_cost_per_circuit, c(.25), na.rm = TRUE), 2),
-                          median = round(quantile(data$monthly_cost_per_circuit, c(.50), na.rm = TRUE), 2),
-                          percentile_75 = round(quantile(data$monthly_cost_per_circuit, c(.75), na.rm = TRUE), 2))
-
-  table_data  
+  n_sr <- nrow(sr_all())
+  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
+  paste("n(services) =", toString(n_sr))
+  
 })
 
 
+output$n_circuits <- renderText({
 
-
+  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
+  paste("n(circuits) =", toString(n_circuits))
+  
+})
 
 output$disp_cpc_table <- renderDataTable({
   
@@ -1223,7 +1146,6 @@ output$disp_cpc_table <- renderDataTable({
   perc_tab <- cbind(add_perc, perc_tab)
   perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
   colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Circuit ($)")
-  print(dim(perc_tab))
   
   datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
 
@@ -1283,13 +1205,6 @@ output$helptext_price_cpm_scatter <- renderUI({
              to clean data, relevant state, connection types, and bandwidth in mbps."))
 })
 
-# Function for generating tooltip text
-#output$bandwidthSelect <- renderUI({
-#  sr_data <- sr_all()
-#  bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
-#  selectInput("bandwidth_list", h2("Select Bandwidth Speeds (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T)
-#})
-
 
 district_tooltip <- function(x) {
   if (is.null(x)) return(NULL)
@@ -1332,7 +1247,6 @@ output$plot1_table <- renderDataTable({
 
 
 # District Lookup
-
 output$helptext_leaflet_map <- renderUI({
   HTML(paste("User Note: Useful for District Callouts. Type in your districts of interest."))
 })
@@ -1341,7 +1255,7 @@ output$helptext_leaflet_map <- renderUI({
 output$testing_leaflet <- renderLeaflet({
   
   data <- district_subset()
-  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
+  selected_district_list <- paste0("c(",toString(paste0('\"', input$districtSelect, '\"')), ')')  #district_list
   
   d <- data %>% 
     filter_(paste("name %in%", selected_district_list))
@@ -1364,62 +1278,75 @@ output$testing_leaflet <- renderLeaflet({
 output$n_ddt <- renderText({
   
   data <- district_subset() %>%
-    filter(!(postal_cd %in% c('AK', 'HI')))
+    filter(!(postal_cd %in% c('AK', 'HI')),
+           new_connect_type_map %in% input$connection_districts,
+           district_size %in% input$district_size_maps,
+           locale %in% input$locale_maps)
   
-
     data2 <- data %>%
       filter(not_all_scalable == 1)
-
-
+    
   switch(input$map_view,
          "General" =  paste("n(districts) =", toString(nrow(data))),
          "Clean/Dirty" =  paste("n(districts) =", toString(nrow(data))),
          'Goals: 100kbps/Student' =  paste("n(districts) =", toString(nrow(data))),
          'Goals: 1Mbps/Student' =  paste("n(districts) =", toString(nrow(data))),
          'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
-  
-  
 })
 
-output$n_ddt2 <- renderText({
+#output$map_tables <- renderDataTable({
+#  map_data <- district_subset() %>%
+#    filter(!(postal_cd %in% c('AK', 'HI')),
+#           district_size %in% input$district_size_maps,
+#           locale %in% input$locale_maps)
   
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
   
-  paste("n(districts) =", toString(nrow(data)))
   
+#  map_data2 <- data %>%
+#    filter(not_all_scalable == 1)
+  
+  
+#  switch(input$map_view,
+#         "General" =  datatable(map_data),
+#         "Clean/Dirty" =  datatable(map_data),
+#         'Goals: 100kbps/Student' =  datatable(map_data),
+#         'Goals: 1Mbps/Student' =  datatable(map_data),
+#         'Fiber Build Cost to Districts' = datatable(map_data2))
+
+#})
+
+
+
+
+
+#creating reset functionality for each tab:
+
+#goals section
+observeEvent(input$goals_reset_all, {
+  reset("goals_filters")
 })
 
-output$n_ddt3 <- renderText({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  paste("n(districts) =", toString(nrow(data)))
-  
+#fiber section
+observeEvent(input$fiber_reset_all,{
+  reset("fiber_filters")
 })
 
-output$n_ddt4 <- renderText({
-  
-  data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  paste("n(districts) =", toString(nrow(data)))
-  
+#affordability section
+observeEvent(input$affordability_reset_all,{
+  reset("affordability_filters")
 })
 
-output$n_ddt5 <- renderText({
-  
-  data <- district_subset() %>% 
-          filter(!(postal_cd %in% c('AK', 'HI'))) %>%
-          filter(not_all_scalable == 1)
-  paste("n(districts) =", toString(nrow(data)))
-  
+#maps section
+observeEvent(input$map_reset_all, {
+  reset("map_filters")
 })
 
-#For downloadable subsets
 
 
+
+
+
+#For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
     paste('districts_by_ia_tech_dataset', '_', Sys.Date(), '.csv', sep = '')},
@@ -1438,55 +1365,69 @@ output$affordability_downloadData <- downloadHandler(
 )
 
 
-output$map_downloadData <- downloadHandler(
-  filename = function(){
-    paste('map_dataset', '_', Sys.Date(), '.csv', sep = '')},
-  content = function(file){
-    write.csv(district_subset(), file)
-  }
-)
+#output$map_downloadData <- downloadHandler(
+#  filename = function(){
+#    paste('map_dataset', '_', Sys.Date(), '.csv', sep = '')},
+#  content = function(file){
+#    write.csv(district_subset(), file)
+#  }
+#)
 
 
+####################################
 
-datasetInput <- reactive({
+datasetInput_maps <- reactive({
   
-  district_data <- district_subset()
-  line_data <- sr_all()               
+  data <- district_subset() %>%
+    filter(!(postal_cd %in% c('AK', 'HI')),
+           new_connect_type_map %in% input$connection_districts,
+           district_size %in% input$district_size_maps,
+           locale %in% input$locale_maps)
   
- #validate(
-#  need(nrow(district_subset()) > 0, "No districts in given subset")
-# )
-  
-#  validate(
- #  need(nrow(sr_all()) > 0, "No line items in given subset")
- # )
-  
-  
-  #selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
-  #district_subset_specific <- district_subset() %>% filter_(paste("name %in%", selected_district_list))
-  
-  #validate(
-   # need(nrow(district_subset_specific) > 0, "No districts in given subset")
-  #)
-  
-  switch(input$download_dataset,
-         "districts_table" = district_data,
-         "line_items_table" = line_data)
+  data2 <- data %>%
+    filter(not_all_scalable == 1)
+    
+    switch(input$map_view,
+        "General" =  data,
+        "Clean/Dirty" =  data,
+        'Goals: 100kbps/Student' =  data,
+        'Goals: 1Mbps/Student' =  data,
+        'Fiber Build Cost to Districts' = data2)
   
 })
 
-output$table <- renderTable({
-  datasetInput()
+output$table_testing <- renderDataTable({
+  map_data <- district_subset() %>%
+    filter(!(postal_cd %in% c('AK', 'HI')),
+           new_connect_type_map %in% input$connection_districts,
+           district_size %in% input$district_size_maps,
+           locale %in% input$locale_maps)
+  
+  
+  
+  map_data2 <- map_data %>%
+    filter(not_all_scalable == 1)
+  
+  
+  switch(input$map_view,
+         "General" =  datatable(map_data),
+         "Clean/Dirty" =  datatable(map_data),
+         'Goals: 100kbps/Student' =  datatable(map_data),
+         'Goals: 1Mbps/Student' =  datatable(map_data),
+         'Fiber Build Cost to Districts' = datatable(map_data2))
   
 })
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$download_dataset, '_', Sys.Date(), '.csv', sep = '')},
+    paste(input$map_view, '_', Sys.Date(), '.csv', sep = '')},
   content = function(file){
-    write.csv(datasetInput(), file)
+    write.csv(datasetInput_maps(), file)
   }
 )
+
+
+####################################
 
 
 }) #closing shiny server function
