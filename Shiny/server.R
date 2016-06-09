@@ -911,21 +911,75 @@ output$table_cost_comparison_by_state <- renderTable({
 ###### 
 ## Maps
 ######
+# District Lookup
+
+output$helptext_leaflet_map <- renderUI({
+  HTML(paste("User Note: Useful for District Callouts. Type in your districts of interest."))
+})
+
+
 
 
 output$districtSelect <- renderUI({
   
-  districtSelect_data <- district_subset() %>%
+  districtSelect_data <<- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
     need(nrow(districtSelect_data) > 0, "No districts in given subset")
   )
   
-  district_list <- c(unique(as.character(districtSelect_data$name)))
-  
-  selectizeInput("district_list", h2("Input District Name(s)"), as.list(district_list), multiple = T, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
+#  #district_list <- c(unique(as.character(districtSelect_data$name)))
+  district_list <<- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
+
+    #"district_list"
+  selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
+
+  })
+
+
+#observe({
+#  if ("SELECT ALL" %in% input$districtSelect) {
+   # # choose all the choices _except_ "Select All"
+    #selected_choices <- setdiff(district_list, "SELECT ALL")
+    #selectizeInput(session, "districtSelect", choices = as.list(district_list), selected = selected_choices)
+  #}
+#})
+
+output$selected <- renderText({
+  paste(input$testing, collapse = ", ")
 })
+
+
+
+##Trying leaflet: 
+#observe({
+school_districts <- eventReactive(input$testing, {
+  d <- district_subset() %>% filter(name %in% input$testing)
+  d %>% select(X = longitude, Y = latitude)
+  #dp <- as.data.frame(data_points)
+})  
+  
+output$testing_leaflet <- renderLeaflet({ 
+  
+  #data <- district_subset()
+  #selected_district_list <- paste0("c(",toString(paste0('\"', input$districtSelect, '\"')), ')')  #district_list
+
+  #d <- district_subset() %>% filter(name %in% input$testing)
+  
+  #d <- data %>% 
+  #  filter_(paste("name %in%", selected_district_list))
+  
+  #content <- paste0("<b>", school_districts$name, "</b><br>",
+  #                  "# of students:", format(school_districts$num_students, big.mark = ",", scientific = FALSE),"<br>",
+  #                  "IA Connection: ", school_districts$hierarchy_connect_category, "<br>",
+  #                  "Total IA monthly cost: $", format(school_districts$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
+  
+  leaflet() %>% addProviderTiles("CartoDB.Positron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y)#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
+  #default view of leaflet map is addTiles()
+})
+
+#})
 
 
 
@@ -964,7 +1018,7 @@ output$choose_district <- renderPlot({
   
 })
 
-# map of districts in population 
+# map of districts 
 output$map_population <- renderPlot({
   
   data <- district_subset() %>%
@@ -979,9 +1033,11 @@ output$map_population <- renderPlot({
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_df <- map_data("county", region = state_name)
+  #hdf <- get_map(state_name, source = 'stamen', maptype = 'toner', zoom = 7, crop = FALSE)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
+    #ggmap(hdf) +
     geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
     theme_classic() +
     theme(line = element_blank(), title = element_blank(), 
@@ -1246,33 +1302,6 @@ output$plot1_table <- renderDataTable({
 
 
 
-# District Lookup
-output$helptext_leaflet_map <- renderUI({
-  HTML(paste("User Note: Useful for District Callouts. Type in your districts of interest."))
-})
-
-##Trying leaflet: 
-output$testing_leaflet <- renderLeaflet({
-  
-  data <- district_subset()
-  selected_district_list <- paste0("c(",toString(paste0('\"', input$districtSelect, '\"')), ')')  #district_list
-  
-  d <- data %>% 
-    filter_(paste("name %in%", selected_district_list))
-  
-  content <- paste0("<b>", d$name, "</b><br>",
-                   "# of students:", format(d$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                   "IA Connection: ", d$hierarchy_connect_category, "<br>",
-                   "Total IA monthly cost: $", format(d$total_ia_monthly_cost, big.mark = ",", scientific = FALSE)
-  )
-  
-  leaflet() %>% 
-    addTiles() %>% 
-    addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~paste(content)) 
-
-})
-
-
 
 
 output$n_ddt <- renderText({
@@ -1314,7 +1343,6 @@ output$n_ddt <- renderText({
 #         'Fiber Build Cost to Districts' = datatable(map_data2))
 
 #})
-
 
 
 

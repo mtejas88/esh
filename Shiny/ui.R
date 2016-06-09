@@ -3,7 +3,7 @@ library(ggvis)
 library(shinydashboard)
 library(DT) #for datatables
 library(shinyjs) #for reset button
-
+library(mapview)
 
 shinyUI(fluidPage(
   useShinyjs(),
@@ -106,6 +106,22 @@ shinyUI(fluidPage(
                     .shiny-output-error-validation {
                     margin-top: 25px;
                     margin-left: 10px;
+                    }
+
+                    leaflet {
+                    height: 100%; 
+                    width: 100%;
+                    }
+
+
+                    div.outer {
+                    position: fixed;
+                    top: 41px;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    overflow: hidden;
+                    padding: 25px;
                     }
                     "))
     ),
@@ -305,19 +321,23 @@ shinyUI(fluidPage(
                             )),#),
                  navbarMenu("Maps", 
                            # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
-                            tabPanel("District Lookup", br(), htmlOutput("helptext_leaflet_map"), br(), br(),
-                                     sidebarLayout(
-                                       sidebarPanel(wellPanel(uiOutput("districtSelect"))),
-                                     #tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                     mainPanel(leafletOutput("testing_leaflet"),
-                                     #absolutePanel( uiOutput("districtSelect"), fixed = TRUE,
-                                    #               draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
-                                    #               width = 330, height = "auto"),
-                                     actionButton("districtSelect", "New Points"))
-                                     
-                                     )), #end of sidebarLayout and tabPanel()
+                            tabPanel("District Lookup", #htmlOutput("helptext_leaflet_map"), br(), br(),
+                                    # tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                    
+                                   # div(class = "outer",
+                                    
+                                     leafletOutput("testing_leaflet"), 
+                                     br(),
+                                     #verbatimTextOutput("selected"),
+                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                 draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                                 width = 330, height = "auto",
+                                                 
+                                                 uiOutput("districtSelect"))#,
 
-                                      #actionButton("districtSelect", "New points")),
+                                     #actionButton("districtSelect", "New Points"))
+                                     
+                                     ),#), #end of tabPanel() and div()
                          
                            tabPanel("District Population Maps", br(),  
                            sidebarLayout(
