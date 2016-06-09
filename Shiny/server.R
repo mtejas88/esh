@@ -604,7 +604,7 @@ output$histogram_by_erate_discounts <- renderPlot({
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
-          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          summarize(n_unscalable_schools_in_rate_band = sum(num_unscalable_schools)) %>%
           mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
                  percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
 
@@ -635,7 +635,7 @@ output$table_by_erate_discounts <- renderDataTable({
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
-          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          summarize(n_unscalable_schools_in_rate_band = round(sum(num_unscalable_schools))) %>%
           mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
                  percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
   colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
