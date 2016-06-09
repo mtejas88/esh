@@ -1,0 +1,11 @@
+"postal_cd","district_size","n_locale","n","percent"
+"WA","Mega",4,295,1
+"WA","Large",31,295,11
+"WA","Medium",77,295,26
+"WA","Small",129,295,44
+"WA","Tiny",54,295,18
+"WA Clean","Mega",2,221,1
+"WA Clean","Large",13,221,6
+"WA Clean","Medium",55,221,25
+"WA Clean","Small",109,221,49
+"WA Clean","Tiny",42,221,19

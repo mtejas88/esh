@@ -257,7 +257,7 @@ size_cuts$percent <- round(100 * size_cuts$n_locale / size_cuts$n, digits = 2)
 size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)
 
-wd <- "~/Google Drive/github/ficher/Shiny"
+wd <- "~/Desktop/github/ficher/Shiny"
 setwd(wd)
 
 # export
