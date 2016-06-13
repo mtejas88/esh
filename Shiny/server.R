@@ -272,8 +272,9 @@ output$table_goals <- renderDataTable({
                                            district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n = n(),
               percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              n_students = sum(num_students),
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
-  colnames(data) <- c("# of districts", "% of districts meeting goals", "% of students meeting goals")
+  colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
   datatable(data, options = list(paging = FALSE, searching = FALSE))
