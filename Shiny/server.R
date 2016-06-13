@@ -170,6 +170,7 @@ output$histogram_locale <- renderPlot({
 output$table_locale <- renderDataTable({
   
   data <- state_subset_locale()
+  data$percent <- round(data$percent, 2)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   validate(
@@ -212,8 +213,8 @@ output$histogram_size <- renderPlot({
 output$table_size <- renderDataTable({
   
   data <- state_subset_size()
-  
-  
+  data$percent <- round(data$percent, 2)
+  colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   validate(
     need(input$state != 'All', "")
   )
@@ -1378,7 +1379,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_', Sys.Date(), '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160517', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech, file)
   }
