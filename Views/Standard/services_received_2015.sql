@@ -132,16 +132,16 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 
       from lines_to_district_by_line_item_2015 ldli
 
-      left join line_items li
+      left join public.line_items li
       on ldli.line_item_id=li.id
 
       left join (
           select distinct name, reporting_name
-          from service_provider_categories
+          from public.service_provider_categories
       ) spc
       on li.service_provider_name = spc.name
 
-      left join districts d
+      left join public.districts d
       on ldli.district_esh_id=d.esh_id
 
 --Group by line_item_id to yield students served by each line item 
@@ -151,10 +151,10 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 
                   from lines_to_district_by_line_item_2015 ldli
 
-                  left join districts d
+                  left join public.districts d
                   on ldli.district_esh_id = d.esh_id
 
-                  left join line_items li
+                  left join public.line_items li
                   on ldli.line_item_id = li.id
 
                   where li.consortium_shared=true 
