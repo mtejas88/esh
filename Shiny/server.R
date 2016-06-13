@@ -113,7 +113,7 @@ district_subset <- reactive({
     selected_state <- paste0('\"',input$state, '\"')
     
     #to create independent filters for goals section
-    districts$new_connect_type_goals <- districts$new_connect_type
+   # districts$new_connect_type_goals <- districts$new_connect_type
     districts$district_size2 <- districts$district_size
     districts$locale2 <- districts$locale
     
@@ -302,7 +302,7 @@ output$histogram_districts_ia_technology <- renderPlot({
        geom_text(aes(label = paste0(n_percent_districts, "%")), 
                  vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
-       scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+       scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
@@ -322,12 +322,12 @@ output$table_districts_ia_technology <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
               district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
-              group_by(hierarchy_connect_category) %>%
+              group_by(new_connect_type_goals) %>%
               summarize(n_districts = n()) %>%
               mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
               n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
   
-  colnames(data) <- c("Hierarchy Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
+  colnames(data) <- c("IA Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
   
   validate(need(nrow(data) > 0, ""))  
   datatable(data, options = list(paging = FALSE))
