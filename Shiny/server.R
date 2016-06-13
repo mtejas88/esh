@@ -316,7 +316,7 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   print(q)
   
-  districts_ia_tech <<- district_subset()
+  districts_ia_tech <- district_subset()
   
 })
 
@@ -924,7 +924,7 @@ output$helptext_leaflet_map <- renderUI({
 
 output$districtSelect <- renderUI({
   
-  districtSelect_data <<- district_subset() %>%
+  districtSelect_data <- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
@@ -932,7 +932,7 @@ output$districtSelect <- renderUI({
   )
   
 #  #district_list <- c(unique(as.character(districtSelect_data$name)))
-  district_list <<- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
+  district_list <- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
 
     #"district_list"
   selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
@@ -1155,7 +1155,7 @@ price_disp_cpc <- reactive({
     add_perc <- c("25th","Median", "75th")
     perc_tab <- cbind(perc_tab, add_perc)
     perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-    #perc_tab_cpc <<- perc_tab
+    #perc_tab_cpc <- perc_tab
     #print(perc_tab_cpc)
       
     print(str(perc_tab))
