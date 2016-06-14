@@ -240,7 +240,7 @@ locale_cuts <- data %>%
 
 locale_cuts <- left_join(locale_cuts, n_all, by = c("postal_cd"))
 
-locale_cuts$percent <- round(100 * locale_cuts$n_locale / locale_cuts$n, digits = 2)
+locale_cuts$percent <- 100 * locale_cuts$n_locale / locale_cuts$n
 
 locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
 locale_cuts <- arrange(locale_cuts, postal_cd, locale)
@@ -252,7 +252,7 @@ size_cuts <- data %>%
 
 size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
-size_cuts$percent <- round(100 * size_cuts$n_locale / size_cuts$n, digits = 2)
+size_cuts$percent <- 100 * size_cuts$n_locale / size_cuts$n
 
 size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)
