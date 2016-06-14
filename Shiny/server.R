@@ -956,8 +956,9 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$testing, {
   d <- district_subset() %>% filter(name %in% input$testing)
-  d %>% select(X = longitude, Y = latitude)
+  d %>% select(name = name, X = longitude, Y = latitude, num_students, hierarchy_connect_category, total_ia_monthly_cost)
   #dp <- as.data.frame(data_points)
+  
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
@@ -970,12 +971,17 @@ output$testing_leaflet <- renderLeaflet({
   #d <- data %>% 
   #  filter_(paste("name %in%", selected_district_list))
   
-  #content <- paste0("<b>", school_districts$name, "</b><br>",
-  #                  "# of students:", format(school_districts$num_students, big.mark = ",", scientific = FALSE),"<br>",
-  #                  "IA Connection: ", school_districts$hierarchy_connect_category, "<br>",
-  #                  "Total IA monthly cost: $", format(school_districts$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
+  sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
+                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                    "IA Connection: ", school_districts()$hierarchy_connect_category, "<br>",
+                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
   
-  leaflet() %>% addProviderTiles("CartoDB.Positron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y)#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
+ # switch(input$map_layout,
+#         "General" =  datatable(map_data),
+#         "Clean/Dirty" =  datatable(map_data))
+
+  
+  leaflet() %>% addProviderTiles("CartoDB.Postiron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
   #default view of leaflet map is addTiles()
 })
 

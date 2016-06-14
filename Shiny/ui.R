@@ -5,6 +5,7 @@ library(DT) #for datatables
 library(shinyjs) #for reset button
 library(mapview)
 
+
 shinyUI(fluidPage(
   useShinyjs(),
   
@@ -31,15 +32,6 @@ shinyUI(fluidPage(
                     margin-top: 0px;
                     }
                     
-                    img {
-                    font-family: 'Roboto Slab';
-                    font-weight: 500;
-                    line-height: 1.1;
-                    color: #F26B21;
-                    margin-top: 500px
-                    align: right;
-                    display: inline-block;
-                    }
                     
                     h2 {
                     font-family: 'Lato', sans-serif;
@@ -51,9 +43,9 @@ shinyUI(fluidPage(
                     
                     h3 {
                     font-family: 'Lato', sans-serif;
-                    font-weight: 300;
+                    font-weight: 600;
                     line-height: 1.1;
-                    font-size: 8pt;
+                    font-size: 12pt;
                     color: #899DA4;
                     
                     }
@@ -69,21 +61,7 @@ shinyUI(fluidPage(
 
                     }
                     
-                    shiny-plot-output {
-                    background-color: #00EFD1;
-                    }
-                    
-                    .test {
-                    font-family: 'Roboto Slab', serif;
-                    font-weight: 100;
-                    line-height: 1.1;
-                    font-size: 18pt;
-                    margin-left: 150px;
-                    text-align: left;
-                    color: #899DA4;
-                    white-space: pre
-                    }
-                    
+
                     .well {
                     background-color: #FFFFFF;
                     }
@@ -103,81 +81,102 @@ shinyUI(fluidPage(
                     a {
                     color: #F26B21;
                     }
+
                     .shiny-output-error-validation {
                     margin-top: 25px;
                     margin-left: 10px;
                     }
 
-                    leaflet {
-                    height: 100%; 
-                    width: 100%;
+
+                   input[type=number] {
+                     max-width: 80%;
                     }
-
-
+                    
                     div.outer {
                     position: fixed;
-                    top: 41px;
+                    top: 120px;
                     left: 0;
                     right: 0;
                     bottom: 0;
                     overflow: hidden;
-                    padding: 25px;
+                    padding: 0;
                     }
+                    
+
+                    div.horizontalformatting{
+                    display: inline-block; 
+                    vertical-align: text-top;
+                    }
+
+                                        
+                    #controls {
+                    /* Fade out while not hovering */
+                    opacity: 0.65;
+                    zoom: 0.9;
+                    transition: opacity 500ms 1s;
+                    }
+
+                    #controls:hover {
+                    /* Fade in while hovering */
+                    opacity: 0.95;
+                    transition-delay: 0;
+                    }
+                    
+                    
+
+                        
                     "))
     ),
 
+
   
-  titlePanel(div(h1("SHINY for EducationSuperHighway"))),
-    
-    mainPanel(width = 12,
-      #navbarPage("",
-                tabsetPanel(
-                  id="panels",
+  titlePanel(h1("SHINY for EducationSuperHighway")),#close title panel
+                #tabsetPanel(
+                #  id="panels",
                  
-                tabPanel("About", 
+                #tabPanel("About", 
                           
-                          fluidRow(
-                            column(12,
-                            wellPanel(#width = 2,
-                                    selectInput("state", 
-                                                h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
-                                                    "Select State"), 
-                                                choices = c('All', 'AL','AR','AZ',
-                                                            'CA','CO','CT',
-                                                            'DE','FL','GA', 'IA',
-                                                            'ID','IL','IN','KS',
-                                                            'KY','LA','MA','MD',
-                                                            'ME','MI','MN','MO',
-                                                            'MS','MT','NC','ND',
-                                                            'NE','NH','NJ','NM',
-                                                            'NV','NY','OH','OK',
-                                                            'OR','PA','RI','SC',
-                                                            'SD','TN','TX','UT','VA',
-                                                            'WA','WI','WV','WY'), selected='All'),
-                                    selectInput("dataset",
-                                                h2("Select Data Cleanliness"),
-                                                choices = c('All', 'Clean'), selected = 'All')#,
-                                    
-                                    #checkboxInput("district_size2", "Select District Size"),
-                                    #conditionalPanel(condition = "input.district_size2 == true",
-                                    #                 checkboxGroupInput(inputId = "district_size", 
-                                    #                                    label = h2("Select District Size(s)"),
-                                    #                                    choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                                    #                                    selected = c("Tiny", "Small", "Medium", "Large", "Mega"))),
-                                    
-                                    #checkboxInput("district_locale", "Select District Locale"),
-                                    #conditionalPanel(condition = "input.district_locale == true",
-                                    #                 checkboxGroupInput(inputId = "locale", 
-                                    #                                    label = h2("Select Locale(s)"),
-                                    #                                    choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                                    #                                    selected = c("Rural", "Small Town", "Suburban", "Urban")))#
-                                    ) # Close WellPanel
-                            ), # close colunmn
+                          #fluidRow(
+
+  
+  
+  tabsetPanel(
+    id="panels",
+    
+                tabPanel("About", 
+                         #div(class = "horizontalformatting",
+                             selectInput("state", 
+                                         h3("Select State"),
+                                         choices = c('All', 'AL','AR','AZ',
+                                                     'CA','CO','CT',
+                                                     'DE','FL','GA', 'IA',
+                                                     'ID','IL','IN','KS',
+                                                     'KY','LA','MA','MD',
+                                                     'ME','MI','MN','MO',
+                                                     'MS','MT','NC','ND',
+                                                     'NE','NH','NJ','NM',
+                                                     'NV','NY','OH','OK',
+                                                     'OR','PA','RI','SC',
+                                                     'SD','TN','TX','UT','VA',
+                                                     'WA','WI','WV','WY'), selected='All', width = '200px'),#)),
+                         
+                         #absolutePanel(fixed = TRUE, #class = "panel panel-default", 
+                         #                                          draggable = TRUE, top = 0, left = "auto", right = 10, bottom = "auto",
+                         #                                          width = "auto", height = "auto",                              
+                         #tags$div(class="span8",
+                         #div(style = "display: inline-block; vertical-align: text-top;",
+                         #div(class = "horizontalformatting",
+                             selectInput("dataset",
+                                         h3("Select Data Cleanliness"),
+                                         choices = c('All', 'Clean'), selected = 'All', width = '200px'),
+                         
+                         
                           column(12,
+                                 h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness."),  br(),
                                  includeHTML("include.html")
                           )
                           
-                          ) # close fluid row
+                          #) # close fluid row
                           
                           ),
                 
@@ -191,7 +190,7 @@ shinyUI(fluidPage(
                  navbarMenu("Goals",
                             tabPanel("Goals Breakdown", br(), htmlOutput("helptext_goals"), br(), br(), 
                                      sidebarLayout(
-                                       sidebarPanel(width = 3,
+                                       sidebarPanel(width = 3, 
                                        div(id = "goals_filters", 
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
                                                             h2("Select Connection Type(s)"),
@@ -319,25 +318,26 @@ shinyUI(fluidPage(
                             
                                      ))
                             )),#),
-                 navbarMenu("Maps", 
+                 navbarMenu("Maps", id = "nav",
                            # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
                             tabPanel("District Lookup", #htmlOutput("helptext_leaflet_map"), br(), br(),
                                     # tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                
+                                    div(class = "outer",
                                     
-                                   # div(class = "outer",
-                                    
-                                     leafletOutput("testing_leaflet"), 
-                                     br(),
+                                     leafletOutput("testing_leaflet", width = "100%", height = "100%")
+                                     , 
+                                     
                                      #verbatimTextOutput("selected"),
-                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                 draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                    absolutePanel(id = "controls", class = "panel panel-default", #fixed = TRUE,
+                                                 draggable = TRUE, top = 130, left = "auto", right = 20, bottom = "auto",
                                                  width = 330, height = "auto",
                                                  
-                                                 uiOutput("districtSelect"))#,
+                                                 uiOutput("districtSelect"), align = "center")#,
 
                                      #actionButton("districtSelect", "New Points"))
                                      
-                                     ),#), #end of tabPanel() and div()
+                                     )), #end of tabPanel() and div()
                          
                            tabPanel("District Population Maps", br(),  
                            sidebarLayout(
@@ -400,7 +400,42 @@ shinyUI(fluidPage(
                 #                  downloadButton('downloadData', 'Download'))), h3(tableOutput("table")))
                  
                 ) #closing tabsetPanel()
+  
+  
+  
+  
+  
+  
+  #absolutePanel(fixed = TRUE, draggable = FALSE, top = 0, left = "auto", right = 100, bottom = "auto",
+  #              width = "auto", height = "auto",
+                #column(4,
+                #       wellPanel(width = 2,
+                #tags$div(class = "row-fluid", 
+                #  tags$div(class = "span8",
+                #div(style = "display: inline-block;  vertical-align: text-top;",
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+                
+                
+                
+  #) #clost absolute panel & fluid row
+  
+  
+  
       #) #closing navbarPage
-    ) #closing mainPanel"
+    #) #closing mainPanel"
   #) #closing sidebarLayout
     )) #closing shinyUI and fluidPage
