@@ -181,11 +181,11 @@ shinyUI(fluidPage(
                           ),
                 
                  
-                 navbarMenu("ESH Sample",
-                            tabPanel("Population vs. Sample Bar Charts", 
+                 navbarMenu("ESH Data",
+                            tabPanel("Overview of ESH Data Composition", 
                                      
-                            wellPanel(h4("Population vs. Sample: Locale"), br(), plotOutput("histogram_locale", width = "50%"), align = "center", br(), br(), dataTableOutput("table_locale")), br(), br(),
-                            wellPanel(h4("Population vs. Sample: District Size"), br(), plotOutput("histogram_size", width = "50%"), align = "center", br(), br(), dataTableOutput("table_size")))),
+                            wellPanel(h4("All vs. Clean: Locale"), br(), plotOutput("histogram_locale", width = "50%"), align = "center", br(), br(), dataTableOutput("table_locale")), br(), br(),
+                            wellPanel(h4("All vs. Clean: District Size"), br(), plotOutput("histogram_size", width = "50%"), align = "center", br(), br(), dataTableOutput("table_size")))),
 
                  navbarMenu("Goals",
                             tabPanel("Goals Breakdown", br(), htmlOutput("helptext_goals"), br(), br(), 

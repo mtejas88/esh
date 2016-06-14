@@ -113,7 +113,7 @@ district_subset <- reactive({
     selected_state <- paste0('\"',input$state, '\"')
     
     #to create independent filters for goals section
-    districts$new_connect_type_goals <- districts$new_connect_type
+   # districts$new_connect_type_goals <- districts$new_connect_type
     districts$district_size2 <- districts$district_size
     districts$locale2 <- districts$locale
     
@@ -170,6 +170,7 @@ output$histogram_locale <- renderPlot({
 output$table_locale <- renderDataTable({
   
   data <- state_subset_locale()
+  data$percent <- round(data$percent, 2)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   validate(
@@ -212,8 +213,8 @@ output$histogram_size <- renderPlot({
 output$table_size <- renderDataTable({
   
   data <- state_subset_size()
-  
-  
+  data$percent <- round(data$percent, 2)
+  colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   validate(
     need(input$state != 'All', "")
   )
@@ -272,8 +273,9 @@ output$table_goals <- renderDataTable({
                                            district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n = n(),
               percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              n_students = sum(num_students),
               percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
-  colnames(data) <- c("# of districts", "% of districts meeting goals", "% of students meeting goals")
+  colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
   datatable(data, options = list(paging = FALSE, searching = FALSE))
@@ -302,7 +304,7 @@ output$histogram_districts_ia_technology <- renderPlot({
        geom_text(aes(label = paste0(n_percent_districts, "%")), 
                  vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
-       scale_x_discrete(limits = c("Other/Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+       scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
@@ -314,7 +316,7 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   print(q)
   
-  districts_ia_tech <<- district_subset()
+  districts_ia_tech <- district_subset()
   
 })
 
@@ -322,12 +324,12 @@ output$table_districts_ia_technology <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
               district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
-              group_by(hierarchy_connect_category) %>%
+              group_by(new_connect_type_goals) %>%
               summarize(n_districts = n()) %>%
               mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
               n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
   
-  colnames(data) <- c("Hierarchy Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
+  colnames(data) <- c("IA Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
   
   validate(need(nrow(data) > 0, ""))  
   datatable(data, options = list(paging = FALSE))
@@ -604,7 +606,7 @@ output$histogram_by_erate_discounts <- renderPlot({
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
-          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          summarize(n_unscalable_schools_in_rate_band = sum(num_unscalable_schools)) %>%
           mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
                  percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
 
@@ -635,7 +637,7 @@ output$table_by_erate_discounts <- renderDataTable({
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
-          summarize(n_unscalable_schools_in_rate_band = n()) %>%
+          summarize(n_unscalable_schools_in_rate_band = round(sum(num_unscalable_schools))) %>%
           mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
                  percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
   colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
@@ -922,7 +924,7 @@ output$helptext_leaflet_map <- renderUI({
 
 output$districtSelect <- renderUI({
   
-  districtSelect_data <<- district_subset() %>%
+  districtSelect_data <- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')))
   
   validate(
@@ -930,7 +932,7 @@ output$districtSelect <- renderUI({
   )
   
 #  #district_list <- c(unique(as.character(districtSelect_data$name)))
-  district_list <<- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
+  district_list <- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
 
     #"district_list"
   selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
@@ -1159,7 +1161,7 @@ price_disp_cpc <- reactive({
     add_perc <- c("25th","Median", "75th")
     perc_tab <- cbind(perc_tab, add_perc)
     perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-    #perc_tab_cpc <<- perc_tab
+    #perc_tab_cpc <- perc_tab
     #print(perc_tab_cpc)
       
     print(str(perc_tab))
@@ -1383,7 +1385,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_', Sys.Date(), '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160517', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech, file)
   }

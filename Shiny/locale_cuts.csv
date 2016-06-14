@@ -1,389 +1,389 @@
 "postal_cd","locale","n_locale","n","percent"
-"AK","Urban",3,53,6
-"AK","Suburban",2,53,4
-"AK","Small Town",6,53,11
-"AK","Rural",42,53,79
-"AK Clean","Urban",3,33,9
-"AK Clean","Suburban",2,33,6
-"AK Clean","Small Town",4,33,12
-"AK Clean","Rural",24,33,73
-"AL","Urban",16,132,12
-"AL","Suburban",22,132,17
-"AL","Small Town",32,132,24
-"AL","Rural",62,132,47
-"AL Clean","Urban",12,94,13
-"AL Clean","Suburban",16,94,17
-"AL Clean","Small Town",25,94,27
-"AL Clean","Rural",41,94,44
-"AR","Urban",14,238,6
-"AR","Suburban",14,238,6
-"AR","Small Town",62,238,26
-"AR","Rural",148,238,62
-"AR Clean","Urban",10,151,7
-"AR Clean","Suburban",11,151,7
-"AR Clean","Small Town",45,151,30
-"AR Clean","Rural",85,151,56
-"AZ","Urban",37,208,18
-"AZ","Suburban",24,208,12
-"AZ","Small Town",45,208,22
-"AZ","Rural",102,208,49
-"AZ Clean","Urban",34,161,21
-"AZ Clean","Suburban",21,161,13
-"AZ Clean","Small Town",33,161,20
-"AZ Clean","Rural",73,161,45
-"CA","Urban",146,944,15
-"CA","Suburban",306,944,32
-"CA","Small Town",157,944,17
-"CA","Rural",335,944,35
-"CA Clean","Urban",59,365,16
-"CA Clean","Suburban",129,365,35
-"CA Clean","Small Town",55,365,15
-"CA Clean","Rural",122,365,33
-"CO","Urban",11,178,6
-"CO","Suburban",20,178,11
-"CO","Small Town",35,178,20
-"CO","Rural",112,178,63
-"CO Clean","Urban",5,86,6
-"CO Clean","Suburban",14,86,16
-"CO Clean","Small Town",20,86,23
-"CO Clean","Rural",47,86,55
-"CT","Urban",14,169,8
-"CT","Suburban",83,169,49
-"CT","Small Town",8,169,5
-"CT","Rural",64,169,38
-"CT Clean","Urban",12,144,8
-"CT Clean","Suburban",68,144,47
-"CT Clean","Small Town",5,144,3
-"CT Clean","Rural",59,144,41
+"AK","Urban",3,53,5.66037735849057
+"AK","Suburban",2,53,3.77358490566038
+"AK","Small Town",6,53,11.3207547169811
+"AK","Rural",42,53,79.2452830188679
+"AK Clean","Urban",3,33,9.09090909090909
+"AK Clean","Suburban",2,33,6.06060606060606
+"AK Clean","Small Town",4,33,12.1212121212121
+"AK Clean","Rural",24,33,72.7272727272727
+"AL","Urban",16,132,12.1212121212121
+"AL","Suburban",22,132,16.6666666666667
+"AL","Small Town",32,132,24.2424242424242
+"AL","Rural",62,132,46.969696969697
+"AL Clean","Urban",12,94,12.7659574468085
+"AL Clean","Suburban",16,94,17.0212765957447
+"AL Clean","Small Town",25,94,26.5957446808511
+"AL Clean","Rural",41,94,43.6170212765957
+"AR","Urban",14,238,5.88235294117647
+"AR","Suburban",14,238,5.88235294117647
+"AR","Small Town",62,238,26.0504201680672
+"AR","Rural",148,238,62.1848739495798
+"AR Clean","Urban",10,151,6.62251655629139
+"AR Clean","Suburban",11,151,7.28476821192053
+"AR Clean","Small Town",45,151,29.8013245033113
+"AR Clean","Rural",85,151,56.2913907284768
+"AZ","Urban",37,208,17.7884615384615
+"AZ","Suburban",24,208,11.5384615384615
+"AZ","Small Town",45,208,21.6346153846154
+"AZ","Rural",102,208,49.0384615384615
+"AZ Clean","Urban",34,161,21.1180124223602
+"AZ Clean","Suburban",21,161,13.0434782608696
+"AZ Clean","Small Town",33,161,20.4968944099379
+"AZ Clean","Rural",73,161,45.3416149068323
+"CA","Urban",146,944,15.4661016949153
+"CA","Suburban",306,944,32.4152542372881
+"CA","Small Town",157,944,16.6313559322034
+"CA","Rural",335,944,35.4872881355932
+"CA Clean","Urban",59,365,16.1643835616438
+"CA Clean","Suburban",129,365,35.3424657534247
+"CA Clean","Small Town",55,365,15.0684931506849
+"CA Clean","Rural",122,365,33.4246575342466
+"CO","Urban",11,178,6.17977528089888
+"CO","Suburban",20,178,11.2359550561798
+"CO","Small Town",35,178,19.6629213483146
+"CO","Rural",112,178,62.9213483146067
+"CO Clean","Urban",5,86,5.81395348837209
+"CO Clean","Suburban",14,86,16.2790697674419
+"CO Clean","Small Town",20,86,23.2558139534884
+"CO Clean","Rural",47,86,54.6511627906977
+"CT","Urban",14,169,8.28402366863905
+"CT","Suburban",83,169,49.112426035503
+"CT","Small Town",8,169,4.73372781065089
+"CT","Rural",64,169,37.8698224852071
+"CT Clean","Urban",12,144,8.33333333333333
+"CT Clean","Suburban",68,144,47.2222222222222
+"CT Clean","Small Town",5,144,3.47222222222222
+"CT Clean","Rural",59,144,40.9722222222222
 "DC","Urban",1,1,100
 "DC Clean","Urban",1,1,100
-"DE","Urban",1,16,6
-"DE","Suburban",9,16,56
+"DE","Urban",1,16,6.25
+"DE","Suburban",9,16,56.25
 "DE","Small Town",4,16,25
-"DE","Rural",2,16,12
-"DE Clean","Urban",1,15,7
-"DE Clean","Suburban",8,15,53
-"DE Clean","Small Town",4,15,27
-"DE Clean","Rural",2,15,13
-"FL","Urban",10,70,14
-"FL","Suburban",27,70,39
+"DE","Rural",2,16,12.5
+"DE Clean","Urban",1,15,6.66666666666667
+"DE Clean","Suburban",8,15,53.3333333333333
+"DE Clean","Small Town",4,15,26.6666666666667
+"DE Clean","Rural",2,15,13.3333333333333
+"FL","Urban",10,70,14.2857142857143
+"FL","Suburban",27,70,38.5714285714286
 "FL","Small Town",14,70,20
-"FL","Rural",19,70,27
-"FL Clean","Urban",5,48,10
-"FL Clean","Suburban",19,48,40
-"FL Clean","Small Town",9,48,19
-"FL Clean","Rural",15,48,31
-"GA","Urban",15,180,8
-"GA","Suburban",25,180,14
-"GA","Small Town",50,180,28
+"FL","Rural",19,70,27.1428571428571
+"FL Clean","Urban",5,48,10.4166666666667
+"FL Clean","Suburban",19,48,39.5833333333333
+"FL Clean","Small Town",9,48,18.75
+"FL Clean","Rural",15,48,31.25
+"GA","Urban",15,180,8.33333333333333
+"GA","Suburban",25,180,13.8888888888889
+"GA","Small Town",50,180,27.7777777777778
 "GA","Rural",90,180,50
-"GA Clean","Urban",15,151,10
-"GA Clean","Suburban",24,151,16
-"GA Clean","Small Town",43,151,28
-"GA Clean","Rural",69,151,46
+"GA Clean","Urban",15,151,9.93377483443709
+"GA Clean","Suburban",24,151,15.8940397350993
+"GA Clean","Small Town",43,151,28.476821192053
+"GA Clean","Rural",69,151,45.6953642384106
 "HI","Suburban",1,1,100
 "HI Clean","Suburban",1,1,100
-"IA","Urban",13,347,4
-"IA","Suburban",15,347,4
-"IA","Small Town",77,347,22
-"IA","Rural",242,347,70
-"IA Clean","Urban",10,253,4
-"IA Clean","Suburban",9,253,4
-"IA Clean","Small Town",56,253,22
-"IA Clean","Rural",178,253,70
-"ID","Urban",5,114,4
-"ID","Suburban",7,114,6
-"ID","Small Town",30,114,26
-"ID","Rural",72,114,63
-"ID Clean","Urban",5,60,8
-"ID Clean","Suburban",5,60,8
+"IA","Urban",13,347,3.7463976945245
+"IA","Suburban",15,347,4.32276657060519
+"IA","Small Town",77,347,22.1902017291066
+"IA","Rural",242,347,69.7406340057637
+"IA Clean","Urban",10,253,3.95256916996047
+"IA Clean","Suburban",9,253,3.55731225296443
+"IA Clean","Small Town",56,253,22.1343873517787
+"IA Clean","Rural",178,253,70.3557312252964
+"ID","Urban",5,114,4.3859649122807
+"ID","Suburban",7,114,6.14035087719298
+"ID","Small Town",30,114,26.3157894736842
+"ID","Rural",72,114,63.1578947368421
+"ID Clean","Urban",5,60,8.33333333333333
+"ID Clean","Suburban",5,60,8.33333333333333
 "ID Clean","Small Town",15,60,25
-"ID Clean","Rural",35,60,58
-"IL","Urban",30,860,3
-"IL","Suburban",342,860,40
-"IL","Small Town",167,860,19
-"IL","Rural",321,860,37
-"IL Clean","Urban",16,392,4
-"IL Clean","Suburban",149,392,38
-"IL Clean","Small Town",85,392,22
-"IL Clean","Rural",142,392,36
-"IN","Urban",28,292,10
-"IN","Suburban",50,292,17
-"IN","Small Town",63,292,22
-"IN","Rural",151,292,52
-"IN Clean","Urban",25,218,11
-"IN Clean","Suburban",36,218,17
-"IN Clean","Small Town",44,218,20
-"IN Clean","Rural",113,218,52
-"KS","Urban",8,285,3
-"KS","Suburban",13,285,5
-"KS","Small Town",68,285,24
-"KS","Rural",196,285,69
-"KS Clean","Urban",5,150,3
+"ID Clean","Rural",35,60,58.3333333333333
+"IL","Urban",30,860,3.48837209302326
+"IL","Suburban",342,860,39.7674418604651
+"IL","Small Town",167,860,19.4186046511628
+"IL","Rural",321,860,37.3255813953488
+"IL Clean","Urban",16,392,4.08163265306122
+"IL Clean","Suburban",149,392,38.0102040816327
+"IL Clean","Small Town",85,392,21.6836734693878
+"IL Clean","Rural",142,392,36.2244897959184
+"IN","Urban",28,292,9.58904109589041
+"IN","Suburban",50,292,17.1232876712329
+"IN","Small Town",63,292,21.5753424657534
+"IN","Rural",151,292,51.7123287671233
+"IN Clean","Urban",25,218,11.4678899082569
+"IN Clean","Suburban",36,218,16.5137614678899
+"IN Clean","Small Town",44,218,20.1834862385321
+"IN Clean","Rural",113,218,51.8348623853211
+"KS","Urban",8,285,2.80701754385965
+"KS","Suburban",13,285,4.56140350877193
+"KS","Small Town",68,285,23.859649122807
+"KS","Rural",196,285,68.7719298245614
+"KS Clean","Urban",5,150,3.33333333333333
 "KS Clean","Suburban",6,150,4
-"KS Clean","Small Town",37,150,25
+"KS Clean","Small Town",37,150,24.6666666666667
 "KS Clean","Rural",102,150,68
-"KY","Urban",6,174,3
-"KY","Suburban",25,174,14
-"KY","Small Town",55,174,32
-"KY","Rural",88,174,51
-"KY Clean","Urban",6,166,4
-"KY Clean","Suburban",23,166,14
-"KY Clean","Small Town",51,166,31
-"KY Clean","Rural",86,166,52
-"LA","Urban",9,69,13
-"LA","Suburban",18,69,26
-"LA","Small Town",17,69,25
-"LA","Rural",25,69,36
-"LA Clean","Urban",7,55,13
-"LA Clean","Suburban",16,55,29
-"LA Clean","Small Town",13,55,24
-"LA Clean","Rural",19,55,35
-"MA","Urban",10,295,3
-"MA","Suburban",194,295,66
-"MA","Small Town",19,295,6
-"MA","Rural",72,295,24
-"MA Clean","Urban",7,191,4
-"MA Clean","Suburban",128,191,67
-"MA Clean","Small Town",12,191,6
-"MA Clean","Rural",44,191,23
-"MD","Urban",4,24,17
-"MD","Suburban",9,24,38
-"MD","Small Town",4,24,17
-"MD","Rural",7,24,29
-"MD Clean","Urban",4,23,17
-"MD Clean","Suburban",8,23,35
-"MD Clean","Small Town",4,23,17
-"MD Clean","Rural",7,23,30
-"ME","Urban",5,175,3
-"ME","Suburban",18,175,10
-"ME","Small Town",17,175,10
-"ME","Rural",135,175,77
-"ME Clean","Urban",1,115,1
-"ME Clean","Suburban",11,115,10
-"ME Clean","Small Town",8,115,7
-"ME Clean","Rural",95,115,83
-"MI","Urban",35,546,6
-"MI","Suburban",148,546,27
-"MI","Small Town",91,546,17
-"MI","Rural",272,546,50
-"MI Clean","Urban",13,232,6
-"MI Clean","Suburban",63,232,27
-"MI Clean","Small Town",42,232,18
-"MI Clean","Rural",114,232,49
-"MN","Urban",9,334,3
-"MN","Suburban",40,334,12
-"MN","Small Town",86,334,26
-"MN","Rural",199,334,60
-"MN Clean","Urban",8,250,3
-"MN Clean","Suburban",31,250,12
-"MN Clean","Small Town",62,250,25
-"MN Clean","Rural",149,250,60
-"MO","Urban",14,520,3
-"MO","Suburban",49,520,9
-"MO","Small Town",95,520,18
-"MO","Rural",362,520,70
-"MO Clean","Urban",10,399,3
-"MO Clean","Suburban",35,399,9
-"MO Clean","Small Town",64,399,16
-"MO Clean","Rural",290,399,73
-"MS","Urban",5,151,3
-"MS","Suburban",10,151,7
-"MS","Small Town",52,151,34
-"MS","Rural",84,151,56
-"MS Clean","Urban",5,109,5
-"MS Clean","Suburban",9,109,8
-"MS Clean","Small Town",38,109,35
-"MS Clean","Rural",57,109,52
-"MT","Urban",4,309,1
-"MT","Suburban",5,309,2
-"MT","Small Town",31,309,10
-"MT","Rural",269,309,87
-"MT Clean","Urban",4,187,2
-"MT Clean","Suburban",5,187,3
-"MT Clean","Small Town",21,187,11
-"MT Clean","Rural",157,187,84
-"NC","Urban",12,115,10
-"NC","Suburban",15,115,13
-"NC","Small Town",14,115,12
-"NC","Rural",74,115,64
-"NC Clean","Urban",9,92,10
-"NC Clean","Suburban",13,92,14
-"NC Clean","Small Town",12,92,13
-"NC Clean","Rural",58,92,63
-"ND","Urban",3,177,2
-"ND","Suburban",2,177,1
-"ND","Small Town",10,177,6
-"ND","Rural",162,177,92
-"ND Clean","Small Town",3,96,3
-"ND Clean","Rural",93,96,97
-"NE","Urban",7,249,3
-"NE","Suburban",5,249,2
-"NE","Small Town",39,249,16
-"NE","Rural",198,249,80
-"NE Clean","Urban",4,90,4
-"NE Clean","Suburban",2,90,2
-"NE Clean","Small Town",19,90,21
-"NE Clean","Rural",65,90,72
-"NH","Urban",2,165,1
-"NH","Suburban",36,165,22
-"NH","Small Town",17,165,10
-"NH","Rural",110,165,67
-"NH Clean","Urban",2,83,2
-"NH Clean","Suburban",20,83,24
-"NH Clean","Small Town",8,83,10
-"NH Clean","Rural",53,83,64
-"NJ","Urban",9,547,2
-"NJ","Suburban",421,547,77
-"NJ","Small Town",23,547,4
-"NJ","Rural",94,547,17
-"NJ Clean","Urban",4,256,2
-"NJ Clean","Suburban",197,256,77
-"NJ Clean","Small Town",10,256,4
-"NJ Clean","Rural",45,256,18
-"NM","Urban",4,89,4
-"NM","Suburban",4,89,4
-"NM","Small Town",28,89,31
-"NM","Rural",53,89,60
-"NM Clean","Urban",3,58,5
-"NM Clean","Suburban",2,58,3
-"NM Clean","Small Town",16,58,28
-"NM Clean","Rural",37,58,64
-"NV","Urban",3,17,18
-"NV","Small Town",8,17,47
-"NV","Rural",6,17,35
-"NV Clean","Urban",3,16,19
+"KY","Urban",6,174,3.44827586206897
+"KY","Suburban",25,174,14.367816091954
+"KY","Small Town",55,174,31.6091954022989
+"KY","Rural",88,174,50.5747126436782
+"KY Clean","Urban",6,166,3.6144578313253
+"KY Clean","Suburban",23,166,13.855421686747
+"KY Clean","Small Town",51,166,30.7228915662651
+"KY Clean","Rural",86,166,51.8072289156626
+"LA","Urban",9,69,13.0434782608696
+"LA","Suburban",18,69,26.0869565217391
+"LA","Small Town",17,69,24.6376811594203
+"LA","Rural",25,69,36.231884057971
+"LA Clean","Urban",7,55,12.7272727272727
+"LA Clean","Suburban",16,55,29.0909090909091
+"LA Clean","Small Town",13,55,23.6363636363636
+"LA Clean","Rural",19,55,34.5454545454545
+"MA","Urban",10,295,3.38983050847458
+"MA","Suburban",194,295,65.7627118644068
+"MA","Small Town",19,295,6.44067796610169
+"MA","Rural",72,295,24.4067796610169
+"MA Clean","Urban",7,191,3.66492146596859
+"MA Clean","Suburban",128,191,67.0157068062827
+"MA Clean","Small Town",12,191,6.28272251308901
+"MA Clean","Rural",44,191,23.0366492146597
+"MD","Urban",4,24,16.6666666666667
+"MD","Suburban",9,24,37.5
+"MD","Small Town",4,24,16.6666666666667
+"MD","Rural",7,24,29.1666666666667
+"MD Clean","Urban",4,23,17.3913043478261
+"MD Clean","Suburban",8,23,34.7826086956522
+"MD Clean","Small Town",4,23,17.3913043478261
+"MD Clean","Rural",7,23,30.4347826086957
+"ME","Urban",5,175,2.85714285714286
+"ME","Suburban",18,175,10.2857142857143
+"ME","Small Town",17,175,9.71428571428571
+"ME","Rural",135,175,77.1428571428571
+"ME Clean","Urban",1,115,0.869565217391304
+"ME Clean","Suburban",11,115,9.56521739130435
+"ME Clean","Small Town",8,115,6.95652173913043
+"ME Clean","Rural",95,115,82.6086956521739
+"MI","Urban",35,546,6.41025641025641
+"MI","Suburban",148,546,27.1062271062271
+"MI","Small Town",91,546,16.6666666666667
+"MI","Rural",272,546,49.8168498168498
+"MI Clean","Urban",13,232,5.60344827586207
+"MI Clean","Suburban",63,232,27.1551724137931
+"MI Clean","Small Town",42,232,18.1034482758621
+"MI Clean","Rural",114,232,49.1379310344828
+"MN","Urban",9,334,2.69461077844311
+"MN","Suburban",40,334,11.9760479041916
+"MN","Small Town",86,334,25.748502994012
+"MN","Rural",199,334,59.5808383233533
+"MN Clean","Urban",8,250,3.2
+"MN Clean","Suburban",31,250,12.4
+"MN Clean","Small Town",62,250,24.8
+"MN Clean","Rural",149,250,59.6
+"MO","Urban",14,520,2.69230769230769
+"MO","Suburban",49,520,9.42307692307692
+"MO","Small Town",95,520,18.2692307692308
+"MO","Rural",362,520,69.6153846153846
+"MO Clean","Urban",10,399,2.5062656641604
+"MO Clean","Suburban",35,399,8.7719298245614
+"MO Clean","Small Town",64,399,16.0401002506266
+"MO Clean","Rural",290,399,72.6817042606516
+"MS","Urban",5,151,3.3112582781457
+"MS","Suburban",10,151,6.62251655629139
+"MS","Small Town",52,151,34.4370860927152
+"MS","Rural",84,151,55.6291390728477
+"MS Clean","Urban",5,109,4.58715596330275
+"MS Clean","Suburban",9,109,8.25688073394495
+"MS Clean","Small Town",38,109,34.8623853211009
+"MS Clean","Rural",57,109,52.2935779816514
+"MT","Urban",4,309,1.29449838187702
+"MT","Suburban",5,309,1.61812297734628
+"MT","Small Town",31,309,10.0323624595469
+"MT","Rural",269,309,87.0550161812298
+"MT Clean","Urban",4,187,2.13903743315508
+"MT Clean","Suburban",5,187,2.67379679144385
+"MT Clean","Small Town",21,187,11.2299465240642
+"MT Clean","Rural",157,187,83.9572192513369
+"NC","Urban",12,115,10.4347826086957
+"NC","Suburban",15,115,13.0434782608696
+"NC","Small Town",14,115,12.1739130434783
+"NC","Rural",74,115,64.3478260869565
+"NC Clean","Urban",9,92,9.78260869565217
+"NC Clean","Suburban",13,92,14.1304347826087
+"NC Clean","Small Town",12,92,13.0434782608696
+"NC Clean","Rural",58,92,63.0434782608696
+"ND","Urban",3,177,1.69491525423729
+"ND","Suburban",2,177,1.12994350282486
+"ND","Small Town",10,177,5.64971751412429
+"ND","Rural",162,177,91.5254237288136
+"ND Clean","Small Town",3,96,3.125
+"ND Clean","Rural",93,96,96.875
+"NE","Urban",7,249,2.81124497991968
+"NE","Suburban",5,249,2.00803212851406
+"NE","Small Town",39,249,15.6626506024096
+"NE","Rural",198,249,79.5180722891566
+"NE Clean","Urban",4,90,4.44444444444444
+"NE Clean","Suburban",2,90,2.22222222222222
+"NE Clean","Small Town",19,90,21.1111111111111
+"NE Clean","Rural",65,90,72.2222222222222
+"NH","Urban",2,165,1.21212121212121
+"NH","Suburban",36,165,21.8181818181818
+"NH","Small Town",17,165,10.3030303030303
+"NH","Rural",110,165,66.6666666666667
+"NH Clean","Urban",2,83,2.40963855421687
+"NH Clean","Suburban",20,83,24.0963855421687
+"NH Clean","Small Town",8,83,9.63855421686747
+"NH Clean","Rural",53,83,63.855421686747
+"NJ","Urban",9,547,1.64533820840951
+"NJ","Suburban",421,547,76.9652650822669
+"NJ","Small Town",23,547,4.20475319926874
+"NJ","Rural",94,547,17.1846435100548
+"NJ Clean","Urban",4,256,1.5625
+"NJ Clean","Suburban",197,256,76.953125
+"NJ Clean","Small Town",10,256,3.90625
+"NJ Clean","Rural",45,256,17.578125
+"NM","Urban",4,89,4.49438202247191
+"NM","Suburban",4,89,4.49438202247191
+"NM","Small Town",28,89,31.4606741573034
+"NM","Rural",53,89,59.5505617977528
+"NM Clean","Urban",3,58,5.17241379310345
+"NM Clean","Suburban",2,58,3.44827586206897
+"NM Clean","Small Town",16,58,27.5862068965517
+"NM Clean","Rural",37,58,63.7931034482759
+"NV","Urban",3,17,17.6470588235294
+"NV","Small Town",8,17,47.0588235294118
+"NV","Rural",6,17,35.2941176470588
+"NV Clean","Urban",3,16,18.75
 "NV Clean","Small Town",8,16,50
-"NV Clean","Rural",5,16,31
-"NY","Urban",22,684,3
-"NY","Suburban",257,684,38
-"NY","Small Town",105,684,15
-"NY","Rural",300,684,44
-"NY Clean","Urban",13,368,4
-"NY Clean","Suburban",114,368,31
-"NY Clean","Small Town",58,368,16
-"NY Clean","Rural",183,368,50
-"OH","Urban",19,614,3
-"OH","Suburban",204,614,33
-"OH","Small Town",118,614,19
-"OH","Rural",273,614,44
-"OH Clean","Urban",7,326,2
-"OH Clean","Suburban",107,326,33
-"OH Clean","Small Town",63,326,19
-"OH Clean","Rural",149,326,46
-"OK","Urban",7,520,1
-"OK","Suburban",23,520,4
-"OK","Small Town",93,520,18
-"OK","Rural",397,520,76
-"OK Clean","Urban",7,308,2
-"OK Clean","Suburban",14,308,5
-"OK Clean","Small Town",51,308,17
-"OK Clean","Rural",236,308,77
-"OR","Urban",13,180,7
-"OR","Suburban",20,180,11
-"OR","Small Town",60,180,33
-"OR","Rural",87,180,48
-"OR Clean","Urban",10,108,9
-"OR Clean","Suburban",14,108,13
-"OR Clean","Small Town",36,108,33
-"OR Clean","Rural",48,108,44
-"PA","Urban",20,499,4
-"PA","Suburban",234,499,47
-"PA","Small Town",77,499,15
-"PA","Rural",168,499,34
-"PA Clean","Urban",11,250,4
+"NV Clean","Rural",5,16,31.25
+"NY","Urban",22,684,3.21637426900585
+"NY","Suburban",257,684,37.5730994152047
+"NY","Small Town",105,684,15.3508771929825
+"NY","Rural",300,684,43.859649122807
+"NY Clean","Urban",13,368,3.53260869565217
+"NY Clean","Suburban",114,368,30.9782608695652
+"NY Clean","Small Town",58,368,15.7608695652174
+"NY Clean","Rural",183,368,49.7282608695652
+"OH","Urban",19,614,3.09446254071661
+"OH","Suburban",204,614,33.2247557003257
+"OH","Small Town",118,614,19.2182410423453
+"OH","Rural",273,614,44.4625407166124
+"OH Clean","Urban",7,326,2.14723926380368
+"OH Clean","Suburban",107,326,32.8220858895706
+"OH Clean","Small Town",63,326,19.3251533742331
+"OH Clean","Rural",149,326,45.7055214723926
+"OK","Urban",7,520,1.34615384615385
+"OK","Suburban",23,520,4.42307692307692
+"OK","Small Town",93,520,17.8846153846154
+"OK","Rural",397,520,76.3461538461538
+"OK Clean","Urban",7,308,2.27272727272727
+"OK Clean","Suburban",14,308,4.54545454545455
+"OK Clean","Small Town",51,308,16.5584415584416
+"OK Clean","Rural",236,308,76.6233766233766
+"OR","Urban",13,180,7.22222222222222
+"OR","Suburban",20,180,11.1111111111111
+"OR","Small Town",60,180,33.3333333333333
+"OR","Rural",87,180,48.3333333333333
+"OR Clean","Urban",10,108,9.25925925925926
+"OR Clean","Suburban",14,108,12.962962962963
+"OR Clean","Small Town",36,108,33.3333333333333
+"OR Clean","Rural",48,108,44.4444444444444
+"PA","Urban",20,499,4.00801603206413
+"PA","Suburban",234,499,46.8937875751503
+"PA","Small Town",77,499,15.4308617234469
+"PA","Rural",168,499,33.6673346693387
+"PA Clean","Urban",11,250,4.4
 "PA Clean","Suburban",125,250,50
-"PA Clean","Small Town",37,250,15
-"PA Clean","Rural",77,250,31
-"RI","Urban",2,36,6
-"RI","Suburban",25,36,69
+"PA Clean","Small Town",37,250,14.8
+"PA Clean","Rural",77,250,30.8
+"RI","Urban",2,36,5.55555555555556
+"RI","Suburban",25,36,69.4444444444444
 "RI","Rural",9,36,25
-"RI Clean","Urban",2,34,6
-"RI Clean","Suburban",23,34,68
-"RI Clean","Rural",9,34,26
-"SC","Urban",8,84,10
-"SC","Suburban",18,84,21
-"SC","Small Town",17,84,20
-"SC","Rural",41,84,49
+"RI Clean","Urban",2,34,5.88235294117647
+"RI Clean","Suburban",23,34,67.6470588235294
+"RI Clean","Rural",9,34,26.4705882352941
+"SC","Urban",8,84,9.52380952380952
+"SC","Suburban",18,84,21.4285714285714
+"SC","Small Town",17,84,20.2380952380952
+"SC","Rural",41,84,48.8095238095238
 "SC Clean","Urban",8,80,10
-"SC Clean","Suburban",17,80,21
+"SC Clean","Suburban",17,80,21.25
 "SC Clean","Small Town",16,80,20
-"SC Clean","Rural",39,80,49
-"SD","Urban",2,151,1
-"SD","Suburban",1,151,1
-"SD","Small Town",21,151,14
-"SD","Rural",127,151,84
-"SD Clean","Urban",1,103,1
-"SD Clean","Suburban",1,103,1
-"SD Clean","Small Town",10,103,10
-"SD Clean","Rural",91,103,88
-"TN","Urban",12,137,9
-"TN","Suburban",18,137,13
-"TN","Small Town",41,137,30
-"TN","Rural",66,137,48
-"TN Clean","Urban",9,109,8
-"TN Clean","Suburban",12,109,11
-"TN Clean","Small Town",36,109,33
-"TN Clean","Rural",52,109,48
-"TX","Urban",75,1026,7
-"TX","Suburban",107,1026,10
-"TX","Small Town",212,1026,21
-"TX","Rural",632,1026,62
-"TX Clean","Urban",58,763,8
-"TX Clean","Suburban",68,763,9
-"TX Clean","Small Town",155,763,20
-"TX Clean","Rural",482,763,63
-"UT","Urban",5,41,12
-"UT","Suburban",10,41,24
-"UT","Small Town",14,41,34
-"UT","Rural",12,41,29
-"UT Clean","Urban",5,38,13
-"UT Clean","Suburban",9,38,24
-"UT Clean","Small Town",14,38,37
-"UT Clean","Rural",10,38,26
-"VA","Urban",18,130,14
-"VA","Suburban",23,130,18
-"VA","Small Town",23,130,18
-"VA","Rural",66,130,51
-"VA Clean","Urban",15,116,13
-"VA Clean","Suburban",20,116,17
-"VA Clean","Small Town",22,116,19
-"VA Clean","Rural",59,116,51
-"VT","Urban",2,58,3
-"VT","Suburban",3,58,5
-"VT","Small Town",20,58,34
-"VT","Rural",33,58,57
-"VT Clean","Urban",1,31,3
-"VT Clean","Suburban",2,31,6
-"VT Clean","Small Town",12,31,39
-"VT Clean","Rural",16,31,52
-"WA","Urban",26,295,9
-"WA","Suburban",54,295,18
+"SC Clean","Rural",39,80,48.75
+"SD","Urban",2,151,1.32450331125828
+"SD","Suburban",1,151,0.662251655629139
+"SD","Small Town",21,151,13.9072847682119
+"SD","Rural",127,151,84.1059602649007
+"SD Clean","Urban",1,103,0.970873786407767
+"SD Clean","Suburban",1,103,0.970873786407767
+"SD Clean","Small Town",10,103,9.70873786407767
+"SD Clean","Rural",91,103,88.3495145631068
+"TN","Urban",12,137,8.75912408759124
+"TN","Suburban",18,137,13.1386861313869
+"TN","Small Town",41,137,29.9270072992701
+"TN","Rural",66,137,48.1751824817518
+"TN Clean","Urban",9,109,8.25688073394495
+"TN Clean","Suburban",12,109,11.0091743119266
+"TN Clean","Small Town",36,109,33.0275229357798
+"TN Clean","Rural",52,109,47.7064220183486
+"TX","Urban",75,1026,7.30994152046784
+"TX","Suburban",107,1026,10.4288499025341
+"TX","Small Town",212,1026,20.6627680311891
+"TX","Rural",632,1026,61.598440545809
+"TX Clean","Urban",58,763,7.60157273918742
+"TX Clean","Suburban",68,763,8.91218872870249
+"TX Clean","Small Town",155,763,20.3145478374836
+"TX Clean","Rural",482,763,63.1716906946265
+"UT","Urban",5,41,12.1951219512195
+"UT","Suburban",10,41,24.390243902439
+"UT","Small Town",14,41,34.1463414634146
+"UT","Rural",12,41,29.2682926829268
+"UT Clean","Urban",5,38,13.1578947368421
+"UT Clean","Suburban",9,38,23.6842105263158
+"UT Clean","Small Town",14,38,36.8421052631579
+"UT Clean","Rural",10,38,26.3157894736842
+"VA","Urban",18,130,13.8461538461538
+"VA","Suburban",23,130,17.6923076923077
+"VA","Small Town",23,130,17.6923076923077
+"VA","Rural",66,130,50.7692307692308
+"VA Clean","Urban",15,116,12.9310344827586
+"VA Clean","Suburban",20,116,17.2413793103448
+"VA Clean","Small Town",22,116,18.9655172413793
+"VA Clean","Rural",59,116,50.8620689655172
+"VT","Urban",2,58,3.44827586206897
+"VT","Suburban",3,58,5.17241379310345
+"VT","Small Town",20,58,34.4827586206897
+"VT","Rural",33,58,56.8965517241379
+"VT Clean","Urban",1,31,3.2258064516129
+"VT Clean","Suburban",2,31,6.45161290322581
+"VT Clean","Small Town",12,31,38.7096774193548
+"VT Clean","Rural",16,31,51.6129032258064
+"WA","Urban",26,295,8.8135593220339
+"WA","Suburban",54,295,18.3050847457627
 "WA","Small Town",59,295,20
-"WA","Rural",156,295,53
-"WA Clean","Urban",16,237,7
-"WA Clean","Suburban",41,237,17
-"WA Clean","Small Town",44,237,19
-"WA Clean","Rural",136,237,57
-"WI","Urban",17,423,4
-"WI","Suburban",78,423,18
-"WI","Small Town",95,423,22
-"WI","Rural",233,423,55
-"WI Clean","Urban",5,196,3
-"WI Clean","Suburban",37,196,19
-"WI Clean","Small Town",43,196,22
-"WI Clean","Rural",111,196,57
-"WV","Urban",4,55,7
-"WV","Suburban",7,55,13
-"WV","Small Town",14,55,25
-"WV","Rural",30,55,55
-"WV Clean","Urban",2,37,5
-"WV Clean","Suburban",5,37,14
-"WV Clean","Small Town",12,37,32
-"WV Clean","Rural",18,37,49
-"WY","Urban",2,48,4
-"WY","Small Town",18,48,38
-"WY","Rural",28,48,58
-"WY Clean","Urban",2,24,8
-"WY Clean","Small Town",8,24,33
-"WY Clean","Rural",14,24,58
+"WA","Rural",156,295,52.8813559322034
+"WA Clean","Urban",16,237,6.75105485232068
+"WA Clean","Suburban",41,237,17.2995780590717
+"WA Clean","Small Town",44,237,18.5654008438819
+"WA Clean","Rural",136,237,57.3839662447257
+"WI","Urban",17,423,4.01891252955083
+"WI","Suburban",78,423,18.4397163120567
+"WI","Small Town",95,423,22.4586288416076
+"WI","Rural",233,423,55.0827423167849
+"WI Clean","Urban",5,196,2.55102040816327
+"WI Clean","Suburban",37,196,18.8775510204082
+"WI Clean","Small Town",43,196,21.9387755102041
+"WI Clean","Rural",111,196,56.6326530612245
+"WV","Urban",4,55,7.27272727272727
+"WV","Suburban",7,55,12.7272727272727
+"WV","Small Town",14,55,25.4545454545455
+"WV","Rural",30,55,54.5454545454545
+"WV Clean","Urban",2,37,5.40540540540541
+"WV Clean","Suburban",5,37,13.5135135135135
+"WV Clean","Small Town",12,37,32.4324324324324
+"WV Clean","Rural",18,37,48.6486486486486
+"WY","Urban",2,48,4.16666666666667
+"WY","Small Town",18,48,37.5
+"WY","Rural",28,48,58.3333333333333
+"WY Clean","Urban",2,24,8.33333333333333
+"WY Clean","Small Town",8,24,33.3333333333333
+"WY Clean","Rural",14,24,58.3333333333333

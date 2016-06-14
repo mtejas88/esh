@@ -144,7 +144,7 @@ districts$meeting_2014_goal_no_oversub <- as.factor(districts$meeting_2014_goal_
 districts$not_all_scalable <- ifelse(districts$nga_v2_known_unscalable_campuses + districts$nga_v2_assumed_unscalable_campuses > 0, 1, 0)
 
 # deluxe districts
-districts$new_connect_type <- ifelse(districts$hierarchy_connect_category %in% c("None - Error", "Other/Uncategorized"), 
+districts$new_connect_type_goals <- ifelse(districts$hierarchy_connect_category %in% c("None - Error", "Other/Uncategorized"), 
                                      "Other / Uncategorized", districts$hierarchy_connect_category)
 
 
@@ -240,7 +240,7 @@ locale_cuts <- data %>%
 
 locale_cuts <- left_join(locale_cuts, n_all, by = c("postal_cd"))
 
-locale_cuts$percent <- round(100 * locale_cuts$n_locale / locale_cuts$n, digits = 2)
+locale_cuts$percent <- 100 * locale_cuts$n_locale / locale_cuts$n
 
 locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
 locale_cuts <- arrange(locale_cuts, postal_cd, locale)
@@ -252,12 +252,12 @@ size_cuts <- data %>%
 
 size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
-size_cuts$percent <- round(100 * size_cuts$n_locale / size_cuts$n, digits = 2)
+size_cuts$percent <- 100 * size_cuts$n_locale / size_cuts$n
 
 size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)
 
-wd <- "~/Google Drive/github/ficher/Shiny"
+wd <- "~/Desktop/ficher/Shiny"
 setwd(wd)
 
 # export
