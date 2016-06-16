@@ -27,10 +27,21 @@ shinyServer(function(input, output, session) {
   library(ggvis)
   library(DT)
   library(shinydashboard)
+  #library(RPostgreSQL)
   
-  #sapply(lib, function(x) library(x, character.only = TRUE))
-  #services <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/services_received.SQL")
-  #districts <- querydb("~/Google Drive/github/ficher/Shiny/prep_for_Shiny/SQL/deluxe_districts.SQL")
+  #drv <- dbDriver("PostgreSQL")
+  #con <- dbConnect(drv, dbname = "daddkut7s5671q",
+                 #  host = "ec2-54-204-38-194.compute-1.amazonaws.com", port = 5572,
+                #   user = "u3v583a3p2pp85", password = "p6omsea0tv60mlfjnosesb7ereu")
+  
+  #querydb <- function(query_name) {
+   # query <- readChar(query_name, file.info(query_name)$size)
+  #  data <- dbGetQuery(con, query)
+   # return(data)
+  #}
+  
+  #districts <- querydb("/prep_for_Shiny/SQL/deluxe_districts.SQL")
+  
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
   locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
@@ -573,13 +584,15 @@ output$table_schools_on_fiber <- renderDataTable({
   
   data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
                                            locale3 %in% input$locale_fiber) %>% 
-          summarize(num_schools = sum(num_campuses),
-                    num_schools_on_fiber = sum(nga_v2_known_scalable_campuses + nga_v2_assumed_scalable_campuses),
-                    num_schools_may_need_upgrades = sum(nga_v2_assumed_unscalable_campuses),
-                    num_schools_need_upgrades = sum(nga_v2_known_unscalable_campuses),
-                    percent_on_fiber = round(100 * num_schools_on_fiber / sum(num_campuses), 2),
-                    percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / sum(num_campuses), 2),
-                    percent_need_upgrades = round(100 * num_schools_need_upgrades / sum(num_campuses), 2))
+    
+      summarize(num_all_schools = sum(num_schools),
+                num_schools_on_fiber = sum(schools_on_fiber),
+                num_schools_may_need_upgrades = sum(schools_may_need_upgrades),
+                num_schools_need_upgrades = sum(schools_need_upgrades),
+                percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
+                percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
+                percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2))
+    
   colnames(data) <- c("# of Schools", "# of Schools on Fiber", "# of Schools That May Need Upgrades", 
                       "# of Schools That Need Upgrades", "% of Schools on Fiber", "% of Schools That May Need Upgrades", "% of Schools That Need Upgrades")
         
@@ -637,9 +650,10 @@ output$table_by_erate_discounts <- renderDataTable({
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
-          summarize(n_unscalable_schools_in_rate_band = round(sum(num_unscalable_schools))) %>%
-          mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
-                 percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
+    summarize(n_unscalable_schools_in_rate_band = round(sum(schools_need_upgrades + schools_may_need_upgrades))) %>%
+    mutate(n_all_unscalable_schools_in_calculation = sum(n_unscalable_schools_in_rate_band),
+           percent_unscalable_schools_in_rate_band = round(100 * n_unscalable_schools_in_rate_band / n_all_unscalable_schools_in_calculation, 2))
+  
   colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
     
   validate(need(nrow(data) > 0, ""))  
