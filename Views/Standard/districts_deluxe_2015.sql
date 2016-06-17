@@ -19,7 +19,7 @@ with agg_district_apps as (
                                         end)
                       end), '; ') as "ia_applicants"
 
-      from services_received svcs
+      from services_received_2015 svcs
       GROUP BY recipient_id),
 agg_district_lines as (
         select 
@@ -305,8 +305,8 @@ agg_district_lines as (
                                       extract(year from contract_end_date::timestamp)) 
                     end), '; ') as "wan_contract_expiration"
             
-        from districts d
-        left join services_received sr
+        from public.districts d
+        left join services_received_2015 sr
         on d.esh_id = sr.recipient_id
 
         where dirty_status = 'include clean'
@@ -513,7 +513,7 @@ agg_district_campus as (
   adc.wan_connections,
   adc.wan_contract_expiration
 
-from  districts
+from  public.districts
 left join district_contacted_2015 as district_contacted
 on district_contacted.district_esh_id = districts.esh_id
 left join sc121a_frl 
