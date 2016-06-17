@@ -22,7 +22,7 @@ most_recent as (
                       then true else false end as assumed_flags
                       
                 from line_item_district_association_2015 av
-                left join public.version_order
+                left join version_order
                 on av.line_item_id = version_order.fy2015_item21_services_and_cost_id
                 left join public.line_items
                 on av.line_item_id = line_items.id
