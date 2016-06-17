@@ -55,6 +55,6 @@ Created On Date: 2/9/2016
 Last Modified Date: 06/17/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Determine whether district was contacted
-Methodology: Determine most recent contacted status for a line item as specified by DQS. Then create cleanliness determination
+Methodology: Determine most recent contacted status for a line item as specified by DQS. Then cleanliness determination
 as defined here: https://educationsuperhighway.atlassian.net/wiki/display/EDS/Dimensioning+Clean
 */
