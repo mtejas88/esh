@@ -1,4 +1,3 @@
---District esh_id of districts and schools for purpose of looking up services received by a district's educational entities
 select  ldli.district_esh_id as recipient_id,
         d.name as recipient_name,
         d.postal_cd as recipient_postal_cd,
