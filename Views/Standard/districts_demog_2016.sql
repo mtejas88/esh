@@ -78,7 +78,7 @@ left join ( select  "LEAID",
             where "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
             and "VIRTUALSTAT" != 'VIRTUALYES'
-            and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excludeda
+            and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
             group by "LEAID" ) sc
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
@@ -97,7 +97,7 @@ left join ( select  "UNION",
             where "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
             and "VIRTUALSTAT" != 'VIRTUALYES'
-            and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excludeda
+            and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
             and "LSTATE" = 'VT' --only smushing by UNION for districts in VT
             group by "UNION" ) sc_VT
 on d."UNION"=sc_VT."UNION"
@@ -119,7 +119,7 @@ left join ( select  ag131a."LSTREE",
             where sc131a."GSHI" != 'PK' 
             and sc131a."STATUS" != '2' --closed schools
             and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-            and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excludeda
+            and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
             and sc131a."LSTATE" = 'MT' --only smushing by UNION for districts in VT
             group by ag131a."LSTREE" ) sc_MT
 on d."LSTREE"=sc_MT."LSTREE"
@@ -133,14 +133,14 @@ where ( --all states except VT include districts of type 1,2 (traditional), or 7
         or ("LSTATE" in ('RI', 'MA')
             and "TYPE" = '4'
             and sc.school_type_1_count/sc.school_count::numeric >= .75 )
-        --in NY we also include 3's; in VT we only include 3's 
+        --in NY we also include 3's, in VT we only include 3's 
         or ("LSTATE" in ('VT', 'NY')
             and "TYPE" = '3') )
 and "LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
 and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
 and ( sc.student_count - sc.student_pk_count  >0 
       or ("LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0) 
-      or ("LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student;
+      or ("LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
       or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts 
 and ( sc.school_count > 0 
       or ("LSTATE" = 'MT' and sc_MT.school_count>0)  
