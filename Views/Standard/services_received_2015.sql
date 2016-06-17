@@ -126,7 +126,8 @@ students (e.g. num_students in district/num_students in ALL districts served by 
           then 'exclude dirty'
           else 'include clean'
       end as dirty_status,
-      spc.reporting_name
+      spc.reporting_name,
+      li.contract_end_date
 
       from lines_to_district_by_line_item_2015 ldli
 
