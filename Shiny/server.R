@@ -1567,7 +1567,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160517', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160617', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
   }
