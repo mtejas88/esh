@@ -291,7 +291,7 @@ left join (
                       and wan_conditions_met = true 
                   then sr."cat.1_allocations_to_district"
                 else 0 
-              end) as gt_1g_wan_lines,        
+              end) as lt_1g_fiber_wan_lines,        
           sum(case 
                 when  bandwidth_in_mbps < 1000 
                       and connect_category != 'Fiber'
@@ -399,7 +399,7 @@ left join (
                       when isp_conditions_met=true
                         then concat(quantity_of_lines_received_by_district, ' line(s) at ', 
                                     bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
-                                    ' for $', line_item_district_monthly_cost_adjusted, '/mth')
+                                    ' for $', line_item_district_monthly_cost, '/mth')
                       end), '; ') as "dedicated_isp_services",             
         array_to_string(
           array_agg(case 
@@ -424,7 +424,7 @@ left join (
                                         then 'T-1'
                                       else connect_category 
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
-                                    ' for $', line_item_district_monthly_cost_adjusted, '/mth')
+                                    ' for $', line_item_district_monthly_cost, '/mth')
                     end), '; ') as "bundled_internet_connections", 
         array_to_string(
           array_agg(case 
@@ -449,7 +449,7 @@ left join (
                                         then 'T-1'
                                       else connect_category
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
-                                    ' for $', line_item_district_monthly_cost_adjusted, '/mth')
+                                    ' for $', line_item_district_monthly_cost, '/mth')
                     end), '; ') as "upstream_connections",
           array_to_string(
             array_agg(case 
@@ -474,7 +474,7 @@ left join (
                                         then 'T-1'
                                       else connect_category
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
-                                    ' for $', line_item_district_monthly_cost_adjusted, '/mth')
+                                    ' for $', line_item_district_monthly_cost, '/mth')
                         end), '; ') as "wan_connections",         
         array_to_string(
           array_agg(case 
