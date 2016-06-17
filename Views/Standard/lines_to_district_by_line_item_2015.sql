@@ -14,8 +14,7 @@ group by  district_esh_id,
 /*
 Author:                       Justine Schott
 Created On Date:              03/03/2016
-Last Modified Date: 		  06/02/2016
+Last Modified Date:           06/02/2016
 Name of QAing Analyst(s):  
-Purpose:                      To aggregate services received by all instructional facilities to the appropriate district. Excludes dirty line items
-                              and normal line item exclusions, such as consortium_shared line items
+Purpose:                      To aggregate services received by all instructional facilities to the appropriate district. (2015)
 */
