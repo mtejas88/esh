@@ -1,4 +1,4 @@
- select 
+select 
 --1) demographics
   districts.esh_id,
   districts.nces_cd,
@@ -379,20 +379,20 @@ left join (
               when isp_conditions_met = TRUE 
                 then service_provider_name
             end --order by service_provider_name
-          ), '; ') as "dedicated_isp_sp",
+          ), ', ') as "dedicated_isp_sp",
         array_to_string(
           array_agg(distinct 
                       case 
                         when upstream_conditions_met=true
                           then applicant_name 
                         else null 
-                      end), '; ') as "upstream_applicants",
+                      end), ', ') as "upstream_applicants",
         array_to_string(
           array_agg(distinct 
                       case 
                         when wan_conditions_met=true
                           then applicant_name 
-                        end), '; ') as "wan_applicants",
+                        end), ', ') as "wan_applicants",
         --dedicated ISP
         array_to_string(
           array_agg(case 
@@ -400,14 +400,14 @@ left join (
                         then concat(quantity_of_lines_received_by_district, ' line(s) at ', 
                                     bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
                                     ' for $', line_item_district_monthly_cost, '/mth')
-                      end), '; ') as "dedicated_isp_services",             
+                      end), ', ') as "dedicated_isp_services",             
         array_to_string(
           array_agg(case 
                       when isp_conditions_met=true 
                         then concat(service_provider_name, ' - ', 
                                     extract(month from contract_end_date::timestamp), '/', 
                                     extract(year from contract_end_date::timestamp)) 
-                      end), '; ') as "dedicated_isp_contract_expiration",
+                      end), ', ') as "dedicated_isp_contract_expiration",
         --bundled IA
         array_to_string(
           array_agg(case 
@@ -425,14 +425,14 @@ left join (
                                       else connect_category 
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
                                     ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "bundled_internet_connections", 
+                    end), ', ') as "bundled_internet_connections", 
         array_to_string(
           array_agg(case 
                       when internet_conditions_met=true 
                         then concat(service_provider_name, ' - ', 
                                     extract(month from contract_end_date::timestamp), '/', 
                                     extract(year from contract_end_date::timestamp)) 
-                    end), '; ') as "bundled_internet_contract_expiration",
+                    end), ', ') as "bundled_internet_contract_expiration",
         --upstream
         array_to_string(
           array_agg(case 
@@ -450,14 +450,14 @@ left join (
                                       else connect_category
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
                                     ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "upstream_connections",
+                    end), ', ') as "upstream_connections",
           array_to_string(
             array_agg(case 
                         when upstream_conditions_met=true
                           then concat(service_provider_name, ' - ', 
                                       extract(month from contract_end_date::timestamp), '/', 
                                       extract(year from contract_end_date::timestamp)) 
-                      end), '; ') as "upstream_contract_expiration",
+                      end), ', ') as "upstream_contract_expiration",
         --WAN                
         array_to_string(
           array_agg(case 
@@ -475,14 +475,14 @@ left join (
                                       else connect_category
                                     end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, 
                                     ' for $', line_item_district_monthly_cost, '/mth')
-                        end), '; ') as "wan_connections",         
+                        end), ', ') as "wan_connections",         
         array_to_string(
           array_agg(case 
                       when wan_conditions_met=true 
                           then concat(service_provider_name, ' - ', 
                                       extract(month from contract_end_date::timestamp), '/', 
                                       extract(year from contract_end_date::timestamp)) 
-                    end), '; ') as "wan_contract_expiration"
+                    end), ', ') as "wan_contract_expiration"
             
         from public.districts d
         left join services_received_2015 sr
@@ -513,7 +513,7 @@ left join (
                                             then ' (dedicated Internet)'
                                           else ' (unknown purpose)'
                                         end)
-                      end), '; ') as "ia_applicants"
+                      end), ', ') as "ia_applicants"
 
       from services_received_2015 svcs
       GROUP BY recipient_id
