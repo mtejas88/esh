@@ -120,7 +120,6 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       d.exclude_from_analysis,
       d.consortium_member,
       'n/a' as recipient_districts,
-      'n/a' as recipient_postal_cd,
       case 
         when d.exclude_from_analysis = true
         or number_of_dirty_line_item_flags = 0
@@ -177,7 +176,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 /*
 Author: Greg Kurzhals
 Created On Date: 11/01/2015
-Last Modified Date: 06/13/2015
+Last Modified Date: 06/17/2015
 Name of QAing Analyst(s): Justine Schott
 Purpose: To identify and display the broadband services (district-dedicated, shared IA, and backbone) received by each district, 
 or applied for by each entity
