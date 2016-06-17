@@ -177,7 +177,7 @@ output$table_locale <- renderDataTable({
     need(input$state != 'All', "")
   )
   
-  datatable(data, options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
   
   })
   
@@ -219,7 +219,8 @@ output$table_size <- renderDataTable({
     need(input$state != 'All', "")
   )
   
-  datatable(data, options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', 
+                   options = list(paging = FALSE))
   
 })
 
@@ -278,7 +279,7 @@ output$table_goals <- renderDataTable({
   colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
-  datatable(data, options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -287,6 +288,20 @@ output$helptext_ia_technology <- renderUI({
   HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that the filters are
              set to clean data, relevant state, goal meeting status, connection types, locales, and district sizes."))
 })
+
+
+districts_ia_tech_data <- reactive({
+  
+  d_ia_tech_data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+  district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, meeting_2014_goal_no_oversub %in% input$meeting_goals) #%>% 
+  #group_by(new_connect_type_goals) %>%
+  #summarize(n_districts = n()) %>%
+  #mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
+         #n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
+
+  d_ia_tech_data
+  
+  })
 
 output$histogram_districts_ia_technology <- renderPlot({
   
@@ -316,14 +331,15 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   print(q)
   
-  districts_ia_tech <- district_subset()
+  #districts_ia_tech <- as.data.frame(data)
   
 })
 
 output$table_districts_ia_technology <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-              district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
+              district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, 
+              meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
               group_by(new_connect_type_goals) %>%
               summarize(n_districts = n()) %>%
               mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
@@ -332,7 +348,8 @@ output$table_districts_ia_technology <- renderDataTable({
   colnames(data) <- c("IA Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
   
   validate(need(nrow(data) > 0, ""))  
-  datatable(data, options = list(paging = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), caption = 'Use the Search bar for the data table below.', 
+                  options = list(paging = FALSE))
   
 })
 
@@ -352,14 +369,20 @@ output$histogram_projected_wan_needs <- renderPlot({
   
   data <- melt(data)
   
-  q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),],
-              aes(x = variable, y = value)) +
-       geom_bar(fill="#fdb913", stat = "identity", width = .5) +
-        geom_text(aes(label = paste0(value, "%")), 
-                  vjust =-1, size = 6) +
+  #q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),],
+  #            aes(x = variable, y = value)) +
+    
+ #   q <- ggplot(data = plot_data) +
+#    geom_bar(aes(x = variable, y = value, fill = variable),  width = .5, stat = "identity") +
+#    geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
+    
+    q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),]) +
+       geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
+        geom_text(aes(label = paste0(value, "%"), x = variable, y = value),  vjust =-1, size = 6) +
         scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
                      labels=c("Schools with >= 1G WAN", "Schools w/ Projected Need of >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
+        scale_fill_manual(values = c("#fdb913", "#f26b21")) + 
         geom_hline(yintercept = 0) +
         theme_classic() + 
         theme(axis.line = element_blank(), 
@@ -367,7 +390,8 @@ output$histogram_projected_wan_needs <- renderPlot({
               axis.text.y = element_blank(),
               axis.ticks = element_blank(),
               axis.title.x=element_blank(),
-              axis.title.y=element_blank()) 
+              axis.title.y=element_blank(),
+              legend.position = "none") 
       
   print(q)
   
@@ -388,7 +412,7 @@ output$table_projected_wan_needs <- renderDataTable({
   
   validate(need(nrow(data) > 0, ""))
   
-  datatable(data, options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -585,7 +609,7 @@ output$table_schools_on_fiber <- renderDataTable({
         
   validate(need(nrow(data) > 0, ""))  
   
-  datatable(data, options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -643,7 +667,7 @@ output$table_by_erate_discounts <- renderDataTable({
   colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
     
   validate(need(nrow(data) > 0, ""))  
-  datatable(data, options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -958,26 +982,20 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$testing, {
   d <- district_subset() %>% filter(name %in% input$testing)
-  d %>% select(X = longitude, Y = latitude)
+  d %>% select(name = name, X = longitude, Y = latitude, num_students, hierarchy_connect_category, total_ia_monthly_cost)
   #dp <- as.data.frame(data_points)
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
   
-  #data <- district_subset()
-  #selected_district_list <- paste0("c(",toString(paste0('\"', input$districtSelect, '\"')), ')')  #district_list
-
-  #d <- district_subset() %>% filter(name %in% input$testing)
+  sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
+                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                    "IA Connection: ", school_districts()$hierarchy_connect_category, "<br>",
+                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
   
-  #d <- data %>% 
-  #  filter_(paste("name %in%", selected_district_list))
   
-  #content <- paste0("<b>", school_districts$name, "</b><br>",
-  #                  "# of students:", format(school_districts$num_students, big.mark = ",", scientific = FALSE),"<br>",
-  #                  "IA Connection: ", school_districts$hierarchy_connect_category, "<br>",
-  #                  "Total IA monthly cost: $", format(school_districts$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
   
-  leaflet() %>% addProviderTiles("CartoDB.Positron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y)#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
+  leaflet() %>% addProviderTiles("CartoDB.Positron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
   #default view of leaflet map is addTiles()
 })
 
@@ -1135,6 +1153,7 @@ output$map_population <- renderPlot({
   #})  
 
 
+#not using ggvis since side-by-side bar chart is not possible
 general_monthly_cpm <- reactive({
   sr_all() %>% 
     ggvis(~monthly_cost_per_mbps) %>% 
@@ -1145,23 +1164,56 @@ general_monthly_cpm <- reactive({
 general_monthly_cpm %>% bind_shiny("gen_m_cpm")
 
 
-
+#not using ggvis since side-by-side bar chart is not possible
 price_disp_cpc <- reactive({
 
-    data <- sr_all()
+  a <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+                 summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE),
+                           Median = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE),
+                           p75th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE))
+  
+   
+   bw <- "bandwidth_in_mbps"
+   percentile <- "percentiles"
+   dispersion <- c("p25th", "Median", "p75th")
+   
+   b <- gather_(a, bw, percentile, dispersion)
+   colnames(b) <- c("bw_mbps", "percentile", "cost" )
+   print(b)
+  
+    data <- sr_all() %>% filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[1]))
     data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
     percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
     perc_tab <- as.data.frame(percentiles)  
     add_perc <- c("25th","Median", "75th")
-    perc_tab <- cbind(perc_tab, add_perc)
+    bw_mbps <- c(rep(data$bandwidth_in_mbps[1], 3)) #added for TESTING 
+    perc_tab <- cbind(perc_tab, add_perc, bw_mbps)
     perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
     #perc_tab_cpc <- perc_tab
     #print(perc_tab_cpc)
-      
-    print(str(perc_tab))
-  
+    
+    if(length(unique(data$bandwidth_in_mbps)) > 1){ 
+        data2 <- data %>% filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[2]))
+        data2$monthly_cost_per_circuit <- as.numeric(as.character(data2$monthly_cost_per_circuit))
+        percentiles <- quantile(data2$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
+        perc_tab2 <- as.data.frame(percentiles)  
+        add_perc <- c("25th","Median", "75th")
+        bw_mbps2 <- c(rep(data2$bandwidth_in_mbps[2], 3))
+        perc_tab2 <- cbind(perc_tab2, add_perc, bw_mbps2)
+        perc_tab2$add_perc <- factor(perc_tab2$add_perc, levels = perc_tab2$add_perc[1:3], labels = c("25th", "Median", "75th"))
+        perc_tab_cpc2 <- perc_tab2
+        print(unique(data2$bandwidth_in_mbps))
+        print(perc_tab_cpc2)
+        
+     data3 <- rbind(perc_tab_cpc, perc_tab_cpc2)    
+     #data3 <- left_join(perc_tab_cpc, perc_tab_cpc2, by = c("add_perc" = "add_perc2"))
+     print(data3)
+    }
+
+    else{
     perc_tab %>% 
     ggvis(x = ~add_perc, y = ~percentiles, fill := "#FDB913", fillOpacity := 0.6) %>% 
+    group_by(add_perc) %>% 
     layer_bars(strokeWidth := 0) %>%    
     layer_rects(fill:="white") %>%
     add_axis("x", title = "Percentile", title_offset = 50, grid=FALSE) %>% 
@@ -1171,6 +1223,7 @@ price_disp_cpc <- reactive({
       #         grid=FALSE)  %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE)
     #hide_axis("y")
+    }
   
 })
 
@@ -1178,32 +1231,85 @@ price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
 
 
-output$n_sr <- renderText({
+
+
+
+
+
+output$cpc_sidebars <- renderPlot({
+
+  a <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+       summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE),
+                 Median = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE),
+                 p75th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE))
   
-  n_sr <- nrow(sr_all())
-  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
-  paste("n(services) =", toString(n_sr))
   
+  bw <- "bandwidth_in_mbps"
+  percentile <- "percentiles"
+  dispersion <- c("p25th", "Median", "p75th")
+  
+  b <- gather_(a, bw, percentile, dispersion)
+  colnames(b) <- c("bw_mbps", "percentile", "cost" )
+  b$percentile <- factor(b$percentile, levels = c("p25th", "Median", "p75th"))
+  print(b)
+
+  positions <- c("p25th", "Median", "p75th")
+  v <- ggplot(data = b, aes(x=percentile, y=cost, fill=factor(bw_mbps)))+
+    geom_bar(stat="identity", position = "dodge") + 
+    geom_text(aes(label = format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
+    #scale_x_discrete(limits = positions) +
+    scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
+                        labels=c("Median", "25th", "75th")) +
+                        #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
+    scale_fill_brewer(palette = "Blues", direction = -1) +
+    geom_hline(yintercept = 0) +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  print(v)
+
 })
 
-
-output$n_circuits <- renderText({
-
-  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
-  paste("n(circuits) =", toString(n_circuits))
+#output$n_sr <- renderText({
   
-})
+#  n_sr <- nrow(sr_all())
+#  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
+#  paste("n(services) =", toString(n_sr))
+  
+#})
+
+
+#output$n_circuits <- renderText({
+
+#  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
+#  paste("n(circuits) =", toString(n_circuits))
+  
+#})
+
 
 output$disp_cpc_table <- renderDataTable({
   
-  data <- sr_all()
-  data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
-  percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
-  perc_tab <- as.data.frame(percentiles)  
-  add_perc <- c("25th","Median", "75th")
-  perc_tab <- cbind(add_perc, perc_tab)
-  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-  colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Circuit ($)")
+  #data <- sr_all()
+  #data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
+  #percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
+  #perc_tab <- as.data.frame(percentiles)  
+  #add_perc <- c("25th","Median", "75th")
+  #perc_tab <- cbind(add_perc, perc_tab)
+  #perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+  #colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Circuit ($)")
+  
+  
+  perc_tab <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+              summarise(n_services = n(),
+              n_circuits = sum(cat.1_allocations_to_district),
+              p25th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
+              Median = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
+              p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
+  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th", "Median", "75th")
   
   datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
 
@@ -1211,42 +1317,93 @@ output$disp_cpc_table <- renderDataTable({
 
 
 
-price_disp_cpm <- reactive({
+#price_disp_cpm <- reactive({
   
-  data <- sr_all()
-  data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
-  percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
-  perc_tab <- as.data.frame(percentiles)  
-  add_perc <- c("25th","Median", "75th")
-  perc_tab <- cbind(perc_tab, add_perc)
-  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+#  data <- sr_all()
+#  data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
+#  percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
+#  perc_tab <- as.data.frame(percentiles)  
+#  add_perc <- c("25th","Median", "75th")
+#  perc_tab <- cbind(perc_tab, add_perc)
+#  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
   
-  print(str(perc_tab))
+#  print(str(perc_tab))
   
-  perc_tab %>% 
-    ggvis(x = ~add_perc, y = ~percentiles, fill := "#009296", fillOpacity := 0.6) %>% 
-    layer_bars(strokeWidth := 0) %>%    
-    layer_rects(fill:="white") %>%
-    add_axis("x", title = "Percentile", title_offset = 50, grid = FALSE) %>% 
-    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75, grid = FALSE)
-  #hide_axis("y")
+#  perc_tab %>% 
+#    ggvis(x = ~add_perc, y = ~percentiles, fill := "#009296", fillOpacity := 0.6) %>% 
+#    layer_bars(strokeWidth := 0) %>%    
+#    layer_rects(fill:="white") %>%
+#    add_axis("x", title = "Percentile", title_offset = 50, grid = FALSE) %>% 
+#    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75, grid = FALSE)
+#  #hide_axis("y")
+  
+#})
+
+#price_disp_cpm %>% bind_shiny("price_disp_cpm")
+
+output$price_disp_cpm_sidebars <- renderPlot({
+  
+  c <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+    summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.25, na.rm = TRUE),
+              Median = quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.50, na.rm = TRUE),
+              p75th = quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.75, na.rm = TRUE))
+  
+  
+  bw <- "bandwidth_in_mbps"
+  percentile <- "percentiles"
+  dispersion <- c("p25th", "Median", "p75th")
+  
+  b2 <- gather_(c, bw, percentile, dispersion)
+  colnames(b2) <- c("bw_mbps", "percentile", "cost" )
+  b2$percentile <- factor(b2$percentile, levels = c("p25th", "Median", "p75th"))
+  print(b2)
+  
+  positions <- c("p25th", "Median", "p75th")
+  v <- ggplot(data = b2, aes(x=percentile, y=cost, fill=factor(bw_mbps)))+
+    geom_bar(stat="identity", position = "dodge") + 
+    geom_text(aes(label = format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
+    #scale_x_discrete(limits = positions) +
+    scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
+                     labels=c("Median", "25th", "75th")) +
+    #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
+    scale_fill_brewer(palette = "BuGN", direction = -1) +
+    geom_hline(yintercept = 0) +
+    theme_classic() + 
+    theme(axis.line = element_blank(), 
+          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank()) 
+  
+  print(v)
   
 })
 
-price_disp_cpm %>% bind_shiny("price_disp_cpm")
+
 
 output$disp_cpm_table <- renderDataTable({
-data <- sr_all()
-data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
-percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
-perc_tab <- as.data.frame(percentiles)  
-add_perc <- c("25th","Median", "75th")
-perc_tab <- cbind(add_perc, perc_tab)
-perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Mbps ($)")
+#data <- sr_all()
+#data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
+#percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
+#perc_tab <- as.data.frame(percentiles)  
+#add_perc <- c("25th","Median", "75th")
+#perc_tab <- cbind(add_perc, perc_tab)
+#perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
+#colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Mbps ($)")
 
-datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
-})
+  perc_tab <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+    summarise(n_services = n(),
+              n_circuits = sum(cat.1_allocations_to_district),
+              p25th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.25, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
+              Median = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.50, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
+              p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
+  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th", "Median", "75th")
+  
+  
+  datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
+
+  })
 
 output$helptext_price_cpc <- renderUI({
   HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
@@ -1277,7 +1434,24 @@ district_tooltip <- function(x) {
 }
 
 vis <- reactive({
-
+    if(length(unique(sr_all()$bandwidth_in_mbps)) == 1){
+      
+      starting_pt <- unique(sr_all()$bandwidth_in_mbps) * 2
+      
+      sr_all() %>% 
+        ggvis(x = ~bandwidth_in_mbps, y = ~monthly_cost_per_circuit) %>% 
+        layer_points(size.hover := 200, fill = ~factor(bandwidth_in_mbps),
+                     fillOpacity := 0.4, fillOpacity.hover := 0.75,
+                     key := ~recipient_name) %>% 
+        add_tooltip(district_tooltip, "hover")  %>%
+        add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
+        add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
+        scale_numeric("x", domain = c(0, starting_pt)) %>% 
+        set_options(width = 800, height = 500)
+    }  
+  
+  
+    else{
     sr_all() %>% 
     ggvis(x = ~bandwidth_in_mbps, y = ~monthly_cost_per_circuit) %>% 
     layer_points(size := 100, size.hover := 200, fill = ~factor(bandwidth_in_mbps),
@@ -1287,7 +1461,7 @@ vis <- reactive({
     add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
     set_options(width = 800, height = 500)
-
+    }
   
 })
 
@@ -1381,7 +1555,7 @@ output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
     paste('districts_by_ia_tech_dataset', '_20160517', '.csv', sep = '')},
   content = function(file){
-    write.csv(districts_ia_tech, file)
+    write.csv(districts_ia_tech_data(), file)
   }
 )
 
