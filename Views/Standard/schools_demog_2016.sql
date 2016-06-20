@@ -129,3 +129,13 @@ and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'VT'
+
+/*
+Author: Justine Schott
+Created On Date: 6/20/2016
+Last Modified Date: 
+Name of QAing Analyst(s): Greg Kurzhals
+Purpose: Schools demographics of those in the universe
+Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
+metrics aggregation so school-district association can be created.
+*/

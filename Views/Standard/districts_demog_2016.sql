@@ -143,3 +143,13 @@ and case --only include the HS district when smushing MT districts (exclude the 
               or right(d."NAME",13) = ' K-12 SCHOOLS'
       else true
     end
+
+/*
+Author: Justine Schott
+Created On Date: 6/20/2016
+Last Modified Date: 
+Name of QAing Analyst(s): Greg Kurzhals
+Purpose: Districts demographics of those in the universe
+Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
+metrics aggregation so school-district association can be created.
+*/

@@ -6,7 +6,7 @@ from fy2016.entity_circuits ec
 join fy2016.circuits c
 on ec.circuit_id = c.id
 join district_lookup_2016 dl
-on ec.entity_id = dl.esh_id
+on ec.entity_id::varchar = dl.esh_id
 
 group by  district_esh_id,
           line_item_id
