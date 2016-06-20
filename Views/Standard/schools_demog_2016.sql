@@ -5,27 +5,40 @@
         end as school_esh_id,
         sc131a."LEAID" as nces_cd,
         sc131a."NCESSCH" as school_nces_code,
-        case when sc131a."TYPE" = '1' then 1 end as school_type_1_indicator,
+        sc131a."SCHNAM" as name,
         case
-          when sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
-            else 0
-        end as student_count,
+          when sc131a."CHARTR" = '1' then 'Charter'
+          else 'Traditional'
+        end as school_type,
+        sc131a."LSTREE" as address,
+        sc131a."LCITY" as city,
+        sc131a."LZIP" as zip,
+        sc131a."LSTATE" as postal_cd,
         case
-          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric <= 0 then sc131a."MEMBER"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."MEMBER"::numeric - sc131a."PK"::numeric
             else 0
-        end as student_pk_count
+        end as num_students,
+        case
+          when left(sc131a."ULOCAL",1) = '1' then 'Urban'
+          when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
+          when left(sc131a."ULOCAL",1) = '3' then 'Town'
+          when left(sc131a."ULOCAL",1) = '4' then 'Rural'
+            else 'Unknown'
+        end as locale
+
 from public.sc131a 
 join (select *
       from districts_demog_2016
       where postal_cd not in ('MT', 'VT')) d --only want schools in districts universe
-on ag131a."LEAID" = d.nces_cd
+on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excluded
+and sc131a."TYPE" in ('1','2','3','4')
 
 UNION
 
@@ -36,15 +49,27 @@ select  d.esh_id as district_esh_id,
         end as school_esh_id,
         d.nces_cd,
         sc131a."NCESSCH" as school_nces_code,
-        case when sc131a."TYPE" = '1' then 1 end as school_type_1_indicator,
+        sc131a."SCHNAM" as name,
         case
-          when sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
-            else 0
-        end as student_count,
+          when sc131a."CHARTR" = '1' then 'Charter'
+          else 'Traditional'
+        end as school_type,
+        sc131a."LSTREE" as address,
+        sc131a."LCITY" as city,
+        sc131a."LZIP" as zip,
+        sc131a."LSTATE" as postal_cd,
         case
-          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric <= 0 then sc131a."MEMBER"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."MEMBER"::numeric - sc131a."PK"::numeric
             else 0
-        end as student_pk_count
+        end as num_students,
+        case
+          when left(sc131a."ULOCAL",1) = '1' then 'Urban'
+          when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
+          when left(sc131a."ULOCAL",1) = '3' then 'Town'
+          when left(sc131a."ULOCAL",1) = '4' then 'Rural'
+            else 'Unknown'
+        end as locale
 from public.sc131a 
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
@@ -58,7 +83,8 @@ on sc131a."NCESSCH" = eim.nces_code
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excludeda
+and sc131a."TYPE" in ('1','2','3','4')
+and sc131a."LSTATE" = 'MT'
 
 UNION
 
@@ -69,15 +95,27 @@ select  d.esh_id as district_esh_id,
         end as school_esh_id,
         d.nces_cd,
         sc131a."NCESSCH" as school_nces_code,
-        case when sc131a."TYPE" = '1' then 1 end as school_type_1_indicator,
+        sc131a."SCHNAM" as name,
         case
-          when sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
-            else 0
-        end as student_count,
+          when sc131a."CHARTR" = '1' then 'Charter'
+          else 'Traditional'
+        end as school_type,
+        sc131a."LSTREE" as address,
+        sc131a."LCITY" as city,
+        sc131a."LZIP" as zip,
+        sc131a."LSTATE" as postal_cd,
         case
-          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric <= 0 then sc131a."MEMBER"::numeric
+          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."MEMBER"::numeric - sc131a."PK"::numeric
             else 0
-        end as student_pk_count
+        end as num_students,
+        case
+          when left(sc131a."ULOCAL",1) = '1' then 'Urban'
+          when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
+          when left(sc131a."ULOCAL",1) = '3' then 'Town'
+          when left(sc131a."ULOCAL",1) = '4' then 'Rural'
+            else 'Unknown'
+        end as locale
 from public.sc131a 
 join (select *
       from districts_demog_2016
@@ -89,4 +127,5 @@ on sc131a."NCESSCH" = eim.nces_code
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included; 5's were decidedly excludeda
+and sc131a."TYPE" in ('1','2','3','4')
+and sc131a."LSTATE" = 'VT'
