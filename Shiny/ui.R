@@ -318,9 +318,9 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                         
                                         checkboxGroupInput(inputId = "connection_services", 
                                                         h2("Select Connection Type(s)"),
-                                                        choices = c("Dark Fiber", "Lit Fiber",
+                                                        choices = c("Dark Fiber", "Lit Fiber", "Fixed Wireless",
                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized"),
-                                                        selected = c("Dark Fiber", "Lit Fiber",
+                                                        selected = c("Dark Fiber", "Lit Fiber", "Fixed Wireless",
                                                                      "Cable", "DSL", "Copper", "Other / Uncategorized")),
                                         
                                         checkboxGroupInput(inputId = "district_size_affordability", 

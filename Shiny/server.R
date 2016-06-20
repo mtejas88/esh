@@ -48,12 +48,18 @@ shinyServer(function(input, output, session) {
   size_cuts <- read.csv("size_cuts.csv", as.is = TRUE)
  
   # factorize
+  # services
   services$band_factor <- as.factor(services$band_factor)
   services$postal_cd <- as.factor(services$postal_cd)
-  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
-  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
+  # districts
+  districts$new_connect_type_goals <- factor(districts$new_connect_type_goals, 
+                                             levels = c("Other / Uncategorized", "Cable", "DSL",
+                                                        "Copper", "Fixed Wireless", "Fiber"))
+  # locale and size cuts
+  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
+  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
   
-  # state lookup
+    # state lookup
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
                                             'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
                                             'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
@@ -163,7 +169,7 @@ output$histogram_locale <- renderPlot({
   q <- ggplot(data = data) +
        geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
        scale_fill_manual(labels = c("Rural", "Small Town", "Suburban", "Urban"), 
-                          values = c("#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
+                          values = c("#fce8b2", "#f7cb4d", "#f4b400", "#f09300")) +
        geom_hline(yintercept = 0) +
        theme_classic() + 
        theme(axis.line = element_blank(), 
@@ -182,6 +188,7 @@ output$table_locale <- renderDataTable({
   
   data <- state_subset_locale()
   data$percent <- round(data$percent, 2)
+  data <- arrange(data, postal_cd, locale)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   validate(
@@ -203,8 +210,8 @@ output$histogram_size <- renderPlot({
   
   q <- ggplot(data = data) +
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
-    scale_fill_manual(labels = c("Tiny", "Small", "Medium", "Large", "Mega"), 
-                       values = c("#a1887f", "#f09300", "#f4b400", "#f7cb4d", "#fce8b2")) +
+    scale_fill_manual(labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                      values = c("#fce8b2", "#f7cb4d", "#f4b400", "#f09300", "#a1887f")) +
     geom_hline(yintercept = 0) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
@@ -225,6 +232,7 @@ output$table_size <- renderDataTable({
   
   data <- state_subset_size()
   data$percent <- round(data$percent, 2)
+  data <- arrange(data, postal_cd, district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   validate(
     need(input$state != 'All', "")
@@ -303,13 +311,12 @@ output$helptext_ia_technology <- renderUI({
 
 districts_ia_tech_data <- reactive({
   
-  d_ia_tech_data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-  district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, meeting_2014_goal_no_oversub %in% input$meeting_goals) #%>% 
-  #group_by(new_connect_type_goals) %>%
-  #summarize(n_districts = n()) %>%
-  #mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
-         #n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
-
+  d_ia_tech_data <- district_subset() %>% 
+                    filter(new_connect_type_goals %in% input$connection_districts_goals,
+                           district_size2 %in% input$district_size_goals, 
+                           locale2 %in% input$locale_goals, 
+                           meeting_2014_goal_no_oversub %in% input$meeting_goals) 
+  
   d_ia_tech_data
   
   })
@@ -348,13 +355,16 @@ output$histogram_districts_ia_technology <- renderPlot({
 
 output$table_districts_ia_technology <- renderDataTable({
   
-  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-              district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, 
-              meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
-              group_by(new_connect_type_goals) %>%
-              summarize(n_districts = n()) %>%
-              mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
-              n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2))
+  data <- district_subset() %>% 
+          filter(new_connect_type_goals %in% input$connection_districts_goals,
+                 district_size2 %in% input$district_size_goals, 
+                 locale2 %in% input$locale_goals, 
+                 meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
+          group_by(new_connect_type_goals) %>%
+          summarize(n_districts = n()) %>%
+                  mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
+                  n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2)) %>%
+          arrange(new_connect_type_goals)
   
   colnames(data) <- c("IA Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
   
@@ -495,7 +505,7 @@ output$hypothetical_ia_goal <- renderPlot({
   
   # Goal %
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Ideal Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -503,8 +513,8 @@ output$hypothetical_ia_goal <- renderPlot({
     geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
     geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
     scale_y_continuous(limits = c(0, 110)) +
-    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Ideal Pricing"), 
-                     labels = c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")) +
+    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing"), 
+                     labels = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")) +
     geom_hline(yintercept = 0) +
     theme_classic() + 
     theme(axis.line = element_blank(), 
@@ -537,7 +547,7 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
   
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals", "% Districts Meeting Goals Under Median Meeting 2014 Goals Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals Under Median Meeting 2014 Goals Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -996,7 +1006,7 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$testing, {
   d <- district_subset() %>% filter(name %in% input$testing)
-  d %>% select(name = name, X = longitude, Y = latitude, num_students, hierarchy_connect_category, total_ia_monthly_cost)
+  d %>% select(name = name, X = longitude, Y = latitude, num_students, new_connect_type_goals, total_ia_monthly_cost)
   #dp <- as.data.frame(data_points)
 })  
   
@@ -1004,7 +1014,7 @@ output$testing_leaflet <- renderLeaflet({
   
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
                     "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                    "IA Connection: ", school_districts()$hierarchy_connect_category, "<br>",
+                    "IA Connection: ", school_districts()$new_connect_type_goals, "<br>",
                     "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
   
   
