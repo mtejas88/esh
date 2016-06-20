@@ -1,4 +1,4 @@
- select d.esh_id as district_esh_id,
+select d.esh_id as district_esh_id,
         case
           when eim.entity_id is null then 'Unknown for 2015'
             else eim.entity_id::varchar
