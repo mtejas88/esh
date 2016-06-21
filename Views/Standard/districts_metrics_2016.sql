@@ -4,36 +4,47 @@ select	d.*,
 				upstream_bandwidth,											
 				isp_bandwidth,											
 				case											
-				when	com_info_bandwidth	>	0								
-				then	com_info_bandwidth										
-				when	upstream_bandwidth	=	0								
-				then	isp_bandwidth										
-				when	isp_bandwidth	=	0								
-				then	upstream_bandwidth										
-				when	upstream_bandwidth	>	isp_bandwidth								
-				then	isp_bandwidth										
-				else	upstream_bandwidth										
-				end	+	internet_bandwidth	as	ia_bandwidth_calc,							
+					when	com_info_bandwidth	>	0								
+						then	com_info_bandwidth										
+					when	upstream_bandwidth	=	0								
+						then	isp_bandwidth										
+					when	isp_bandwidth	=	0								
+						then	upstream_bandwidth										
+					when	upstream_bandwidth	>	isp_bandwidth								
+						then	isp_bandwidth										
+					else	upstream_bandwidth										
+				end	+	internet_bandwidth	as	ia_bandwidth,							
 				case
 					when num_students != 0
 						then (case											
-								when	com_info_bandwidth	>	0								
-								then	com_info_bandwidth										
-								when	upstream_bandwidth	=	0								
-								then	isp_bandwidth										
-								when	isp_bandwidth	=	0								
-								then	upstream_bandwidth										
-								when	upstream_bandwidth	>	isp_bandwidth								
-								then	isp_bandwidth										
-								else	upstream_bandwidth										
-								end	+	internet_bandwidth)/num_students*1000
+										when	com_info_bandwidth	>	0								
+											then	com_info_bandwidth										
+										when	upstream_bandwidth	=	0								
+											then	isp_bandwidth										
+										when	isp_bandwidth	=	0								
+											then	upstream_bandwidth										
+										when	upstream_bandwidth	>	isp_bandwidth								
+											then	isp_bandwidth										
+										else	upstream_bandwidth										
+									end	+	internet_bandwidth)/num_students*1000
 				end as ia_bandwidth_per_student,								
 				ia_cost_direct_to_district,											
 				ia_cost_per_student_backbone_pieces,											
-			  	com_info_bandwidth_cost,												
+			  com_info_bandwidth_cost,												
 				internet_bandwidth_cost,											
 				upstream_bandwidth_cost,											
 				isp_bandwidth_cost,											
+				case											
+					when	com_info_bandwidth_cost	>	0								
+						then	com_info_bandwidth_cost										
+					when	upstream_bandwidth_cost	=	0								
+						then	isp_bandwidth_cost										
+					when	isp_bandwidth_cost	=	0								
+						then	upstream_bandwidth_cost										
+					when	upstream_bandwidth_cost	>	isp_bandwidth_cost								
+						then	isp_bandwidth_cost										
+					else	upstream_bandwidth_cost										
+				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,											
 				case											
 				  when (case											
 			          	when	com_info_bandwidth_cost	>	0								
@@ -59,12 +70,16 @@ select	d.*,
                     	then	isp_bandwidth_cost										
                     	else	upstream_bandwidth_cost										
                     end	+	internet_bandwidth_cost)					
-			  end as	ia_cost_per_mbps_calc,
+			  end as	ia_cost_per_mbps,
+			  wan_lines,
+			  fiber_lines,
+			  copper_dsl_lines,
+			  non_fiber_lines,
 				case
 		      when num_campuses < fiber_lines 
 		        then num_campuses 
 		        else fiber_lines 
-		    end as nga_v2_known_scalable_campuses,
+		    end as known_scalable_campuses,
 		    case 
 		      when num_schools > 5 and wan_lines = 0 
 		        then 
@@ -74,7 +89,7 @@ select	d.*,
 		              else 0
 		          end
 		        else 0
-		    end as nga_v2_assumed_scalable_campuses,
+		    end as assumed_scalable_campuses,
 		    case
 		      when copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
 		        then 
@@ -86,7 +101,7 @@ select	d.*,
 		              else copper_dsl_lines
 		          end
 		        else 0
-		    end as nga_v2_known_unscalable_campuses,
+		    end as known_unscalable_campuses,
 		    case 
 		      when num_schools > 5 and wan_lines = 0 
 		        then 0 
@@ -96,7 +111,7 @@ select	d.*,
 		              then 0
 		              else num_campuses - (fiber_lines + copper_dsl_lines)
 		          end
-		    end as nga_v2_assumed_unscalable_campuses,
+		    end as assumed_unscalable_campuses,
 		    case
 		      when num_campuses < fiber_lines
 		        then num_campuses 

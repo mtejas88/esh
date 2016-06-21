@@ -127,7 +127,8 @@ select  district_esh_id,
 									and backbone_conditions_met = false									
 										then	allocation_lines								
 									else	0										
-								end) as non_fiber_lines
+								end) as non_fiber_lines,
+						campus_count
 
 from	lines_to_district_by_line_item_2016	ldli									
 join	fy2016.line_items	li									
@@ -150,9 +151,23 @@ left join (
 													
 		group	by	ldli.line_item_id	
 ) district_info_by_li									
-on	district_info_by_li.line_item_id	=	ldli.line_item_id								
+on	district_info_by_li.line_item_id	=	ldli.line_item_id
+left join (
+		select	district_esh_id,
+						count(case
+										when campus_id is null
+											then address
+										else campus_id
+									end) as campus_count									
+													
+		from schools_demog_2016										
+													
+		group	by	district_esh_id	
+) campus_info									
+on	campus_info.district_esh_id	=	ldli.district_esh_id								
 where broadband = true
-group by	district_esh_id									
+group by	district_esh_id,
+					campus_count
 
 /*
 Author: Justine Schott
