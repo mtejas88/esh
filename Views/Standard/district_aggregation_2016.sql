@@ -128,7 +128,9 @@ select  ldli.district_esh_id,
 										then	allocation_lines								
 									else	0										
 								end) as non_fiber_lines,
-						campus_count
+						campus_count,
+						flag_array,
+						tag_array
 
 from	lines_to_district_by_line_item_2016	ldli									
 join	fy2016.line_items	li									
@@ -152,28 +154,53 @@ left join (
 		group	by	ldli.line_item_id	
 ) district_info_by_li									
 on	district_info_by_li.line_item_id	=	ldli.line_item_id
-left join (
+full outer join (
 		select	district_esh_id,
-						count(case
-										when campus_id is null
-											then address
-										else campus_id
-									end) as campus_count									
+						count(distinct 	case
+															when campus_id is null
+																then address
+															else campus_id
+														end) as campus_count									
 													
 		from schools_demog_2016										
 													
 		group	by	district_esh_id	
 ) campus_info									
-on	campus_info.district_esh_id	=	ldli.district_esh_id								
+on	campus_info.district_esh_id	=	ldli.district_esh_id		
+full outer join (
+		select	flaggable_id,
+						array_agg(distinct label) as flag_array									
+													
+		from fy2016.flags
+		where status = 'open'
+		and flaggable_type = 'District'										
+													
+		group	by	flaggable_id	
+) flag_info									
+on	flag_info.flaggable_id::varchar	=	ldli.district_esh_id	
+full outer join (
+		select	taggable_id,
+						array_agg(distinct label) as tag_array									
+													
+		from fy2016.tags
+		where deleted_at is null
+		and taggable_type = 'District'											
+													
+		group	by	taggable_id	
+) tag_info									
+on	tag_info.taggable_id::varchar	=	ldli.district_esh_id								
 where broadband = true
 group by	ldli.district_esh_id,
-					campus_count
+					campus_count,
+					flag_array,
+					tag_array
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
 Last Modified Date: 
 Name of QAing Analyst(s): 
-Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics)
+Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
+as well as campus and flag/tag aggregation
 Methodology: Utilizing other aggregation tables
 */

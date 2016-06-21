@@ -1,5 +1,7 @@
-select	dd.*,
-				da.*,											
+select	dd.*,	
+				da.campus_count,
+				da.flag_array,
+				da.tag_array,								
 				case											
 					when	com_info_bandwidth	>	0								
 						then	com_info_bandwidth										
@@ -35,7 +37,9 @@ select	dd.*,
 					when	upstream_bandwidth_cost	>	isp_bandwidth_cost								
 						then	isp_bandwidth_cost										
 					else	upstream_bandwidth_cost										
-				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,											
+				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,	
+				ia_cost_direct_to_district	+	
+				    			(ia_cost_per_student_backbone_pieces*num_students) as ia_cost,										
 				case											
 				  when (case											
 			          	when	com_info_bandwidth_cost	>	0								
@@ -135,7 +139,21 @@ select	dd.*,
 		              then 0
 		              else campus_count - (fiber_lines + non_fiber_lines)
 		          end
-		    end as assumed_nonfiber_campuses										
+		    end as assumed_nonfiber_campuses,
+		    da.com_info_bandwidth,
+		    da.internet_bandwidth,
+		    da.upstream_bandwidth,
+		    da.isp_bandwidth,
+		    da.com_info_bandwidth_cost,
+		    da.internet_bandwidth_cost,
+		    da.upstream_bandwidth_cost,
+		    da.isp_bandwidth_cost,
+		    da.ia_cost_direct_to_district,
+		    da.ia_cost_per_student_backbone_pieces,
+		    da.wan_lines,
+		    da.fiber_lines,
+		    da.copper_dsl_lines,
+		    da.non_fiber_lines										
 												
 from	districts_demog_2016		 dd									
 left	join	district_aggregation_2016	da									
