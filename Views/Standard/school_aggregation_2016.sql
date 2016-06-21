@@ -1,4 +1,6 @@
 select 	s.school_esh_id,
+				flag_array,
+				tag_array,
        	count(distinct 	case
 													when	li.connect_category ilike '%fiber%'
 													and li.isp_conditions_met = false								
@@ -23,8 +25,32 @@ join fy2016.line_items li
 on c.line_item_id = li.id
 right join schools_demog_2016 s
 on ec.entity_id::varchar = s.school_esh_id
+full outer join (
+		select	flaggable_id,
+						array_agg(distinct label) as flag_array									
+													
+		from fy2016.flags
+		where status = 'open'
+		and flaggable_type = 'School'										
+													
+		group	by	flaggable_id	
+) flag_info									
+on	flag_info.flaggable_id::varchar	=	s.school_esh_id	
+full outer join (
+		select	taggable_id,
+						array_agg(distinct label) as tag_array									
+													
+		from fy2016.tags
+		where deleted_at is null
+		and taggable_type = 'School'											
+													
+		group	by	taggable_id	
+) tag_info									
+on	tag_info.taggable_id::varchar	=	s.school_esh_id			
 
-group by  s.school_esh_id
+group by  s.school_esh_id,
+					flag_array,
+					tag_array
 
 /*
 Author:                       Justine Schott
