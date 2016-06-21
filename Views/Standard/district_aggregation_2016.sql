@@ -1,4 +1,4 @@
-select  district_esh_id,
+select  ldli.district_esh_id,
 --ia bw/student pieces											
 				sum(case											
 							when	'committed_information_rate'	=	any(open_tag_labels)								
@@ -166,7 +166,7 @@ left join (
 ) campus_info									
 on	campus_info.district_esh_id	=	ldli.district_esh_id								
 where broadband = true
-group by	district_esh_id,
+group by	ldli.district_esh_id,
 					campus_count
 
 /*
