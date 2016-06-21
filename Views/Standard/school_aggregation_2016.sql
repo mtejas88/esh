@@ -48,6 +48,8 @@ full outer join (
 ) tag_info									
 on	tag_info.taggable_id::varchar	=	s.school_esh_id			
 
+where s.school_esh_id is not null
+
 group by  s.school_esh_id,
 					flag_array,
 					tag_array
