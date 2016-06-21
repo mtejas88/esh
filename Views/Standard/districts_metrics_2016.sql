@@ -1,8 +1,5 @@
-select	d.*,											
-				com_info_bandwidth,											
-				internet_bandwidth,											
-				upstream_bandwidth,											
-				isp_bandwidth,											
+select	dd.*,
+				da.*,											
 				case											
 					when	com_info_bandwidth	>	0								
 						then	com_info_bandwidth										
@@ -28,12 +25,6 @@ select	d.*,
 										else	upstream_bandwidth										
 									end	+	internet_bandwidth)/num_students*1000
 				end as ia_bandwidth_per_student,								
-				ia_cost_direct_to_district,											
-				ia_cost_per_student_backbone_pieces,											
-			  com_info_bandwidth_cost,												
-				internet_bandwidth_cost,											
-				upstream_bandwidth_cost,											
-				isp_bandwidth_cost,											
 				case											
 					when	com_info_bandwidth_cost	>	0								
 						then	com_info_bandwidth_cost										
@@ -58,7 +49,7 @@ select	d.*,
 			          	else	upstream_bandwidth_cost										
 			          end	+	internet_bandwidth_cost) > 0									
 				    then  (ia_cost_direct_to_district	+	
-				    			(ia_cost_per_student_backbone_pieces*num_students)/
+				    			(ia_cost_per_student_backbone_pieces*num_students))/
 				    				(case									
                     	when	com_info_bandwidth_cost	>	0								
                     	then	com_info_bandwidth_cost										
@@ -71,21 +62,17 @@ select	d.*,
                     	else	upstream_bandwidth_cost										
                     end	+	internet_bandwidth_cost)					
 			  end as	ia_cost_per_mbps,
-			  wan_lines,
-			  fiber_lines,
-			  copper_dsl_lines,
-			  non_fiber_lines,
 				case
-		      when num_campuses < fiber_lines 
-		        then num_campuses 
+		      when campus_count < fiber_lines 
+		        then campus_count 
 		        else fiber_lines 
 		    end as known_scalable_campuses,
 		    case 
 		      when num_schools > 5 and wan_lines = 0 
 		        then 
 		          case 
-		            when num_campuses > fiber_lines 
-		              then num_campuses - fiber_lines 
+		            when campus_count > fiber_lines 
+		              then campus_count - fiber_lines 
 		              else 0
 		          end
 		        else 0
@@ -94,10 +81,10 @@ select	d.*,
 		      when copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
 		        then 
 		          case
-		            when num_campuses < (fiber_lines )
+		            when campus_count < (fiber_lines )
 		              then 0
-		            when num_campuses - (fiber_lines ) < copper_dsl_lines
-		              then num_campuses - (fiber_lines)
+		            when campus_count - (fiber_lines ) < copper_dsl_lines
+		              then campus_count - (fiber_lines)
 		              else copper_dsl_lines
 		          end
 		        else 0
@@ -107,22 +94,22 @@ select	d.*,
 		        then 0 
 		        else 
 		          case
-		            when num_campuses < (fiber_lines + copper_dsl_lines)
+		            when campus_count < (fiber_lines + copper_dsl_lines)
 		              then 0
-		              else num_campuses - (fiber_lines + copper_dsl_lines)
+		              else campus_count - (fiber_lines + copper_dsl_lines)
 		          end
 		    end as assumed_unscalable_campuses,
 		    case
-		      when num_campuses < fiber_lines
-		        then num_campuses 
+		      when campus_count < fiber_lines
+		        then campus_count 
 		        else fiber_lines
 		    end as known_fiber_campuses,
 		    case 
 		      when num_schools > 5 and wan_lines = 0 
 		        then 
 		          case 
-		            when num_campuses > fiber_lines 
-		              then num_campuses - fiber_lines
+		            when campus_count > fiber_lines 
+		              then campus_count - fiber_lines
 		              else 0
 		          end
 		        else 0
@@ -131,10 +118,10 @@ select	d.*,
 		      when non_fiber_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
 		        then 
 		          case
-		            when num_campuses < fiber_lines
+		            when campus_count < fiber_lines
 		              then 0
-		            when num_campuses - fiber_lines < non_fiber_lines
-		              then num_campuses - fiber_lines 
+		            when campus_count - fiber_lines < non_fiber_lines
+		              then campus_count - fiber_lines 
 		              else non_fiber_lines
 		          end
 		        else 0
@@ -144,15 +131,15 @@ select	d.*,
 		        then 0 
 		        else 
 		          case
-		            when num_campuses < fiber_lines + non_fiber_lines
+		            when campus_count < fiber_lines + non_fiber_lines
 		              then 0
-		              else num_campuses - (fiber_lines + non_fiber_lines)
+		              else campus_count - (fiber_lines + non_fiber_lines)
 		          end
 		    end as assumed_nonfiber_campuses										
 												
-from	districts_demog_2016											
-left	join	district_aggregation_2016										
-on	districts_demog_2016.esh_id	=	district_aggregation_2016.district_esh_id									
+from	districts_demog_2016		 dd									
+left	join	district_aggregation_2016	da									
+on	dd.esh_id	=	da.district_esh_id									
 
 /*
 Author: Justine Schott
