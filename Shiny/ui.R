@@ -321,11 +321,20 @@ titlePanel(div(h1("Warchild"))),
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                     h4(strong("Please select circuit speed(s) in the side panel")), br(),
-                                     h4("Price Dispersion: Monthly Cost per Circuit"), br(), 
-                                     p("test2"), br(), plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(), br(), dataTableOutput("disp_cpc_table"), br(), br(),
-                                     h4("Price Dispersion: Monthly Cost per Mbps"),    br(), br(), plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), #plotOutput("price_disp_cpm_sidebars"),
-                                     h4("Scatterplot: Monthly Cost per Circuit"),      br(), br(), ggvisOutput("plot1"), br(), div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
+                                     h4(strong("Please select the circuit size(s) in the side panel")), br(),
+                                     h4("Distribution of Monthly Cost per Circuit"), br(), 
+                                     p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
+                                       for selected services."), br(), 
+                                     plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpc_table"), br(), br(),
+                                     h4("Distribution of Monthly Cost per Mbps"), br(), 
+                                     p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per mbps
+                                       for selected services."), br(), 
+                                     plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), 
+                                     h4("Scatterplot of Monthly Cost per Circuit"), br(), 
+                                     p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
+                                       at different circuit sizes."), br(), 
+                                     ggvisOutput("plot1"), br(), 
+                                     div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,

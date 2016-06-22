@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
   output$bandwidthSelect <- renderUI({
     sr_data <- services
     bandwidth_list <- c(unique(services$bandwidth_in_mbps))
-    selectizeInput("bandwidth_list", h2("Select Circuit Speed(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
+    selectizeInput("bandwidth_list", h2("Select Circuit Size(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
   sr_all <- reactive({
