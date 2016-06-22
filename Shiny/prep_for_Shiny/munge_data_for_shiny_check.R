@@ -132,8 +132,8 @@ districts$meeting_goals_district <- ifelse(districts$meeting_2014_goal_no_oversu
 # New Variables for mapping #
 districts$exclude <- ifelse(districts$exclude_from_analysis == "FALSE", "Clean", "Dirty")
 districts$meeting_2014_goal_no_oversub <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 
-                                                 "Meeting 2014 Goals",
-                                                 "Not Meeting 2014 Goals")
+                                                 "Meeting Goal",
+                                                 "Not Meeting Goal")
 districts$meeting_2018_goal_oversub <- ifelse(districts$meeting_2018_goal_oversub == "TRUE", 
                                               "Meeting 2018 Goals",
                                               "Not Meeting 2018 Goals")
