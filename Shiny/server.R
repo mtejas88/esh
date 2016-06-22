@@ -1325,7 +1325,7 @@ output$disp_cpc_table <- renderDataTable({
               p25th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
               Median = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
               p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
-  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th", "Median", "75th")
+  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th Percentile", "Median", "75th Percentile")
   
   datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
 
@@ -1414,7 +1414,7 @@ output$disp_cpm_table <- renderDataTable({
               p25th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.25, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
               Median = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.50, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
               p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
-  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th", "Median", "75th")
+  colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th Percentile", "Median", "75th Percentile")
   
   
   datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))

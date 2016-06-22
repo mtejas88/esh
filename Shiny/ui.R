@@ -363,7 +363,7 @@ titlePanel(div(h1("Warchild"))),
                                      
                                      ),#), #end of tabPanel() and div()
                          
-                           tabPanel("District Population Maps", br(),  
+                           tabPanel("Maps", br(),  
                            sidebarLayout(
                                     sidebarPanel(width = 3,
                                     div(id = "map_filters", 
@@ -386,14 +386,14 @@ titlePanel(div(h1("Warchild"))),
                                                          choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                          selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
                                       checkboxGroupInput(inputId = "locale_maps", 
-                                                         label = h2("Select Locale(s)"),
+                                                         label = h2("Select District Locale(s)"),
                                                          choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                          selected = c("Rural", "Small Town", "Suburban", "Urban"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
                                      
-                                     h4("Maps"), plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
+                                     plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
                                      div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
