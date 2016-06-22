@@ -12,7 +12,7 @@ shinyUI(fluidPage(
     tags$style(HTML("
                     @import url('//fonts.googleapis.com/css?family=Roboto+Slab');
                     @import url('//fonts.googleapis.com/css?family=Lato:300');
-                    
+
                     body {
                     background-color: #FFFFFF;
                     font-family: 'Lato', sans-serif;
@@ -51,9 +51,9 @@ shinyUI(fluidPage(
                     
                     h3 {
                     font-family: 'Lato', sans-serif;
-                    font-weight: 300;
+                    font-weight: 600;
                     line-height: 1.1;
-                    font-size: 8pt;
+                    font-size: 12pt;
                     color: #899DA4;
                     
                     }
@@ -67,21 +67,6 @@ shinyUI(fluidPage(
                     display: inline-block;
                     margin-top: 0px;
 
-                    }
-                    
-                    shiny-plot-output {
-                    background-color: #00EFD1;
-                    }
-                    
-                    .test {
-                    font-family: 'Roboto Slab', serif;
-                    font-weight: 100;
-                    line-height: 1.1;
-                    font-size: 18pt;
-                    margin-left: 150px;
-                    text-align: left;
-                    color: #899DA4;
-                    white-space: pre
                     }
                     
                     .well {
@@ -108,29 +93,88 @@ shinyUI(fluidPage(
                     margin-left: 10px;
                     }
 
-                    leaflet {
-                    height: 100%; 
-                    width: 100%;
+                    input[type=number] {
+                     max-width: 80%;
                     }
-
 
                     div.outer {
                     position: fixed;
-                    top: 41px;
+                    top: 125px;
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    overflow: hidden;
-                    padding: 25px;
+
                     }
+                    
+                    div.manualmainpanel{
+                    position: auto;
+                    top: 90px;
+
+                    }
+                    
+                    div.horizontalformatting1{
+                    float: right;
+                    right:  0;
+                    bottom: 0;
+
+                    }
+
+                    div.horizontalformatting2{
+                    float: right;
+                    right: 0;
+                    bottom:0;
+  
+                    }
+                    
+                    #controls {
+                    /* Fade out while not hovering */
+                    margin: auto;
+                    padding: 20px;
+                    opacity: 0.65;
+                    zoom: 0.9;
+                    transition: opacity 500ms 1s;
+                    }
+                    
+                    #controls:hover {
+                    /* Fade in while hovering */
+                    opacity: 0.95;
+                    transition-delay: 0;
+                    }
+
+
                     "))
     ),
 
   
-  titlePanel(div(h1("SHINY for EducationSuperHighway"))),
-    
-    mainPanel(width = 12,
-      #navbarPage("",
+  
+  div(class = 'horizontalformatting2', #style = 'display:inline-block',  #; horizontal-align: text-top;' 
+      selectInput("dataset",
+                  h2("Select Data Cleanliness"),
+                  choices = c('All', 'Clean'), selected = 'All', width='200px')), 
+
+#end selectInput() and div()
+div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-align: text-top;',           
+    selectInput("state", h2("Select State"),
+                choices = c('All', 'AL','AR','AZ',
+                            'CA','CO','CT',
+                            'DE','FL','GA', 'IA',
+                            'ID','IL','IN','KS',
+                            'KY','LA','MA','MD',
+                            'ME','MI','MN','MO',
+                            'MS','MT','NC','ND',
+                            'NE','NH','NJ','NM',
+                            'NV','NY','OH','OK',
+                            'OR','PA','RI','SC',
+                            'SD','TN','TX','UT','VA',
+                            'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()
+  
+  
+titlePanel(div(h1("SHINY for EducationSuperHighway"))),
+
+   #mainPanel(width = 12,
+      ##navbarPage("",
+  
+  div(class = "manualmainpanel",
                 tabsetPanel(
                   id="panels",
                  
@@ -138,40 +182,29 @@ shinyUI(fluidPage(
                           
                           fluidRow(
                             column(12,
-                            wellPanel(#width = 2,
-                                    selectInput("state", 
-                                                h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
-                                                    "Select State"), 
-                                                choices = c('All', 'AL','AR','AZ',
-                                                            'CA','CO','CT',
-                                                            'DE','FL','GA', 'IA',
-                                                            'ID','IL','IN','KS',
-                                                            'KY','LA','MA','MD',
-                                                            'ME','MI','MN','MO',
-                                                            'MS','MT','NC','ND',
-                                                            'NE','NH','NJ','NM',
-                                                            'NV','NY','OH','OK',
-                                                            'OR','PA','RI','SC',
-                                                            'SD','TN','TX','UT','VA',
-                                                            'WA','WI','WV','WY'), selected='All'),
-                                    selectInput("dataset",
-                                                h2("Select Data Cleanliness"),
-                                                choices = c('All', 'Clean'), selected = 'All')#,
-                                    
-                                    #checkboxInput("district_size2", "Select District Size"),
-                                    #conditionalPanel(condition = "input.district_size2 == true",
-                                    #                 checkboxGroupInput(inputId = "district_size", 
-                                    #                                    label = h2("Select District Size(s)"),
-                                    #                                    choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                                    #                                    selected = c("Tiny", "Small", "Medium", "Large", "Mega"))),
-                                    
-                                    #checkboxInput("district_locale", "Select District Locale"),
-                                    #conditionalPanel(condition = "input.district_locale == true",
-                                    #                 checkboxGroupInput(inputId = "locale", 
-                                    #                                    label = h2("Select Locale(s)"),
-                                    #                                    choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                                    #                                    selected = c("Rural", "Small Town", "Suburban", "Urban")))#
-                                    ) # Close WellPanel
+                            #wellPanel(#width = 2,
+                              h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness."), br(),br()
+                       
+                                  #  selectInput("state", 
+                                  #              h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
+                                  #                  "Select State"), 
+                                  #              choices = c('All', 'AL','AR','AZ',
+                                  #                          'CA','CO','CT',
+                                  #                          'DE','FL','GA', 'IA',
+                                  #                          'ID','IL','IN','KS',
+                                  #                          'KY','LA','MA','MD',
+                                  #                          'ME','MI','MN','MO',
+                                  #                          'MS','MT','NC','ND',
+                                  #                          'NE','NH','NJ','NM',
+                                  #                          'NV','NY','OH','OK',
+                                  #                          'OR','PA','RI','SC',
+                                  #                          'SD','TN','TX','UT','VA',
+                                  #                          'WA','WI','WV','WY'), selected='All'),
+                                  #  selectInput("dataset",
+                                  #              h2("Select Data Cleanliness"),
+                                  #              choices = c('All', 'Clean'), selected = 'All')#,
+
+                                    #) # Close WellPanel
                             ), # close colunmn
                           column(12,
                                  includeHTML("include.html")
@@ -227,7 +260,7 @@ shinyUI(fluidPage(
                                                                                    selected = c("Meeting 2014 Goals", "Not Meeting 2014 Goals"))), br(),
                                                downloadButton('ia_tech_downloadData', 'Download'), br(),
                                                
-                                               plotOutput("histogram_districts_ia_technology"), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
+                                               plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
                                      h4("Current WAN Goal Percentage vs. Projected WAN Needs"), br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
                                      h4("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps"), br(),
                                      fluidRow(
@@ -285,9 +318,9 @@ shinyUI(fluidPage(
                                         
                                         checkboxGroupInput(inputId = "connection_services", 
                                                         h2("Select Connection Type(s)"),
-                                                        choices = c("Dark Fiber", "Lit Fiber",
+                                                        choices = c("Dark Fiber", "Lit Fiber", "Fixed Wireless",
                                                                     "Cable", "DSL", "Copper", "Other / Uncategorized"),
-                                                        selected = c("Dark Fiber", "Lit Fiber",
+                                                        selected = c("Dark Fiber", "Lit Fiber", "Fixed Wireless",
                                                                      "Cable", "DSL", "Copper", "Other / Uncategorized")),
                                         
                                         checkboxGroupInput(inputId = "district_size_affordability", 
@@ -307,9 +340,10 @@ shinyUI(fluidPage(
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                     h4("Price Dispersion: Monthly Cost per Circuit"), br(), br(), ggvisOutput("price_disp_cpc"), br(), br(), textOutput("n_sr"), br(), textOutput("n_circuits"), br(), dataTableOutput("disp_cpc_table"), br(), br(),
-                                     h4("Price Dispersion: Monthly Cost per Mbps"), br(), br(), ggvisOutput("price_disp_cpm"), br(), dataTableOutput("disp_cpm_table"), br(), br(),
-                                     h4("Scatterplot: Monthly Cost per Circuit"), br(), br(), ggvisOutput("plot1"), br(), div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
+                                                                                                #ggvisOutput("price_disp_cpc")                  
+                                     h4("Price Dispersion: Monthly Cost per Circuit"), br(), br(), plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(), br(), dataTableOutput("disp_cpc_table"), br(), br(),
+                                     h4("Price Dispersion: Monthly Cost per Mbps"),    br(), br(), plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), #plotOutput("price_disp_cpm_sidebars"),
+                                     h4("Scatterplot: Monthly Cost per Circuit"),      br(), br(), ggvisOutput("plot1"), br(), div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
@@ -322,15 +356,15 @@ shinyUI(fluidPage(
                  navbarMenu("Maps", 
                            # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
                             tabPanel("District Lookup", #htmlOutput("helptext_leaflet_map"), br(), br(),
-                                    # tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
                                     
                                    # div(class = "outer",
                                     
-                                     leafletOutput("testing_leaflet"), 
+                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
                                      br(),
                                      #verbatimTextOutput("selected"),
                                      absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                 draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                                 draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
                                                  width = 330, height = "auto",
                                                  
                                                  uiOutput("districtSelect"))#,
@@ -382,12 +416,7 @@ shinyUI(fluidPage(
                                      #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
                                      )))
                            
-                                    #tabPanel("District Meeting Goals Maps",
-                                     #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
-                                     #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4"))),
-                                     
-                                      #tabPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))#,
-                            #tabPanel("Price Dispersion: Automatic, in development", plotOutput("map_price_dispersion_automatic"))), #closing navbarMenu
+
                  
                 # tabPanel("View Underlying Data", p(), 
                 #            fluidPage(
@@ -399,8 +428,12 @@ shinyUI(fluidPage(
                 #                                                        "line_items_table")),
                 #                  downloadButton('downloadData', 'Download'))), h3(tableOutput("table")))
                  
-                ) #closing tabsetPanel()
-      #) #closing navbarPage
-    ) #closing mainPanel"
-  #) #closing sidebarLayout
-    )) #closing shinyUI and fluidPage
+                )) #closing tabsetPanel() and div()
+
+  
+  
+
+
+
+  
+  )) #closing fluidPage() and shinyUI()
