@@ -638,9 +638,21 @@ criteria as (
           ia_service_providers.*,
           wan_service_providers.*,
           district_line_items.applicants,
-          district_ia_prices_pct_max.pct_dists_same_cost_more_bw
+          district_ia_prices_pct_max.pct_dists_same_cost_more_bw, 
+          "NAME", 
+          "PHONE", 
+          "MSTREE", 
+          "MCITY", 
+          "MSTATE", 
+          "MZIP", 
+          "LSTREE", 
+          "LCITY", 
+          "LSTATE", 
+          "LZIP"
 
   from districts_charters dc
+  left join ag121a
+  on dc.district_nces = ag121a.nces_cd
 
   left join district_line_items
   on dc.esh_id=district_line_items.esh_id
@@ -747,7 +759,17 @@ before_prior as (
             when pct_dists_same_cost_more_bw = 0
               then 'false'
             else 'true'
-          end as similar_priced_service_for_more_bw
+          end as similar_priced_service_for_more_bw, 
+          "NAME", 
+          "PHONE", 
+          "MSTREE", 
+          "MCITY", 
+          "MSTATE", 
+          "MZIP", 
+          "LSTREE", 
+          "LCITY", 
+          "LSTATE", 
+          "LZIP"
 
 
   from criteria
@@ -769,17 +791,9 @@ before_status as (
       when "Zero E-rated services"='Yes'
       or NOT(clean_status='clean')  
           then 'Priority 7'
---P10 became the catch all for any districts that would have previously been defined as a different priority but
---would have otherwise fallen off, since we didn't want to lose any "potential targets"          
-      when clean_status='clean' and (NOT(how_cleaned='verified') or ("No WAN information"='Yes' 
-                                                                      and num_all_schools>3 )
-                                                                  or ( "low_bandwidth_fiber_IA"='Yes' 
-                                                                        or "low_bandwidth_fiber_WAN"='Yes')
-                                                                  or ( "low_bandwidth_fiber_IA"='Yes' 
-                                                                        or "low_bandwidth_fiber_WAN"='Yes'))
-          then 'Priority 10'
+--P10 has been updated to be the prioritization for all remaining clean line items         
       else
-          null
+          'Priority 10'
     end as priority_status__c_f,
     case
       when goal_status = 'Meeting'
@@ -906,7 +920,17 @@ select  esh_id__c,
             'DQT Review Needed' 
         end as "StageName_A",
         null as ownerid,
-        null as batch__c
+        null as batch__c, 
+        "NAME", 
+        "PHONE", 
+        "MSTREE", 
+        "MCITY", 
+        "MSTATE", 
+        "MZIP", 
+        "LSTREE", 
+        "LCITY", 
+        "LSTATE", 
+        "LZIP"
 
         
 from before_status
