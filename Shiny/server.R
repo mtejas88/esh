@@ -76,10 +76,9 @@ shinyServer(function(input, output, session) {
 
   ##Main data set to use to any Services Recieved related work: 
   output$bandwidthSelect <- renderUI({
-    #sr_data <- sr_all()
     sr_data <- services
-    bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
-    selectizeInput("bandwidth_list", h2("Input Bandwidth Circuit Speed(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
+    bandwidth_list <- c(unique(services$bandwidth_in_mbps))
+    selectizeInput("bandwidth_list", h2("Select Circuit Speed(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
   sr_all <- reactive({
@@ -144,10 +143,6 @@ district_subset <- reactive({
     districts %>% 
       filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) #%>% 
-      #filter(#new_connect_type %in% input$connection_districts, 
-             #district_size %in% input$district_size,
-             #locale %in% input$locale,
-            # meeting_2014_goal_no_oversub %in% input$meeting_goals)
              
   })
 
@@ -281,11 +276,6 @@ output$histogram_goals <- renderPlot({
 ## Table of numbers in districts / students meeting goals
 
 # Help text for Histogram on Meeting Goals
-output$helptext_goals <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that the filters are
-set to ", "<b>", "clean", "</b>", "data, relevant", "<b>", "state", "</b>", ",and", "<b>", 
-              "inclusive", "</b>", "of all connection types, locales, and district sizes."))
-})
 
 output$table_goals <- renderDataTable({
   
@@ -315,7 +305,7 @@ districts_ia_tech_data <- reactive({
                     filter(new_connect_type_goals %in% input$connection_districts_goals,
                            district_size2 %in% input$district_size_goals, 
                            locale2 %in% input$locale_goals, 
-                           meeting_2014_goal_no_oversub %in% input$meeting_goals) 
+                           meeting_2014_goal_no_oversub %in% input$meeting_goal) 
   
   d_ia_tech_data
   
@@ -324,7 +314,7 @@ districts_ia_tech_data <- reactive({
 output$histogram_districts_ia_technology <- renderPlot({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-            district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
+            district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals, meeting_2014_goal_no_oversub %in% input$meeting_goal) %>% 
             group_by(new_connect_type_goals) %>%
             summarize(n_districts = n()) %>%
             mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
@@ -359,14 +349,14 @@ output$table_districts_ia_technology <- renderDataTable({
           filter(new_connect_type_goals %in% input$connection_districts_goals,
                  district_size2 %in% input$district_size_goals, 
                  locale2 %in% input$locale_goals, 
-                 meeting_2014_goal_no_oversub %in% input$meeting_goals) %>% 
+                 meeting_2014_goal_no_oversub %in% input$meeting_goal) %>% 
           group_by(new_connect_type_goals) %>%
           summarize(n_districts = n()) %>%
                   mutate(n_all_districts_in_goal_meeting_status = sum(n_districts),
                   n_percent_districts = round(100 * n_districts / n_all_districts_in_goal_meeting_status, 2)) %>%
           arrange(new_connect_type_goals)
   
-  colnames(data) <- c("IA Connect Category", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
+  colnames(data) <- c("Highest IA Technology", "# of Districts", "# of Districts in Goal Meeting Status", "% of Districts")
   
   validate(need(nrow(data) > 0, ""))  
   datatable(format(data, big.mark = ",", scientific = FALSE), caption = 'Use the Search bar for the data table below.', 
@@ -428,7 +418,9 @@ output$table_projected_wan_needs <- renderDataTable({
                     n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
                     n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
                     percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
-  colnames(data) <- c("# of >=1G WAN circuits", "# of <1G WAN circuits", "current WAN goals %", "# of schools w/ projected WAN need", "# of schools in WAN need calculation", "% of schools w/ projected WAN need")
+  colnames(data) <- c("# of >=1G WAN Circuits", "# of <1G WAN Circuits", "% Schools Currently Meeting WAN Goal", 
+                      "# of Schools that Need >=1G WAN", "# of Schools in Projected WAN Needs Calculation", 
+                      "% of Schools that Need >=1G WAN")
   #print(names(data))
   
   validate(need(nrow(data) > 0, ""))
@@ -462,7 +454,7 @@ output$hypothetical_ia_price  <- renderPlot({
          geom_bar(aes(x = variable, y = value, fill = variable),  width = .5, stat = "identity") +
          geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
-         scale_x_discrete(limits = c("Not Meeting 2014 Goals", "Meeting 2014 Goals")) +
+         scale_x_discrete(limits = c("Not Meeting Goal", "Meeting Goal")) +
          scale_fill_manual(values = c("#fdb913", "grey")) + 
          geom_hline(yintercept = 0) +
          theme_classic() + 
@@ -491,9 +483,9 @@ output$hypothetical_ia_goal <- renderPlot({
   
   current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
   
-  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
+  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting Goal", ]$median_monthly_ia_cost_per_mbps
   
-  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting Goal")
   
   data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
   
@@ -536,8 +528,8 @@ output$table_hypothetical_ia_goal <- renderDataTable({
               median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
   
   current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
-  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting 2014 Goals", ]$median_monthly_ia_cost_per_mbps
-  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals")
+  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting Goal", ]$median_monthly_ia_cost_per_mbps
+  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting Goal")
   data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
   
   # for districts not meeting goals, replace their current bw with the hypothetical number
@@ -556,8 +548,8 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   plot_data$label <- paste0("$", plot_data$value)
   
   table_data <- as.data.frame(rbind(plot_data, plot_data1))
-  table_data[which(table_data$variable == "Meeting 2014 Goals"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
-  table_data[which(table_data$variable == "Not Meeting 2014 Goals"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
+  table_data[which(table_data$variable == "Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
+  table_data[which(table_data$variable == "Not Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
   table_data$value <- NULL
   datatable(table_data, options = list(paging = FALSE, searching = FALSE))
   
