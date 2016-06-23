@@ -74,15 +74,15 @@ shinyUI(fluidPage(
                     }
                     
                     .irs-bar {
-                    background-color: #F26B23;
+                    background-color: #FFFCF5;
                     }
                     
                     .irs-from {
-                    background-color: #F26B23;
+                    background-color: #FFFCF5;
                     }
                     
                     .irs-to {
-                    background-color: #F26B23;
+                    background-color: #FFFCF5;
                     }
                     
                     a {
@@ -420,8 +420,11 @@ titlePanel(div(h1("Warchild"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
-                                     htmlOutput("text_maps"), br(),
-                                     plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
+                                     fluidRow(
+                                       column(12, align = "left",  htmlOutput("text_maps")), br(),
+                                       column(12, align = "center", plotOutput("map_population")),
+                                       column(12, align = "left", textOutput("n_ddt"))
+                                     ), br(), br(),
                                      div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),

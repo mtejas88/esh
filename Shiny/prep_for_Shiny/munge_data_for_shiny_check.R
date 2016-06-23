@@ -248,11 +248,11 @@ locale_cuts <- arrange(locale_cuts, postal_cd, locale)
 # by districts
 size_cuts <- data %>%
                   group_by(postal_cd, district_size) %>%
-                  summarize(n_locale = n())
+                  summarize(n_size = n())
 
 size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
-size_cuts$percent <- 100 * size_cuts$n_locale / size_cuts$n
+size_cuts$percent <- 100 * size_cuts$n_size / size_cuts$n
 
 size_cuts$district_size <- factor(size_cuts$district_size, c("Tiny", "Small", "Medium", "Large", "Mega"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)
