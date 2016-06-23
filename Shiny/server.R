@@ -163,11 +163,14 @@ output$histogram_locale <- renderPlot({
   
   q <- ggplot(data = data) +
        geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
-       scale_fill_manual(labels = c("Rural", "Small Town", "Suburban", "Urban"), 
-                          values = c("#fce8b2", "#f7cb4d", "#f4b400", "#f09300")) +
+       scale_fill_manual(name = "",
+                         labels = c("Rural", "Small Town", "Suburban", "Urban"), 
+                          values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
        geom_hline(yintercept = 0) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
+       theme(plot.background = element_rect(fill = "#fffcf5"),
+             panel.background = element_rect(fill = "#fffcf5"),
+             legend.background = element_rect(fill = "#fffcf5"),
+             axis.line = element_blank(), 
              axis.line.x = element_blank(),
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
@@ -205,11 +208,14 @@ output$histogram_size <- renderPlot({
   
   q <- ggplot(data = data) +
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
-    scale_fill_manual(labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                      values = c("#fce8b2", "#f7cb4d", "#f4b400", "#f09300", "#a1887f")) +
+    scale_fill_manual(name = "",
+                      labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                      values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
     geom_hline(yintercept = 0) +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
+    theme(plot.background = element_rect(fill = "#fffcf5"),
+          panel.background = element_rect(fill = "#fffcf5"),
+          legend.background = element_rect(fill = "#fffcf5"),
+          axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
@@ -261,13 +267,15 @@ output$histogram_goals <- renderPlot({
                      labels=c("Districts", "Students")) +
          scale_y_continuous(limits = c(0, 110)) +
          geom_hline(yintercept = 0) +
-         theme_classic() + 
-         theme(axis.line = element_blank(), 
-                axis.text.x=element_text(size=14, colour= "#899DA4"), 
-                axis.text.y = element_blank(),
-                axis.ticks = element_blank(),
-                axis.title.x=element_blank(),
-                axis.title.y=element_blank()) 
+         theme(plot.background = element_rect(fill = "#fffcf5"),
+               panel.background = element_rect(fill = "#fffcf5"),
+               legend.background = element_rect(fill = "#fffcf5"),
+               axis.line = element_blank(), 
+               axis.text.x=element_text(size=14, colour= "#899DA4"), 
+               axis.text.y = element_blank(),
+               axis.ticks = element_blank(),
+               axis.title.x=element_blank(),
+               axis.title.y=element_blank()) 
       
   print(q)
   
@@ -329,8 +337,10 @@ output$histogram_districts_ia_technology <- renderPlot({
        scale_y_continuous(limits = c(0, 110)) +
        scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        geom_hline(yintercept = 0) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
+       theme(plot.background = element_rect(fill = "#fffcf5"),
+             panel.background = element_rect(fill = "#fffcf5"),
+             legend.background = element_rect(fill = "#fffcf5"),
+             axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
@@ -364,7 +374,7 @@ output$table_districts_ia_technology <- renderDataTable({
   
 })
 
-## WAN Goals: Current vs. Projected Needs
+## WAN Goals: Current vs.  Needs
 output$histogram_projected_wan_needs <- renderPlot({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
@@ -393,10 +403,12 @@ output$histogram_projected_wan_needs <- renderPlot({
         scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
                      labels=c("Schools with >= 1G WAN", "Schools w/ Projected Need of >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
-        scale_fill_manual(values = c("#fdb913", "grey")) + 
+        scale_fill_manual(values = c("#fdb913", "#899DA4")) + 
         geom_hline(yintercept = 0) +
-        theme_classic() + 
-        theme(axis.line = element_blank(), 
+        theme(plot.background = element_rect(fill = "#fffcf5"),
+              panel.background = element_rect(fill = "#fffcf5"),
+              legend.background = element_rect(fill = "#fffcf5"),
+              axis.line = element_blank(), 
               axis.text.x=element_text(size=14, colour= "#899DA4"), 
               axis.text.y = element_blank(),
               axis.ticks = element_blank(),
@@ -413,12 +425,12 @@ output$table_projected_wan_needs <- renderDataTable({
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
                    district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
           summarize(n_circuits_1g_wan = sum(gt_1g_wan_lines, na.rm = TRUE),
-                    n_circuits_lt_1g = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE),
-                    percent_current_wan_goals = round(100 * n_circuits_1g_wan / (n_circuits_1g_wan + n_circuits_lt_1g), 2),
+                    n_circuits_all_wan = sum(lt_1g_fiber_wan_lines + lt_1g_nonfiber_wan_lines, na.rm = TRUE) + n_circuits_1g_wan,
+                    percent_current_wan_goals = round(100 * n_circuits_1g_wan / n_circuits_all_wan, 2),
                     n_schools_with_proj_wan_needs = sum(n_schools_wan_needs, na.rm = TRUE),
                     n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
                     percent_schools_with_proj_wan_needs = round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2))
-  colnames(data) <- c("# of >=1G WAN Circuits", "# of <1G WAN Circuits", "% Schools Currently Meeting WAN Goal", 
+  colnames(data) <- c("# of >=1G WAN Circuits", "# of All WAN Circuits", "% Schools Currently Meeting WAN Goal", 
                       "# of Schools that Need >=1G WAN", "# of Schools in Projected WAN Needs Calculation", 
                       "% of Schools that Need >=1G WAN")
   #print(names(data))
@@ -451,21 +463,21 @@ output$hypothetical_ia_price  <- renderPlot({
   #plot_data <- rbind(plot_data2, plot_data1)
   
   q <- ggplot(data = plot_data) +
-         geom_bar(aes(x = variable, y = value, fill = variable),  width = .5, stat = "identity") +
+         geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
          geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
          scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
          scale_x_discrete(limits = c("Not Meeting Goal", "Meeting Goal")) +
-         scale_fill_manual(values = c("#fdb913", "grey")) + 
          geom_hline(yintercept = 0) +
-         theme_classic() + 
-         theme(legend.position = "none",
-           axis.line = element_blank(), 
-            axis.text.x = element_text(size=14, colour= "#899DA4"), 
-            axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
-
+         theme(plot.background = element_rect(fill = "#fffcf5"),
+               panel.background = element_rect(fill = "#fffcf5"),
+               legend.background = element_rect(fill = "#fffcf5"),
+               legend.position = "none",
+               axis.line = element_blank(), 
+               axis.text.x = element_text(size=14, colour= "#899DA4"), 
+               axis.text.y = element_blank(),
+               axis.ticks = element_blank(),
+               axis.title.x=element_blank(),
+               axis.title.y=element_blank()) 
   print(q)
 })
 
@@ -473,7 +485,6 @@ output$hypothetical_ia_goal <- renderPlot({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
                                        district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
-  
   validate(need(nrow(data) > 0, ""))
   
   cost_data <- data %>%
@@ -497,7 +508,7 @@ output$hypothetical_ia_goal <- renderPlot({
   
   # Goal %
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -505,11 +516,13 @@ output$hypothetical_ia_goal <- renderPlot({
     geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
     geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
     scale_y_continuous(limits = c(0, 110)) +
-    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing"), 
-                     labels = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nUnder Median Meeting 2014 Goals Pricing")) +
+    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing"), 
+                     labels = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing")) +
     geom_hline(yintercept = 0) +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
+    theme(plot.background = element_rect(fill = "#fffcf5"),
+          panel.background = element_rect(fill = "#fffcf5"),
+          legend.background = element_rect(fill = "#fffcf5"),
+          axis.line = element_blank(), 
           axis.text.x = element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
@@ -539,7 +552,7 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
   
   plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals Under Median Meeting 2014 Goals Pricing")
+  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals at Median Meeting 2014 Goals Pricing")
   plot_data1 <- melt(plot_data1)
   plot_data1$label <- paste0(plot_data1$value, "%")
   
@@ -551,6 +564,7 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   table_data[which(table_data$variable == "Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
   table_data[which(table_data$variable == "Not Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
   table_data$value <- NULL
+  names(table_data) <- c("Data Point", "Value")
   datatable(table_data, options = list(paging = FALSE, searching = FALSE))
   
 })
@@ -587,20 +601,21 @@ output$histogram_schools_on_fiber <- renderPlot({
   
   q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades")), ],
               aes(x = variable, y = value)) +
-       geom_bar(fill="#009291", stat = "identity", width = .5) +
+       geom_bar(fill="#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
        scale_x_discrete(breaks=c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades"),
                      labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
        scale_y_continuous(limits = c(0, 110)) +
        geom_hline(yintercept = 0) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
-            axis.text.x=element_text(size=14, colour= "#899DA4"), 
-            axis.text.y = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x=element_blank(),
-            axis.title.y=element_blank()) 
-    
+       theme(plot.background = element_rect(fill = "#fffcf5"),
+             panel.background = element_rect(fill = "#fffcf5"),
+             legend.background = element_rect(fill = "#fffcf5"),
+             axis.line = element_blank(), 
+             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.y = element_blank(),
+             axis.ticks = element_blank(),
+             axis.title.x=element_blank(),
+             axis.title.y=element_blank()) 
   print(q)
   
 })
@@ -608,19 +623,23 @@ output$histogram_schools_on_fiber <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_schools_on_fiber <- renderDataTable({
   
-  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
-                                           locale3 %in% input$locale_fiber) %>% 
-    
-      summarize(num_all_schools = sum(num_schools),
-                num_schools_on_fiber = sum(schools_on_fiber),
-                num_schools_may_need_upgrades = sum(schools_may_need_upgrades),
-                num_schools_need_upgrades = sum(schools_need_upgrades),
-                percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
-                percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
-                percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2))
-    
-  colnames(data) <- c("# of Schools", "# of Schools on Fiber", "# of Schools That May Need Upgrades", 
-                      "# of Schools That Need Upgrades", "% of Schools on Fiber", "% of Schools That May Need Upgrades", "% of Schools That Need Upgrades")
+  data <- district_subset() %>% 
+          filter(district_size3 %in% input$district_size_fiber,
+                 locale3 %in% input$locale_fiber) %>% 
+           summarize(num_schools_on_fiber = round(sum(schools_on_fiber), 0),
+                     num_schools_may_need_upgrades = round(sum(schools_may_need_upgrades), 0),
+                     num_schools_need_upgrades = round(sum(schools_need_upgrades), 0),
+                     num_all_schools = sum(num_schools_on_fiber, num_schools_may_need_upgrades, num_schools_need_upgrades),
+                     percent_on_fiber = round(100 * num_schools_on_fiber / num_all_schools, 2),
+                     percent_may_need_upgrades = round(100 * num_schools_may_need_upgrades / num_all_schools, 2),
+                     percent_need_upgrades = round(100 * num_schools_need_upgrades / num_all_schools, 2)
+                     ) %>%
+          select(percent_on_fiber, percent_may_need_upgrades, percent_need_upgrades,
+                 num_all_schools, num_schools_on_fiber, num_schools_may_need_upgrades, num_schools_need_upgrades)
+        
+  colnames(data) <- c("% of Schools on Fiber", "% of Schools That May Need Upgrades", "% of Schools That Need Upgrades",
+                      "# of Schools", "# of Schools on Fiber", "# of Schools That May Need Upgrades", 
+                      "# of Schools That Need Upgrades")
         
   validate(need(nrow(data) > 0, ""))  
   
@@ -652,17 +671,19 @@ output$histogram_by_erate_discounts <- renderPlot({
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
 
   q <- ggplot(data = data, aes(x = as.factor(c1_discount_rate), y = percent_unscalable_schools_in_rate_band)) +
-       geom_bar(fill="#009291", stat = "identity", width = .5) +
+       geom_bar(fill="#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
        geom_hline(yintercept = 0) +
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
+       theme(plot.background = element_rect(fill = "#fffcf5"),
+             panel.background = element_rect(fill = "#fffcf5"),
+             legend.background = element_rect(fill = "#fffcf5"),
+             axis.line = element_blank(), 
+             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.y = element_blank(),
+             axis.ticks = element_blank(),
+             axis.title.x=element_blank(),
+             axis.title.y=element_blank()) 
   
   print(q)
   
@@ -1075,8 +1096,10 @@ output$map_population <- renderPlot({
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
     #ggmap(hdf) +
     geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
+    theme(plot.background = element_rect(fill = "#fffcf5"),
+          panel.background = element_rect(fill = "#fffcf5"),
+          legend.background = element_rect(fill = "#fffcf5"),
+          line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
           legend.text = element_text(size=16), legend.position= "bottom") +
     guides(shape=guide_legend(override.aes=list(size=7))) 
@@ -1084,12 +1107,13 @@ output$map_population <- renderPlot({
   q <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
                                alpha = 0.7, size = 4)
+      
   
     
   qq <- q + coord_map()
   
   r <- state_base + 
-    geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
+       geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
                alpha = 0.7, size = 4) + scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#0073B6", "#CCCCCC"))
   rr <- r + coord_map()
   
@@ -1101,9 +1125,13 @@ output$map_population <- renderPlot({
   ss <- s + coord_map()
   
   t <- state_base + 
-    geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
-               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
-                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#CCCCCC", "#CB2027")) #+
+       geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
+                 alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
+                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#CCCCCC", "#CB2027")) +
+      theme(plot.background = element_rect(fill = "#fffcf5"),
+            panel.background = element_rect(fill = "#fffcf5"),
+            legend.background = element_rect(fill = "#fffcf5")
+      )
   
   tt <- t + coord_map()
   
@@ -1277,10 +1305,12 @@ output$cpc_sidebars <- renderPlot({
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                         labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(palette = "Blues", direction = -1) +
+    scale_fill_brewer(palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
+    theme(plot.background = element_rect(fill = "#fffcf5"),
+          panel.background = element_rect(fill = "#fffcf5"),
+          legend.background = element_rect(fill = "#fffcf5"),
+          axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
@@ -1382,10 +1412,12 @@ output$price_disp_cpm_sidebars <- renderPlot({
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                      labels=c("Median", "25th", "75th")) +
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(palette = "BuGN", direction = -1) +
+    scale_fill_brewer(palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
-    theme_classic() + 
-    theme(axis.line = element_blank(), 
+    theme(plot.background = element_rect(fill = "#fffcf5"),
+          panel.background = element_rect(fill = "#fffcf5"),
+          legend.background = element_rect(fill = "#fffcf5"),
+          axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
@@ -1399,14 +1431,6 @@ output$price_disp_cpm_sidebars <- renderPlot({
 
 
 output$disp_cpm_table <- renderDataTable({
-#data <- sr_all()
-#data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
-#percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
-#perc_tab <- as.data.frame(percentiles)  
-#add_perc <- c("25th","Median", "75th")
-#perc_tab <- cbind(add_perc, perc_tab)
-#perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-#colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Mbps ($)")
 
   perc_tab <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
     summarise(n_services = n(),
@@ -1421,20 +1445,6 @@ output$disp_cpm_table <- renderDataTable({
 
   })
 
-output$helptext_price_cpc <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
-             to clean data, relevant state, connection types, and bandwidth in mbps."))
-})
-
-output$helptext_price_cpm <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
-             to clean data, relevant state, connection types, and bandwidth in mbps."))
-})
-
-output$helptext_price_cpm_scatter <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that filters are set
-             to clean data, relevant state, connection types, and bandwidth in mbps."))
-})
 
 
 district_tooltip <- function(x) {
@@ -1483,7 +1493,6 @@ vis <- reactive({
 
 vis %>% bind_shiny("plot1")
 
-
 output$plot1_table <- renderDataTable({
   
   datatable(sr_all())
@@ -1492,22 +1501,21 @@ output$plot1_table <- renderDataTable({
 
 output$text_maps <- renderUI({
     
-  text_all <- HTML(paste(h4("Map of School Districts"), br(), 
+  text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
                    p("This map shows the location of all school districts in the ESH data universe."), br()))
-  
-  text_clean <- HTML(paste(h4("Map of School Districts and Data Cleanliness Status"), br(), 
+  text_clean <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND DATA CLEANLINESS STATUS"), br(), 
                      p("This map shows the location of all school districts and cleanliness of the district data.
                        Please limit the analyses on state engagement products to clean data."), br()))
   
-  text_2014goals <- HTML(paste(h4("Map of School Districts and 2014 Goal Meeting Status"), br(),
+  text_2014goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2014 GOAL MEETING STATUS"), br(),
                          p("This map shows the location of all school districts and the 2014 FCC goal meeting status. 
                            A district is meeting the 2014 FCC goal if its total bandwidth is greater than or equal to 100 kbps per student.")))
   
-  text_2018goals <- HTML(paste(h4("Map of School Districts and 2018 Goal Meeting Status"), br(),
+  text_2018goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2018 GOAL MEETING STATUS"), br(),
                          p("This map shows the location of all school districts and the 2018 FCC goal meeting status. 
                            A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 gbps per student.")))
   
-  text_fiber <- HTML(paste(h4("Map of School Districts with Schools Using Unscalable Technology and Fiber Build Cost to Districts"), br(),
+  text_fiber <- HTML(paste(h4("MAP OF UNSCALABLE SCHOOL DISTRICTS AND FIBER BUILD COSTS"), br(),
                      p("This map shows the location of school districts that have at least one school using unscalable technology. 
                        It also shows whether districts can self-provision fiber with no cost to school districts, assuming
                        20% state match fund."), br()))

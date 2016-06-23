@@ -14,7 +14,7 @@ shinyUI(fluidPage(
                     @import url('//fonts.googleapis.com/css?family=Lato:300');
 
                     body {
-                    background-color: #FFFFFF;
+                    background-color: #FFFCF5;
                     font-family: 'Lato', sans-serif;
                     font-weight: 300;
                     line-height: 1.1;
@@ -26,7 +26,7 @@ shinyUI(fluidPage(
                     font-family: 'Roboto Slab';
                     font-weight: 500;
                     line-height: 1.1;
-                    color: #F26B21;
+                    color: #F26B23;
                     display: inline-block;
                     margin-top: 0px;
                     }
@@ -35,7 +35,7 @@ shinyUI(fluidPage(
                     font-family: 'Roboto Slab';
                     font-weight: 500;
                     line-height: 1.1;
-                    color: #F26B21;
+                    color: #F26B23;
                     margin-top: 500px
                     align: right;
                     display: inline-block;
@@ -59,7 +59,7 @@ shinyUI(fluidPage(
                     }
 
                     h4 {
-                    background-color: #FFFFFF;
+                    background-color: #FFFCF5;
                     font-family: 'Lato', sans-serif;
                     font-weight: 500;
                     line-height: 1.1;
@@ -70,23 +70,23 @@ shinyUI(fluidPage(
                     }
                     
                     .well {
-                    background-color: #FFFFFF;
+                    background-color: #FFFCF5;
                     }
                     
                     .irs-bar {
-                    background-color: #F26B21;
+                    background-color: #F26B23;
                     }
                     
                     .irs-from {
-                    background-color: #F26B21;
+                    background-color: #F26B23;
                     }
                     
                     .irs-to {
-                    background-color: #F26B21;
+                    background-color: #F26B23;
                     }
                     
                     a {
-                    color: #F26B21;
+                    color: #F26B23;
                     }
                     .shiny-output-error-validation {
                     margin-top: 25px;
@@ -190,17 +190,36 @@ titlePanel(div(h1("Warchild"))),
                           ),
                 
                  
-                 navbarMenu("ESH Data",
-                            tabPanel("Overview of ESH Data Composition", br(),
+                 navbarMenu("Demographics",
+                            tabPanel("Demographics Breakdown", br(),
                                      
-                            wellPanel(h4("All vs. Clean: Locale"), br(), plotOutput("histogram_locale", width = "50%"), align = "center", br(), br(), dataTableOutput("table_locale")), br(), br(),
-                            wellPanel(h4("All vs. Clean: District Size"), br(), plotOutput("histogram_size", width = "50%"), align = "center", br(), br(), dataTableOutput("table_size")))),
+                            wellPanel(
+                                      fluidRow(
+                                        column(12, align = "left", h4("All vs. CLEAN: DISTRIBUTION BY DISTRICT LOCALE"), br(), 
+                                              p("This chart shows the distribution of districts in clean and all data, by their locale
+                                              classification according to NCES.")), br(),
+                                        column(12, align = "center", plotOutput("histogram_locale", width = "50%")), br(), br(), 
+                                              dataTableOutput("table_locale"), br(), br())  #close fluidRow
+                                      ), # close wellPanel
+                            wellPanel(
+                                      fluidRow(
+                                      column(12, align = "left", h4("All VS CLEAN: DISTRIBUTION BY DISTRICT SIZE"), br(), 
+                                            p("This chart shows the distribution of districts in clean and all data, by their size 
+                                               classification based on number of schools in the district. The definitions are as 
+                                               follows: Tiny(1 school); Small(2-5 schools); Medium(6-15 schools); 
+                                               Large(16-50 schools); Mega(51+ schools).")), br(),
+                                      column(12, align = "center", plotOutput("histogram_size", width = "50%")), br(), br(), 
+                                      dataTableOutput("table_size"))#fluidRow
+                                      ) #close wellPanel
+                            )# close tabPanel
+                            ), # close navbarMenu
 
                  navbarMenu("Goals",
                             tabPanel("Goals Breakdown", br(), #htmlOutput("helptext_goals"), br(), br(), 
                                      sidebarLayout(
                                        sidebarPanel(width = 3,
                                        div(id = "goals_filters", 
+                                           h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
                                                             h2("Select Highest IA Connection Type(s) for Districts"),
                                                             choices = c("Fiber", "Cable", "DSL",
@@ -228,11 +247,13 @@ titlePanel(div(h1("Warchild"))),
                                        Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
                                      plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
                                      
-                                     h4("PERCENT OF DISTRICTS, BROKEN OUT BY MOST ADVANCED INTERNET ACCESS TECHNOLOGY"), br(), 
+                                     h4("PERCENT OF DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
                                          p("This chart shows the percentage of 2014 goal meeting districts, broken out by the highest internet
-                                            access technology in each district. The hierarchy of technology is as follows: Copper, DSL,
-                                           Cable, Fixed Wireless, Fiber."), br(),
+                                            access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
+                                            accounted for in the fiber category)."), 
+                                         p("Unknown/Error will only apply districts that do not have clean data."), br(),
                                           checkboxInput("district_filters", "Choose 2014 Goal Meeting Status"),
+                                          h2(strong("Note: this filter only affects this chart.")),
                                           conditionalPanel(condition = "input.district_filters == true",
                                                            checkboxGroupInput(inputId = "meeting_goal", 
                                                                               h2("Select whether District is Meeting the 2014 FCC Goal"),
@@ -243,7 +264,8 @@ titlePanel(div(h1("Warchild"))),
                                      h4("PERCENTAGE OF SCHOOLS CURRENTLY MEETING WAN GOAL AND SCHOOLS THAT NEED TO BE MEETING WAN GOAL"), br(),
                                         p("Percentage of schools currently meeting WAN goal is represented by the percentage of WAN connections that are at least 1 gbps. 
                                           Percentage of schools that should be meeting WAN goal is estimated by the percentage of schools that have more than 100 students in 
-                                          school districts that have at least three schools."), br(),
+                                          school districts that have at least three schools."), 
+                                        p("As of 6/22/16, estimates for WAN needs may not be available for some states. Please reach out to the Analysis Team for the estimate, if needed.."), br(),
                                         plotOutput("histogram_projected_wan_needs"), br(), 
                                         dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
                                      h4("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps"), br(),
@@ -258,6 +280,7 @@ titlePanel(div(h1("Warchild"))),
                             tabPanel("Fiber Breakdown", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
                                      sidebarLayout( sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
+                                                    h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                                 #checkboxInput("district_size2", "Select District Size"),
                                                 #conditionalPanel(condition = "input.district_size2 == true",
                                                                  checkboxGroupInput(inputId = "district_size_fiber", 
@@ -276,18 +299,22 @@ titlePanel(div(h1("Warchild"))),
                                        
                                      
                                     mainPanel( 
-                                    h4("Distribution of Schools by Infrastructure Type"), br(), 
-                                    
-                                        plotOutput("histogram_schools_on_fiber"), br(), 
-                                        dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
-                                    h4("Distribution of Schools by E-Rate Discount Rates"), br(), plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
-                                     
+                                        h4("DISTRIBUTION OF SCHOOLS BY INFRASTRUCTURE TYPE"), br(), 
+                                        p("PLACEHOLDER"), br(),
+                                            plotOutput("histogram_schools_on_fiber"), br(), 
+                                            dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
+                                        h4("DISTRIBUTION OF UNSCALABLE SCHOOLS BY DISTRICT E-RATE DISCOUNT RATES"), br(), 
+                                        p("PLACEHOLDER"), br(),
+                                            plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
+                                         
                                     
                                     ))),
                  
                  navbarMenu("Affordability",
                             tabPanel("Affordability Breakdown", br(), #htmlOutput("helptext_price_cpc"), br(), 
                                   sidebarLayout( sidebarPanel(width = 3,
+                                                              h2(strong("Please select circuit size(s) below. 
+                                                                        Any filters and selections applied will affect all charts on this tab.")),
                                   div(id = "affordability_filters", 
                                         uiOutput("bandwidthSelect"), 
                                        
@@ -321,16 +348,16 @@ titlePanel(div(h1("Warchild"))),
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                     h4(strong("Please select the circuit size(s) in the side panel")), br(),
-                                     h4("Distribution of Monthly Cost per Circuit"), br(), 
+                                     h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br(), 
                                      p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
                                        for selected services."), br(), 
-                                     plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpc_table"), br(), br(),
-                                     h4("Distribution of Monthly Cost per Mbps"), br(), 
+                                     plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(),
+                                     dataTableOutput("disp_cpc_table"), br(), br(),
+                                     h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), 
                                      p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per mbps
                                        for selected services."), br(), 
                                      plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), 
-                                     h4("Scatterplot of Monthly Cost per Circuit"), br(), 
+                                     h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(), 
                                      p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
                                        at different circuit sizes."), br(), 
                                      ggvisOutput("plot1"), br(), 
@@ -367,6 +394,7 @@ titlePanel(div(h1("Warchild"))),
                            sidebarLayout(
                                     sidebarPanel(width = 3,
                                     div(id = "map_filters", 
+                                        h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
                                                  choices = c("All Districts", "Clean/Dirty Districts", 
