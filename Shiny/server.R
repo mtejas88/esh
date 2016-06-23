@@ -393,7 +393,7 @@ output$histogram_projected_wan_needs <- renderPlot({
         scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
                      labels=c("Schools with >= 1G WAN", "Schools w/ Projected Need of >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
-        scale_fill_manual(values = c("#fdb913", "#f26b21")) + 
+        scale_fill_manual(values = c("#fdb913", "grey")) + 
         geom_hline(yintercept = 0) +
         theme_classic() + 
         theme(axis.line = element_blank(), 
@@ -1120,8 +1120,8 @@ output$map_population <- renderPlot({
   uu <- u + coord_map()
   
   switch(input$map_view,
-         "General" = print(qq),
-         "Clean/Dirty" = print(rr),
+         "All Districts" = print(qq),
+         "Clean/Dirty Districts" = print(rr),
          'Goals: 100kbps/Student' = print(ss),
          'Goals: 1Mbps/Student' = print(tt),
          'Fiber Build Cost to Districts' = print(uu))
@@ -1490,11 +1490,41 @@ output$plot1_table <- renderDataTable({
   
 })
 
-
-
-
-
-
+output$text_maps <- renderUI({
+    
+  text_all <- HTML(paste(h4("Map of School Districts"), br(), 
+                   p("This map shows the location of all school districts in the ESH data universe."), br()))
+  
+  text_clean <- HTML(paste(h4("Map of School Districts and Data Cleanliness Status"), br(), 
+                     p("This map shows the location of all school districts and cleanliness of the district data.
+                       Please limit the analyses on state engagement products to clean data."), br()))
+  
+  text_2014goals <- HTML(paste(h4("Map of School Districts and 2014 Goal Meeting Status"), br(),
+                         p("This map shows the location of all school districts and the 2014 FCC goal meeting status. 
+                           A district is meeting the 2014 FCC goal if its total bandwidth is greater than or equal to 100 kbps per student.")))
+  
+  text_2018goals <- HTML(paste(h4("Map of School Districts and 2018 Goal Meeting Status"), br(),
+                         p("This map shows the location of all school districts and the 2018 FCC goal meeting status. 
+                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 gbps per student.")))
+  
+  text_fiber <- HTML(paste(h4("Map of School Districts with Schools Using Unscalable Technology and Fiber Build Cost to Districts"), br(),
+                     p("This map shows the location of school districts that have at least one school using unscalable technology. 
+                       It also shows whether districts can self-provision fiber with no cost to school districts, assuming
+                       20% state match fund."), br()))
+  
+      #  text_clean <- "test2"
+  # text_2014goals <- "test3"
+  #text_2018goals <- "test4"
+  #text_fiber <- "test5"
+  
+  switch(input$map_view,
+         "All Districts" =  text_all,
+         "Clean/Dirty Districts" =  text_clean,
+         "Goals: 100kbps/Student" =  text_2014goals,
+         "Goals: 1Mbps/Student" =  text_2018goals,
+         "Fiber Build Cost to Districts" = text_fiber)
+  
+})
 
 output$n_ddt <- renderText({
   
@@ -1508,8 +1538,8 @@ output$n_ddt <- renderText({
       filter(not_all_scalable == 1)
     
   switch(input$map_view,
-         "General" =  paste("n(districts) =", toString(nrow(data))),
-         "Clean/Dirty" =  paste("n(districts) =", toString(nrow(data))),
+         "All Districts" =  paste("n(districts) =", toString(nrow(data))),
+         "Clean/Dirty Districts" =  paste("n(districts) =", toString(nrow(data))),
          'Goals: 100kbps/Student' =  paste("n(districts) =", toString(nrow(data))),
          'Goals: 1Mbps/Student' =  paste("n(districts) =", toString(nrow(data))),
          'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
@@ -1584,16 +1614,6 @@ output$affordability_downloadData <- downloadHandler(
   }
 )
 
-
-#output$map_downloadData <- downloadHandler(
-#  filename = function(){
-#    paste('map_dataset', '_', Sys.Date(), '.csv', sep = '')},
-#  content = function(file){
-#    write.csv(district_subset(), file)
-#  }
-#)
-
-
 ####################################
 
 datasetInput_maps <- reactive({
@@ -1608,8 +1628,8 @@ datasetInput_maps <- reactive({
     filter(not_all_scalable == 1)
     
     switch(input$map_view,
-        "General" =  data,
-        "Clean/Dirty" =  data,
+        "All Districts" =  data,
+        "Clean/Dirty Districts" =  data,
         'Goals: 100kbps/Student' =  data,
         'Goals: 1Mbps/Student' =  data,
         'Fiber Build Cost to Districts' = data2)
@@ -1630,8 +1650,8 @@ output$table_testing <- renderDataTable({
   
   
   switch(input$map_view,
-         "General" =  datatable(map_data),
-         "Clean/Dirty" =  datatable(map_data),
+         "All Districts" =  datatable(map_data),
+         "Clean/Dirty Districts" =  datatable(map_data),
          'Goals: 100kbps/Student' =  datatable(map_data),
          'Goals: 1Mbps/Student' =  datatable(map_data),
          'Fiber Build Cost to Districts' = datatable(map_data2))

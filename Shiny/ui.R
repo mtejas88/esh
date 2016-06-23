@@ -369,10 +369,10 @@ titlePanel(div(h1("Warchild"))),
                                     div(id = "map_filters", 
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
-                                                 choices = c("General", "Clean/Dirty", 
+                                                 choices = c("All Districts", "Clean/Dirty Districts", 
                                                              "Goals: 100kbps/Student", "Goals: 1Mbps/Student",
                                                              "Fiber Build Cost to Districts"),
-                                                 selected = "General"),
+                                                 selected = "All Districts"),
                                       
             
                                       checkboxGroupInput(inputId = "connection_districts", 
@@ -381,7 +381,7 @@ titlePanel(div(h1("Warchild"))),
                                                                     "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                         selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
                                                                      "Copper", "Other / Uncategorized")), 
-                                       checkboxGroupInput(inputId = "district_size_maps", 
+                                      checkboxGroupInput(inputId = "district_size_maps", 
                                                          label = h2("Select District Size(s)"),
                                                          choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                          selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
@@ -392,7 +392,7 @@ titlePanel(div(h1("Warchild"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
-                                     
+                                     htmlOutput("text_maps"), br(),
                                      plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
                                      div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
