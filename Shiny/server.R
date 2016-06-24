@@ -62,16 +62,16 @@ shinyServer(function(input, output, session) {
   #size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
   
     # state lookup
-  state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
-                                            'deleware', 'florida', 'georgia', 'idaho', 'illinois', 'indiana',
+  state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
+                                            'deleware', 'florida', 'georgia', 'hawaii', 'idaho', 'illinois', 'indiana',
                                             'iowa', 'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts',
                                             'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey',
                                             'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon',
                                             'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
                                             'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming'),
                                    
-                                   code = c('.', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
-                                            "GA", 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+                                   code = c('.', 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', "FL", 
+                                            "GA", 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
                                             'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
                                             'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
                                             'UT', 'VT', 'VA', 'WA', 'WV', 'WI', "WY")), stringsAsFactors = F)
@@ -191,7 +191,9 @@ output$table_locale <- renderDataTable({
   validate(
     need(input$state != 'All', "")
   )
-  
+
+ # datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
+
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
@@ -200,7 +202,7 @@ output$table_locale <- renderDataTable({
   
   
   datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
-  
+
   })
   
 ## size distribution
@@ -243,14 +245,16 @@ output$table_size <- renderDataTable({
     need(input$state != 'All', "")
   )
   
+
+  #datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE,
+
   data$n_size <- as.character(data$n_size)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
   data <- arrange(data, postal_cd, -district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', 
-                   options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
   
 })
 
@@ -265,6 +269,8 @@ output$histogram_goals <- renderPlot({
                                        district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
             summarize(percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
                       percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+  
+  print(head(data))
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
       
@@ -306,7 +312,7 @@ output$table_goals <- renderDataTable({
   colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
-  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -374,7 +380,7 @@ output$table_districts_ia_technology <- renderDataTable({
   
   validate(need(nrow(data) > 0, ""))  
   datatable(format(data, big.mark = ",", scientific = FALSE), caption = 'Use the Search bar for the data table below.', 
-                  options = list(paging = FALSE))
+            rownames = FALSE, options = list(paging = FALSE))
   
 })
 
@@ -441,7 +447,7 @@ output$table_projected_wan_needs <- renderDataTable({
   
   validate(need(nrow(data) > 0, ""))
   
-  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -568,9 +574,12 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   table_data[which(table_data$variable == "Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
   table_data[which(table_data$variable == "Not Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
   table_data$value <- NULL
+
+  #datatable(table_data, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
+
   names(table_data) <- c("Data Point", "Value")
   datatable(table_data, options = list(paging = FALSE, searching = FALSE))
-  
+
 })
 
 ######
@@ -647,7 +656,7 @@ output$table_schools_on_fiber <- renderDataTable({
         
   validate(need(nrow(data) > 0, ""))  
   
-  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -709,7 +718,7 @@ output$table_by_erate_discounts <- renderDataTable({
   colnames(data) <- c("C1 Discount Rate", "# of Unscalable Schools in Discount Rate Group", "# of All Unscalable Schools in Calculation", "% of Unscalable Schools in Discount Rate Group") 
     
   validate(need(nrow(data) > 0, ""))  
-  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
   
 })
 
@@ -990,8 +999,7 @@ output$helptext_leaflet_map <- renderUI({
 
 output$districtSelect <- renderUI({
   
-  districtSelect_data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
+  districtSelect_data <- district_subset() 
   
   validate(
     need(nrow(districtSelect_data) > 0, "No districts in given subset")
@@ -1029,6 +1037,7 @@ school_districts <- eventReactive(input$testing, {
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
+
   
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
                     "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
@@ -1037,7 +1046,7 @@ output$testing_leaflet <- renderLeaflet({
   
   
   
-  leaflet() %>% addProviderTiles("CartoDB.Positron") %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
+  leaflet() %>% addProviderTiles(input$tile) %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
   #default view of leaflet map is addTiles()
 })
 
@@ -1081,6 +1090,63 @@ output$choose_district <- renderPlot({
 })
 
 # map of districts 
+output$population_leaflet <- renderLeaflet({ 
+  
+  
+#  sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
+#                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
+#                    "IA Connection: ", school_districts()$new_connect_type_goals, "<br>",
+#                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
+  
+  data <- district_subset() %>%
+           filter(new_connect_type_map %in% input$connection_districts,
+           district_size %in% input$district_size_maps,
+           locale %in% input$locale_maps)
+  
+  ddt_unscalable <- data %>% 
+    filter(not_all_scalable == 1)
+
+  
+  
+  l1 <- leaflet(data) %>% 
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#0073B6", stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name))  
+  
+  l2 <- leaflet(data) %>% 
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#0073B6", "#CCCCCC"), 
+                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
+            addLegend("bottomright", colors = c("blue", "#CCCCCC"), labels = c("Clean Districts", "Dirty Districts"),
+                        title = "Cleanliness Status of District", opacity = 1)
+  
+  l3 <- leaflet(data) %>% 
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting 2014 Goals", "#CCCCCC", "#CB2027"), 
+                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
+           addLegend("bottomright", colors = c("#CCCCCC", "#CB2027"), labels = c("Meeting 100kbps/Student Goal", "Not Meeting 100kbps/Student Goal"),
+              title = "Goal Status", opacity = 1)
+  
+  l4 <- leaflet(data) %>% 
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#CCCCCC", "#CB2027"), 
+                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
+           addLegend("bottomright", colors = c("#CCCCCC", "#CB2027"), labels = c("Meeting 1Mbps/Student Goal", "Not Meeting 1Mbps/Student Goal"),
+              title = "Goal Status", opacity = 1)
+  
+  l5 <- leaflet(ddt_unscalable) %>% 
+                     addProviderTiles(input$tile2) %>% 
+                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(as.factor(zero_build_cost_to_district) == 0, "#A3E5E6", "#0073B6"), 
+                                      stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
+                    addLegend("bottomright", colors = c("#A3E5E6", "#0073B6"), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"),
+                               title = "Cost for Fiber Build", opacity = 1)
+  
+  switch(input$map_view,
+         "All Districts" = print(l1),
+         "Clean/Dirty Districts" = print(l2),
+         'Goals: 100 kbps/Student' = print(l3),
+         'Goals: 1 Mbps/Student' = print(l4),
+         'Fiber Build Cost to Districts' = print(l5))
+
+})
+
+
+
 output$map_population <- renderPlot({
   
   data <- district_subset() %>%
@@ -1153,8 +1219,8 @@ output$map_population <- renderPlot({
   switch(input$map_view,
          "All Districts" = print(qq),
          "Clean/Dirty Districts" = print(rr),
-         'Goals: 100kbps/Student' = print(ss),
-         'Goals: 1Mbps/Student' = print(tt),
+         'Goals: 100 kbps/Student' = print(ss),
+         'Goals: 1 Mbps/Student' = print(tt),
          'Fiber Build Cost to Districts' = print(uu))
   
 })
@@ -1360,7 +1426,7 @@ output$disp_cpc_table <- renderDataTable({
               p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
   colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th Percentile", "Median", "75th Percentile")
   
-  datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
+  datatable(perc_tab, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
 
 })
 
@@ -1444,7 +1510,7 @@ output$disp_cpm_table <- renderDataTable({
   colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th Percentile", "Median", "75th Percentile")
   
   
-  datatable(perc_tab, options = list(paging = FALSE, searching = FALSE))
+  datatable(perc_tab, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
 
   })
 
@@ -1498,9 +1564,10 @@ vis %>% bind_shiny("plot1")
 
 output$plot1_table <- renderDataTable({
   
-  datatable(sr_all())
+  datatable(sr_all(), rownames = FALSE)
   
 })
+
 
 output$text_maps <- renderUI({
     
@@ -1537,6 +1604,7 @@ output$text_maps <- renderUI({
   
 })
 
+
 output$n_ddt <- renderText({
   
   data <- district_subset() %>%
@@ -1556,27 +1624,101 @@ output$n_ddt <- renderText({
          'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
 })
 
-#output$map_tables <- renderDataTable({
-#  map_data <- district_subset() %>%
-#    filter(!(postal_cd %in% c('AK', 'HI')),
-#           district_size %in% input$district_size_maps,
-#           locale %in% input$locale_maps)
-  
-  
-  
-#  map_data2 <- data %>%
-#    filter(not_all_scalable == 1)
-  
-  
-#  switch(input$map_view,
-#         "General" =  datatable(map_data),
-#         "Clean/Dirty" =  datatable(map_data),
-#         'Goals: 100kbps/Student' =  datatable(map_data),
-#         'Goals: 1Mbps/Student' =  datatable(map_data),
-#         'Fiber Build Cost to Districts' = datatable(map_data2))
 
-#})
 
+
+
+## Dynamic Viz Testing:
+
+plot2 <- reactive({
+
+    d_sub <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                          district_size2 %in% input$district_size_goals,
+                                          locale2 %in% input$locale_goals)
+  
+    price <- input$set_price
+
+    
+    nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals") 
+    nmg_data2 <- nmg_data %>% mutate(need_kbps = num_students*100,
+                                     need_mbps = need_kbps / 1000,
+                                     hyp_cost = need_mbps*price,
+                                     can_mt_goals = ifelse(hyp_cost <= total_ia_monthly_cost, "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student"))
+#    nmg_data3 <- nmg_data2 %>% mutate(mtg_budget   = need_bw*price) #price variable is the user input value
+#    nmg_data4 <- nmg_data3 %>% mutate(total_cost   = total_ia_monthly_cost*12)
+    
+#    nmg_data4$can_mt_goals <- ifelse(as.numeric(as.character(nmg_data4$total_cost)) > as.numeric(as.character(nmg_data4$mtg_budget)), "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student")
+    
+    nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
+    nmg_table <- as.data.frame(na.omit(nmg_table))
+
+################## Trying out Jess' Methodology #########################    
+    
+#        nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals") 
+#        nmg_data2 <- nmg_data %>% mutate(mbps = total_ia_monthly_cost / monthly_ia_cost_per_mbps,
+#                                         kbps = mbps * 1000,
+#                                         kbps_stud = kbps / num_students,
+#                                         can_mt_goals = ifelse(kbps_stud >= 100, "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student"))
+      
+#        nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
+#        nmg_table <- as.data.frame(na.omit(nmg_table))        
+    
+###############################################################################    
+    
+    can_meet <- nmg_table %>% filter(can_mt_goals == "Can Meet 100kbps/Student")
+    
+    #districts meeting goals %
+    mg <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Meeting 2014 Goals")
+    pct_mg <- round((nrow(mg)/nrow(d_sub))*100, digits = 2) #63%
+    pct_hyp <-  round(((nrow(mg) + can_meet$n) / nrow(d_sub))*100, digits = 2)
+    
+    pct_joined <- c(pct_mg, pct_hyp)
+    pct_names <- c("% Districts Currently Meeting Goal", "% Districts Meeting Goal Under Hypothetical Pricing")
+    
+    pct_joined2 <- cbind(pct_names, pct_joined)
+    
+    pct_joined3 <- as.data.frame(pct_joined2)
+    colnames(pct_joined3) <- c("status", "breakdown")
+    pct_joined3$breakdown <- as.numeric(as.character(pct_joined3$breakdown))
+    
+    
+    pct_joined3$pct <- paste(pct_joined3$breakdown, "%", sep = "")
+    pct_joined4 <- pct_joined3[,-2]
+    colnames(pct_joined4) <- c("variable", "percentage")
+    
+    pct_joined5 <<- pct_joined3
+
+    pct_joined3 %>% 
+      ggvis(~status, ~breakdown) %>% 
+      layer_bars(fillOpacity := 0.4, fill = ~status, strokeWidth := 0) %>% 
+      #layer_text(x = prop("x", ~status),
+      #           y = prop("y", ~breakdown, scale = "ycenter"), text := ~breakdown,  fontSize:=20) %>% 
+      add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
+      add_axis("y", title = "% of Districts", title_offset = 75, grid = FALSE) %>%
+      scale_numeric("y", domain = c(0, 100)) %>% 
+      set_options(width = 850, height = 500)
+
+})
+
+
+
+plot2 %>% bind_shiny("plot2")
+
+
+observe({   
+  updateSliderInput(session, "set_price",
+                        label = "Pricing $:")
+})
+
+
+output$table_hyp_cost <- renderDataTable({
+  
+  validate(need(nrow(pct_joined5) > 0, ""))  
+  
+  
+  datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
+  
+})
 
 
 
@@ -1652,7 +1794,7 @@ output$table_testing <- renderDataTable({
     filter(!(postal_cd %in% c('AK', 'HI')),
            new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
-           locale %in% input$locale_maps)
+           locale %in% input$locale_maps) %>% select(c(1:61, 78, 79))
   
   
   
