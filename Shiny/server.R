@@ -191,10 +191,9 @@ output$table_locale <- renderDataTable({
   validate(
     need(input$state != 'All', "")
   )
-  
-<<<<<<< HEAD
-  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
-=======
+
+ # datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
+
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
@@ -203,8 +202,7 @@ output$table_locale <- renderDataTable({
   
   
   datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
->>>>>>> master
-  
+
   })
   
 ## size distribution
@@ -247,18 +245,16 @@ output$table_size <- renderDataTable({
     need(input$state != 'All', "")
   )
   
-<<<<<<< HEAD
-  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE,
-=======
+
+  #datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE,
+
   data$n_size <- as.character(data$n_size)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
   data <- arrange(data, postal_cd, -district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', 
->>>>>>> master
-                   options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
   
 })
 
@@ -578,13 +574,12 @@ output$table_hypothetical_ia_goal <- renderDataTable({
   table_data[which(table_data$variable == "Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
   table_data[which(table_data$variable == "Not Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
   table_data$value <- NULL
-<<<<<<< HEAD
-  datatable(table_data, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
-=======
+
+  #datatable(table_data, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
+
   names(table_data) <- c("Data Point", "Value")
   datatable(table_data, options = list(paging = FALSE, searching = FALSE))
->>>>>>> master
-  
+
 })
 
 ######
@@ -1142,10 +1137,10 @@ output$population_leaflet <- renderLeaflet({
                                title = "Cost for Fiber Build", opacity = 1)
   
   switch(input$map_view,
-         "General" = print(l1),
-         "Clean/Dirty" = print(l2),
-         'Goals: 100kbps/Student' = print(l3),
-         'Goals: 1Mbps/Student' = print(l4),
+         "All Districts" = print(l1),
+         "Clean/Dirty Districts" = print(l2),
+         'Goals: 100 kbps/Student' = print(l3),
+         'Goals: 1 Mbps/Student' = print(l4),
          'Fiber Build Cost to Districts' = print(l5))
 
 })
@@ -1224,8 +1219,8 @@ output$map_population <- renderPlot({
   switch(input$map_view,
          "All Districts" = print(qq),
          "Clean/Dirty Districts" = print(rr),
-         'Goals: 100kbps/Student' = print(ss),
-         'Goals: 1Mbps/Student' = print(tt),
+         'Goals: 100 kbps/Student' = print(ss),
+         'Goals: 1 Mbps/Student' = print(tt),
          'Fiber Build Cost to Districts' = print(uu))
   
 })
@@ -1573,8 +1568,7 @@ output$plot1_table <- renderDataTable({
   
 })
 
-<<<<<<< HEAD
-=======
+
 output$text_maps <- renderUI({
     
   text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
@@ -1609,7 +1603,7 @@ output$text_maps <- renderUI({
          "Fiber Build Cost to Districts" = text_fiber)
   
 })
->>>>>>> master
+
 
 output$n_ddt <- renderText({
   

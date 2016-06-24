@@ -242,38 +242,7 @@ titlePanel(div(h1("Warchild"))),
                                          actionButton("goals_reset_all", "Reset All Filters")#
                                          ),
                                   mainPanel(
-<<<<<<< HEAD
-                                     h4("Districts / Students Meeting IA Goals"), br(), plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
-                                     h4("Districts by IA Technology"), br(), 
 
-                                               checkboxInput("district_filters", "Filter for Meeting Goals Status"),
-                                               conditionalPanel(condition = "input.district_filters == true",
-                                                                
-                                                                checkboxGroupInput(inputId = "meeting_goals", 
-                                                                                   h2("Select whether District is Meeting 2014 Goals"),
-                                                                                   choices = c("Meeting 2014 Goals", "Not Meeting 2014 Goals"), 
-                                                                                   selected = c("Meeting 2014 Goals", "Not Meeting 2014 Goals"))), br(),
-                                               downloadButton('ia_tech_downloadData', 'Download'), br(),
-                                               
-                                               plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
-                                     h4("Current WAN Goal Percentage vs. Projected WAN Needs"), br(), plotOutput("histogram_projected_wan_needs"), br(), dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
-                                     h4("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps"), br(),
-                                     fluidRow(
-                                       column(12, plotOutput("hypothetical_ia_price")),
-                                       column(12, plotOutput("hypothetical_ia_goal"))
-                                     , br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(), br(), br(),
-                                     h4("Dynamic Hypothetical Pricing"), br(), br(), 
-                                  
-                                                            sliderInput(width = '300px', inputId = "set_price", 
-                                                              label = h2("Set Pricing: (in $)"), 
-                                                              min=0, 
-                                                              max=15, 
-                                                              value=3,
-                                                              step=1),   
-                                     br(),
-                                     ggvisOutput("plot2"), br(), br(), 
-                                     dataTableOutput("table_hyp_cost")))) #close fluidRow, mainPanel and sidebarLayout
-=======
                                      h4("DISTRICTS/STUDENTS MEETING THE 2014 FCC INTERNET ACCESS GOAL"), br(), 
                                      p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
                                        Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
@@ -307,9 +276,21 @@ titlePanel(div(h1("Warchild"))),
                                         fluidRow(
                                            column(12, plotOutput("hypothetical_ia_price")),
                                            column(12, plotOutput("hypothetical_ia_goal"))
-                                        ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br()))#close mainPanel and sidebarLayout
->>>>>>> master
+                                        ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(),
                                      
+                                    h4("DYNAMIC HYPOTHETICAL PRICING"), br(), br(), 
+
+                                          sliderInput(width = '300px', inputId = "set_price", 
+                                                  label = h2("Set Pricing: (in $)"), 
+                                                  min=0, 
+                                                  max=15, 
+                                                  value=3,
+                                                  step=1),   
+                                        br(),
+                                        ggvisOutput("plot2"), br(), br(), 
+                                        dataTableOutput("table_hyp_cost")
+))#close mainPanel and sidebarLayout
+                    
                                      )),
 
                  navbarMenu("Fiber",
@@ -450,7 +431,7 @@ titlePanel(div(h1("Warchild"))),
                          
                            tabPanel("Maps", br(),  
                            sidebarLayout(
-                                    sidebarPanel(width = 2,
+                                    sidebarPanel(width = 3,
                                     div(id = "map_filters", 
                                         h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                       selectInput(inputId = "map_view", 
@@ -492,27 +473,18 @@ titlePanel(div(h1("Warchild"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
-<<<<<<< HEAD
-                                       
                                        
                                      
                                      fluidRow(h4("District Maps: Click on dots to look up districts"), br(), 
-                                            splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "600px"), 
-                                                        leafletOutput("population_leaflet", height = "600px"), style="width: 125% ; height: 600px",
-                                                        cellArgs = list(style = "padding: 12px")),  
-                                              
-                                              br(), br(),textOutput("n_ddt"), br(), br(),
+                                            htmlOutput("text_maps"), br(),  #  column(12, align = "left",   
+                                            column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
+                                                        leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
+                                                        cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
+                                            p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
+                                                            " to see more information  about a particular district."))),
+                                              br(), textOutput("n_ddt"), br(), br(),
                                      div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
-=======
-                                     fluidRow(
-                                       column(12, align = "left",  htmlOutput("text_maps")), br(),
-                                       column(12, align = "center", plotOutput("map_population")),
-                                       column(12, align = "left",  p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
-                                                   about a particular district.")))),
-                                       column(12, align = "left", textOutput("n_ddt"))
-                                     ), br(), br(),
-                                     div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
->>>>>>> master
+
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
