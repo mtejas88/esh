@@ -196,7 +196,7 @@ titlePanel(div(h1("Warchild"))),
                             wellPanel(
                                       fluidRow(
                                         column(12, align = "left", h4("All vs. CLEAN: DISTRIBUTION BY DISTRICT LOCALE"), br(), 
-                                              p("This chart shows the distribution of districts in clean and all data, by their locale
+                                              p("This chart shows the distribution of districts by their locale
                                               classification according to NCES.")), br(),
                                         column(12, align = "center", plotOutput("histogram_locale", width = "50%")), br(), br(), 
                                               dataTableOutput("table_locale"), br(), br())  #close fluidRow
@@ -204,7 +204,7 @@ titlePanel(div(h1("Warchild"))),
                             wellPanel(
                                       fluidRow(
                                       column(12, align = "left", h4("All VS CLEAN: DISTRIBUTION BY DISTRICT SIZE"), br(), 
-                                            p("This chart shows the distribution of districts in clean and all data, by their size 
+                                            p("This chart shows the distribution of districts by their size 
                                                classification based on number of schools in the district. The definitions are as 
                                                follows: Tiny(1 school); Small(2-5 schools); Medium(6-15 schools); 
                                                Large(16-50 schools); Mega(51+ schools).")), br(),
@@ -242,12 +242,12 @@ titlePanel(div(h1("Warchild"))),
                                          actionButton("goals_reset_all", "Reset All Filters")#
                                          ),
                                   mainPanel(
-                                     h4("PERCENT OF DISTRICTS/STUDENTS MEETING THE 2014 FCC INTERNET ACCESS GOAL"), br(), 
-                                     p("A district is meeting the 2014 FCC goal if its total bandwidth is greater than or equal to 100 kbps per student. 
+                                     h4("DISTRICTS/STUDENTS MEETING THE 2014 FCC INTERNET ACCESS GOAL"), br(), 
+                                     p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
                                        Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
                                      plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
                                      
-                                     h4("PERCENT OF DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
+                                     h4("DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
                                          p("This chart shows the percentage of 2014 goal meeting districts, broken out by the highest internet
                                             access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
                                             accounted for in the fiber category)."), 
@@ -261,14 +261,17 @@ titlePanel(div(h1("Warchild"))),
                                                                               selected = c("Meeting Goal", "Not Meeting Goal"))), br(),
                                           downloadButton('ia_tech_downloadData', 'Download'), br(),
                                           plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
-                                     h4("PERCENTAGE OF SCHOOLS CURRENTLY MEETING WAN GOAL AND SCHOOLS THAT NEED TO BE MEETING WAN GOAL"), br(),
-                                        p("Percentage of schools currently meeting WAN goal is represented by the percentage of WAN connections that are at least 1 gbps. 
-                                          Percentage of schools that should be meeting WAN goal is estimated by the percentage of schools that have more than 100 students in 
+                                     h4("SCHOOLS THAT ARE CURRENTLY OR NEED TO BE MEETING THE FCC WAN GOAL"), br(),
+                                        p("Percentage of schools currently meeting the FCC WAN Goal is represented by the percentage of WAN connections that are at least 1 Gbps. 
+                                          Percentage of schools that should be meeting the FCC WAN Goal is estimated by the percentage of schools that have more than 100 students in 
                                           school districts that have at least three schools."), 
-                                        p("As of 6/22/16, estimates for WAN needs may not be available for some states. Please reach out to the Analysis Team for the estimate, if needed.."), br(),
+                                        p("Estimates for WAN needs may not be available for some states. Please reach out to Strategic Analysis Team for the estimate, if needed."), br(),
                                         plotOutput("histogram_projected_wan_needs"), br(), 
                                         dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
-                                     h4("Districts Not Meeting vs. Meeting Goals: Median Cost per Mbps"), br(),
+                                     h4("DISTRICTS MEETING THE 2014 FCC GOAL UNDER HYPOTHETICAL PRICING"), br(),
+                                        p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal and the percentage of districts
+                                          that would be meeting the goal if districts currently not meeting the goal were to have access to the hypothetical pricing. 
+                                          The scale indicates cost of internet access per Mbps."), br(),
                                         fluidRow(
                                            column(12, plotOutput("hypothetical_ia_price")),
                                            column(12, plotOutput("hypothetical_ia_goal"))
@@ -300,11 +303,15 @@ titlePanel(div(h1("Warchild"))),
                                      
                                     mainPanel( 
                                         h4("DISTRIBUTION OF SCHOOLS BY INFRASTRUCTURE TYPE"), br(), 
-                                        p("PLACEHOLDER"), br(),
+                                        p("This chart breaks out distribution of schools into the following buckets: Schools that have
+                                          associated fiber circuits or in districts assumed to have dark fiber, schools that may have
+                                          associated cable, fixed wireless, or other circuits, and schools that only have associated 
+                                          copper or DSL circuits."), br(),
                                             plotOutput("histogram_schools_on_fiber"), br(), 
                                             dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
                                         h4("DISTRIBUTION OF UNSCALABLE SCHOOLS BY DISTRICT E-RATE DISCOUNT RATES"), br(), 
-                                        p("PLACEHOLDER"), br(),
+                                        p("This chart shows the distribution of schools that need or may need upgrades 
+                                          according to the e-rate discount rates for C1 items."), br(),
                                             plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
                                          
                                     
@@ -348,19 +355,23 @@ titlePanel(div(h1("Warchild"))),
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                     h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br(), 
-                                     p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
-                                       for selected services."), br(), 
-                                     plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(),
+                                       fluidRow(
+                                     column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br()), 
+                                     column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
+                                       for selected services."), br()), 
+                                     column(12, align = "center", plotOutput("cpc_sidebars", width = '800px', height = '500px'), br()),
                                      dataTableOutput("disp_cpc_table"), br(), br(),
-                                     h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), 
-                                     p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per mbps
-                                       for selected services."), br(), 
-                                     plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), 
-                                     h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(), 
-                                     p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
-                                       at different circuit sizes."), br(), 
-                                     ggvisOutput("plot1"), br(), 
+                                     column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br()), 
+                                     column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per Mbps
+                                       for selected services."), br()), 
+                                     column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), 
+                                     h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br()), 
+                                     column(12, align = "left", p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
+                                       at different circuit sizes.")),
+                                     column(12, align = "left", p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
+                                                   about a particular district."))), br()),
+                                     column(12, align = "center", ggvisOutput("plot1"), br())#close last column
+                                     ),# close fluidRow 
                                      div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
@@ -398,7 +409,7 @@ titlePanel(div(h1("Warchild"))),
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
                                                  choices = c("All Districts", "Clean/Dirty Districts", 
-                                                             "Goals: 100kbps/Student", "Goals: 1Mbps/Student",
+                                                             "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
                                                              "Fiber Build Cost to Districts"),
                                                  selected = "All Districts"),
                                       
@@ -423,6 +434,8 @@ titlePanel(div(h1("Warchild"))),
                                      fluidRow(
                                        column(12, align = "left",  htmlOutput("text_maps")), br(),
                                        column(12, align = "center", plotOutput("map_population")),
+                                       column(12, align = "left",  p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
+                                                   about a particular district.")))),
                                        column(12, align = "left", textOutput("n_ddt"))
                                      ), br(), br(),
                                      div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables

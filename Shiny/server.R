@@ -56,8 +56,10 @@ shinyServer(function(input, output, session) {
                                              levels = c("Other / Uncategorized", "Cable", "DSL",
                                                         "Copper", "Fixed Wireless", "Fiber"))
   # locale and size cuts
-  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
-  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
+  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
+  #locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
+  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
+  #size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
   
     # state lookup
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
@@ -162,10 +164,11 @@ output$histogram_locale <- renderPlot({
   )
   
   q <- ggplot(data = data) +
-       geom_bar(aes(x = factor(postal_cd), y = percent, fill = locale), stat = "identity") +
+       geom_bar(aes(x = factor(postal_cd), y = percent, fill = factor(locale)), stat = "identity") +
        scale_fill_manual(name = "",
                          labels = c("Rural", "Small Town", "Suburban", "Urban"), 
-                          values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
+                         values = c("#f26b23", "#f09221", "#fdb913", "#fff1d0")) +
+                          #values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
        geom_hline(yintercept = 0) +
        theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
@@ -192,7 +195,7 @@ output$table_locale <- renderDataTable({
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
-  data <- arrange(data, postal_cd, locale)
+  data <- arrange(data, postal_cd, -locale)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   
@@ -213,7 +216,8 @@ output$histogram_size <- renderPlot({
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
     scale_fill_manual(name = "",
                       labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                      values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
+                      values = c("#F0643C", "#f09221", "#f4b400", "#fdb913", "#fff1d0")) + 
+                      #values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -242,7 +246,7 @@ output$table_size <- renderDataTable({
   data$n_size <- as.character(data$n_size)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent), "%")
-  data <- arrange(data, postal_cd, district_size)
+  data <- arrange(data, postal_cd, -district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
   datatable(data, caption = 'Use the Search bar for the data table below.', 
@@ -401,9 +405,9 @@ output$histogram_projected_wan_needs <- renderPlot({
        geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
         geom_text(aes(label = paste0(value, "%"), x = variable, y = value),  vjust =-1, size = 6) +
         scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
-                     labels=c("Schools with >= 1G WAN", "Schools w/ Projected Need of >= 1G WAN")) +
+                     labels=c("Schools that Currently Have >= 1G WAN", "Schools that Need >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
-        scale_fill_manual(values = c("#fdb913", "#899DA4")) + 
+        scale_fill_manual(values = c("#fdb913", "#f09221")) + 
         geom_hline(yintercept = 0) +
         theme(plot.background = element_rect(fill = "white"),
               panel.background = element_rect(fill = "white"),
@@ -431,7 +435,7 @@ output$table_projected_wan_needs <- renderDataTable({
                     n_all_schools_in_wan_needs_calculation = sum(n_schools_in_wan_needs_calculation, na.rm = TRUE),
                     percent_schools_with_proj_wan_needs = paste0(round(100 * n_schools_with_proj_wan_needs / n_all_schools_in_wan_needs_calculation, 2), "%"))
   colnames(data) <- c("# of >=1G WAN Circuits", "# of All WAN Circuits", "% Schools Currently Meeting WAN Goal", 
-                      "# of Schools that Need >=1G WAN", "# of Schools in Projected WAN Needs Calculation", 
+                      "# of Schools that Need >=1G WAN", "# of Schools in WAN Needs Calculation", 
                       "% of Schools that Need >=1G WAN")
   #print(names(data))
   
@@ -1501,7 +1505,7 @@ output$plot1_table <- renderDataTable({
 output$text_maps <- renderUI({
     
   text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
-                   p("This map shows the location of all school districts in the ESH data universe."), br()))
+                   p("This map shows the location of all school districts in the ESH data."), br()))
   text_clean <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND DATA CLEANLINESS STATUS"), br(), 
                      p("This map shows the location of all school districts and cleanliness of the district data.
                        Please limit the analyses on state engagement products to clean data."), br()))
@@ -1512,7 +1516,7 @@ output$text_maps <- renderUI({
   
   text_2018goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2018 GOAL MEETING STATUS"), br(),
                          p("This map shows the location of all school districts and the 2018 FCC goal meeting status. 
-                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 gbps per student.")))
+                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 Gbps per student.")))
   
   text_fiber <- HTML(paste(h4("MAP OF UNSCALABLE SCHOOL DISTRICTS AND FIBER BUILD COSTS"), br(),
                      p("This map shows the location of school districts that have at least one school using unscalable technology. 
@@ -1527,8 +1531,8 @@ output$text_maps <- renderUI({
   switch(input$map_view,
          "All Districts" =  text_all,
          "Clean/Dirty Districts" =  text_clean,
-         "Goals: 100kbps/Student" =  text_2014goals,
-         "Goals: 1Mbps/Student" =  text_2018goals,
+         "Goals: 100 kbps/Student" =  text_2014goals,
+         "Goals: 1 Mbps/Student" =  text_2018goals,
          "Fiber Build Cost to Districts" = text_fiber)
   
 })
@@ -1547,8 +1551,8 @@ output$n_ddt <- renderText({
   switch(input$map_view,
          "All Districts" =  paste("n(districts) =", toString(nrow(data))),
          "Clean/Dirty Districts" =  paste("n(districts) =", toString(nrow(data))),
-         'Goals: 100kbps/Student' =  paste("n(districts) =", toString(nrow(data))),
-         'Goals: 1Mbps/Student' =  paste("n(districts) =", toString(nrow(data))),
+         'Goals: 100 kbps/Student' =  paste("n(districts) =", toString(nrow(data))),
+         'Goals: 1 Mbps/Student' =  paste("n(districts) =", toString(nrow(data))),
          'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
 })
 
@@ -1606,7 +1610,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160617', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160624', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
   }
@@ -1615,7 +1619,7 @@ output$ia_tech_downloadData <- downloadHandler(
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_', Sys.Date(), '.csv', sep = '')},
+    paste('affordability_dataset', '_20160624', '.csv', sep = '')},
   content = function(file){
     write.csv(sr_all(), file)
   }
@@ -1637,8 +1641,8 @@ datasetInput_maps <- reactive({
     switch(input$map_view,
         "All Districts" =  data,
         "Clean/Dirty Districts" =  data,
-        'Goals: 100kbps/Student' =  data,
-        'Goals: 1Mbps/Student' =  data,
+        'Goals: 100 kbps/Student' =  data,
+        'Goals: 1 Mbps/Student' =  data,
         'Fiber Build Cost to Districts' = data2)
   
 })
@@ -1659,15 +1663,15 @@ output$table_testing <- renderDataTable({
   switch(input$map_view,
          "All Districts" =  datatable(map_data),
          "Clean/Dirty Districts" =  datatable(map_data),
-         'Goals: 100kbps/Student' =  datatable(map_data),
-         'Goals: 1Mbps/Student' =  datatable(map_data),
+         'Goals: 100 kbps/Student' =  datatable(map_data),
+         'Goals: 1 Mbps/Student' =  datatable(map_data),
          'Fiber Build Cost to Districts' = datatable(map_data2))
   
 })
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$map_view, '_', Sys.Date(), '.csv', sep = '')},
+    paste(input$map_view, '_20160624', '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput_maps(), file)
   }
