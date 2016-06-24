@@ -269,19 +269,17 @@ titlePanel(div(h1("Warchild"))),
                                         p("Estimates for WAN needs may not be available for some states. Please reach out to Strategic Analysis Team for the estimate, if needed."), br(),
                                         plotOutput("histogram_projected_wan_needs"), br(), 
                                         dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
-                                     h4("DISTRICTS MEETING THE 2014 FCC GOAL UNDER HYPOTHETICAL PRICING"), br(),
-                                        p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal and the percentage of districts
-                                          that would be meeting the goal if districts currently not meeting the goal were to have access to the hypothetical pricing. 
-                                          The scale indicates cost of internet access per Mbps."), br(),
-                                        fluidRow(
-                                           column(12, plotOutput("hypothetical_ia_price")),
-                                           column(12, plotOutput("hypothetical_ia_goal"))
-                                        ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(),
+                                   #     fluidRow(
+                                    #       column(12, plotOutput("hypothetical_ia_price")),
+                                     #      column(12, plotOutput("hypothetical_ia_goal"))
+                                      #  ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(),
                                      
-                                    h4("DYNAMIC HYPOTHETICAL PRICING"), br(), br(), 
-
+                                     h4("DISTRICTS MEETING THE 2014 FCC GOAL UNDER HYPOTHETICAL PRICING"), br(),
+                                     p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal and the percentage of districts
+                                          that would be meeting the goal if districts currently not meeting the goal were to have access to the hypothetical pricing. 
+                                       The scale indicates cost of internet access per Mbps."), br(),
                                           sliderInput(width = '300px', inputId = "set_price", 
-                                                  label = h2("Set Pricing: (in $)"), 
+                                                  label = h2("Pricing Assumption: Cost per Mbps"), 
                                                   min=0, 
                                                   max=15, 
                                                   value=3,
@@ -475,7 +473,7 @@ titlePanel(div(h1("Warchild"))),
                                      mainPanel(
                                        
                                      
-                                     fluidRow(h4("District Maps: Click on dots to look up districts"), br(), 
+                                     fluidRow(
                                             htmlOutput("text_maps"), br(),  #  column(12, align = "left",   
                                             column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
                                                         leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
