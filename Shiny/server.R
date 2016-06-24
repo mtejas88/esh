@@ -1280,8 +1280,9 @@ general_monthly_cpm %>% bind_shiny("gen_m_cpm")
 #not using ggvis since side-by-side bar chart is not possible
 price_disp_cpc <- reactive({
 
-  a <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
-                 summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE),
+  a <- sr_all() %>% 
+       group_by(bandwidth_in_mbps) %>% 
+       summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE),
                            Median = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE),
                            p75th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE))
   
@@ -1294,7 +1295,8 @@ price_disp_cpc <- reactive({
    colnames(b) <- c("bw_mbps", "percentile", "cost" )
    print(b)
   
-    data <- sr_all() %>% filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[1]))
+    data <- sr_all() %>% 
+            filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[1]))
     data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
     percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
     perc_tab <- as.data.frame(percentiles)  
@@ -1335,6 +1337,8 @@ price_disp_cpc <- reactive({
      #          properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
       #         grid=FALSE)  %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE)
+      #%>%
+    #add_legend(title = "test")
     #hide_axis("y")
     }
   
@@ -1351,7 +1355,13 @@ price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
 output$cpc_sidebars <- renderPlot({
 
-  a <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+  
+  validate(
+    need(length(unique(sr_all()$bandwidth_in_mbps)) > 0, "Please select circuit size(s) through the side panel.")
+  )
+  
+  a <- sr_all() %>% 
+       group_by(bandwidth_in_mbps) %>% 
        summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE),
                  Median = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE),
                  p75th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE))
@@ -1367,15 +1377,17 @@ output$cpc_sidebars <- renderPlot({
   print(b)
 
   positions <- c("p25th", "Median", "p75th")
-  v <- ggplot(data = b, aes(x=percentile, y=cost,fill=factor(bw_mbps))) +
+  v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge") + 
-    geom_text(aes(label = format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
+    geom_text(aes(label = round(cost, digits = 2)
+                                 #, big.mark = ",", nsmall = 2, scientific = FALSE)
+                  ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
     #scale_x_discrete(limits = positions) +
     scale_x_discrete( 
                      breaks=c("Median", "p25th", "p75th"),
                         labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(palette = "BlGn", direction = -1) +
+    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -1393,13 +1405,6 @@ output$cpc_sidebars <- renderPlot({
   
 })
 
-#output$n_sr <- renderText({
-  
-#  n_sr <- nrow(sr_all())
-#  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
-#  paste("n(services) =", toString(n_sr))
-  
-#})
 
 
 #output$n_circuits <- renderText({
@@ -1462,6 +1467,10 @@ output$disp_cpc_table <- renderDataTable({
 
 output$price_disp_cpm_sidebars <- renderPlot({
   
+  validate(
+    need(length(unique(sr_all()$bandwidth_in_mbps)) > 0, "Please select circuit size(s) through the side panel.")
+  )
+  
   c <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
     summarise(p25th = quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.25, na.rm = TRUE),
               Median = quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.50, na.rm = TRUE),
@@ -1480,12 +1489,14 @@ output$price_disp_cpm_sidebars <- renderPlot({
   positions <- c("p25th", "Median", "p75th")
   v <- ggplot(data = b2, aes(x=percentile, y=cost, fill=factor(bw_mbps)))+
     geom_bar(stat="identity", position = "dodge") + 
-    geom_text(aes(label = format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
+    geom_text(aes(label = paste0("$", round(cost, digits = 2))
+                  #  format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)
+                  ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
     #scale_x_discrete(limits = positions) +
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                      labels=c("Median", "25th", "75th")) +
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(palette = "BlGn", direction = -1) +
+    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
