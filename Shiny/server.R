@@ -201,7 +201,7 @@ output$table_locale <- renderDataTable({
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
 
   })
   
@@ -254,7 +254,7 @@ output$table_size <- renderDataTable({
   data <- arrange(data, postal_cd, -district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', options = list(paging = FALSE))
+  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
   
 })
 
@@ -312,7 +312,7 @@ output$table_goals <- renderDataTable({
   colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
 
   validate(need(nrow(data) > 0, ""))  
-  datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE), rownames = FALSE)
   
 })
 
@@ -1109,31 +1109,31 @@ output$population_leaflet <- renderLeaflet({
   
   
   l1 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#0073B6", stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name))  
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name))  
   
   l2 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#0073B6", "#CCCCCC"), 
-                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
-            addLegend("bottomright", colors = c("blue", "#CCCCCC"), labels = c("Clean Districts", "Dirty Districts"),
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#fdb913", "#fff1d0"), 
+                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
+            addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Clean Districts", "Dirty Districts"),
                         title = "Cleanliness Status of District", opacity = 1)
   
   l3 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting 2014 Goals", "#CCCCCC", "#CB2027"), 
-                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
-           addLegend("bottomright", colors = c("#CCCCCC", "#CB2027"), labels = c("Meeting 100kbps/Student Goal", "Not Meeting 100kbps/Student Goal"),
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting 2014 Goals", "#fdb913", "#fff1d0"), 
+                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
+           addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
               title = "Goal Status", opacity = 1)
   
   l4 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#CCCCCC", "#CB2027"), 
-                                           stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
-           addLegend("bottomright", colors = c("#CCCCCC", "#CB2027"), labels = c("Meeting 1Mbps/Student Goal", "Not Meeting 1Mbps/Student Goal"),
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#fdb913", "#fff1d0"), 
+                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
+           addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Meets 1Mbps/Student Goal", "Does Not Meet 1Mbps/Student Goal"),
               title = "Goal Status", opacity = 1)
   
   l5 <- leaflet(ddt_unscalable) %>% 
                      addProviderTiles(input$tile2) %>% 
-                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(as.factor(zero_build_cost_to_district) == 0, "#A3E5E6", "#0073B6"), 
-                                      stroke = FALSE, fillOpacity = 0.6, popup = ~as.character(name)) %>% 
-                    addLegend("bottomright", colors = c("#A3E5E6", "#0073B6"), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"),
+                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(as.factor(zero_build_cost_to_district) == 0, "#fff1d0", "#fdb913"), 
+                                      stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
+                    addLegend("bottomright", colors = c("#fff1d0", "#fdb913"), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"),
                                title = "Cost for Fiber Build", opacity = 1)
   
   switch(input$map_view,
@@ -1367,11 +1367,12 @@ output$cpc_sidebars <- renderPlot({
   print(b)
 
   positions <- c("p25th", "Median", "p75th")
-  v <- ggplot(data = b, aes(x=percentile, y=cost, fill=factor(bw_mbps)))+
+  v <- ggplot(data = b, aes(x=percentile, y=cost,fill=factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge") + 
     geom_text(aes(label = format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
     #scale_x_discrete(limits = positions) +
-    scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
+    scale_x_discrete( 
+                     breaks=c("Median", "p25th", "p75th"),
                         labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(palette = "BlGn", direction = -1) +
@@ -1387,6 +1388,9 @@ output$cpc_sidebars <- renderPlot({
           axis.title.y=element_blank()) 
   print(v)
 
+  
+  
+  
 })
 
 #output$n_sr <- renderText({
