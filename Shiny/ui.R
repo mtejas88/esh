@@ -150,14 +150,14 @@ shinyUI(fluidPage(
   div(class = 'horizontalformatting2', #style = 'display:inline-block',  #; horizontal-align: text-top;' 
       selectInput("dataset",
                   h2("Select Data Cleanliness"),
-                  choices = c('All', 'Clean'), selected = 'All', width='200px')), 
+                  choices = c('All', 'Clean'), selected = 'Clean', width='200px')), 
 
 #end selectInput() and div()
 div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-align: text-top;',           
     selectInput("state", h2("Select State"),
-                choices = c('All', 'AL','AR','AZ',
-                            'CA','CO','CT',
-                            'DE','FL','GA', 'IA',
+                choices = c('All', 'AL', 'AK', 'AR','AZ',
+                            'CA','CO','CT', 'DE',
+                            'FL','GA', 'HI','IA',
                             'ID','IL','IN','KS',
                             'KY','LA','MA','MD',
                             'ME','MI','MN','MO',
@@ -212,7 +212,7 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                           
                           ) # close fluid row
                           
-                          ),
+                          ), #close tabPanel()
                 
                  
                  navbarMenu("ESH Data",
@@ -224,7 +224,7 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                  navbarMenu("Goals",
                             tabPanel("Goals Breakdown", br(), htmlOutput("helptext_goals"), br(), br(), 
                                      sidebarLayout(
-                                       sidebarPanel(width = 3,
+                                       sidebarPanel(width = 3,            
                                        div(id = "goals_filters", 
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
                                                             h2("Select Connection Type(s)"),
@@ -266,7 +266,18 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                      fluidRow(
                                        column(12, plotOutput("hypothetical_ia_price")),
                                        column(12, plotOutput("hypothetical_ia_goal"))
-                                     ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br()))#close mainPanel and sidebarLayout
+                                     , br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(), br(), br(),
+                                     h4("Dynamic Hypothetical Pricing"), br(), br(), 
+                                  
+                                                            sliderInput(width = '300px', inputId = "set_price", 
+                                                              label = h2("Set Pricing: (in $)"), 
+                                                              min=0, 
+                                                              max=15, 
+                                                              value=3,
+                                                              step=1),   
+                                     br(),
+                                     ggvisOutput("plot2"), br(), br(), 
+                                     dataTableOutput("table_hyp_cost")))) #close fluidRow, mainPanel and sidebarLayout
                                      
                                      )),
 
@@ -367,15 +378,29 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                                  draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
                                                  width = 330, height = "auto",
                                                  
-                                                 uiOutput("districtSelect"))#,
+                                                 uiOutput("districtSelect"),
+                                                 selectInput(inputId = "tile",
+                                                             label = h2("Choose Map Background"),
+                                                             choices = c("Color1" = "MapQuestOpen.OSM",
+                                                                         "Color2" = "Esri.WorldStreetMap",
+                                                                         "Color3" = "Thunderforest.Transport",
+                                                                         "Color4" = "Thunderforest.OpenCycleMap",
+                                                                         "Gray1" = "CartoDB.Positron",
+                                                                         "Gray2" = "Stamen.TonerLite",
+                                                                         "Gray3" = "CartoDB.DarkMatter",
+                                                                         "Terrain1" =  "Thunderforest.Landscape",
+                                                                         "Terrain2" = "Stamen.TerrainBackground",
+                                                                         "Terrain3" = "Esri.WorldImagery",
+                                                                         "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                             selected = "Gray1")) #
 
                                      #actionButton("districtSelect", "New Points"))
                                      
-                                     ),#), #end of tabPanel() and div()
+                                     ), #end of tabPanel() 
                          
                            tabPanel("District Population Maps", br(),  
                            sidebarLayout(
-                                    sidebarPanel(width = 3,
+                                    sidebarPanel(width = 2,
                                     div(id = "map_filters", 
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
@@ -384,7 +409,21 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                                              "Fiber Build Cost to Districts"),
                                                  selected = "General"),
                                       
-            
+                                      selectInput(inputId = "tile2",
+                                                  label = h2("Choose Map Background:"),
+                                                  choices = c("Color1" = "MapQuestOpen.OSM",
+                                                              "Color2" = "Esri.WorldStreetMap",
+                                                              "Color3" = "Thunderforest.Transport",
+                                                              "Color4" = "Thunderforest.OpenCycleMap",
+                                                              "Gray1" = "CartoDB.Positron",
+                                                              "Gray2" = "Stamen.TonerLite",
+                                                              "Gray3" = "CartoDB.DarkMatter",
+                                                              "Terrain1" =  "Thunderforest.Landscape",
+                                                              "Terrain2" = "Stamen.TerrainBackground",
+                                                              "Terrain3" = "Esri.WorldImagery",
+                                                              "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                  selected = "Gray1"), #
+                                      
                                       checkboxGroupInput(inputId = "connection_districts", 
                                                         h2("Select Connection Type(s) - map/district view only"),
                                                         choices = c("Fiber", "Cable", "DSL",
@@ -407,17 +446,21 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
+                                       
+                                       
                                      
-                                     h4("District Maps"), br(), plotOutput("map_population"), align = "center", textOutput("n_ddt"), align = "center", br(), br(),
-                                     div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
+                                     fluidRow(h4("District Maps: Click on dots to look up districts"), br(), 
+                                            splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "600px"), 
+                                                        leafletOutput("population_leaflet", height = "600px"), style="width: 125% ; height: 600px",
+                                                        cellArgs = list(style = "padding: 12px")),  
+                                              
+                                              br(), br(),textOutput("n_ddt"), br(), br(),
+                                     div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
                                      #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
                                      )))
-                           
-
-                 
                 # tabPanel("View Underlying Data", p(), 
                 #            fluidPage(
                 #                  wellPanel(tags$style(type="text/css", '#leftPanel { width:300px; float:left;}'),
