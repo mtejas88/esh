@@ -132,8 +132,8 @@ districts$meeting_goals_district <- ifelse(districts$meeting_2014_goal_no_oversu
 # New Variables for mapping #
 districts$exclude <- ifelse(districts$exclude_from_analysis == "FALSE", "Clean", "Dirty")
 districts$meeting_2014_goal_no_oversub <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 
-                                                 "Meeting 2014 Goals",
-                                                 "Not Meeting 2014 Goals")
+                                                 "Meeting Goal",
+                                                 "Not Meeting Goal")
 districts$meeting_2018_goal_oversub <- ifelse(districts$meeting_2018_goal_oversub == "TRUE", 
                                               "Meeting 2018 Goals",
                                               "Not Meeting 2018 Goals")
@@ -248,11 +248,11 @@ locale_cuts <- arrange(locale_cuts, postal_cd, locale)
 # by districts
 size_cuts <- data %>%
                   group_by(postal_cd, district_size) %>%
-                  summarize(n_locale = n())
+                  summarize(n_size = n())
 
 size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
-size_cuts$percent <- 100 * size_cuts$n_locale / size_cuts$n
+size_cuts$percent <- 100 * size_cuts$n_size / size_cuts$n
 
 size_cuts$district_size <- factor(size_cuts$district_size, c("Tiny", "Small", "Medium", "Large", "Mega"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)

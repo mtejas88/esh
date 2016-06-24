@@ -14,7 +14,7 @@ shinyUI(fluidPage(
                     @import url('//fonts.googleapis.com/css?family=Lato:300');
 
                     body {
-                    background-color: #FFFFFF;
+                    background-color: white;
                     font-family: 'Lato', sans-serif;
                     font-weight: 300;
                     line-height: 1.1;
@@ -26,7 +26,7 @@ shinyUI(fluidPage(
                     font-family: 'Roboto Slab';
                     font-weight: 500;
                     line-height: 1.1;
-                    color: #F26B21;
+                    color: #F26B23;
                     display: inline-block;
                     margin-top: 0px;
                     }
@@ -35,7 +35,7 @@ shinyUI(fluidPage(
                     font-family: 'Roboto Slab';
                     font-weight: 500;
                     line-height: 1.1;
-                    color: #F26B21;
+                    color: #F26B23;
                     margin-top: 500px
                     align: right;
                     display: inline-block;
@@ -59,7 +59,7 @@ shinyUI(fluidPage(
                     }
 
                     h4 {
-                    background-color: #FFFFFF;
+                    background-color: white;
                     font-family: 'Lato', sans-serif;
                     font-weight: 500;
                     line-height: 1.1;
@@ -70,23 +70,23 @@ shinyUI(fluidPage(
                     }
                     
                     .well {
-                    background-color: #FFFFFF;
+                    background-color: white;
                     }
                     
                     .irs-bar {
-                    background-color: #F26B21;
+                    background-color: white;
                     }
                     
                     .irs-from {
-                    background-color: #F26B21;
+                    background-color: white;
                     }
                     
                     .irs-to {
-                    background-color: #F26B21;
+                    background-color: white;
                     }
                     
                     a {
-                    color: #F26B21;
+                    color: #F26B23;
                     }
                     .shiny-output-error-validation {
                     margin-top: 25px;
@@ -169,7 +169,7 @@ div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-al
                             'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()
   
   
-titlePanel(div(h1("SHINY for EducationSuperHighway"))),
+titlePanel(div(h1("Warchild"))),
 
    #mainPanel(width = 12,
       ##navbarPage("",
@@ -181,33 +181,8 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                 tabPanel("About", 
                           
                           fluidRow(
-                            column(12,
-                            #wellPanel(#width = 2,
-                              h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness."), br(),br()
-                       
-                                  #  selectInput("state", 
-                                  #              h2("Before you toggle over to the other tabs, please select your state of interest and data cleanliness.", br(),br(),
-                                  #                  "Select State"), 
-                                  #              choices = c('All', 'AL','AR','AZ',
-                                  #                          'CA','CO','CT',
-                                  #                          'DE','FL','GA', 'IA',
-                                  #                          'ID','IL','IN','KS',
-                                  #                          'KY','LA','MA','MD',
-                                  #                          'ME','MI','MN','MO',
-                                  #                          'MS','MT','NC','ND',
-                                  #                          'NE','NH','NJ','NM',
-                                  #                          'NV','NY','OH','OK',
-                                  #                          'OR','PA','RI','SC',
-                                  #                          'SD','TN','TX','UT','VA',
-                                  #                          'WA','WI','WV','WY'), selected='All'),
-                                  #  selectInput("dataset",
-                                  #              h2("Select Data Cleanliness"),
-                                  #              choices = c('All', 'Clean'), selected = 'All')#,
-
-                                    #) # Close WellPanel
-                            ), # close colunmn
                           column(12,
-                                 includeHTML("include.html")
+                                 includeHTML("html/intro.html")
                           )
                           
                           ) # close fluid row
@@ -215,19 +190,38 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                           ), #close tabPanel()
                 
                  
-                 navbarMenu("ESH Data",
-                            tabPanel("Overview of ESH Data Composition", 
+                 navbarMenu("Demographics",
+                            tabPanel("Demographics Breakdown", br(),
                                      
-                            wellPanel(h4("All vs. Clean: Locale"), br(), plotOutput("histogram_locale", width = "50%"), align = "center", br(), br(), dataTableOutput("table_locale")), br(), br(),
-                            wellPanel(h4("All vs. Clean: District Size"), br(), plotOutput("histogram_size", width = "50%"), align = "center", br(), br(), dataTableOutput("table_size")))),
+                            wellPanel(
+                                      fluidRow(
+                                        column(12, align = "left", h4("All vs. CLEAN: DISTRIBUTION BY DISTRICT LOCALE"), br(), 
+                                              p("This chart shows the distribution of districts by their locale
+                                              classification according to NCES.")), br(),
+                                        column(12, align = "center", plotOutput("histogram_locale", width = "50%")), br(), br(), 
+                                              dataTableOutput("table_locale"), br(), br())  #close fluidRow
+                                      ), # close wellPanel
+                            wellPanel(
+                                      fluidRow(
+                                      column(12, align = "left", h4("All VS CLEAN: DISTRIBUTION BY DISTRICT SIZE"), br(), 
+                                            p("This chart shows the distribution of districts by their size 
+                                               classification based on number of schools in the district. The definitions are as 
+                                               follows: Tiny(1 school); Small(2-5 schools); Medium(6-15 schools); 
+                                               Large(16-50 schools); Mega(51+ schools).")), br(),
+                                      column(12, align = "center", plotOutput("histogram_size", width = "50%")), br(), br(), 
+                                      dataTableOutput("table_size"))#fluidRow
+                                      ) #close wellPanel
+                            )# close tabPanel
+                            ), # close navbarMenu
 
                  navbarMenu("Goals",
-                            tabPanel("Goals Breakdown", br(), htmlOutput("helptext_goals"), br(), br(), 
+                            tabPanel("Goals Breakdown", br(), #htmlOutput("helptext_goals"), br(), br(), 
                                      sidebarLayout(
                                        sidebarPanel(width = 3,            
                                        div(id = "goals_filters", 
+                                           h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
-                                                            h2("Select Connection Type(s)"),
+                                                            h2("Select Highest IA Connection Type(s) for Districts"),
                                                             choices = c("Fiber", "Cable", "DSL",
                                                                         "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                             selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
@@ -242,12 +236,13 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                          #checkboxInput("district_locale", "Select District Locale"),
                                          #conditionalPanel(condition = "input.district_locale == true",
                                          checkboxGroupInput(inputId = "locale_goals", 
-                                                            label = h2("Select Locale(s)"),
+                                                            label = h2("Select District Locale(s)"),
                                                             choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                             selected = c("Rural", "Small Town", "Suburban", "Urban"))),
                                          actionButton("goals_reset_all", "Reset All Filters")#
                                          ),
                                   mainPanel(
+<<<<<<< HEAD
                                      h4("Districts / Students Meeting IA Goals"), br(), plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
                                      h4("Districts by IA Technology"), br(), 
 
@@ -278,15 +273,50 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                      br(),
                                      ggvisOutput("plot2"), br(), br(), 
                                      dataTableOutput("table_hyp_cost")))) #close fluidRow, mainPanel and sidebarLayout
+=======
+                                     h4("DISTRICTS/STUDENTS MEETING THE 2014 FCC INTERNET ACCESS GOAL"), br(), 
+                                     p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
+                                       Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
+                                     plotOutput("histogram_goals"), br(), dataTableOutput("table_goals"), br(), br(), br(),
+                                     
+                                     h4("DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
+                                         p("This chart shows the percentage of 2014 goal meeting districts, broken out by the highest internet
+                                            access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
+                                            accounted for in the fiber category)."), 
+                                         p("Unknown/Error will only apply districts that do not have clean data."), br(),
+                                          checkboxInput("district_filters", "Choose 2014 Goal Meeting Status"),
+                                          h2(strong("Note: this filter only affects this chart.")),
+                                          conditionalPanel(condition = "input.district_filters == true",
+                                                           checkboxGroupInput(inputId = "meeting_goal", 
+                                                                              h2("Select whether District is Meeting the 2014 FCC Goal"),
+                                                                              choices = c("Meeting Goal", "Not Meeting Goal"), 
+                                                                              selected = c("Meeting Goal", "Not Meeting Goal"))), br(),
+                                          downloadButton('ia_tech_downloadData', 'Download'), br(),
+                                          plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
+                                     h4("SCHOOLS THAT ARE CURRENTLY OR NEED TO BE MEETING THE FCC WAN GOAL"), br(),
+                                        p("Percentage of schools currently meeting the FCC WAN Goal is represented by the percentage of WAN connections that are at least 1 Gbps. 
+                                          Percentage of schools that should be meeting the FCC WAN Goal is estimated by the percentage of schools that have more than 100 students in 
+                                          school districts that have at least three schools."), 
+                                        p("Estimates for WAN needs may not be available for some states. Please reach out to Strategic Analysis Team for the estimate, if needed."), br(),
+                                        plotOutput("histogram_projected_wan_needs"), br(), 
+                                        dataTableOutput("table_projected_wan_needs"), br(), br(), br(),
+                                     h4("DISTRICTS MEETING THE 2014 FCC GOAL UNDER HYPOTHETICAL PRICING"), br(),
+                                        p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal and the percentage of districts
+                                          that would be meeting the goal if districts currently not meeting the goal were to have access to the hypothetical pricing. 
+                                          The scale indicates cost of internet access per Mbps."), br(),
+                                        fluidRow(
+                                           column(12, plotOutput("hypothetical_ia_price")),
+                                           column(12, plotOutput("hypothetical_ia_goal"))
+                                        ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br()))#close mainPanel and sidebarLayout
+>>>>>>> master
                                      
                                      )),
 
                  navbarMenu("Fiber",
-                            tabPanel("Fiber Charts", br(), htmlOutput("helptext_schools_on_fiber"), br(), br(), 
-                                    
-                                     
+                            tabPanel("Fiber Breakdown", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
                                      sidebarLayout( sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
+                                                    h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                                 #checkboxInput("district_size2", "Select District Size"),
                                                 #conditionalPanel(condition = "input.district_size2 == true",
                                                                  checkboxGroupInput(inputId = "district_size_fiber", 
@@ -304,20 +334,27 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                        )),
                                        
                                      
-                                     
                                     mainPanel( 
-                                    h4("Distribution of Schools by Infrastructure Type"), br(), plotOutput("histogram_schools_on_fiber"), br(), dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
-                                    h4("Distribution of Schools by E-Rate Discount Rates"), br(), plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
-                                     
+                                        h4("DISTRIBUTION OF SCHOOLS BY INFRASTRUCTURE TYPE"), br(), 
+                                        p("This chart breaks out distribution of schools into the following buckets: Schools that have
+                                          associated fiber circuits or in districts assumed to have dark fiber, schools that may have
+                                          associated cable, fixed wireless, or other circuits, and schools that only have associated 
+                                          copper or DSL circuits."), br(),
+                                            plotOutput("histogram_schools_on_fiber"), br(), 
+                                            dataTableOutput("table_schools_on_fiber"), br(), br(), br(),
+                                        h4("DISTRIBUTION OF UNSCALABLE SCHOOLS BY DISTRICT E-RATE DISCOUNT RATES"), br(), 
+                                        p("This chart shows the distribution of schools that need or may need upgrades 
+                                          according to the e-rate discount rates for C1 items."), br(),
+                                            plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
+                                         
                                     
                                     ))),
                  
                  navbarMenu("Affordability",
-                          
-                            #tabPanel("Box and Whiskers: Monthly Cost Per Circuit", plotOutput("bw_plot"), tableOutput("counts_table"), tableOutput("prices_table")),
-                            tabPanel("Bar Charts + Scatterplot: Price Dispersion", br(), htmlOutput("helptext_price_cpc"), br(), align = "left", br() , 
-                                     
+                            tabPanel("Affordability Breakdown", br(), #htmlOutput("helptext_price_cpc"), br(), 
                                   sidebarLayout( sidebarPanel(width = 3,
+                                                              h2(strong("Please select circuit size(s) below. 
+                                                                        Any filters and selections applied will affect all charts on this tab.")),
                                   div(id = "affordability_filters", 
                                         uiOutput("bandwidthSelect"), 
                                        
@@ -351,10 +388,24 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                      
                                      #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                                                                                #ggvisOutput("price_disp_cpc")                  
-                                     h4("Price Dispersion: Monthly Cost per Circuit"), br(), br(), plotOutput("cpc_sidebars", width = '800px', height = '500px'), br(), br(), dataTableOutput("disp_cpc_table"), br(), br(),
-                                     h4("Price Dispersion: Monthly Cost per Mbps"),    br(), br(), plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), #plotOutput("price_disp_cpm_sidebars"),
-                                     h4("Scatterplot: Monthly Cost per Circuit"),      br(), br(), ggvisOutput("plot1"), br(), div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
+                                       fluidRow(
+                                     column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br()), 
+                                     column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
+                                       for selected services."), br()), 
+                                     column(12, align = "center", plotOutput("cpc_sidebars", width = '800px', height = '500px'), br()),
+                                     dataTableOutput("disp_cpc_table"), br(), br(),
+                                     column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br()), 
+                                     column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per Mbps
+                                       for selected services."), br()), 
+                                     column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table"), br(), br(), 
+                                     h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br()), 
+                                     column(12, align = "left", p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
+                                       at different circuit sizes.")),
+                                     column(12, align = "left", p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
+                                                   about a particular district."))), br()),
+                                     column(12, align = "center", ggvisOutput("plot1"), br())#close last column
+                                     ),# close fluidRow 
+                                     div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br() 
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
@@ -364,9 +415,8 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                             
                                      ))
                             )),#),
-                 navbarMenu("Maps", 
-                           # tabPanel("Your Selected Districts Map", plotOutput("choose_district")),
-                            tabPanel("District Lookup", #htmlOutput("helptext_leaflet_map"), br(), br(),
+                 navbarMenu("Maps",
+                            tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
                                     tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
                                     
                                    # div(class = "outer",
@@ -398,16 +448,17 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                      
                                      ), #end of tabPanel() 
                          
-                           tabPanel("District Population Maps", br(),  
+                           tabPanel("Maps", br(),  
                            sidebarLayout(
                                     sidebarPanel(width = 2,
                                     div(id = "map_filters", 
+                                        h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                       selectInput(inputId = "map_view", 
                                                  label = h2("Choose Map View:"),
-                                                 choices = c("General", "Clean/Dirty", 
-                                                             "Goals: 100kbps/Student", "Goals: 1Mbps/Student",
+                                                 choices = c("All Districts", "Clean/Dirty Districts", 
+                                                             "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
                                                              "Fiber Build Cost to Districts"),
-                                                 selected = "General"),
+                                                 selected = "All Districts"),
                                       
                                       selectInput(inputId = "tile2",
                                                   label = h2("Choose Map Background:"),
@@ -430,22 +481,18 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                                                     "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                         selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
                                                                      "Copper", "Other / Uncategorized")), 
-                                      #checkboxInput("district_size2", "Select District Size"),
-                                      #conditionalPanel(condition = "input.district_size2 == true",
                                       checkboxGroupInput(inputId = "district_size_maps", 
                                                          label = h2("Select District Size(s)"),
                                                          choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                          selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
-                                      
-                                      #checkboxInput("district_locale", "Select District Locale"),
-                                      #conditionalPanel(condition = "input.district_locale == true",
                                       checkboxGroupInput(inputId = "locale_maps", 
-                                                         label = h2("Select Locale(s)"),
+                                                         label = h2("Select District Locale(s)"),
                                                          choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                          selected = c("Rural", "Small Town", "Suburban", "Urban"))),
                                                  actionButton("map_reset_all", "Reset All Filters"),#
                                                  downloadButton('downloadData', 'Download')), #'map_downloadData'
                                      mainPanel(
+<<<<<<< HEAD
                                        
                                        
                                      
@@ -456,6 +503,16 @@ titlePanel(div(h1("SHINY for EducationSuperHighway"))),
                                               
                                               br(), br(),textOutput("n_ddt"), br(), br(),
                                      div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
+=======
+                                     fluidRow(
+                                       column(12, align = "left",  htmlOutput("text_maps")), br(),
+                                       column(12, align = "center", plotOutput("map_population")),
+                                       column(12, align = "left",  p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
+                                                   about a particular district.")))),
+                                       column(12, align = "left", textOutput("n_ddt"))
+                                     ), br(), br(),
+                                     div(dataTableOutput("table_testing"), style = "font-size:60%"), br(), br())#,  map_tables
+>>>>>>> master
                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
