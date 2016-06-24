@@ -14,7 +14,7 @@ shinyUI(fluidPage(
                     @import url('//fonts.googleapis.com/css?family=Lato:300');
 
                     body {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     font-family: 'Lato', sans-serif;
                     font-weight: 300;
                     line-height: 1.1;
@@ -59,7 +59,7 @@ shinyUI(fluidPage(
                     }
 
                     h4 {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     font-family: 'Lato', sans-serif;
                     font-weight: 500;
                     line-height: 1.1;
@@ -70,19 +70,19 @@ shinyUI(fluidPage(
                     }
                     
                     .well {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     }
                     
                     .irs-bar {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     }
                     
                     .irs-from {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     }
                     
                     .irs-to {
-                    background-color: #FFFCF5;
+                    background-color: white;
                     }
                     
                     a {

@@ -167,9 +167,9 @@ output$histogram_locale <- renderPlot({
                          labels = c("Rural", "Small Town", "Suburban", "Urban"), 
                           values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
        geom_hline(yintercept = 0) +
-       theme(plot.background = element_rect(fill = "#fffcf5"),
-             panel.background = element_rect(fill = "#fffcf5"),
-             legend.background = element_rect(fill = "#fffcf5"),
+       theme(plot.background = element_rect(fill = "white"),
+             panel.background = element_rect(fill = "white"),
+             legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
              axis.line.x = element_blank(),
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
@@ -215,9 +215,9 @@ output$histogram_size <- renderPlot({
                       labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
                       values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
     geom_hline(yintercept = 0) +
-    theme(plot.background = element_rect(fill = "#fffcf5"),
-          panel.background = element_rect(fill = "#fffcf5"),
-          legend.background = element_rect(fill = "#fffcf5"),
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
@@ -273,9 +273,9 @@ output$histogram_goals <- renderPlot({
                      labels=c("Districts", "Students")) +
          scale_y_continuous(limits = c(0, 110)) +
          geom_hline(yintercept = 0) +
-         theme(plot.background = element_rect(fill = "#fffcf5"),
-               panel.background = element_rect(fill = "#fffcf5"),
-               legend.background = element_rect(fill = "#fffcf5"),
+         theme(plot.background = element_rect(fill = "white"),
+               panel.background = element_rect(fill = "white"),
+               legend.background = element_rect(fill = "white"),
                axis.line = element_blank(), 
                axis.text.x=element_text(size=14, colour= "#899DA4"), 
                axis.text.y = element_blank(),
@@ -337,9 +337,9 @@ output$histogram_districts_ia_technology <- renderPlot({
        scale_y_continuous(limits = c(0, 110)) +
        scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
        geom_hline(yintercept = 0) +
-       theme(plot.background = element_rect(fill = "#fffcf5"),
-             panel.background = element_rect(fill = "#fffcf5"),
-             legend.background = element_rect(fill = "#fffcf5"),
+       theme(plot.background = element_rect(fill = "white"),
+             panel.background = element_rect(fill = "white"),
+             legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
@@ -405,9 +405,9 @@ output$histogram_projected_wan_needs <- renderPlot({
         scale_y_continuous(limits = c(0, 110)) +
         scale_fill_manual(values = c("#fdb913", "#899DA4")) + 
         geom_hline(yintercept = 0) +
-        theme(plot.background = element_rect(fill = "#fffcf5"),
-              panel.background = element_rect(fill = "#fffcf5"),
-              legend.background = element_rect(fill = "#fffcf5"),
+        theme(plot.background = element_rect(fill = "white"),
+              panel.background = element_rect(fill = "white"),
+              legend.background = element_rect(fill = "white"),
               axis.line = element_blank(), 
               axis.text.x=element_text(size=14, colour= "#899DA4"), 
               axis.text.y = element_blank(),
@@ -468,9 +468,9 @@ output$hypothetical_ia_price  <- renderPlot({
          scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
          scale_x_discrete(limits = c("Not Meeting Goal", "Meeting Goal")) +
          geom_hline(yintercept = 0) +
-         theme(plot.background = element_rect(fill = "#fffcf5"),
-               panel.background = element_rect(fill = "#fffcf5"),
-               legend.background = element_rect(fill = "#fffcf5"),
+         theme(plot.background = element_rect(fill = "white"),
+               panel.background = element_rect(fill = "white"),
+               legend.background = element_rect(fill = "white"),
                legend.position = "none",
                axis.line = element_blank(), 
                axis.text.x = element_text(size=14, colour= "#899DA4"), 
@@ -519,9 +519,9 @@ output$hypothetical_ia_goal <- renderPlot({
     scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing"), 
                      labels = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing")) +
     geom_hline(yintercept = 0) +
-    theme(plot.background = element_rect(fill = "#fffcf5"),
-          panel.background = element_rect(fill = "#fffcf5"),
-          legend.background = element_rect(fill = "#fffcf5"),
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
           axis.text.x = element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
@@ -607,9 +607,9 @@ output$histogram_schools_on_fiber <- renderPlot({
                      labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
        scale_y_continuous(limits = c(0, 110)) +
        geom_hline(yintercept = 0) +
-       theme(plot.background = element_rect(fill = "#fffcf5"),
-             panel.background = element_rect(fill = "#fffcf5"),
-             legend.background = element_rect(fill = "#fffcf5"),
+       theme(plot.background = element_rect(fill = "white"),
+             panel.background = element_rect(fill = "white"),
+             legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
@@ -675,9 +675,9 @@ output$histogram_by_erate_discounts <- renderPlot({
        geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
        geom_hline(yintercept = 0) +
-       theme(plot.background = element_rect(fill = "#fffcf5"),
-             panel.background = element_rect(fill = "#fffcf5"),
-             legend.background = element_rect(fill = "#fffcf5"),
+       theme(plot.background = element_rect(fill = "white"),
+             panel.background = element_rect(fill = "white"),
+             legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
              axis.text.x=element_text(size=14, colour= "#899DA4"), 
              axis.text.y = element_blank(),
@@ -1097,9 +1097,9 @@ output$map_population <- renderPlot({
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
     #ggmap(hdf) +
     geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'white', fill = "#c9c9c9") +
-    theme(plot.background = element_rect(fill = "#fffcf5"),
-          panel.background = element_rect(fill = "#fffcf5"),
-          legend.background = element_rect(fill = "#fffcf5"),
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
           line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
           legend.text = element_text(size=16), legend.position= "bottom") +
@@ -1127,9 +1127,9 @@ output$map_population <- renderPlot({
        geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
                  alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
                                                                       "Does Not Meet 1Mbps/Student Goal"), values = c("#fdb913", "#fff1d0")) +
-      theme(plot.background = element_rect(fill = "#fffcf5"),
-            panel.background = element_rect(fill = "#fffcf5"),
-            legend.background = element_rect(fill = "#fffcf5")
+      theme(plot.background = element_rect(fill = "white"),
+            panel.background = element_rect(fill = "white"),
+            legend.background = element_rect(fill = "white")
       )
   
   tt <- t + coord_map()
@@ -1306,9 +1306,9 @@ output$cpc_sidebars <- renderPlot({
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
-    theme(plot.background = element_rect(fill = "#fffcf5"),
-          panel.background = element_rect(fill = "#fffcf5"),
-          legend.background = element_rect(fill = "#fffcf5"),
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
@@ -1413,9 +1413,9 @@ output$price_disp_cpm_sidebars <- renderPlot({
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(palette = "BlGn", direction = -1) +
     geom_hline(yintercept = 0) +
-    theme(plot.background = element_rect(fill = "#fffcf5"),
-          panel.background = element_rect(fill = "#fffcf5"),
-          legend.background = element_rect(fill = "#fffcf5"),
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
           axis.text.x=element_text(size=14, colour= "#899DA4"), 
           axis.text.y = element_blank(),
