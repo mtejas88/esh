@@ -1649,7 +1649,7 @@ output$n_ddt <- renderText({
 
 ## Dynamic Viz Testing:
 
-plot2 <- reactive({
+plot2_data <- reactive({
 
     d_sub <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
                                           district_size2 %in% input$district_size_goals,
@@ -1658,7 +1658,8 @@ plot2 <- reactive({
     price <- input$set_price
 
     
-    nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals") 
+    nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting Goal") 
+
     nmg_data2 <- nmg_data %>% mutate(need_kbps = num_students*100,
                                      need_mbps = need_kbps / 1000,
                                      hyp_cost = need_mbps*price,
@@ -1687,7 +1688,7 @@ plot2 <- reactive({
     can_meet <- nmg_table %>% filter(can_mt_goals == "Can Meet 100kbps/Student")
     
     #districts meeting goals %
-    mg <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Meeting 2014 Goals")
+    mg <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Meeting Goal")
     pct_mg <- round((nrow(mg)/nrow(d_sub))*100, digits = 2) #63%
     pct_hyp <-  round(((nrow(mg) + can_meet$n) / nrow(d_sub))*100, digits = 2)
     
@@ -1700,28 +1701,27 @@ plot2 <- reactive({
     colnames(pct_joined3) <- c("status", "breakdown")
     pct_joined3$breakdown <- as.numeric(as.character(pct_joined3$breakdown))
     
-    
-    pct_joined3$pct <- paste(pct_joined3$breakdown, "%", sep = "")
-    pct_joined4 <- pct_joined3[,-2]
-    colnames(pct_joined4) <- c("variable", "percentage")
-    
-    pct_joined5 <<- pct_joined3
+    pct_joined3 #added
+    }) #added
 
-    pct_joined3 %>% 
+
+plot2 <- reactive({
+
+      plot2_data() %>%                     #pct_joined3 %>% 
       ggvis(~status, ~breakdown) %>% 
       layer_bars(fillOpacity := 0.4, fill = ~status, strokeWidth := 0) %>% 
       #layer_text(x = prop("x", ~status),
       #           y = prop("y", ~breakdown, scale = "ycenter"), text := ~breakdown,  fontSize:=20) %>% 
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
-      add_axis("y", title = "% of Districts", title_offset = 75, grid = FALSE) %>%
-      scale_numeric("y", domain = c(0, 100)) %>% 
+      add_axis("y", grid = FALSE) %>% #title = "% of Districts", title_offset = 75, 
+      #scale_numeric("y", domain = c(0, 100)) %>% 
       set_options(width = 850, height = 500)
 
 })
 
 
 
-plot2 %>% bind_shiny("plot2")
+plot2 %>% bind_shiny("hyp_plot")
 
 
 observe({   
@@ -1732,11 +1732,20 @@ observe({
 
 output$table_hyp_cost <- renderDataTable({
   
+  #validate(need(nrow(pct_joined5) > 0, ""))  
+  #datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
+  
+  pct_joined4 <- plot2_data()
+  pct_joined4$pct <- paste(format(pct_joined4$breakdown,  nsmall = 2), "%", sep = "")
+  pct_joined5 <- pct_joined4[,-2]
+  colnames(pct_joined5) <- c("variable", "percentage")
+  
+  
+  
+  
+  
   validate(need(nrow(pct_joined5) > 0, ""))  
-  
-  
   datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
-  
 })
 
 
