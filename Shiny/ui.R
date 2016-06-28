@@ -190,8 +190,8 @@ titlePanel(div(h1("Warchild"))),
                           ), #close tabPanel()
                 
                  
-                 navbarMenu("Demographics",
-                            tabPanel("Demographics Breakdown", br(),
+                 #navbarMenu("Demographics",
+                            tabPanel("Demographics", br(),
                                      
                             wellPanel(
                                       fluidRow(
@@ -211,11 +211,11 @@ titlePanel(div(h1("Warchild"))),
                                       column(12, align = "center", plotOutput("histogram_size", width = "50%")), br(), br(), 
                                       dataTableOutput("table_size"))#fluidRow
                                       ) #close wellPanel
-                            )# close tabPanel
-                            ), # close navbarMenu
+                            #), #was for navbarMenu() which we aren't using anymore
+                            ), # close tabPanel
 
-                 navbarMenu("Goals",
-                            tabPanel("Goals Breakdown", br(), #htmlOutput("helptext_goals"), br(), br(), 
+                 #navbarMenu("Goals",
+                            tabPanel("Goals", br(), #htmlOutput("helptext_goals"), br(), br(), 
                                      sidebarLayout(
                                        sidebarPanel(width = 3,            
                                        div(id = "goals_filters", 
@@ -289,7 +289,7 @@ titlePanel(div(h1("Warchild"))),
                                         dataTableOutput("table_hyp_cost")
 ))#close mainPanel and sidebarLayout
                     
-                                     )),
+                                     ),#),
 
                  navbarMenu("Fiber",
                             tabPanel("Fiber Breakdown", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
