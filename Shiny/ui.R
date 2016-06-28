@@ -252,14 +252,14 @@ titlePanel(div(h1("Warchild"))),
                                          p("This chart shows the percentage of 2014 goal meeting districts, broken out by the highest internet
                                             access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
                                             accounted for in the fiber category)."), 
-                                         p("Unknown/Error will only apply districts that do not have clean data."), br(),
-                                          checkboxInput("district_filters", "Choose 2014 Goal Meeting Status"),
+                                         p("Unknown/Error will only apply districts that do not have clean data."), 
+                                          #checkboxInput("district_filters", "Choose 2014 Goal Meeting Status"),
                                           h2(strong("Note: this filter only affects this chart.")),
-                                          conditionalPanel(condition = "input.district_filters == true",
+                                          #conditionalPanel(condition = "input.district_filters == true",
                                                            checkboxGroupInput(inputId = "meeting_goal", 
                                                                               h2("Select whether District is Meeting the 2014 FCC Goal"),
                                                                               choices = c("Meeting Goal", "Not Meeting Goal"), 
-                                                                              selected = c("Meeting Goal", "Not Meeting Goal"))), br(),
+                                                                              selected = c("Meeting Goal", "Not Meeting Goal")), br(), #) for ending conditionalPanel()
                                           downloadButton('ia_tech_downloadData', 'Download'), br(),
                                           plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology"), br(), br(), br(),
                                      h4("SCHOOLS THAT ARE CURRENTLY OR NEED TO BE MEETING THE FCC WAN GOAL"), br(),
@@ -285,14 +285,14 @@ titlePanel(div(h1("Warchild"))),
                                                   value=3,
                                                   step=1),   
                                         br(),
-                                        ggvisOutput("plot2"), br(), br(), 
+                                        ggvisOutput("hyp_plot"), br(), br(), 
                                         dataTableOutput("table_hyp_cost")
 ))#close mainPanel and sidebarLayout
                     
                                      ),#),
 
-                 navbarMenu("Fiber",
-                            tabPanel("Fiber Breakdown", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
+                 #navbarMenu("Fiber",
+                            tabPanel("Fiber", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
                                      sidebarLayout( sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
                                                     h2(strong("Any filters and selections applied will affect all charts on this tab.")),
@@ -327,10 +327,10 @@ titlePanel(div(h1("Warchild"))),
                                             plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts"))
                                          
                                     
-                                    ))),
+                                    )),#),
                  
-                 navbarMenu("Affordability",
-                            tabPanel("Affordability Breakdown", br(), #htmlOutput("helptext_price_cpc"), br(), 
+                # navbarMenu("Affordability",
+                            tabPanel("Affordability", br(), #htmlOutput("helptext_price_cpc"), br(), 
                                   sidebarLayout( sidebarPanel(width = 3,
                                                               h2(strong("Please select circuit size(s) below. 
                                                                         Any filters and selections applied will affect all charts on this tab.")),
@@ -393,7 +393,7 @@ titlePanel(div(h1("Warchild"))),
                             #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             
                                      ))
-                            )),#),
+                            ),#)
                  navbarMenu("Maps",
                             tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
                                     tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
