@@ -1,11 +1,3 @@
-/*
-Date Created: Spring 2016
-Date Last Modified : 06/27/2016
-Author(s): Justine Schott
-QAing Analyst(s): Jess Seok
-Purpose: for each zip code, count the number of active service providers and distinct types of services provided
-*/
-
 select  "LZIP",
         count(distinct reporting_name) as service_providers_in_zip,
         count(distinct concat(svcs.connect_category,
@@ -20,7 +12,7 @@ join ( select distinct entity_id, nces_code
             from public.entity_nces_codes 
             where entity_type = 'District' ) eim
 on svcs.recipient_id = eim.entity_id 
-join ag131a  -- joined because we only want to join services included in the BEN-NCES map
+join ag131a  
 on left(eim.nces_code,7) = ag131a."LEAID"
 join line_items
 on svcs.line_item_id = line_items.id

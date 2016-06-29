@@ -1,11 +1,3 @@
-/*
-Date Created: Spring 2016
-Date Last Modified : 06/27/2016
-Author(s): Justine Schott
-QAing Analyst(s): Jess Seok
-Purpose: For each district, find affordability ($3 per mbps) and bandwidth (100 kbps per student) meeting status 
-*/
-
 select  esh_id,
         exclude_from_analysis,
         case
@@ -21,7 +13,8 @@ select  esh_id,
           when ia_bandwidth_per_student::numeric < 100 then 'Not meeting'
         end as bandwidth_status,
         ia_bandwidth_per_student,
-        slug -- slug is a short-hand for unique district name created by ENG Team
+        slug 
         
 from public.districts
 where include_in_universe_of_districts = true
+
