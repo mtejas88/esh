@@ -1374,7 +1374,7 @@ output$cpc_sidebars <- renderPlot({
   b <- gather_(a, bw, percentile, dispersion)
   colnames(b) <- c("bw_mbps", "percentile", "cost" )
   b$percentile <- factor(b$percentile, levels = c("p25th", "Median", "p75th"))
-  print(b)
+
 
   positions <- c("p25th", "Median", "p75th")
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
@@ -1387,7 +1387,7 @@ output$cpc_sidebars <- renderPlot({
                      breaks=c("Median", "p25th", "p75th"),
                         labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "BlGn", direction = -1) +
+    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -1496,7 +1496,7 @@ output$price_disp_cpm_sidebars <- renderPlot({
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                      labels=c("Median", "25th", "75th")) +
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
-    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "BlGn", direction = -1) +
+    scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -1671,6 +1671,8 @@ plot2_data <- reactive({
     
     nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
     nmg_table <- as.data.frame(na.omit(nmg_table))
+    
+    print(nmg_table)
 
 ################## Trying out Jess' Methodology #########################    
     
@@ -1713,7 +1715,7 @@ plot2 <- reactive({
       #layer_text(x = prop("x", ~status),
       #           y = prop("y", ~breakdown, scale = "ycenter"), text := ~breakdown,  fontSize:=20) %>% 
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
-      add_axis("y", grid = FALSE) %>% #title = "% of Districts", title_offset = 75, 
+      add_axis("y", title = " ", ticks = 0, grid = FALSE, properties = axis_props(axis = list(strokeWidth = 0))) %>%
       #scale_numeric("y", domain = c(0, 100)) %>% 
       set_options(width = 850, height = 500)
 
