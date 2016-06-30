@@ -195,7 +195,7 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                      
                             wellPanel(
                                       fluidRow(
-                                        column(12, align = "left", h4("All vs. CLEAN: DISTRIBUTION BY DISTRICT LOCALE"), br(), 
+                                        column(12, align = "left", h4("DISTRICT LOCAL DISTRIBUTION: ALL VS. CLEAN"), br(), 
                                               p("This chart shows the distribution of districts by their locale
                                               classification according to NCES.")), br(),
                                         column(12, align = "center", plotOutput("histogram_locale", width = "50%")), br(), br(), 
@@ -203,11 +203,11 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                       ), # close wellPanel
                             wellPanel(
                                       fluidRow(
-                                      column(12, align = "left", h4("All VS CLEAN: DISTRIBUTION BY DISTRICT SIZE"), br(), 
+                                      column(12, align = "left", h4("DISTRICT SIZE DISTRIBUTION: ALL VS. CLEAN"), br(), 
                                             p("This chart shows the distribution of districts by their size 
                                                classification based on number of schools in the district. The definitions are as 
-                                               follows: Tiny(1 school); Small(2-5 schools); Medium(6-15 schools); 
-                                               Large(16-50 schools); Mega(51+ schools).")), br(),
+                                               follows: Tiny (1 school); Small (2-5 schools); Medium (6-15 schools); 
+                                               Large (16-50 schools); Mega (51+ schools).")), br(),
                                       column(12, align = "center", plotOutput("histogram_size", width = "50%")), br(), br(), 
                                       dataTableOutput("table_size"))#fluidRow
                                       ) #close wellPanel
@@ -409,6 +409,7 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                      #column(12, align = "center", ggvisOutput("plot1"), br())),#close last column & closing wellPanel
                                      column(12, align = "center", ggvisOutput("plot1"), br()), 
                                      div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br(), br() 
+
                             ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
                             ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
                              #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,

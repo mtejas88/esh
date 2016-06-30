@@ -196,7 +196,7 @@ output$table_locale <- renderDataTable({
 
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
-  data$percent <- paste0(round(data$percent), "%")
+  data$percent <- paste0(round(data$percent, 2), "%")
   data <- arrange(data, postal_cd, -locale)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
@@ -250,7 +250,7 @@ output$table_size <- renderDataTable({
 
   data$n_size <- as.character(data$n_size)
   data$n <- as.character(data$n)
-  data$percent <- paste0(round(data$percent), "%")
+  data$percent <- paste0(round(data$percent, 2), "%")
   data <- arrange(data, postal_cd, -district_size)
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
