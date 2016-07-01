@@ -1307,7 +1307,7 @@ price_disp_cpc <- reactive({
    
    b <- gather_(a, bw, percentile, dispersion)
    colnames(b) <- c("bw_mbps", "percentile", "cost" )
-   print(b)
+   #print(b)
   
     data <- sr_all() %>% 
             filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[1]))
@@ -1336,7 +1336,7 @@ price_disp_cpc <- reactive({
         
      data3 <- rbind(perc_tab_cpc, perc_tab_cpc2)    
      #data3 <- left_join(perc_tab_cpc, perc_tab_cpc2, by = c("add_perc" = "add_perc2"))
-     print(data3)
+  #   print(data3)
     }
 
     else{
@@ -1361,12 +1361,6 @@ price_disp_cpc <- reactive({
 price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
 
-
-
-
-
-
-
 output$cpc_sidebars <- renderPlot({
 
   
@@ -1380,7 +1374,6 @@ output$cpc_sidebars <- renderPlot({
                  Median = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.50, na.rm = TRUE),
                  p75th = quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.75, na.rm = TRUE))
   
-  
   bw <- "bandwidth_in_mbps"
   percentile <- "percentiles"
   dispersion <- c("p25th", "Median", "p75th")
@@ -1388,12 +1381,16 @@ output$cpc_sidebars <- renderPlot({
   b <- gather_(a, bw, percentile, dispersion)
   colnames(b) <- c("bw_mbps", "percentile", "cost" )
   b$percentile <- factor(b$percentile, levels = c("p25th", "Median", "p75th"))
-
+  b$cost_label <- paste0("$", round(b$cost, 2))
 
   positions <- c("p25th", "Median", "p75th")
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge") + 
+
     geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")
+
+#geom_text(aes(label = cost_label
+
                                  #, big.mark = ",", nsmall = 2, scientific = FALSE)
                   ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
     #scale_x_discrete(limits = positions) +
@@ -1814,7 +1811,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160624', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160701', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
   }
@@ -1823,7 +1820,7 @@ output$ia_tech_downloadData <- downloadHandler(
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_20160624', '.csv', sep = '')},
+    paste('affordability_dataset', '_20160701', '.csv', sep = '')},
   content = function(file){
     write.csv(sr_all(), file)
   }
@@ -1890,7 +1887,7 @@ output$table_testing <- renderDataTable({
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$map_view, '_20160624', '.csv', sep = '')},
+    paste(input$map_view, '_20160701', '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput_maps(), file)
   }
