@@ -27,7 +27,11 @@ shinyServer(function(input, output, session) {
   library(ggvis)
   library(DT)
   library(shinydashboard)
+  library(extrafont)
   #library(RPostgreSQL)
+  
+  #font_import(pattern="[L/l]ato")
+
   
   #drv <- dbDriver("PostgreSQL")
   #con <- dbConnect(drv, dbname = "daddkut7s5671q",
@@ -179,7 +183,12 @@ output$histogram_locale <- renderPlot({
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              axis.title.x=element_blank(),
-             axis.title.y=element_blank()) 
+             axis.title.y=element_blank(),
+             text=element_text(size = 18, family="Lato")) +
+        guides(fill=guide_legend(
+                    keywidth = 0.35,
+                    keyheight = 0.35,
+                    default.unit = "inch"))
     
   print(q)
   
@@ -229,7 +238,12 @@ output$histogram_size <- renderPlot({
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
+          axis.title.y=element_blank(),             
+          text=element_text(size = 18, family="Lato")) +
+    guides(fill=guide_legend(
+          keywidth = 0.35,
+          keyheight = 0.35,
+          default.unit = "inch"))
   
   print(q)
   
@@ -1372,25 +1386,41 @@ output$cpc_sidebars <- renderPlot({
   positions <- c("p25th", "Median", "p75th")
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge") + 
-    geom_text(aes(label = cost_label
+
+    geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")
+
+#geom_text(aes(label = cost_label
+
                                  #, big.mark = ",", nsmall = 2, scientific = FALSE)
-                  ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
+                  ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
     #scale_x_discrete(limits = positions) +
-    scale_x_discrete( 
+    scale_x_discrete(
                      breaks=c("Median", "p25th", "p75th"),
-                        labels=c("Median", "25th", "75th")) +
+                     labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
-    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = 0, colour = "#636363") +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.x=element_text(size=14, colour= "#636363"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
+          axis.title.y=element_blank(),
+          text=element_text(size = 16, family="Lato"),
+          legend.title = element_text(colour = "#636363"),
+          legend.text = element_text(colour = "#636363"),
+          legend.position = c(0.5, 0.97),
+          legend.box = "horizontal",
+          plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
+    guides(fill=guide_legend(
+      keywidth = 0.35,
+      keyheight = 0.35,
+      default.unit = "inch"))
+  
   print(v)
 
   
@@ -1490,16 +1520,26 @@ output$price_disp_cpm_sidebars <- renderPlot({
                      labels=c("Median", "25th", "75th")) +
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
-    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = 0, colour = "#636363") +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.x=element_text(size=14, colour= "#636363"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank()) 
+          axis.title.y=element_blank(),
+          legend.title = element_text(colour = "#636363"),
+          legend.text = element_text(colour = "#636363"),
+          legend.position = c(0.5, 0.97),
+          text=element_text(size = 16, family="Lato"),
+          plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
+    guides(fill=guide_legend(
+      keywidth = 0.35,
+      keyheight = 0.35,
+      default.unit = "inch")) 
   
   print(v)
   
@@ -1702,14 +1742,16 @@ plot2_data <- reactive({
 
 plot2 <- reactive({
 
-      plot2_data() %>%                     #pct_joined3 %>% 
+      plot2_data() %>%                   
       ggvis(~status, ~breakdown) %>% 
-      layer_bars(fillOpacity := 0.4, fill = ~status, strokeWidth := 0) %>% 
+      scale_ordinal('fill', range = c("#fdb913", "#f09221")) %>%
+      layer_bars(fill = ~status, strokeWidth := 0) %>% #fillOpacity := 0.4, 
       #layer_text(x = prop("x", ~status),
       #           y = prop("y", ~breakdown, scale = "ycenter"), text := ~breakdown,  fontSize:=20) %>% 
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
       add_axis("y", title = " ", ticks = 0, grid = FALSE, properties = axis_props(axis = list(strokeWidth = 0))) %>%
-      #scale_numeric("y", domain = c(0, 100)) %>% 
+      scale_numeric("y", domain = c(0, 100)) %>% 
+      add_legend("fill", title = "testing") %>% 
       set_options(width = 850, height = 500)
 
 })
@@ -1727,17 +1769,11 @@ observe({
 
 output$table_hyp_cost <- renderDataTable({
   
-  #validate(need(nrow(pct_joined5) > 0, ""))  
-  #datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
-  
   pct_joined4 <- plot2_data()
   pct_joined4$pct <- paste(format(pct_joined4$breakdown,  nsmall = 2), "%", sep = "")
   pct_joined5 <- pct_joined4[,-2]
   colnames(pct_joined5) <- c("variable", "percentage")
-  
-  
-  
-  
+
   
   validate(need(nrow(pct_joined5) > 0, ""))  
   datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
@@ -1789,6 +1825,21 @@ output$affordability_downloadData <- downloadHandler(
     write.csv(sr_all(), file)
   }
 )
+
+
+
+output$ESH_logo <- renderImage({
+  return(list(
+  src = "ESH_logo.png",
+  contentType = "image/png"))
+  
+})
+
+
+
+
+
+
 
 ####################################
 
