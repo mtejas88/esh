@@ -99,7 +99,7 @@ shinyUI(fluidPage(
 
                     div.outer {
                     position: fixed;
-                    top: 125px;
+                    top: 154px;
                     left: 0;
                     right: 0;
                     bottom: 0;
@@ -146,38 +146,38 @@ shinyUI(fluidPage(
     ),
 
   
-  
   div(class = 'horizontalformatting2', #style = 'display:inline-block',  #; horizontal-align: text-top;' 
       selectInput("dataset",
                   h2("Select Data Cleanliness"),
                   choices = c('All', 'Clean'), selected = 'Clean', width='200px')), 
+  
+  #end selectInput() and div()
+  div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-align: text-top;',           
+      selectInput("state", h2("Select State"),
+                  choices = c('All', 'AL', 'AK', 'AR','AZ',
+                              'CA','CO','CT', 'DE',
+                              'FL','GA', 'HI','IA',
+                              'ID','IL','IN','KS',
+                              'KY','LA','MA','MD',
+                              'ME','MI','MN','MO',
+                              'MS','MT','NC','ND',
+                              'NE','NH','NJ','NM',
+                              'NV','NY','OH','OK',
+                              'OR','PA','RI','SC',
+                              'SD','TN','TX','UT','VA',
+                              'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()  
 
-#end selectInput() and div()
-div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-align: text-top;',           
-    selectInput("state", h2("Select State"),
-                choices = c('All', 'AL', 'AK', 'AR','AZ',
-                            'CA','CO','CT', 'DE',
-                            'FL','GA', 'HI','IA',
-                            'ID','IL','IN','KS',
-                            'KY','LA','MA','MD',
-                            'ME','MI','MN','MO',
-                            'MS','MT','NC','ND',
-                            'NE','NH','NJ','NM',
-                            'NV','NY','OH','OK',
-                            'OR','PA','RI','SC',
-                            'SD','TN','TX','UT','VA',
-                            'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()
   
-  
-titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
+titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Warchild"),  #div(h1("Warchild"))
 
    #mainPanel(width = 12,
       ##navbarPage("",
-  
+
   div(class = "manualmainpanel",
+
                 tabsetPanel(
                   id="panels",
-                 
+                
                 tabPanel("About", 
                           
                           fluidRow(
@@ -289,7 +289,7 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                                   value=3,
                                                   step=1),   
                                         br(),
-                                        column(12, align = "center", ggvisOutput("hyp_plot"), br(), br()), 
+                                        column(12, align = "center", fluidRow(ggvisOutput("hyp_plot")), br(), br()), 
                                         dataTableOutput("table_hyp_cost")), br(), br(), br()
 ))#close mainPanel and sidebarLayout
                     
@@ -378,7 +378,7 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                     wellPanel(     
                                      column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br()), 
                                      column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per circuit
-                                       for selected services."), br()), 
+                                       for selected services."), br(), br(), br(), br()),  
                                      column(12, align = "center", plotOutput("cpc_sidebars", width = '800px', height = '500px'), br()),
                                      dataTableOutput("disp_cpc_table")), br(), br(), br(),
                                     
