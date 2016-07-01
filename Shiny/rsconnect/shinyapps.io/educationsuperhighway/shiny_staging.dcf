@@ -2,8 +2,8 @@ name: shiny_staging
 account: educationsuperhighway
 server: shinyapps.io
 appId: 108606
-bundleId: 488639
+bundleId: 493923
 url: https://educationsuperhighway.shinyapps.io/shiny_staging/
-when: 1466796974.89702
+when: 1467336169.27737
 asMultiple: FALSE
 asStatic: FALSE

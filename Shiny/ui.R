@@ -188,14 +188,108 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                           ) # close fluid row
                           
                           ), #close tabPanel()
-                
+                navbarMenu("Maps",
+                           tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
+                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                    
+                                    # div(class = "outer",
+                                    
+                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
+                                    br(),
+                                    #verbatimTextOutput("selected"),
+                                    absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                  draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
+                                                  width = 330, height = "auto",
+                                                  
+                                                  uiOutput("districtSelect"),
+                                                  selectInput(inputId = "tile",
+                                                              label = h2("Choose Map Background"),
+                                                              choices = c("Color1" = "MapQuestOpen.OSM",
+                                                                          "Color2" = "Esri.WorldStreetMap",
+                                                                          "Color3" = "Thunderforest.Transport",
+                                                                          "Color4" = "Thunderforest.OpenCycleMap",
+                                                                          "Gray1" = "CartoDB.Positron",
+                                                                          "Gray2" = "Stamen.TonerLite",
+                                                                          "Gray3" = "CartoDB.DarkMatter",
+                                                                          "Terrain1" =  "Thunderforest.Landscape",
+                                                                          "Terrain2" = "Stamen.TerrainBackground",
+                                                                          "Terrain3" = "Esri.WorldImagery",
+                                                                          "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                              selected = "Gray1")) #
+                                    
+                                    #actionButton("districtSelect", "New Points"))
+                                    
+                           ), #end of tabPanel() 
+                           
+                           tabPanel("Maps", br(),  
+                                    sidebarLayout(
+                                      sidebarPanel(width = 3,
+                                                   div(id = "map_filters", 
+                                                       h2(strong("Any filters and selections applied will affect all charts on this tab.")),
+                                                       selectInput(inputId = "map_view", 
+                                                                   label = h2("Choose Map View:"),
+                                                                   choices = c("All Districts", "Clean/Dirty Districts", 
+                                                                               "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
+                                                                               "Fiber Build Cost to Districts"),
+                                                                   selected = "All Districts"),
+                                                       
+                                                       selectInput(inputId = "tile2",
+                                                                   label = h2("Choose Map Background:"),
+                                                                   choices = c("Color1" = "MapQuestOpen.OSM",
+                                                                               "Color2" = "Esri.WorldStreetMap",
+                                                                               "Color3" = "Thunderforest.Transport",
+                                                                               "Color4" = "Thunderforest.OpenCycleMap",
+                                                                               "Gray1" = "CartoDB.Positron",
+                                                                               "Gray2" = "Stamen.TonerLite",
+                                                                               "Gray3" = "CartoDB.DarkMatter",
+                                                                               "Terrain1" =  "Thunderforest.Landscape",
+                                                                               "Terrain2" = "Stamen.TerrainBackground",
+                                                                               "Terrain3" = "Esri.WorldImagery",
+                                                                               "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                                   selected = "Gray1"), #
+                                                       
+                                                       checkboxGroupInput(inputId = "connection_districts", 
+                                                                          h2("Select Connection Type(s) - map/district view only"),
+                                                                          choices = c("Fiber", "Cable", "DSL",
+                                                                                      "Fixed Wireless", "Copper", "Other / Uncategorized"), 
+                                                                          selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
+                                                                                       "Copper", "Other / Uncategorized")), 
+                                                       checkboxGroupInput(inputId = "district_size_maps", 
+                                                                          label = h2("Select District Size(s)"),
+                                                                          choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                                                                          selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
+                                                       checkboxGroupInput(inputId = "locale_maps", 
+                                                                          label = h2("Select District Locale(s)"),
+                                                                          choices = c("Rural", "Small Town", "Suburban", "Urban"),
+                                                                          selected = c("Rural", "Small Town", "Suburban", "Urban"))),
+                                                   actionButton("map_reset_all", "Reset All Filters"),#
+                                                   downloadButton('downloadData', 'Download')), #'map_downloadData'
+                                      mainPanel(
+                                        
+                                        
+                                        fluidRow(
+                                          htmlOutput("text_maps"), br(),  #  column(12, align = "left",   
+                                          column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
+                                                                 leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
+                                                                 cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
+                                          p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
+                                                        " to see more information  about a particular district."))),
+                                          br(), textOutput("n_ddt"), br(), br(),
+                                          div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
+                                      
+                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
+                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
+                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
+                                      #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
+                                    )))
+                ,
                  
                  #navbarMenu("Demographics",
                             tabPanel("Demographics", br(),
                                      
                             wellPanel(
                                       fluidRow(
-                                        column(12, align = "left", h4("DISTRICT LOCAL DISTRIBUTION: ALL VS. CLEAN"), br(), 
+                                        column(12, align = "left", h4("DISTRICT LOCALE DISTRIBUTION: ALL VS. CLEAN"), br(), 
                                               p("This chart shows the distribution of districts by their locale
                                               classification according to NCES.")), br(),
                                         column(12, align = "center", plotOutput("histogram_locale", width = "50%")), br(), br(), 
@@ -278,12 +372,14 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                                       #  ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(),
                                   
                                     wellPanel(
-                                     h4("DISTRICTS MEETING THE 2014 FCC GOAL UNDER HYPOTHETICAL PRICING"), br(),
-                                     p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal and the percentage of districts
-                                          that would be meeting the goal if districts currently not meeting the goal were to have access to the hypothetical pricing. 
-                                       The scale indicates cost of internet access per Mbps."), br(),
+                                     h4(" HYPOTHETICAL PRICING ANALYSIS: DISTRICTS MEETING THE 2014 FCC GOAL"), br(),
+                                     p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal
+                                          and the percentage of districts
+                                          that would be meeting the goal if districts currently not meeting the goal were to
+                                  have access to more affordable internet access."), 
+                                     p("You can adjust the IA cost per Mbps assumption by using the scale."), br(),
                                           sliderInput(width = '300px', inputId = "set_price", 
-                                                  label = h2("Pricing Assumption: Cost per Mbps"), 
+                                                  label = h2("Pricing Assumption: IA Cost per Mbps"), 
                                                   min=0, 
                                                   max=15, 
                                                   value=3,
@@ -418,101 +514,7 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                             #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
                             
                                      ))
-                            ),#)
-                 navbarMenu("Maps",
-                            tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
-                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                    
-                                   # div(class = "outer",
-                                    
-                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
-                                     br(),
-                                     #verbatimTextOutput("selected"),
-                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                 draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
-                                                 width = 330, height = "auto",
-                                                 
-                                                 uiOutput("districtSelect"),
-                                                 selectInput(inputId = "tile",
-                                                             label = h2("Choose Map Background"),
-                                                             choices = c("Color1" = "MapQuestOpen.OSM",
-                                                                         "Color2" = "Esri.WorldStreetMap",
-                                                                         "Color3" = "Thunderforest.Transport",
-                                                                         "Color4" = "Thunderforest.OpenCycleMap",
-                                                                         "Gray1" = "CartoDB.Positron",
-                                                                         "Gray2" = "Stamen.TonerLite",
-                                                                         "Gray3" = "CartoDB.DarkMatter",
-                                                                         "Terrain1" =  "Thunderforest.Landscape",
-                                                                         "Terrain2" = "Stamen.TerrainBackground",
-                                                                         "Terrain3" = "Esri.WorldImagery",
-                                                                         "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                             selected = "Gray1")) #
-
-                                     #actionButton("districtSelect", "New Points"))
-                                     
-                                     ), #end of tabPanel() 
-                         
-                           tabPanel("Maps", br(),  
-                           sidebarLayout(
-                                    sidebarPanel(width = 3,
-                                    div(id = "map_filters", 
-                                        h2(strong("Any filters and selections applied will affect all charts on this tab.")),
-                                      selectInput(inputId = "map_view", 
-                                                 label = h2("Choose Map View:"),
-                                                 choices = c("All Districts", "Clean/Dirty Districts", 
-                                                             "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
-                                                             "Fiber Build Cost to Districts"),
-                                                 selected = "All Districts"),
-                                      
-                                      selectInput(inputId = "tile2",
-                                                  label = h2("Choose Map Background:"),
-                                                  choices = c("Color1" = "MapQuestOpen.OSM",
-                                                              "Color2" = "Esri.WorldStreetMap",
-                                                              "Color3" = "Thunderforest.Transport",
-                                                              "Color4" = "Thunderforest.OpenCycleMap",
-                                                              "Gray1" = "CartoDB.Positron",
-                                                              "Gray2" = "Stamen.TonerLite",
-                                                              "Gray3" = "CartoDB.DarkMatter",
-                                                              "Terrain1" =  "Thunderforest.Landscape",
-                                                              "Terrain2" = "Stamen.TerrainBackground",
-                                                              "Terrain3" = "Esri.WorldImagery",
-                                                              "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                  selected = "Gray1"), #
-                                      
-                                      checkboxGroupInput(inputId = "connection_districts", 
-                                                        h2("Select Connection Type(s) - map/district view only"),
-                                                        choices = c("Fiber", "Cable", "DSL",
-                                                                    "Fixed Wireless", "Copper", "Other / Uncategorized"), 
-                                                        selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
-                                                                     "Copper", "Other / Uncategorized")), 
-                                      checkboxGroupInput(inputId = "district_size_maps", 
-                                                         label = h2("Select District Size(s)"),
-                                                         choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                                                         selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
-                                      checkboxGroupInput(inputId = "locale_maps", 
-                                                         label = h2("Select District Locale(s)"),
-                                                         choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                                                         selected = c("Rural", "Small Town", "Suburban", "Urban"))),
-                                                 actionButton("map_reset_all", "Reset All Filters"),#
-                                                 downloadButton('downloadData', 'Download')), #'map_downloadData'
-                                     mainPanel(
-                                       
-                                     
-                                     fluidRow(
-                                            htmlOutput("text_maps"), br(),  #  column(12, align = "left",   
-                                            column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
-                                                        leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
-                                                        cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
-                                            p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
-                                                            " to see more information  about a particular district."))),
-                                              br(), textOutput("n_ddt"), br(), br(),
-                                     div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
-
-                                     #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
-                                     #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
-                                     #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
-                                     #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
-                                     )))
+                            )#, 
                 # tabPanel("View Underlying Data", p(), 
                 #            fluidPage(
                 #                  wellPanel(tags$style(type="text/css", '#leftPanel { width:300px; float:left;}'),
@@ -523,7 +525,8 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
                 #                                                        "line_items_table")),
                 #                  downloadButton('downloadData', 'Download'))), h3(tableOutput("table")))
                  
-                )) #closing tabsetPanel() and div()
+                )
+) #closing tabsetPanel() and div()
 
   
   
@@ -531,4 +534,5 @@ titlePanel(div(h1("Warchild"))),  #div(h1("Warchild"))
 
 
   
-  )) #closing fluidPage() and shinyUI()
+  )
+) #closing fluidPage() and shinyUI()
