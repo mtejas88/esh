@@ -250,7 +250,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                    selected = "Gray1"), #
                                                        
                                                        checkboxGroupInput(inputId = "connection_districts", 
-                                                                          h2("Select Connection Type(s) - map/district view only"),
+                                                                          h2("Select Highest IA Connection Type(s) for Districts"),
                                                                           choices = c("Fiber", "Cable", "DSL",
                                                                                       "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                                           selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
@@ -436,8 +436,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                 # navbarMenu("Affordability",
                             tabPanel("Affordability", br(), #htmlOutput("helptext_price_cpc"), br(), 
                                   sidebarLayout( sidebarPanel(width = 3,
-                                                              h2(strong("Please select circuit size(s) below. 
-                                                                        Any filters and selections applied will affect all charts on this tab.")),
+                                                              h2(strong("Please select circuit size(s) below. Default selection has been set to 
+                                                                        lit fiber Internet pricing.")), 
+                                                              h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                   div(id = "affordability_filters", 
                                         uiOutput("bandwidthSelect"), 
                                        
