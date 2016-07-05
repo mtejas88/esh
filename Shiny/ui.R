@@ -11,6 +11,7 @@ shinyUI(fluidPage(
   tags$head(
     tags$style(HTML("
                     @import url('//fonts.googleapis.com/css?family=Roboto+Slab');
+                    @import url('//fonts.googleapis.com/css?family=MuseoSlabW01-700');
                     @import url('//fonts.googleapis.com/css?family=Lato:300');
 
                     body {
@@ -479,7 +480,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                      dataTableOutput("disp_cpc_table")), br(), br(), br(),
                                     
                                     wellPanel(
-                                      h4("DISTRIBUTION OF MONTHLY COST PER MBPS"),
+                                      h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), br(), br(), br(),
                                       column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px')),
                                       br(), dataTableOutput("disp_cpm_table")
                                     ), 

@@ -31,7 +31,9 @@ shinyServer(function(input, output, session) {
   #library(RPostgreSQL)
   
   #font_import(pattern="[L/l]ato")
-
+  #font_import(pattern="MuseoSlabW01-700")
+  
+  loadfonts()
   
   #drv <- dbDriver("PostgreSQL")
   #con <- dbConnect(drv, dbname = "daddkut7s5671q",
@@ -239,11 +241,11 @@ output$histogram_size <- renderPlot({
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank(),             
-          text=element_text(size = 18, family="Lato")) +
-    guides(fill=guide_legend(
-          keywidth = 0.35,
-          keyheight = 0.35,
-          default.unit = "inch"))
+          text=element_text(size = 18, family="Lato")) #+
+   # guides(fill=guide_legend(
+  #        keywidth = 0.35,
+  #        keyheight = 0.35,
+  #        default.unit = "inch"))
   
   print(q)
   
@@ -1384,8 +1386,12 @@ output$cpc_sidebars <- renderPlot({
   b$cost_label <- paste0("$", round(b$cost, 2))
 
   positions <- c("p25th", "Median", "p75th")
+  
+  m <- max(b$cost) * 1.5 #adjusting height of ggplot2 chart
+  n <- nrow(b) * 2
+  
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
-    geom_bar(stat="identity", position = "dodge") + 
+    geom_bar(stat="identity", position = "dodge", width = 0.75) + 
 
     geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")
 
@@ -1400,11 +1406,12 @@ output$cpc_sidebars <- renderPlot({
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
     geom_hline(yintercept = 0, colour = "#636363") +
+    coord_cartesian(ylim=c(0, m)) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#636363"), 
+          axis.text.x=element_text(size=18, colour= "#636363"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
@@ -1412,20 +1419,18 @@ output$cpc_sidebars <- renderPlot({
           text=element_text(size = 16, family="Lato"),
           legend.title = element_text(colour = "#636363"),
           legend.text = element_text(colour = "#636363"),
-          legend.position = c(0.5, 0.97),
+          legend.position = "top", #c(0.5, 0.97),
           legend.box = "horizontal",
+          #legend.text.align = ,
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
     ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
-    guides(fill=guide_legend(
-      keywidth = 0.35,
-      keyheight = 0.35,
+    guides(fill=guide_legend(title.position="top",
+      #keywidth = 0.35,
+      #keyheight = 0.35,
       default.unit = "inch"))
-  
+
   print(v)
 
-  
-  
-  
 })
 
 
@@ -1510,8 +1515,11 @@ output$price_disp_cpm_sidebars <- renderPlot({
   print(b2)
   
   positions <- c("p25th", "Median", "p75th")
+  
+  m2 <- max(b2$cost) * 1.5 #adjusting height of ggplot2 
+  
   v <- ggplot(data = b2, aes(x=percentile, y=cost, fill=factor(bw_mbps)))+
-    geom_bar(stat="identity", position = "dodge") + 
+    geom_bar(stat="identity", position = "dodge", width = 0.75) + 
     geom_text(aes(label = paste0("$", round(cost, digits = 2))
                   #  format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)
                   ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
@@ -1521,24 +1529,26 @@ output$price_disp_cpm_sidebars <- renderPlot({
     #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
     geom_hline(yintercept = 0, colour = "#636363") +
+    coord_cartesian(ylim=c(0, m2)) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#636363"), 
+          axis.text.x=element_text(size=18, colour= "#636363"), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank(),
           legend.title = element_text(colour = "#636363"),
           legend.text = element_text(colour = "#636363"),
-          legend.position = c(0.5, 0.97),
+          legend.position = "top", #c(0.5, 0.97),
+          legend.box = "horizontal",
           text=element_text(size = 16, family="Lato"),
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
     ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
-    guides(fill=guide_legend(
-      keywidth = 0.35,
-      keyheight = 0.35,
+    guides(fill=guide_legend(title.position="top",
+      #keywidth = 0.35,
+      #keyheight = 0.35,
       default.unit = "inch")) 
   
   print(v)
