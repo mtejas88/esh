@@ -8,6 +8,8 @@ library(mapview)
 shinyUI(fluidPage(
   useShinyjs(),
   
+  # original grey color: 899DA4;
+  
   tags$head(
     tags$style(HTML("
                     @import url('//fonts.googleapis.com/css?family=Roboto+Slab');
@@ -20,7 +22,7 @@ shinyUI(fluidPage(
                     font-weight: 300;
                     line-height: 1.1;
                     font-size: 14pt;
-                    color: #899DA4;
+                    color: #737373;
                     }
                     
                     h1 {
@@ -47,7 +49,7 @@ shinyUI(fluidPage(
                     font-weight: 300;
                     line-height: 1.1;
                     font-size: 12pt;
-                    color: #899DA4;
+                    color: #737373;
                     }
                     
                     h3 {
@@ -190,37 +192,6 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                           
                           ), #close tabPanel()
                 navbarMenu("Maps",
-                           tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
-                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                    
-                                    # div(class = "outer",
-                                    
-                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
-                                    br(),
-                                    #verbatimTextOutput("selected"),
-                                    absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                  draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
-                                                  width = 330, height = "auto",
-                                                  
-                                                  uiOutput("districtSelect"),
-                                                  selectInput(inputId = "tile",
-                                                              label = h2("Choose Map Background"),
-                                                              choices = c("Color1" = "MapQuestOpen.OSM",
-                                                                          "Color2" = "Esri.WorldStreetMap",
-                                                                          "Color3" = "Thunderforest.Transport",
-                                                                          "Color4" = "Thunderforest.OpenCycleMap",
-                                                                          "Gray1" = "CartoDB.Positron",
-                                                                          "Gray2" = "Stamen.TonerLite",
-                                                                          "Gray3" = "CartoDB.DarkMatter",
-                                                                          "Terrain1" =  "Thunderforest.Landscape",
-                                                                          "Terrain2" = "Stamen.TerrainBackground",
-                                                                          "Terrain3" = "Esri.WorldImagery",
-                                                                          "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Gray1")) #
-                                    
-                                    #actionButton("districtSelect", "New Points"))
-                                    
-                           ), #end of tabPanel() 
                            
                            tabPanel("Maps", br(),  
                                     sidebarLayout(
@@ -231,7 +202,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                    label = h2("Choose Map View:"),
                                                                    choices = c("All Districts", "Clean/Dirty Districts", 
                                                                                "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
-                                                                               "Fiber Build Cost to Districts"),
+                                                                               "Fiber Build Cost to Districts",
+                                                                               "Connect Category"),
                                                                    selected = "All Districts"),
                                                        
                                                        selectInput(inputId = "tile2",
@@ -282,9 +254,43 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                       #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
                                       #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
                                       #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
-                                    )))
-                ,
-                 
+                                    )),
+                           tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
+                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                    
+                                    # div(class = "outer",
+                                    
+                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
+                                    br(),
+                                    #verbatimTextOutput("selected"),
+                                    absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                  draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
+                                                  width = 330, height = "auto",
+                                                  
+                                                  uiOutput("districtSelect"),
+                                                  selectInput(inputId = "tile",
+                                                              label = h2("Choose Map Background"),
+                                                              choices = c("Color1" = "MapQuestOpen.OSM",
+                                                                          "Color2" = "Esri.WorldStreetMap",
+                                                                          "Color3" = "Thunderforest.Transport",
+                                                                          "Color4" = "Thunderforest.OpenCycleMap",
+                                                                          "Gray1" = "CartoDB.Positron",
+                                                                          "Gray2" = "Stamen.TonerLite",
+                                                                          "Gray3" = "CartoDB.DarkMatter",
+                                                                          "Terrain1" =  "Thunderforest.Landscape",
+                                                                          "Terrain2" = "Stamen.TerrainBackground",
+                                                                          "Terrain3" = "Esri.WorldImagery",
+                                                                          "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                              selected = "Gray1")) #
+                                    
+                                    #actionButton("districtSelect", "New Points"))
+                                    
+                           ) #end of tabPanel() 
+                           
+                           
+                           
+                           ), #end of navbarMenu() for Maps section
+
                  #navbarMenu("Demographics",
                             tabPanel("Demographics", br(),
                                      

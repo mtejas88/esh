@@ -62,10 +62,8 @@ shinyServer(function(input, output, session) {
                                              levels = c("Other / Uncategorized", "Cable", "DSL",
                                                         "Copper", "Fixed Wireless", "Fiber"))
   # locale and size cuts
-  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
-  #locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
-  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
-  #size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
+  locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
+  size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
   
     # state lookup
   state_lookup <- data.frame(cbind(name = c('All', 'alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut',
@@ -128,6 +126,7 @@ shinyServer(function(input, output, session) {
     
     size_cuts %>% 
       filter(postal_cd %in% c(input$state, sample))
+    
   })
   
 ##Keep as main reactive function using district deluxe table
@@ -172,7 +171,7 @@ output$histogram_locale <- renderPlot({
   q <- ggplot(data = data) +
        geom_bar(aes(x = factor(postal_cd), y = percent, fill = factor(locale)), stat = "identity") +
        scale_fill_manual(name = "",
-                         labels = c("Rural", "Small Town", "Suburban", "Urban"), 
+                         #labels = c("Rural", "Small Town", "Suburban", "Urban"), 
                          values = c("#f26b23", "#f09221", "#fdb913", "#fff1d0")) +
                           #values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
        geom_hline(yintercept = 0) +
@@ -188,6 +187,7 @@ output$histogram_locale <- renderPlot({
              axis.title.y=element_blank(),
              text=element_text(size = 18, family="Lato")) +
         guides(fill=guide_legend(
+                    #reverse = TRUE,
                     keywidth = 0.35,
                     keyheight = 0.35,
                     default.unit = "inch"))
@@ -208,7 +208,7 @@ output$table_locale <- renderDataTable({
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent, 2), "%")
-  data <- arrange(data, postal_cd, -locale)
+  data <- data %>% group_by(postal_cd) %>% arrange(locale)
   colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
   
   
@@ -228,9 +228,10 @@ output$histogram_size <- renderPlot({
   q <- ggplot(data = data) +
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
     scale_fill_manual(name = "",
-                      labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                      #labels = c("Mega", "Large", "Medium")
+                      #labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
                       values = c("#F0643C", "#f09221", "#f4b400", "#fdb913", "#fff1d0")) + 
-                      #values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
+                    #  values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
     geom_hline(yintercept = 0) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -241,11 +242,12 @@ output$histogram_size <- renderPlot({
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank(),             
-          text=element_text(size = 18, family="Lato")) #+
-   # guides(fill=guide_legend(
-  #        keywidth = 0.35,
-  #        keyheight = 0.35,
-  #        default.unit = "inch"))
+          text=element_text(size = 18, family="Lato")) +
+   guides(fill=guide_legend(
+          #reverse = TRUE,
+          keywidth = 0.35,
+          keyheight = 0.35,
+          default.unit = "inch"))
   
   print(q)
   
@@ -260,18 +262,17 @@ output$table_size <- renderDataTable({
   validate(
     need(input$state != 'All', "")
   )
-  
 
   #datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE,
 
-  data$n_size <- as.character(data$n_size)
-  data$n <- as.character(data$n)
-  data$percent <- paste0(round(data$percent, 2), "%")
-  data <- arrange(data, postal_cd, -district_size)
+  #data$n_size <- as.character(data$n_size)
+  #data$n <- as.character(data$n)
+  data <- data %>% group_by(postal_cd) %>% arrange(district_size)
+  data$percent <- paste(round(data$percent, 2), "%", sep ="")
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
   
   datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
-  
+
 })
 
 ######
@@ -1108,12 +1109,6 @@ output$choose_district <- renderPlot({
 # map of districts 
 output$population_leaflet <- renderLeaflet({ 
   
-  
-#  sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
-#                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
-#                    "IA Connection: ", school_districts()$new_connect_type_goals, "<br>",
-#                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
-  
   data <- district_subset() %>%
            filter(new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
@@ -1134,9 +1129,9 @@ output$population_leaflet <- renderLeaflet({
                         title = "Cleanliness Status of District", opacity = 1)
   
   l3 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting 2014 Goals", "#fdb913", "#fff1d0"), 
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting Goal", "#fdb913", "#cb2027"), 
                                            stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-           addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
+           addLegend("bottomright", colors = c("#fdb913", "#cb2027"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
               title = "Goal Status", opacity = 1)
   
   l4 <- leaflet(data) %>% 
@@ -1151,6 +1146,12 @@ output$population_leaflet <- renderLeaflet({
                                       stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
                     addLegend("bottomright", colors = c("#fff1d0", "#fdb913"), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"),
                                title = "Cost for Fiber Build", opacity = 1)
+  
+  #l6 <- leaflet(data) %>% 
+  #  addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~as.factor(new_connect_type_map), 
+  #                                                     stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
+  #  addLegend("bottomright", title = "Connect Category", opacity = 1)
+  
   
   switch(input$map_view,
          "All Districts" = print(l1),
@@ -1182,14 +1183,19 @@ output$map_population <- renderPlot({
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
     #ggmap(hdf) +
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'white', fill = "#c9c9c9") +
+    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'white', fill = "#d9d9d9") +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position= "bottom") +
+          legend.key = element_blank(),
+          legend.text = element_text(size=16, family="Lato"), 
+          legend.position= "bottom",
+          legend.direction="vertical") +
     guides(shape=guide_legend(override.aes=list(size=7))) 
+
+  
   
   q <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#fdb913"),
@@ -1206,13 +1212,13 @@ output$map_population <- renderPlot({
   s <- state_base + 
     geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
                alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 100kbps/Student Goal", 
-                                                                      "Does Not Meet 100kbps/Student Goal"), values = c("#fdb913", "#fff1d0"))
+                                                                      "Does Not Meet 100kbps/Student Goal"), values = c("#fdb913", "#cb2027"))
   ss <- s + coord_map()
   
   t <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
                  alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
-                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#fdb913", "#fff1d0")) +
+                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#009296", "#fff1d0")) +
       theme(plot.background = element_rect(fill = "white"),
             panel.background = element_rect(fill = "white"),
             legend.background = element_rect(fill = "white")
@@ -1228,16 +1234,23 @@ output$map_population <- renderPlot({
                aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
                alpha = 0.8, size = 4) +
     scale_color_manual(values = c("#fff1d0", "#fdb913"), 
-                       breaks = c(0, 1), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"))
+                       breaks = c(0, 1), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district"))
   
   uu <- u + coord_map()
+  
+  
+  v <- state_base + 
+      geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(hierarchy_connect_category)),
+                 alpha = 0.7, size = 4)
+  vv <- v + coord_map()
   
   switch(input$map_view,
          "All Districts" = print(qq),
          "Clean/Dirty Districts" = print(rr),
          'Goals: 100 kbps/Student' = print(ss),
          'Goals: 1 Mbps/Student' = print(tt),
-         'Fiber Build Cost to Districts' = print(uu))
+         'Fiber Build Cost to Districts' = print(uu),
+         'Connect Category' = print(vv))
   
 })
 
@@ -1352,9 +1365,8 @@ price_disp_cpc <- reactive({
     #add_axis("x", orient = "top", title = "Price Dispersion: Monthly Cost Per Circuit",
      #          properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
       #         grid=FALSE)  %>% 
-    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE)
-      #%>%
-    #add_legend(title = "test")
+    add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE) %>% 
+    add_legend("stroke", title = "")    
     #hide_axis("y")
     }
   
@@ -1600,6 +1612,7 @@ vis <- reactive({
         add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
         add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
         scale_numeric("x", domain = c(0, starting_pt)) %>% 
+        add_legend("fill", title = "") %>% 
         set_options(width = 800, height = 500)
     }  
   
@@ -1613,6 +1626,7 @@ vis <- reactive({
     add_tooltip(district_tooltip, "hover")  %>%
     add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
+    add_legend("fill", title = "") %>%         
     set_options(width = 800, height = 500)
     }
   
@@ -1869,7 +1883,8 @@ datasetInput_maps <- reactive({
         "Clean/Dirty Districts" =  data,
         'Goals: 100 kbps/Student' =  data,
         'Goals: 1 Mbps/Student' =  data,
-        'Fiber Build Cost to Districts' = data2)
+        'Fiber Build Cost to Districts' = data2,
+        'Connect Category' = data)
   
 })
 
@@ -1891,7 +1906,8 @@ output$table_testing <- renderDataTable({
          "Clean/Dirty Districts" =  datatable(map_data),
          'Goals: 100 kbps/Student' =  datatable(map_data),
          'Goals: 1 Mbps/Student' =  datatable(map_data),
-         'Fiber Build Cost to Districts' = datatable(map_data2))
+         'Fiber Build Cost to Districts' = datatable(map_data2),
+         'Connect Category' = datatable(map_data))
   
 })
 
