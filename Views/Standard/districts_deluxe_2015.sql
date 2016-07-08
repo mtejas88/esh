@@ -51,12 +51,12 @@ select
   case 
     when adc.ia_cost_per_mbps is null 
       then districts.ia_cost_per_mbps 
-      else (adc.ia_cost_per_mbps::numeric/12)::varchar
+      else (adc.ia_cost_per_mbps/12)::varchar
   end as "monthly_ia_cost_per_mbps",
   (adc.ia_bandwidth_per_student/1000) * adc.num_students as total_ia_bw_mbps, 
   (adc.ia_bandwidth_per_student/1000) * adc.num_students * adc.ia_cost_per_mbps/12 as total_ia_monthly_cost,
   case 
-    when (adc.ia_cost_per_mbps::numeric/12)<=3 
+    when adc.ia_cost_per_mbps/12.0<=3 
       then true 
       else false 
   end as meeting_$3_per_mbps_affordability_target,

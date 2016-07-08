@@ -124,18 +124,7 @@ left join ( select  ag131a."LSTREE",
             group by ag131a."LSTREE" ) sc_MT
 on d."LSTREE"=sc_MT."LSTREE"
 
-where ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
-        (case   
-            when "LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')    
-            else false    
-          end )   
-        --in RI and MA we also include 4's with majority type 1 schools.    
-        or ("LSTATE" in ('RI', 'MA')    
-            and "TYPE" = '4'    
-            and sc.school_type_1_count/sc.school_count::numeric >= .75 )    
-        --in NY we also include 3's, in VT we only include 3's    
-        or ("LSTATE" in ('VT', 'NY')    
-            and "TYPE" = '3') )
+where sc131a
 and "LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
 and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
 and ( sc.student_count - sc.student_pk_count  >0 
