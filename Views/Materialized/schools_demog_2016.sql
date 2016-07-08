@@ -25,7 +25,8 @@ select d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '3' then 'Town'
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
-        end as locale
+        end as locale,
+        ds.campus_id
 
 from public.sc131a 
 join (select *
@@ -35,6 +36,8 @@ on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
+left join public.districts_schools ds
+on eim.entity_id = ds.school_id
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
@@ -69,7 +72,9 @@ select  d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '3' then 'Town'
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
-        end as locale
+        end as locale,
+        ds.campus_id
+
 from public.sc131a 
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
@@ -80,6 +85,8 @@ on ag131a."LSTREE" = d.address
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
+left join public.districts_schools ds
+on eim.entity_id = ds.school_id
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
@@ -115,7 +122,9 @@ select  d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '3' then 'Town'
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
-        end as locale
+        end as locale,
+        ds.campus_id
+        
 from public.sc131a 
 join (select *
       from districts_demog_2016
@@ -124,6 +133,8 @@ on sc131a."UNION" = d.union_code
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
+left join public.districts_schools ds
+on eim.entity_id = ds.school_id
 where sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
