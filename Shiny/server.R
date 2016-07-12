@@ -768,7 +768,7 @@ output$map_population <- renderPlot({
   
   
   v <- state_base + 
-      geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(hierarchy_connect_category)),
+      geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(new_connect_type_goals)),
                  alpha = 0.7, size = 4)
   vv <- v + coord_map()
   
@@ -777,8 +777,8 @@ output$map_population <- renderPlot({
          "Clean/Dirty Districts" = print(rr),
          'Goals: 100 kbps/Student' = print(ss),
          'Goals: 1 Mbps/Student' = print(tt),
-         'Fiber Build Cost to Districts' = print(uu),
-         'Connect Category' = print(vv))
+         'Fiber Build Cost to Districts' = print(uu))#,
+         #'Highest IA Connect Type' = print(vv))
   
 })
 

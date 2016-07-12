@@ -197,8 +197,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                    label = h2("Choose Map View:"),
                                                                    choices = c("All Districts", "Clean/Dirty Districts", 
                                                                                "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
-                                                                               "Fiber Build Cost to Districts",
-                                                                               "Connect Category"),
+                                                                               "Fiber Build Cost to Districts"),
+                                                                               #"Connect Category"),
                                                                    selected = "All Districts"),
                                                        
                                                        selectInput(inputId = "tile2",
