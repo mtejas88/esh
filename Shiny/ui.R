@@ -8,8 +8,6 @@ library(mapview)
 shinyUI(fluidPage(
   useShinyjs(),
   
-  # original grey color: 899DA4;
-  
   tags$head(
     tags$style(HTML("
                     @import url('//fonts.googleapis.com/css?family=Roboto+Slab');
@@ -173,9 +171,6 @@ shinyUI(fluidPage(
   
 titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Warchild"),  #div(h1("Warchild"))
 
-   #mainPanel(width = 12,
-      ##navbarPage("",
-
   div(class = "manualmainpanel",
 
                 tabsetPanel(
@@ -248,21 +243,13 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
                                           br(), textOutput("n_ddt"), br(), br(),
-                                          div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br())) #end of fluidRow()
-                                      
-                                      #wellPanel("Clean/Dirty Districts", br(), plotOutput("map_cleanliness"), textOutput("n_ddt2")),
-                                      #wellPanel("Districts Meeting 2014 IA Goal (no oversub)", br(), plotOutput("map_2014_goals"), textOutput("n_ddt3")),
-                                      #wellPanel("Districts Meeting 2018 IA Goal (w/ oversub)", br(), plotOutput("map_2018_goals"), textOutput("n_ddt4")),
-                                      #wellPanel("Fiber Build Costs to Unscalable Districts", plotOutput("map_fiber_needs"), textOutput("n_ddt5")))
+                                          div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br()
+                                          )) #end of fluidRow()
                                     )),
                            tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
                                     tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                    
-                                    # div(class = "outer",
-                                    
                                     div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
                                     br(),
-                                    #verbatimTextOutput("selected"),
                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                                                   draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
                                                   width = 330, height = "auto",
@@ -283,11 +270,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
                                                               selected = "Gray1")) #
                                     
-                                    #actionButton("districtSelect", "New Points"))
-                                    
                            ) #end of tabPanel() 
-                           
-                           
                            
                            ), #end of navbarMenu() for Maps section
 
@@ -327,8 +310,6 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                         "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                             selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
                                                                          "Copper", "Other / Uncategorized")), 
-                                         #checkboxInput("district_size2", "Select District Size"),
-                                         #conditionalPanel(condition = "input.district_size2 == true",
                                          checkboxGroupInput(inputId = "district_size_goals", 
                                                             label = h2("Select District Size(s)"),
                                                             choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
@@ -355,9 +336,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                             access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
                                             accounted for in the fiber category)."), 
                                          p("Unknown/Error will only apply districts that do not have clean data."), 
-                                          #checkboxInput("district_filters", "Choose 2014 Goal Meeting Status"),
                                           h2(strong("Note: this filter only affects this chart.")),
-                                          #conditionalPanel(condition = "input.district_filters == true",
                                                            checkboxGroupInput(inputId = "meeting_goal", 
                                                                               h2("Select whether District is Meeting the 2014 FCC Goal"),
                                                                               choices = c("Meeting Goal", "Not Meeting Goal"), 
@@ -373,11 +352,6 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                         p("Estimates for WAN needs may not be available for some states. Please reach out to Strategic Analysis Team for the estimate, if needed."), br(),
                                         plotOutput("histogram_projected_wan_needs"), br(), 
                                         dataTableOutput("table_projected_wan_needs")), br(), br(), br(),
-                                   #     fluidRow(
-                                    #       column(12, plotOutput("hypothetical_ia_price")),
-                                     #      column(12, plotOutput("hypothetical_ia_goal"))
-                                      #  ), br(), dataTableOutput("table_hypothetical_ia_goal"), br(), br(),
-                                  
                                     wellPanel(
                                      h4(" HYPOTHETICAL PRICING ANALYSIS: DISTRICTS MEETING THE 2014 FCC GOAL"), br(),
                                      p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal
@@ -397,29 +371,22 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
 ))#close mainPanel and sidebarLayout
                     
                                      ),#),
-
-                 #navbarMenu("Fiber",
                             tabPanel("Fiber", br(), #htmlOutput("helptext_schools_on_fiber"), br(), br(), 
-                                     sidebarLayout( sidebarPanel(width = 3,
+                                     sidebarLayout( 
+                                       sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
                                                     h2(strong("Any filters and selections applied will affect all charts on this tab.")),
-                                                #checkboxInput("district_size2", "Select District Size"),
-                                                #conditionalPanel(condition = "input.district_size2 == true",
                                                                  checkboxGroupInput(inputId = "district_size_fiber", 
                                                                                     label = h2("Select District Size(s)"),
                                                                                     choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                                                     selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
-                                                
-                                                #checkboxInput("district_locale", "Select District Locale"),
-                                                #conditionalPanel(condition = "input.district_locale == true",
                                                                  checkboxGroupInput(inputId = "locale_fiber", 
                                                                                     label = h2("Select Locale(s)"),
                                                                                     choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                                                     selected = c("Rural", "Small Town", "Suburban", "Urban")),#,
                                                 actionButton("fiber_reset_all", "Reset All Filters")
                                        )),
-                                       
-                                     
+                                   
                                     mainPanel( 
                                       
                                       wellPanel(
@@ -437,10 +404,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           according to the e-rate discount rates for C1 items."), br(),
                                             plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts")))
                                         
-                                    )),#),
-                 
-                # navbarMenu("Affordability",
-                            tabPanel("Affordability", br(), #htmlOutput("helptext_price_cpc"), br(), 
+                                    )), # close Fiber tabPanel
+                            tabPanel("Affordability", br(), 
                                   sidebarLayout( sidebarPanel(width = 3,
                                                               h2(strong("Please select circuit size(s) below. Default selection has been set to 
                                                                         lit fiber Internet pricing.")), 
@@ -464,9 +429,6 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                            label = h2("Select District Size(s)"),
                                                            choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
                                                            selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
-                                        
-                                        #checkboxInput("district_locale", "Select District Locale"),
-                                        #conditionalPanel(condition = "input.district_locale == true",
                                         checkboxGroupInput(inputId = "locale_affordability", 
                                                            label = h2("Select Locale(s)"),
                                                            choices = c("Rural", "Small Town", "Suburban", "Urban"),
@@ -474,10 +436,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                        
                                        actionButton("affordability_reset_all", "Reset All Filters"),  
                                        downloadButton('affordability_downloadData', 'Download')), # closing sidebar panel,
-                                     
-                                     #splitLayout(cellWidths = c("50%", "50%"), ggvisOutput("price_disp_cpc"), ggvisOutput("price_disp_cpm")),
                                      mainPanel(
-                                       #fluidRow(
                                          
                                     wellPanel(     
                                      column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER CIRCUIT"), br()), 
@@ -489,58 +448,21 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                     wellPanel(
                                       h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), br(), br(), br(),
                                       column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px')),
-                                      br(), dataTableOutput("disp_cpm_table")
-                                    ), 
-                                     #column(12, align = "left", h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br()), 
-                                     #column(12, align = "left", p("This chart shows the 25th percentile, median, and 75th percentile of monthly cost per Mbps
-                                     #  for selected services."), br()), 
-                                     #column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px'), br(), dataTableOutput("disp_cpm_table")), 
+                                      br(), dataTableOutput("disp_cpm_table"), 
+                                     
                                      br(), br(), br(),
                                     
-                                    #),# close fluidRow 
-                        
-                                     
-                                
                                      h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(),#), 
                                     p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
                                        at different circuit sizes."),
                                     p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
                                                    about a particular district."))), br(),
-                                     #column(12, align = "left", p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
-                                    #   at different circuit sizes.")),
-                                     #column(12, align = "left", p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
-                                      #             about a particular district."))), br()),
-                                     #column(12, align = "center", ggvisOutput("plot1"), br())),#close last column & closing wellPanel
                                      column(12, align = "center", ggvisOutput("plot1"), br()), 
                                      div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br(), br() 
-
-                            ##tabPanel("Histogram: Monthly Cost Per Mbps", htmlOutput("helptext_price_cpm"), align = "left", ggvisOutput("price_disp_cpm"), align = "center"),
-                            ##tabPanel("Scatterplot: Monthly Cost Per Circuit", htmlOutput("helptext_price_cpm_scatter"), align = "left", ggvisOutput("plot1"), align = "center")
-                             #tabPanel("Histogram: Median Cost per Circuit by State", plotOutput("histogram_cost_comparison_by_state"), tableOutput("table_cost_comparison_by_state"))#,
-                            #tabPanel("Current vs. Ideal Pricing: % Districts Meeting Goals", plotOutput("histogram_hypothetical_ia_goal"), tableOutput("table_hypothetical_ia_goal"), tableOutput("table_hypothetical_median_cost2"))
-                            #tabPanel("Comparison: Overall National", plotOutput("overall_national_comparison"), tableOutput("national_n_table"), tableOutput("state_n_table")),
-                            #tabPanel("Comparison: Your State vs. Rest", plotOutput("state_vs_rest_comparison"), tableOutput("n_observations_comparison"))
-                            
                                      ))
-                            )#, 
-                # tabPanel("View Underlying Data", p(), 
-                #            fluidPage(
-                #                  wellPanel(tags$style(type="text/css", '#leftPanel { width:300px; float:left;}'),
-                #                            id = "leftPanel",
-                #                            selectInput(inputId = "download_dataset", 
-                #                                            label = h2("Choose a dataset:"),
-                #                                            choices = c("districts_table", 
-                #                                                        "line_items_table")),
-                #                  downloadButton('downloadData', 'Download'))), h3(tableOutput("table")))
-                 
-                )
-) #closing tabsetPanel() and div()
+                            )
+                ) # close affordability tabPanel  
+      ))#closing tabsetPanel()  #close  div()
 
   
-  
-
-
-
-  
-  )
-) #closing fluidPage() and shinyUI()
+)) #closing fluidPage() and shinyUI()

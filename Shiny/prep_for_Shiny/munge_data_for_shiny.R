@@ -11,22 +11,17 @@ sapply(lib, function(x) require(x, character.only = TRUE))
 wd <- "~/Desktop/ficher/Shiny/prep_for_Shiny"
 setwd(wd)
 
-services <- read.csv("services_received_20160701.csv", as.is = TRUE)
-districts <- read.csv("deluxe_districts_20160701.csv", as.is = TRUE)
+services <- read.csv("services_received_20160711.csv", as.is = TRUE)
+districts <- read.csv("deluxe_districts_20160711.csv", as.is = TRUE)
 discounts <- read.csv("district_discount_rates_20160414.csv", as.is = TRUE)
 usac_matrix <- read.csv("usac_discount_matrix.csv", as.is = TRUE)
 schools_needing_wan <- read.csv("schools_needing_wan_20160624.csv", as.is = TRUE)
-
-# nrow(services) #83196
-# nrow(districts) #13025
 
 ### SERVICES RECEIVED
 # filter the data, using proper conditions
 services <- services %>% 
   filter(shared_service == "District-dedicated" & 
            dirty_status == "include clean" & exclude == "FALSE")
-# nrow(services) #15812
-# length(unique(services$line_item_id)) #13,554
 
 # exclude rows that that contain duplicate line items
 services <- services[!duplicated(services$line_item_id), ]
@@ -39,14 +34,12 @@ services <- services[!grepl("exclude_for_cost_only", services$open_flags),]
 
 services$ia_bandwidth_per_student <- as.numeric(services$ia_bandwidth_per_student)
 services$postal_cd <- as.character(services$postal_cd)
-services$band_factor <- as.factor(services$bandwidth_in_mbps)
 
 # Append new column for purpose type
 services$new_purpose[services$internet_conditions_met == TRUE] <- "Internet"
 services$new_purpose[services$wan_conditions_met == TRUE] <- "WAN"
 services$new_purpose[services$isp_conditions_met == TRUE] <- "ISP Only"
 services$new_purpose[services$upstream_conditions_met == TRUE] <- "Upstream"
-# table(services$new_purpose)
 
 # Create new column for monthly cost per circuit:
 services$monthly_cost_per_circuit <- services$line_item_total_monthly_cost / services$line_item_total_num_lines 
@@ -61,73 +54,37 @@ services$new_connect_type[services$connect_type %in% c("Lit Fiber Service")] <- 
 services$new_connect_type[services$connect_type %in% c("DS-1 (T-1)", "DS-3 (T-3)")] <- "Copper"
 services$new_connect_type <- ifelse(is.na(services$new_connect_type), "Other / Uncategorized", services$new_connect_type)
 
-# Create National column for overall national
-services$national <- rep("National", nrow(services))
+# take out columns that are internal only
+out <- which(names(services) %in% c("consortium_shared",
+                                     "shared_service",
+                                     "purpose",
+                                     "wan",
+                                     "broadband",
+                                     "exclude",
+                                     "open_flags",
+                                     "dqs_excluded",
+                                     "district_monthly_ia_cost_per_mbps",
+                                     "district_total_ia_rounded_to_nearest_mbps",
+                                     "exclude_from_analysis",
+                                     "isp_conditions_met",
+                                     "wan_conditions_met",
+                                     "internet_conditions_met",
+                                     "upstream_conditions_met",
+                                     "recipient_districts",
+                                     "recipient_postal_cd",
+                                     "dirty_status",
+                                     "band_factor",
+                                     "connect_type"))
 
-##  SERVICES RECEIVED DATA: END ##
+services <- services[, -out]
+rm(out)
 
-## prepare data for IA price dispersion chart, holding  circuit size and type constant
-
-ia_prices <- services %>%
-             filter(band_factor %in% c(50, 100, 500, 1000, 10000))
-                      
-dispersion <- ia_prices %>%
-              group_by(postal_cd, band_factor, new_connect_type, new_purpose) %>%
-              summarize(n = n(),
-                        min = round(quantile(monthly_cost_per_circuit, 0.10, na.rm = TRUE), -2),
-                        q10 = round(quantile(monthly_cost_per_circuit, 0.10, na.rm = TRUE), -2),
-                        q50 = round(quantile(monthly_cost_per_circuit, 0.50, na.rm = TRUE), -2),
-                        q90 = round(quantile(monthly_cost_per_circuit, 0.90, na.rm = TRUE), -2),
-                        max = round(quantile(monthly_cost_per_circuit, 0.90, na.rm = TRUE), -2))
-
-dispersion$bucket_1 <- paste("$", dispersion$min, " - ", "less than ", "$", dispersion$q10, sep = "")
-dispersion$bucket_2 <- paste("$", dispersion$q10, " - ", "less than ", "$", dispersion$q50, sep = "")
-dispersion$bucket_3 <- paste("$", dispersion$q50, " - ", "less than ", "$", dispersion$q90, sep = "")
-dispersion$bucket_4 <- paste("$", dispersion$q90, " - ", "up to ", "$", dispersion$max, sep = "")
-
-services <- left_join(services, dispersion, by = c("postal_cd", "band_factor", "new_connect_type", "new_purpose"))
-
-services$price_bucket <- ifelse(services$monthly_cost_per_circuit < services$q10, services$bucket_1,
-                                ifelse(services$monthly_cost_per_circuit < services$q50, services$bucket_2,
-                                       ifelse(services$monthly_cost_per_circuit < services$q90, services$bucket_3, services$bucket_4)))
-
-services$bubble_size <- ifelse(services$monthly_cost_per_circuit < services$q10, 3,
-                              ifelse(services$monthly_cost_per_circuit < services$q50, 6,
-                                    ifelse(services$monthly_cost_per_circuit < services$q90, 9, 12)))
-
-# the auto-update experiment kind of failed
-services$price_bucket_beta <- ifelse(services$monthly_cost_per_circuit < 1000, "less than $1,000",
-                                ifelse(services$monthly_cost_per_circuit < 2000, "$1,000 - less than $2,000",
-                                       ifelse(services$monthly_cost_per_circuit < 4000, "$2,000 - less than $4,000",
-                                              ifelse(services$monthly_cost_per_circuit < 6000, "$4,000 - less than $6,000", "more than $6,000"))))
-                                  
-services$bubble_size_beta <- ifelse(services$monthly_cost_per_circuit < 1000, 3,
-                                     ifelse(services$monthly_cost_per_circuit < 2000, 6,
-                                            ifelse(services$monthly_cost_per_circuit < 4000, 9,
-                                                   ifelse(services$monthly_cost_per_circuit < 6000, 12, 15))))
-
-
-
-# filter to relevant columns
-# names(services)
-
-
-#services <- dplyr::select(services, recipient_id, postal_cd,
-#                          line_item_total_num_lines, line_item_total_monthly_cost,
-#                          num_students, num_schools, latitude, longitude,
-#                          locale, district_size, band_factor, new_purpose,
-#                          monthly_cost_per_circuit, monthly_cost_per_mbps,
-#                          new_connect_type, national, q10, q50, q90, bubble_size,
-#                          price_bucket, bubble_size_beta, price_bucket_beta)
-
-
-### DELUXE DISTRICTS TABLE:  prepping the data to be the correct subset to use ###
+### DELUXE DISTRICTS TABLE: 
 districts$ia_bandwidth_per_student <- as.numeric(districts$ia_bandwidth_per_student)
 districts$monthly_ia_cost_per_mbps <- as.numeric(districts$monthly_ia_cost_per_mbps)
 ## Keep original goals variables
 # District Meeting Goals: 1 if district is meeting goal
 districts$meeting_goals_district <- ifelse(districts$meeting_2014_goal_no_oversub == "TRUE", 1, 0)
-
 
 # New Variables for mapping #
 districts$exclude <- ifelse(districts$exclude_from_analysis == "FALSE", "Clean", "Dirty")
@@ -146,14 +103,6 @@ districts$not_all_scalable <- ifelse(districts$nga_v2_known_unscalable_campuses 
 # deluxe districts
 districts$new_connect_type_goals <- ifelse(districts$hierarchy_connect_category %in% c("None - Error", "Other/Uncategorized"), 
                                      "Other / Uncategorized", districts$hierarchy_connect_category)
-
-
-
-# unscalable ratio
-
-districts$unscalability_ratio <- (districts$nga_v2_assumed_unscalable_campuses + districts$nga_v2_known_unscalable_campuses) / districts$num_campuses
-districts$num_unscalable_schools <- districts$unscalability_ratio * districts$num_schools  
-
 
 
 # merge on discount rates
@@ -190,7 +139,7 @@ districts[missing_discount_rate_urban, ]$c1_discount_rate <- districts[missing_d
 districts[missing_discount_rate_rural, ]$c1_discount_rate <- districts[missing_discount_rate_rural, ]$usac_c1_rural
 
 # there are 165 districts still missing discount rates
-# since they are also missing FLR percentage, :/
+# since they are also missing FRL percentage, :/
 districts$usac_c1_urban <- NULL
 districts$usac_c1_rural <- NULL
 
@@ -218,13 +167,35 @@ districts$schools_on_fiber <- ((districts$nga_v2_known_scalable_campuses + distr
 districts$schools_may_need_upgrades <- (districts$nga_v2_assumed_unscalable_campuses / districts$num_campuses) * districts$num_schools
 districts$schools_need_upgrades <- (districts$nga_v2_known_unscalable_campuses / districts$num_campuses) * districts$num_schools
 
+# filter to relevant columns
+out <- which(names(districts) %in% c("esh_id", "ia_oversub_ratio", "district_type",
+                                 "num_campuses", "num_open_dirty_flags", "clean_categorization",
+                                 "meeting_2014_goal_oversub", "meeting_2018_goal_no_oversub",
+                                 "meeting_.3_per_mbps_affordability_target",
+                                 "hierarchy_connect_category", "nga_v2_known_scalable_campuses",
+                                 "nga_v2_assumed_scalable_campuses", "nga_v2_known_unscalable_campuses",
+                                 "nga_v2_assumed_unscalable_campuses",
+                                 "known_fiber_campuses", "assumed_fiber_campuses", "known_nonfiber_campuses",
+                                 "assumed_nonfiber_campuses", "fiber_lines", "fixed_wireless_lines",
+                                 "cable_lines", "copper_dsl_lines", "other_uncategorized_lines",
+                                 "fiber_internet_upstream_lines", "fixed_wireless_internet_upstream_lines",
+                                 "cable_internet_upstream_lines", "copper_dsl_internet_upstream_lines",
+                                 "other_uncategorized_internet_upstream_lines",
+                                 "wan_lines", "ia_applicants", "dedicated_isp_sp",
+                                 "dedicated_isp_services", "dedicated_isp_contract_expiration",
+                                 "bundled_internet_sp", "bundled_internet_connections",
+                                 "bundled_internet_contract_expiration", "upstream_applicants",
+                                 "upstream_sp", "upstream_connections", "upstream_contract_expiration",
+                                 "wan_applicants", "wan_sp", "wan_connections",
+                                 "wan_contract_expiration"))
 
+districts <- districts[, -out]
 ## END
 
 ## locale and district size cuts
 
 districts_clean <- districts %>%
-                   filter(exclude_from_analysis == FALSE)
+                   filter(exclude == "Clean")
 districts_clean$postal_cd <- paste0(districts_clean$postal_cd, " Clean")
 
 data <- rbind(districts, districts_clean)
@@ -245,7 +216,7 @@ locale_cuts$percent <- 100 * locale_cuts$n_locale / locale_cuts$n
 locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
 locale_cuts <- arrange(locale_cuts, postal_cd, locale)
 
-# by districts
+# by district sizes
 size_cuts <- data %>%
                   group_by(postal_cd, district_size) %>%
                   summarize(n_locale = n())
