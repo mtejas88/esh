@@ -9,11 +9,6 @@
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
-  ## Note: it is necessary to create two separate reactive datasets for box-and-whiskers (b-w) plot 
-  ## and other price comparison plots since b-w plot is limited to popular bandwidths
-  
-  ## General Line Items for national comparison (national vs. state) and
-  ## also one state vs. all other states
   library(shiny)
   library(tidyr)
   library(dplyr)
@@ -30,38 +25,26 @@ shinyServer(function(input, output, session) {
   library(extrafontdb)
   library(extrafont)
   
+  
   #library(RPostgreSQL)
   
   #font_import(pattern="[L/l]ato")
   #font_import(pattern="MuseoSlabW01-700")
 
-  
-  #drv <- dbDriver("PostgreSQL")
-  #con <- dbConnect(drv, dbname = "daddkut7s5671q",
-                 #  host = "ec2-54-204-38-194.compute-1.amazonaws.com", port = 5572,
-                #   user = "u3v583a3p2pp85", password = "p6omsea0tv60mlfjnosesb7ereu")
-  
-  #querydb <- function(query_name) {
-   # query <- readChar(query_name, file.info(query_name)$size)
-  #  data <- dbGetQuery(con, query)
-   # return(data)
-  #}
-  
-  #districts <- querydb("/prep_for_Shiny/SQL/deluxe_districts.SQL")
+
+  loadfonts()
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
   locale_cuts <- read.csv("locale_cuts.csv", as.is = TRUE)
   size_cuts <- read.csv("size_cuts.csv", as.is = TRUE)
  
-  # factorize
-  # services
-  services$band_factor <- as.factor(services$band_factor)
+  # factorize columns as needed
   services$postal_cd <- as.factor(services$postal_cd)
-  # districts
   districts$new_connect_type_goals <- factor(districts$new_connect_type_goals, 
                                              levels = c("Other / Uncategorized", "Cable", "DSL",
                                                         "Copper", "Fixed Wireless", "Fiber"))
+  
   # locale and size cuts
   locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Rural", "Small Town", "Suburban", "Urban"))
   size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Tiny", "Small", "Medium", "Large", "Mega"))
@@ -121,7 +104,7 @@ shinyServer(function(input, output, session) {
   state_subset_size <- reactive({
     
     # only include options for state selection
-    #  selected_dataset <- paste0('\"', input$dataset, '\"')
+    # selected_dataset <- paste0('\"', input$dataset, '\"')
     selected_state <- paste0('\"',input$state, '\"')
     sample <- paste0(input$state, " Clean")
     
@@ -136,8 +119,6 @@ district_subset <- reactive({
     selected_dataset <- paste0('\"', input$dataset, '\"')
     selected_state <- paste0('\"',input$state, '\"')
     
-    #to create independent filters for goals section
-   # districts$new_connect_type_goals <- districts$new_connect_type
     districts$district_size2 <- districts$district_size
     districts$locale2 <- districts$locale
     
@@ -146,7 +127,7 @@ district_subset <- reactive({
     districts$locale3 <- districts$locale
     
     #to create independent filters for maps section
-    districts$new_connect_type_map <- districts$new_connect_type
+    districts$new_connect_type_map <- districts$new_connect_type_goals
     
     districts %>% 
       filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
@@ -188,7 +169,6 @@ output$histogram_locale <- renderPlot({
              axis.title.y=element_blank(),
              text=element_text(size = 18, family="Lato")) +
         guides(fill=guide_legend(
-                    #reverse = TRUE,
                     keywidth = 0.35,
                     keyheight = 0.35,
                     default.unit = "inch"))
@@ -203,8 +183,6 @@ output$table_locale <- renderDataTable({
   validate(
     need(input$state != 'All', "")
   )
-
- # datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
 
   data$n_locale <- as.character(data$n_locale)
   data$n <- as.character(data$n)
@@ -229,7 +207,6 @@ output$histogram_size <- renderPlot({
   q <- ggplot(data = data) +
     geom_bar(aes(x = factor(postal_cd), y = percent, fill = district_size), stat = "identity") +
     scale_fill_manual(name = "",
-                      #labels = c("Mega", "Large", "Medium")
                       #labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
                       values = c("#F0643C", "#f09221", "#f4b400", "#fdb913", "#fff1d0")) + 
                     #  values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
@@ -264,10 +241,6 @@ output$table_size <- renderDataTable({
     need(input$state != 'All', "")
   )
 
-  #datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE,
-
-  #data$n_size <- as.character(data$n_size)
-  #data$n <- as.character(data$n)
   data <- data %>% group_by(postal_cd) %>% arrange(district_size)
   data$percent <- paste(round(data$percent, 2), "%", sep ="")
   colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
@@ -422,8 +395,6 @@ output$myImage <- renderImage({
 
 ## Table of numbers in districts / students meeting goals
 
-# Help text for Histogram on Meeting Goals
-
 output$table_goals <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
@@ -509,7 +480,9 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   print(q)
 
+
   #districts_ia_tech <- as.data.frame(data)
+
   
 })
 
@@ -550,13 +523,6 @@ output$histogram_projected_wan_needs <- renderPlot({
   
   data <- melt(data)
   
-  #q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),],
-  #            aes(x = variable, y = value)) +
-    
- #   q <- ggplot(data = plot_data) +
-#    geom_bar(aes(x = variable, y = value, fill = variable),  width = .5, stat = "identity") +
-#    geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
-    
     q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),]) +
        geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
         geom_text(aes(label = paste0(value, "%"), x = variable, y = value),  vjust =-1, size = 6) +
@@ -614,150 +580,12 @@ output$table_projected_wan_needs <- renderDataTable({
   
 })
 
-## Median Pricing Districts Not Meeting vs. Meeting Goals
-output$hypothetical_ia_price  <- renderPlot({
-  
-  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-                                       district_size2 %in% input$district_size_goals, 
-                                       locale2 %in% input$locale_goals)
-  
-  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
-  
-  cost_data <- data %>%
-               group_by(meeting_2014_goal_no_oversub) %>%
-               summarize(n_districts = n(),
-                         median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
-  
-  # Price
-  plot_data <- cost_data[, c(1,3)]
-  names(plot_data) <- c("variable", "value")
-  plot_data$label <- paste0("$", plot_data$value)
-  
-  #plot_data <- rbind(plot_data2, plot_data1)
-  
-  q <- ggplot(data = plot_data) +
-         geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
-         geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
-         scale_y_continuous(limits = c(0, 1.1 * max(plot_data$value))) +
-         scale_x_discrete(limits = c("Not Meeting Goal", "Meeting Goal")) +
-         geom_hline(yintercept = 0, colour= "#899DA4") +
-         theme(plot.background = element_rect(fill = "white"),
-               panel.background = element_rect(fill = "white"),
-               legend.background = element_rect(fill = "white"),
-               legend.position = "none",
-               axis.line = element_blank(), 
-               axis.text.x = element_text(size=14), 
-               axis.text.y = element_blank(),
-               axis.ticks = element_blank(),
-               axis.title.x=element_blank(),
-               axis.title.y=element_blank()) 
-  print(q)
-})
-
-output$hypothetical_ia_goal <- renderPlot({
-  
-  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
-  validate(need(nrow(data) > 0, ""))
-  
-  cost_data <- data %>%
-    group_by(meeting_2014_goal_no_oversub) %>%
-    summarize(n_districts = n(),
-              median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
-  
-  current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
-  
-  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting Goal", ]$median_monthly_ia_cost_per_mbps
-  
-  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting Goal")
-   
-  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
-  
-  # for districts not meeting goals, replace their current bw with the hypothetical number
-  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
-  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
-  
-  hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
-  
-  # Goal %
-  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing")
-  plot_data1 <- melt(plot_data1)
-  plot_data1$label <- paste0(plot_data1$value, "%")
-  
-  goals <- ggplot(data = plot_data1) +
-    geom_bar(aes(x = variable, y = value), fill = "#fdb913", width = .5, stat = "identity") +
-    geom_text(aes(label = label, x = variable, y = value), vjust = -1, size = 6) +
-    scale_y_continuous(limits = c(0, 110)) +
-    scale_x_discrete(breaks = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing"), 
-                     labels = c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals \nat Median Meeting 2014 Goals Pricing")) +
-    geom_hline(yintercept = 0, colour= "#899DA4") +
-    theme(plot.background = element_rect(fill = "white"),
-          panel.background = element_rect(fill = "white"),
-          legend.background = element_rect(fill = "white"),
-          axis.line = element_blank(), 
-          axis.text.x = element_text(size=16, family="Lato", colour= "#636363"), 
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank())
-  
-  print(goals)
-})
-
-output$table_hypothetical_ia_goal <- renderDataTable({
-  
-  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
-  cost_data <- data %>%
-    group_by(meeting_2014_goal_no_oversub) %>%
-    summarize(n_districts = n(),
-              median_monthly_ia_cost_per_mbps = round(median(monthly_ia_cost_per_mbps, na.rm = TRUE), 2))
-  
-  current_pricing_percent_district_meeting_goals <- round(mean(100 * data$meeting_goals_district, na.rm = TRUE), 2)
-  hypothetical_cost <- cost_data[cost_data$meeting_2014_goal_no_oversub == "Meeting Goal", ]$median_monthly_ia_cost_per_mbps
-  not_meeting <- which(data$meeting_2014_goal_no_oversub == "Not Meeting Goal")
-  data$hypothetical_kbps_per_student <- (1000 * (data$total_ia_monthly_cost / hypothetical_cost)) / data$num_students
-  
-  # for districts not meeting goals, replace their current bw with the hypothetical number
-  data[not_meeting, ]$ia_bandwidth_per_student <- data[not_meeting, ]$hypothetical_kbps_per_student
-  data$new_meeting_goals_district <- ifelse(data$ia_bandwidth_per_student >= 100, 1, 0)
-  
-  hypothetical_district_meeting_goals <- round(100 * mean(data$new_meeting_goals_district, na.rm = TRUE), 2)
-  
-  plot_data1 <- as.data.frame(cbind(current_pricing_percent_district_meeting_goals, hypothetical_district_meeting_goals))
-  names(plot_data1) <- c("% Districts \nCurrently Meeting Goals\n", "(Hypothetical)\n% Districts Meeting Goals at Median Meeting 2014 Goals Pricing")
-  plot_data1 <- melt(plot_data1)
-  plot_data1$label <- paste0(plot_data1$value, "%")
-  
-  plot_data <- cost_data[, c(1,3)]
-  names(plot_data) <- c("variable", "value")
-  plot_data$label <- paste0("$", plot_data$value)
-  
-  table_data <- as.data.frame(rbind(plot_data, plot_data1))
-  table_data[which(table_data$variable == "Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Meeting IA Goal"
-  table_data[which(table_data$variable == "Not Meeting Goal"),]$variable <- "Median Cost per Mbps for Districts Not Meeting IA Goal"
-  table_data$value <- NULL
-
-  #datatable(table_data, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
-
-  names(table_data) <- c("Data Point", "Value")
-  datatable(table_data, options = list(paging = FALSE, searching = FALSE))
-
-})
 
 ######
 ## Fiber Section
 ######
 
-output$helptext_schools_on_fiber <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that the filters are
-             set to clean data, relevant state, goal meeting status, connection types, locales, and district sizes."))
-})
-
-
 ## Districts and Students Meeting Goals
-
 output$histogram_schools_on_fiber <- renderPlot({
   
   data1 <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
@@ -832,14 +660,6 @@ output$table_schools_on_fiber <- renderDataTable({
 })
 
 ## Districts - E-rate Discount Rates
-
-output$helptext_by_erate_discounts <- renderUI({
-  HTML(paste("User Note:  When using this view for Gov Preps/Connectivity Reports, check that the filters are
-             set to clean data, relevant state, goal meeting status, connection types, locales, and district sizes."))
-})
-
-
-
 output$histogram_by_erate_discounts <- renderPlot({
   
   
@@ -895,280 +715,10 @@ output$table_by_erate_discounts <- renderDataTable({
   
 })
 
-
-
-######
- ## Affordability Section
-######
- 
-## Box and Whiskers Plots
-
-output$bw_plot <- renderPlot({
-  
-  data <- sr_all()
-  
-  #give.n <- function(x){
-  #  return(c(y = median(x) * 0.85, label = length(x))) 
-  #  # experiment with the multiplier to find the perfect position
-  #}
-  
-  #meds <- data %>% 
-  #        group_by(band_factor) %>% 
-  #        summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
-  
-  #dollar_format(largest_with_cents=1)
-  
-  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]   #column 1 and 5 are min and max
-  
-  p0 <- ggplot(data, aes(x = factor(bandwidth_in_mbps), y = monthly_cost_per_circuit)) + 
-        geom_boxplot(fill="#009291", colour="#ABBFC6", outlier.colour=NA, width=.5) 
-  #+ stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 5) 
-      
-  a <- p0 + 
-     #  coord_cartesian(ylim = ylim1 * 2.0) + 
-     # scale_y_continuous("", labels = dollar) +
-     # geom_text(data = meds, aes(x = band_factor, y = medians, label = dollar(medians)), 
-     #            size = 5, vjust = -.3, colour= "#F26B21", hjust=.5)+
-       theme_classic() + 
-       theme(axis.line = element_blank(), 
-              axis.text.x=element_text(size=14, colour= "#899DA4"), 
-              axis.text.y=element_text(size=14, colour= "#899DA4"),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank())
-    
-     print(a)
-     print(nrow(data))
-
-})
-
-output$counts_table <- renderTable({
-
-  data <- sr_all()
-  
-  data %>% 
-    group_by(band_factor) %>% 
-    summarise(num_line_items = n(), 
-              num_circuits = sum(line_item_total_num_lines))
-  
-})
-
-output$prices_table <- renderTable({
-  
-
-  data <- sr_all()
-  
-  data %>% 
-    group_by(band_factor) %>% 
-    summarise(min_cost_per_mbps = round(min(monthly_cost_per_mbps, na.rm = TRUE), 2),
-              q25_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.25, na.rm = TRUE), 2),
-              median_cost_per_mbps = round(median(monthly_cost_per_mbps, na.rm = TRUE), 2),
-              q75_cost_per_mbps = round(quantile(monthly_cost_per_mbps, 0.75, na.rm = TRUE), 2),
-              max_cost_per_mbps = round(max(monthly_cost_per_mbps, na.rm = TRUE), 2))
-  
-})
-
-
-output$histogram_cost_comparison_by_state <- renderPlot({
-  
-  data <- sr_all()
-  
-  plot_data <- data %>%
-               group_by(postal_cd) %>%
-               summarize(median_cost = median(monthly_cost_per_circuit, na.rm = TRUE))
-        
-  validate(
-    need(nrow(data) > 0, "No district in given subset; please adjust your selection")
-  )
-  
-  validate(
-    need(input$state == 'All', "Please adjust your state selection to 'All.'")
-  )
-  
-  q <- ggplot(data = plot_data) +
-      geom_bar(aes(x = reorder(factor(postal_cd), median_cost), y = median_cost), 
-               fill="#009291", stat = "identity", width = .5) +
-      theme_classic() + 
-      theme(axis.line = element_blank(), 
-            axis.text.x=element_text(size=14, colour= "#899DA4"), 
-            axis.text.y = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x=element_blank(),
-            axis.title.y=element_blank()) 
-    
-  print(q)
-  
-  
-})
-
-output$table_cost_comparison_by_state <- renderTable({
-  
-  data <- sr_all()
-  
-  plot_data <- data %>%
-    group_by(postal_cd) %>%
-    summarize(median_cost = round(median(monthly_cost_per_circuit, na.rm = TRUE), 2))
-  
-  validate(
-    need(nrow(data) > 0, "")
-  )
-  
-  plot_data ## 
-  
-})
-
-## Comparison: Specific State vs. the Rest of the States 
-#output$state_vs_rest_comparison <- renderPlot({
-  
-  #excluding the state that is specifically being compared to rest of the nation
- # data <- li_all() 
-  
-  #levels(data$postal_cd) <- c(levels(data$postal_cd), "National Excluding Selected State")
-  #data$postal_cd[data$postal_cd != input$state] <- "National Excluding Selected State"
-  
- 
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
-  #validate(
-  #  need(nrow(data > 0), "No circuits in given subset")
-  #)
-  #####
-  
-  #give.n <- function(x){
-  #  return(c(y = median(x) * 0.85, label = length(x))) 
-    # experiment with the multiplier to find the perfect position
-  #}
-  
-  #p0 <- ggplot(data, aes(x=postal_cd, y = monthly_cost_per_circuit)) + 
-   #     geom_boxplot(fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) 
-     #   stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
-      
-  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]
-
-#  meds <- data %>% 
- #         group_by(postal_cd) %>% 
-  #        summarise(medians = median(monthly_cost_per_circuit))
-  
-  #dollar_format(largest_with_cents = 1)
-  
-  #b <- p0 + 
-   #   coord_cartesian(ylim = ylim1 * 2.0) +
-    #  scale_y_continuous("",labels = dollar) +
-     # geom_text(data = meds, aes(x = postal_cd, y = medians, label = dollar(medians)), 
-      #          size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) +
-      #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-       #     panel.background = element_blank(), axis.line = element_blank(), 
-        #    axis.text.x = element_text(size = 14, colour = "#899DA4"), 
-         #   axis.text.y = element_text(size = 14, colour = "#899DA4"),
-          #  axis.ticks = element_blank(),
-           # axis.title.x = element_blank(),
-            #axis.title.y = element_blank())
-    #print(b)
-  #)
-
-
-#output$n_observations_comparison <- renderTable({
-  
- # data <- li_all() 
-  
-  #data$postal_cd[data$postal_cd != input$state] <- c('National Excluding Selected State')
-  #data$postal_cd <- as.factor(data$postal_cd)
-  
-#  ns <- data %>% 
- #       group_by(postal_cd) %>% 
-  #      summarise(num_line_items = n(),
-   #               num_circuits = sum(line_item_total_num_lines))
-#})
-
-# Overall National Comparison
-#output$overall_national_comparison <- renderPlot({
-  
-  #excluding the state that is specifically being compared to rest of the nation
- # data <- li_all()
-  
-  ##### NOTE: This causes as warning: "Warning in Ops.factor(left, right) : ???>??? not meaningful for factors"
-#  validate(
- #   need(nrow(data > 0), "No circuits in given subset")
-#  )
-  #####
-  
- # give.n <- function(x){
-#    return(c(y = median(x) * 0.85, label = length(x))) 
-    # experiment with the multiplier to find the perfect position
-  #}
- # 
- # p0 <- ggplot() + #changed x = postal_cd to x="All"
-  #      geom_boxplot(data = data, aes(x = national, y = monthly_cost_per_circuit),
-   #                  fill = "#009291", colour = "#ABBFC6", outlier.colour = NA, width = .5) +
-    #    stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) +
-     #   geom_boxplot(data = data[data$postal_cd == input$state,], aes(x = postal_cd, y = monthly_cost_per_circuit), 
-                     #fill="#009291", colour = "#ABBFC6", outlier.colour=NA, width=.5) +
-        #stat_summary(fun.data = give.n, geom = "text", fun.y = median, size = 4) 
-  
-  #ylim1 <- boxplot.stats(data$monthly_cost_per_circuit)$stats[c(1, 5)]
-  
-  #national_median <- data %>% 
-   #                  group_by(national) %>%  
-    #                 summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
-  #state_median <-    data %>% 
-   #                  group_by(postal_cd) %>% 
-    #                 filter(postal_cd == input$state) %>% 
-     #                summarise(medians = round(median(monthly_cost_per_circuit, na.rm = TRUE)))
-  #dollar_format(largest_with_cents=1)
-  
-  #b <- p0 + 
-   #    coord_cartesian(ylim = ylim1 * 1.05) +
-    #   scale_y_continuous("", labels = dollar) +
-     #  geom_text(data = national_median, aes(x = national, y = medians, label = dollar(medians)), 
-      #           size = 6, vjust = 0, colour = "#F26B21", hjust=0.5) + 
-      # geom_text(data = state_median, aes(x = postal_cd, y = medians, label = dollar(medians)), 
-        #         size = 6, vjust = 0, colour= "#F26B21", hjust=0.5) + 
-       #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-         #    panel.background = element_blank(), axis.line = element_blank(), 
-          #   axis.text.x=element_text(size=14, colour= "#899DA4"), 
-           #  axis.text.y=element_text(size=14, colour= "#899DA4"),
-            # axis.ticks=element_blank(),
-             #axis.title.x=element_blank(),
-             #axis.title.y=element_blank())
-       #print(b)
-  #})
-
-## n's for overall national comparison
-#output$national_n_table <- renderTable({
-  
- # data <- li_all() 
-  
-  #data %>% 
-   # group_by(national) %>% 
-    #summarise(num_line_items = n(), 
-     #         num_circuits = sum(line_item_total_num_lines))
-  
-#})
-
-#output$state_n_table <- renderTable({
-  
- # selected_state <- paste0('\"',input$state, '\"')
-  
-#  data <- li_all() %>%
-  #        filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
-  
-  #data %>% 
-   # group_by(postal_cd) %>% 
-    #summarise(num_line_items = n(), 
-     #         num_circuits = sum(line_item_total_num_lines))
-  
-#})
-
 ###### 
 ## Maps
 ######
 # District Lookup
-
-output$helptext_leaflet_map <- renderUI({
-  HTML(paste("User Note: Useful for District Callouts. Type in your districts of interest."))
-})
-
-
-
 
 output$districtSelect <- renderUI({
   
@@ -1185,15 +735,6 @@ output$districtSelect <- renderUI({
   selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 
   })
-
-
-#observe({
-#  if ("SELECT ALL" %in% input$districtSelect) {
-   # # choose all the choices _except_ "Select All"
-    #selected_choices <- setdiff(district_list, "SELECT ALL")
-    #selectizeInput(session, "districtSelect", choices = as.list(district_list), selected = selected_choices)
-  #}
-#})
 
 output$selected <- renderText({
   paste(input$testing, collapse = ", ")
@@ -1225,7 +766,6 @@ output$testing_leaflet <- renderLeaflet({
 })
 
 #})
-
 
 
 output$choose_district <- renderPlot({
@@ -1396,10 +936,12 @@ output$map_population <- renderPlot({
   uu <- u + coord_map()
   
   
+
   #v <- state_base + 
   #    geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(hierarchy_connect_category)),
   #               alpha = 0.7, size = 4)
- # vv <- v + coord_map()
+  #vv <- v + coord_map()
+
   
   switch(input$map_view,
          "All Districts" = print(qq),
@@ -1409,6 +951,7 @@ output$map_population <- renderPlot({
          'Fiber Build Cost to Districts' = print(uu)#,
          #'Connect Category' = print(vv)
          )
+
   
 })
 
@@ -1452,8 +995,6 @@ output$map_population <- renderPlot({
   #print(q + coord_map())
   #})  
 
-
-#not using ggvis since side-by-side bar chart is not possible
 general_monthly_cpm <- reactive({
   sr_all() %>% 
     ggvis(~monthly_cost_per_mbps) %>% 
@@ -1491,8 +1032,6 @@ price_disp_cpc <- reactive({
     bw_mbps <- c(rep(data$bandwidth_in_mbps[1], 3)) #added for TESTING 
     perc_tab <- cbind(perc_tab, add_perc, bw_mbps)
     perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-    #perc_tab_cpc <- perc_tab
-    #print(perc_tab_cpc)
     
     if(length(unique(data$bandwidth_in_mbps)) > 1){ 
         data2 <- data %>% filter(bandwidth_in_mbps == unique(bandwidth_in_mbps[2]))
@@ -1508,8 +1047,6 @@ price_disp_cpc <- reactive({
         print(perc_tab_cpc2)
         
      data3 <- rbind(perc_tab_cpc, perc_tab_cpc2)    
-     #data3 <- left_join(perc_tab_cpc, perc_tab_cpc2, by = c("add_perc" = "add_perc2"))
-  #   print(data3)
     }
 
     else{
@@ -1519,13 +1056,8 @@ price_disp_cpc <- reactive({
     layer_bars(strokeWidth := 0) %>%    
     layer_rects(fill:="white") %>%
     add_axis("x", title = "Percentile", title_offset = 50, grid=FALSE) %>% 
-      # commented out title fyi
-    #add_axis("x", orient = "top", title = "Price Dispersion: Monthly Cost Per Circuit",
-     #          properties = axis_props(axis = list(stroke = "white"), labels = list(fontSize = 0)), 
-      #         grid=FALSE)  %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid=FALSE) %>% 
     add_legend("stroke", title = "")    
-    #hide_axis("y")
     }
   
 })
@@ -1563,12 +1095,7 @@ output$cpc_sidebars <- renderPlot({
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge", width = 0.75) + 
 
-    geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")
-
-#geom_text(aes(label = cost_label
-
-                                 #, big.mark = ",", nsmall = 2, scientific = FALSE)
-                  ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
+    geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
     #scale_x_discrete(limits = positions) +
     scale_x_discrete(
                      breaks=c("Median", "p25th", "p75th"),
@@ -1605,27 +1132,11 @@ output$cpc_sidebars <- renderPlot({
 
 
 
-#output$n_circuits <- renderText({
-
-#  n_circuits <- sum(sr_all()$cat.1_allocations_to_district)
-#  paste("n(circuits) =", toString(n_circuits))
-  
-#})
-
 
 output$disp_cpc_table <- renderDataTable({
   
-  #data <- sr_all()
-  #data$monthly_cost_per_circuit <- as.numeric(as.character(data$monthly_cost_per_circuit))
-  #percentiles <- quantile(data$monthly_cost_per_circuit, c(.25, .50, .75), na.rm = TRUE)  
-  #perc_tab <- as.data.frame(percentiles)  
-  #add_perc <- c("25th","Median", "75th")
-  #perc_tab <- cbind(add_perc, perc_tab)
-  #perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-  #colnames(perc_tab) <- c("Percentile", "Monthly Cost Per Circuit ($)")
-  
-  
-  perc_tab <- sr_all() %>% group_by(bandwidth_in_mbps) %>% 
+  perc_tab <- sr_all() %>% 
+              group_by(bandwidth_in_mbps) %>% 
               summarise(n_services = n(),
               n_circuits = sum(cat.1_allocations_to_district),
               p25th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_circuit)), 0.25, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""),
@@ -1636,32 +1147,6 @@ output$disp_cpc_table <- renderDataTable({
   datatable(perc_tab, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
 
 })
-
-
-
-#price_disp_cpm <- reactive({
-  
-#  data <- sr_all()
-#  data$monthly_cost_per_mbps <- as.numeric(as.character(data$monthly_cost_per_mbps))
-#  percentiles <- quantile(data$monthly_cost_per_mbps, c(.25, .50, .75), na.rm = TRUE)  
-#  perc_tab <- as.data.frame(percentiles)  
-#  add_perc <- c("25th","Median", "75th")
-#  perc_tab <- cbind(perc_tab, add_perc)
-#  perc_tab$add_perc <- factor(perc_tab$add_perc, levels = perc_tab$add_perc[1:3], labels = c("25th", "Median", "75th"))
-  
-#  print(str(perc_tab))
-  
-#  perc_tab %>% 
-#    ggvis(x = ~add_perc, y = ~percentiles, fill := "#009296", fillOpacity := 0.6) %>% 
-#    layer_bars(strokeWidth := 0) %>%    
-#    layer_rects(fill:="white") %>%
-#    add_axis("x", title = "Percentile", title_offset = 50, grid = FALSE) %>% 
-#    add_axis("y", title = "Monthly Cost per Mbps ($)", title_offset = 75, grid = FALSE)
-#  #hide_axis("y")
-  
-#})
-
-#price_disp_cpm %>% bind_shiny("price_disp_cpm")
 
 output$price_disp_cpm_sidebars <- renderPlot({
   
@@ -1693,10 +1178,8 @@ output$price_disp_cpm_sidebars <- renderPlot({
     geom_text(aes(label = paste0("$", round(cost, digits = 2))
                   #  format(round(cost, digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE)
                   ), vjust = -0.5, position = position_dodge(width = 0.9), size = 5) +
-    #scale_x_discrete(limits = positions) +
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                      labels=c("Median", "25th", "75th")) +
-    #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
     geom_hline(yintercept = 0, colour= "#899DA4") +
     coord_cartesian(ylim=c(0, m2)) +
@@ -1711,21 +1194,17 @@ output$price_disp_cpm_sidebars <- renderPlot({
           axis.title.y=element_blank(),
           legend.title = element_text(colour = "#636363"),
           legend.text = element_text(colour = "#636363"),
-          legend.position = "top", #c(0.5, 0.97),
+          legend.position = "top", 
           legend.box = "horizontal",
           text=element_text(size = 16, family="Lato"),
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
     ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
-    guides(fill=guide_legend(title.position="top",
-      #keywidth = 0.35,
-      #keyheight = 0.35,
-      default.unit = "inch")) 
+    guides(fill = guide_legend(title.position="top",
+           default.unit = "inch")) 
   
   print(v)
   
 })
-
-
 
 output$disp_cpm_table <- renderDataTable({
 
@@ -1737,12 +1216,9 @@ output$disp_cpm_table <- renderDataTable({
               p75th  = paste("$", format(round(quantile(as.numeric(as.character(monthly_cost_per_mbps)), 0.75, na.rm = TRUE), digits = 2), big.mark = ",", nsmall = 2, scientific = FALSE), sep = ""))
   colnames(perc_tab)<- c("Circuit Size (Mbps)" ,"# of Line Items", "# of Circuits", "25th Percentile", "Median", "75th Percentile")
   
-  
   datatable(perc_tab, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
 
   })
-
-
 
 district_tooltip <- function(x) {
   if (is.null(x)) return(NULL)
@@ -1824,11 +1300,6 @@ output$text_maps <- renderUI({
                        20% state match fund.
                        You can zoom in on specific districts by clicking on the map on the right."), br()))
   
-      #  text_clean <- "test2"
-  # text_2014goals <- "test3"
-  #text_2018goals <- "test4"
-  #text_fiber <- "test5"
-  
   switch(input$map_view,
          "All Districts" =  text_all,
          "Clean/Dirty Districts" =  text_clean,
@@ -1858,10 +1329,6 @@ output$n_ddt <- renderText({
          'Fiber Build Cost to Districts' = paste("n(districts) =", toString(nrow(data2))))
 })
 
-
-
-
-
 ## Dynamic Viz Testing:
 
 plot2_data <- reactive({
@@ -1879,28 +1346,9 @@ plot2_data <- reactive({
                                      need_mbps = need_kbps / 1000,
                                      hyp_cost = need_mbps*price,
                                      can_mt_goals = ifelse(hyp_cost <= total_ia_monthly_cost, "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student"))
-#    nmg_data3 <- nmg_data2 %>% mutate(mtg_budget   = need_bw*price) #price variable is the user input value
-#    nmg_data4 <- nmg_data3 %>% mutate(total_cost   = total_ia_monthly_cost*12)
-    
-#    nmg_data4$can_mt_goals <- ifelse(as.numeric(as.character(nmg_data4$total_cost)) > as.numeric(as.character(nmg_data4$mtg_budget)), "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student")
-    
+
     nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
     nmg_table <- as.data.frame(na.omit(nmg_table))
-    
-    print(nmg_table)
-
-################## Trying out Jess' Methodology #########################    
-    
-#        nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting 2014 Goals") 
-#        nmg_data2 <- nmg_data %>% mutate(mbps = total_ia_monthly_cost / monthly_ia_cost_per_mbps,
-#                                         kbps = mbps * 1000,
-#                                         kbps_stud = kbps / num_students,
-#                                         can_mt_goals = ifelse(kbps_stud >= 100, "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student"))
-      
-#        nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
-#        nmg_table <- as.data.frame(na.omit(nmg_table))        
-    
-###############################################################################    
     
     can_meet <- nmg_table %>% filter(can_mt_goals == "Can Meet 100kbps/Student")
     
@@ -1928,8 +1376,6 @@ plot2 <- reactive({
       ggvis(~status, ~breakdown) %>% 
       scale_ordinal('fill', range = c("#fdb913", "#f09221")) %>%
       layer_bars(fill = ~status, strokeWidth := 0) %>% #fillOpacity := 0.4, 
-      #layer_text(x = prop("x", ~status),
-      #           y = prop("y", ~breakdown, scale = "ycenter"), text := ~breakdown,  fontSize:=20) %>% 
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
       add_axis("y", title = " ", ticks = 0, grid = FALSE, properties = axis_props(axis = list(strokeWidth = 0))) %>%
       scale_numeric("y", domain = c(0, 100)) %>% 
@@ -1961,9 +1407,7 @@ output$table_hyp_cost <- renderDataTable({
   datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
 })
 
-
-
-#creating reset functionality for each tab:
+# create reset functionality for each tab:
 
 #goals section
 observeEvent(input$goals_reset_all, {
@@ -1985,15 +1429,10 @@ observeEvent(input$map_reset_all, {
   reset("map_filters")
 })
 
-
-
-
-
-
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160701', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160711', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
   }
@@ -2002,7 +1441,7 @@ output$ia_tech_downloadData <- downloadHandler(
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_20160701', '.csv', sep = '')},
+    paste('affordability_dataset', '_20160711', '.csv', sep = '')},
   content = function(file){
     write.csv(sr_all(), file)
   }
@@ -2016,11 +1455,6 @@ output$ESH_logo <- renderImage({
   contentType = "image/png"))
   
 })
-
-
-
-
-
 
 
 ####################################
@@ -2051,8 +1485,7 @@ output$table_testing <- renderDataTable({
     filter(!(postal_cd %in% c('AK', 'HI')),
            new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
-           locale %in% input$locale_maps) %>% select(c(1:61, 78, 79))
-  
+           locale %in% input$locale_maps)# %>% select(c(1:61, 78, 79))
   
   
   map_data2 <- map_data %>%
@@ -2071,7 +1504,7 @@ output$table_testing <- renderDataTable({
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$map_view, '_20160701', '.csv', sep = '')},
+    paste(input$map_view, '_20160711', '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput_maps(), file)
   }
