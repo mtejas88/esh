@@ -202,8 +202,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                    label = h2("Choose Map View:"),
                                                                    choices = c("All Districts", "Clean/Dirty Districts", 
                                                                                "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
-                                                                               "Fiber Build Cost to Districts",
-                                                                               "Connect Category"),
+                                                                               "Fiber Build Cost to Districts"),
+                                                                               #"Connect Category"),
                                                                    selected = "All Districts"),
                                                        
                                                        selectInput(inputId = "tile2",
@@ -348,6 +348,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                      p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
                                        Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
                                      plotOutput("histogram_goals"), br(), dataTableOutput("table_goals")), br(), br(), br(),
+                                     #imageOutput("myImage"), 
                                      
                                      wellPanel(
                                       h4("DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
