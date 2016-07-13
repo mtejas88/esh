@@ -31,7 +31,6 @@ shinyServer(function(input, output, session) {
   #font_import(pattern="[L/l]ato")
   #font_import(pattern="MuseoSlabW01-700")
 
-
   loadfonts()
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
@@ -383,18 +382,6 @@ output$myImage <- renderImage({
 
 ########## END TESTING RENDERIMAGE #########################
 
-
-
-
-
-
-
-
-
-
-
-## Table of numbers in districts / students meeting goals
-
 output$table_goals <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
@@ -479,9 +466,6 @@ output$histogram_districts_ia_technology <- renderPlot({
                              default.unit = "inch"))
   
   print(q)
-
-
-  #districts_ia_tech <- as.data.frame(data)
 
   
 })
