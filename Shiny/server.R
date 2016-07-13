@@ -22,7 +22,15 @@ shinyServer(function(input, output, session) {
   library(ggvis)
   library(DT)
   library(shinydashboard)
+  library(extrafontdb)
   library(extrafont)
+  
+  
+  #library(RPostgreSQL)
+  
+  #font_import(pattern="[L/l]ato")
+  #font_import(pattern="MuseoSlabW01-700")
+
   loadfonts()
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
@@ -147,13 +155,13 @@ output$histogram_locale <- renderPlot({
                          #labels = c("Rural", "Small Town", "Suburban", "Urban"), 
                          values = c("#f26b23", "#f09221", "#fdb913", "#fff1d0")) +
                           #values = c("#fff1d0", "#fdb913", "#f09221", "#f26b23")) +
-       geom_hline(yintercept = 0) +
+       geom_hline(yintercept = 0, colour= "#899DA4") +
        theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
              legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
              axis.line.x = element_blank(),
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.x=element_text(size=14), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              axis.title.x=element_blank(),
@@ -201,12 +209,12 @@ output$histogram_size <- renderPlot({
                       #labels = c("Tiny", "Small", "Medium", "Large", "Mega"),
                       values = c("#F0643C", "#f09221", "#f4b400", "#fdb913", "#fff1d0")) + 
                     #  values = c("#fff1d0", "#fdb913", "#f4b400", "#f09221", "#F0643C")) +
-    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = 0, colour= "#899DA4") +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           legend.background = element_rect(fill = "white"),
           axis.line = element_blank(), 
-          axis.text.x=element_text(size=14, colour= "#899DA4"), 
+          axis.text.x=element_text(size=14), 
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.title.x=element_blank(),
@@ -264,22 +272,115 @@ output$histogram_goals <- renderPlot({
          scale_x_discrete(breaks=c("percent_districts_meeting_goals", "percent_students_meeting_goals"),
                      labels=c("Districts", "Students")) +
          scale_y_continuous(limits = c(0, 110)) +
-         geom_hline(yintercept = 0) +
+         geom_hline(yintercept = 0, colour= "#899DA4") +
          theme(plot.background = element_rect(fill = "white"),
                panel.background = element_rect(fill = "white"),
                legend.background = element_rect(fill = "white"),
                axis.line = element_blank(), 
-               axis.text.x=element_text(size=14, colour= "#899DA4"), 
+               axis.text.x = element_text(size=14), 
                axis.text.y = element_blank(),
                axis.ticks = element_blank(),
-               axis.title.x=element_blank(),
-               axis.title.y=element_blank()) 
+               axis.title.x=element_blank(),   
+               axis.title.y=element_blank(),
+               text=element_text(size = 16, family="Lato"),
+               legend.title = element_text(colour = "#636363"),
+               legend.text = element_text(colour = "#636363"),
+               legend.position = "top", #c(0.5, 0.97),
+               legend.box = "horizontal",
+               #legend.text.align = ,
+               plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+                 ggtitle(paste("Percent of Districts and Students \nMeeting 100 Kbps/Student Goal", "\n\n\n\n")) + 
+                 guides(fill=guide_legend(title.position="top",
+                                          #keywidth = 0.35,
+                                          #keyheight = 0.35,
+                                          default.unit = "inch"))
+            
+  
+  
       
   print(q)
   
 })
 
-## Table of numbers in districts / students meeting goals
+########### TESTING RENDERIMAGE ########################
+
+output$myImage <- renderImage({
+    
+    #postscriptFonts()
+  
+    # Read myImage's width and height. These are reactive values, so this
+    # expression will re-run whenever they change.
+    width  <- session$clientData$output_myImage_width
+    height <- session$clientData$output_myImage_height
+    
+    # For high-res displays, this will be greater than 1
+    pixelratio <- session$clientData$pixelratio
+    
+    # A temp file to save the output.
+    # This file will be removed later by renderImage
+    outfile <- tempfile(fileext='.png')
+  
+  
+  
+  data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
+                                       district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
+    summarize(percent_districts_meeting_goals = round(100 * mean(meeting_goals_district), 2),
+              percent_students_meeting_goals = round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2))
+  
+  validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
+  
+  data <- melt(data)
+  
+  # Generate the image file
+  esh_fonts <- c("Lato", "MuseoSlabW01-700")
+  png(outfile, width=width*pixelratio, height=height*pixelratio,
+      res=72*pixelratio, antialias = "none")# ,type = "Xlib", fonts = esh_fonts)
+  
+  
+  #postscript("outfile.png", fonts = esh_fonts)#, width=width*pixelratio, height=height*pixelratio,
+  #        #  res=72*pixelratio)
+  
+  q <- ggplot(data = data) +
+    geom_bar(aes(x = variable, y = value), width = .5, fill="#fdb913", stat = "identity") +
+    geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
+    scale_x_discrete(breaks=c("percent_districts_meeting_goals", "percent_students_meeting_goals"),
+                     labels=c("Districts", "Students")) +
+    scale_y_continuous(limits = c(0, 110)) +
+    geom_hline(yintercept = 0, colour= "#899DA4") +
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
+          axis.line = element_blank(), 
+          axis.text.x = element_text(size=14), 
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x=element_blank(),   
+          axis.title.y=element_blank(),
+          text=element_text(size = 16, family="Lato"),
+          legend.title = element_text(colour = "#636363"),
+          legend.text = element_text(colour = "#636363"),
+          legend.position = "top", #c(0.5, 0.97),
+          legend.box = "horizontal",
+          #legend.text.align = ,
+          plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("Percent of Districts and Students \nMeeting 100 Kbps/Student Goal", "\n\n\n\n")) + 
+    guides(fill=guide_legend(title.position="top",
+                             #keywidth = 0.35,
+                             #keyheight = 0.35,
+                             default.unit = "inch"))
+  print(q)
+
+  dev.off()
+  
+  # Return a list containing the filename
+  list(src = outfile,
+       contentType = 'image/png',
+       width = width,
+       height = height,
+       alt = "This is alternate text")
+}, deleteFile = TRUE)
+
+########## END TESTING RENDERIMAGE #########################
 
 output$table_goals <- renderDataTable({
   
@@ -320,24 +421,52 @@ output$histogram_districts_ia_technology <- renderPlot({
   
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
+  plot_title <- ifelse(input$meeting_goal[1] == c("Meeting Goal") & input$meeting_goal[2] == c("Not Meeting Goal"), "All Districts", 
+                       "Districts Meeting Goals")
+                       #ifelse(length(input$meeting_goal) == 1 & input$meeting_goal == "Meeting Goal", "Districts Meeting 100kbps/Student Goal",
+                      #        "Districts Not Meeting 100kbps/Student Goal"))
+  
+  print(plot_title)
+  print(input$meeting_goal)
+  print(length(input$meeting_goal))
+  
   q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
        geom_bar(fill = "#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(n_percent_districts, "%")), 
                  vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
        scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
-       geom_hline(yintercept = 0) +
+       geom_hline(yintercept = 0, colour= "#899DA4") +
        theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
              legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             axis.text.x=element_text(size=14), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              axis.title.x=element_blank(),
-             axis.title.y=element_blank()) 
+             axis.title.y=element_blank(),
+             text=element_text(size = 16, family="Lato"),
+             legend.title = element_text(colour = "#636363"),
+             legend.text = element_text(colour = "#636363"),
+             #legend.position = "top", #c(0.5, 0.97),
+             #legend.box = "horizontal",
+             #legend.text.align = ,
+             plot.title = element_text(size = 22, family="MuseoSlabW01-700")) + 
+    ggtitle(paste("Highest IA Connect Types: ", "\n", plot_title
+                  
+                  #ifelse(input$meeting_goal[1] == "Meeting Goal" & input$meeting_goal[2] == "Not Meeting Goal", "All Districts", 
+                  #                                       ifelse(input$meeting_goal[1] == c("Not Meeting Goal"), "Districts Not Meeting 100kbps/Student Goal", #if(input$meeting_goal == "NA") "Districts Meeting 100kbps/Student Goal"))
+                  #                                              if(input$meeting_goal[1] == "Meeting Goal" & length(input$meeting_goal) == 1)"Districts Meeting 100kbps/Student Goal"))
+                  #                                              #ifelse(input$meeting_goal == c("Meeting Goal"), "Districts Meeting 100kbps/Student Goal", "")))
+                                                                ,  "\n\n\n\n")) + 
+    guides(fill=guide_legend(title.position="top",
+                             #keywidth = 0.35,
+                             #keyheight = 0.35,
+                             default.unit = "inch"))
   
   print(q)
+
   
 })
 
@@ -385,17 +514,30 @@ output$histogram_projected_wan_needs <- renderPlot({
                      labels=c("Schools that Currently Have >= 1G WAN", "Schools that Need >= 1G WAN")) +
         scale_y_continuous(limits = c(0, 110)) +
         scale_fill_manual(values = c("#fdb913", "#f09221")) + 
-        geom_hline(yintercept = 0) +
-        theme(plot.background = element_rect(fill = "white"),
-              panel.background = element_rect(fill = "white"),
-              legend.background = element_rect(fill = "white"),
-              axis.line = element_blank(), 
-              axis.text.x=element_text(size=14, colour= "#899DA4"), 
-              axis.text.y = element_blank(),
-              axis.ticks = element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              legend.position = "none") 
+        geom_hline(yintercept = 0, colour= "#899DA4") +
+      theme(plot.background = element_rect(fill = "white"),
+            panel.background = element_rect(fill = "white"),
+            legend.background = element_rect(fill = "white"),
+            axis.line = element_blank(), 
+            axis.text.x = element_text(size=14), 
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title.x=element_blank(),   
+            axis.title.y=element_blank(),
+            text=element_text(size = 16, family="Lato"),
+            legend.position = "none",
+            #legend.title = element_blank(),
+            #legend.text = element_blank(),
+            #legend.position = "top", #c(0.5, 0.97),
+            #legend.box = "horizontal",
+            #legend.text.align = ,
+            plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+      ggtitle(paste("Percent of WAN Connections >= 1 Gbps",  "\n\n\n\n")) + 
+      guides(fill=guide_legend(title.position="top",
+                               #keywidth = 0.35,
+                               #keyheight = 0.35,
+                               default.unit = "inch"))
+    
       
   print(q)
   
@@ -421,6 +563,7 @@ output$table_projected_wan_needs <- renderDataTable({
   datatable(format(data, big.mark = ",", scientific = FALSE), rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
   
 })
+
 
 ######
 ## Fiber Section
@@ -452,16 +595,23 @@ output$histogram_schools_on_fiber <- renderPlot({
        scale_x_discrete(breaks=c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades"),
                      labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
        scale_y_continuous(limits = c(0, 110)) +
-       geom_hline(yintercept = 0) +
+       geom_hline(yintercept = 0, colour= "#899DA4") +
        theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
              legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             text=element_text(size = 16, family="Lato"),
+             #axis.text.x=element_text(colour= "#899DA4"), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              axis.title.x=element_blank(),
-             axis.title.y=element_blank()) 
+             axis.title.y=element_blank(),
+             plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("Distribution of Schools by Infrastructure Type",  "\n\n\n\n")) + 
+    guides(fill=guide_legend(title.position="top",
+                             #keywidth = 0.35,
+                             #keyheight = 0.35,
+                             default.unit = "inch"))
   print(q)
   
 })
@@ -512,16 +662,18 @@ output$histogram_by_erate_discounts <- renderPlot({
        geom_bar(fill="#fdb913", stat = "identity", width = .5) +
        geom_text(aes(label = paste0(percent_unscalable_schools_in_rate_band, "%")), vjust = -1, size = 6) +
        scale_y_continuous(limits = c(0, 110)) +
-       geom_hline(yintercept = 0) +
+       geom_hline(yintercept = 0, colour= "#899DA4") +
        theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
              legend.background = element_rect(fill = "white"),
              axis.line = element_blank(), 
-             axis.text.x=element_text(size=14, colour= "#899DA4"), 
+             text=element_text(size = 18, family="Lato"),
+             #axis.text.x=element_text(colour= "#899DA4"), 
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
-             axis.title.x=element_blank(),
-             axis.title.y=element_blank()) 
+             #axis.title.x=element_text("Distribution of campuses by E-rate discount rate (%)"),
+             axis.title.y=element_blank()) + 
+    xlab("\nDistribution of campuses by E-rate discount rate (%)\n\n") 
   
   print(q)
   
@@ -578,7 +730,7 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$testing, {
   d <- district_subset() %>% filter(name %in% input$testing)
-  d %>% select(name = name, X = longitude, Y = latitude, num_students, new_connect_type_goals, total_ia_monthly_cost)
+  d %>% select(name = name, X = longitude, Y = latitude, num_students, ia_bandwidth_per_student, new_connect_type_goals, monthly_ia_cost_per_mbps)
   #dp <- as.data.frame(data_points)
 })  
   
@@ -586,9 +738,10 @@ output$testing_leaflet <- renderLeaflet({
 
   
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
-                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                    "IA Connection: ", school_districts()$new_connect_type_goals, "<br>",
-                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
+                    "# of Students: ", format(school_districts()$num_students, big.mark = ",", scientific = FALSE), "<br>",
+                    "IA Bandwidth/Student: ", format(round(school_districts()$ia_bandwidth_per_student, digits=0), big.mark = ",", scientific = FALSE),"kbps", "<br>",
+                    "Highest IA Connect Type: ", school_districts()$new_connect_type_goals, "<br>",
+                    "Total IA monthly cost/Mbps: $", format(round(school_districts()$monthly_ia_cost_per_mbps, digits=2), big.mark = ",", scientific = FALSE))
   
   
   
@@ -767,18 +920,22 @@ output$map_population <- renderPlot({
   uu <- u + coord_map()
   
   
-  v <- state_base + 
-      geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(new_connect_type_goals)),
-                 alpha = 0.7, size = 4)
-  vv <- v + coord_map()
+
+  #v <- state_base + 
+  #    geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(hierarchy_connect_category)),
+  #               alpha = 0.7, size = 4)
+  #vv <- v + coord_map()
+
   
   switch(input$map_view,
          "All Districts" = print(qq),
          "Clean/Dirty Districts" = print(rr),
          'Goals: 100 kbps/Student' = print(ss),
          'Goals: 1 Mbps/Student' = print(tt),
-         'Fiber Build Cost to Districts' = print(uu))#,
-         #'Highest IA Connect Type' = print(vv))
+         'Fiber Build Cost to Districts' = print(uu)#,
+         #'Connect Category' = print(vv)
+         )
+
   
 })
 
@@ -929,7 +1086,7 @@ output$cpc_sidebars <- renderPlot({
                      labels=c("Median", "25th", "75th")) +
                         #guide = guide_legend(title = "Bandwidth Speed (Mbps)")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
-    geom_hline(yintercept = 0, colour = "#636363") +
+    geom_hline(yintercept = 0, colour= "#899DA4") +
     coord_cartesian(ylim=c(0, m)) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -1008,7 +1165,7 @@ output$price_disp_cpm_sidebars <- renderPlot({
     scale_x_discrete(breaks=c("Median", "p25th", "p75th"),
                      labels=c("Median", "25th", "75th")) +
     scale_fill_brewer(name = "Circuit Size(s) in Mbps", palette = "YlOrRd", direction = -1) +
-    geom_hline(yintercept = 0, colour = "#636363") +
+    geom_hline(yintercept = 0, colour= "#899DA4") +
     coord_cartesian(ylim=c(0, m2)) +
     theme(plot.background = element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
@@ -1206,7 +1363,7 @@ plot2 <- reactive({
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
       add_axis("y", title = " ", ticks = 0, grid = FALSE, properties = axis_props(axis = list(strokeWidth = 0))) %>%
       scale_numeric("y", domain = c(0, 100)) %>% 
-      add_legend("fill", title = "testing") %>% 
+      add_legend("fill", title = "") %>% 
       set_options(width = 850, height = 500)
 
 })
