@@ -21,7 +21,7 @@ schools_needing_wan <- read.csv("schools_needing_wan_20160624.csv", as.is = TRUE
 # filter the data, using proper conditions
 services <- services %>% 
   filter(shared_service == "District-dedicated" & 
-           dirty_status == "include clean" & exclude == "FALSE")
+           dirty_status == "include clean" & exclude == "FALSE" & exclude_from_analysis == "FALSE")
 
 # exclude rows that that contain duplicate line items
 services <- services[!duplicated(services$line_item_id), ]
