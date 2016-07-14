@@ -284,13 +284,21 @@ output$histogram_goals <- renderPlot({
 output$table_goals <- renderDataTable({
   
   data <- district_subset() %>% filter(new_connect_type_goals %in% input$connection_districts_goals,
-                                           district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) %>% 
-          summarize(n = n(),
+                                           district_size2 %in% input$district_size_goals, locale2 %in% input$locale_goals) 
+  data$num_stud_mtg_goals <- ifelse(data$meeting_goals_district == 1, data$num_students, 0)
+  data <- data %>% 
+          summarize(
+              n_dists_mg = sum(meeting_goals_district),
+              n = n(),
               percent_districts_meeting_goals = paste0(round(100 * mean(meeting_goals_district), 2), "%"),
+              n_stud_mg = sum(num_stud_mtg_goals),
               n_students = sum(num_students),
               percent_students_meeting_goals = paste0(round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2), "%"))
-  colnames(data) <- c("# of districts", "% of districts meeting goals", "# of students", "% of students meeting goals")
+  colnames(data) <- c("# of districts meeting goals", "# of clean districts", "% of districts meeting goals", 
+                      "# of students in districts meeting goals", "# of students in clean districts", "% of students meeting goals")
 
+  
+  
   validate(need(nrow(data) > 0, ""))  
   datatable(format(data, big.mark = ",", scientific = FALSE), options = list(paging = FALSE, searching = FALSE), rownames = FALSE)
   
@@ -578,7 +586,7 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$testing, {
   d <- district_subset() %>% filter(name %in% input$testing)
-  d %>% select(name = name, X = longitude, Y = latitude, num_students, new_connect_type_goals, total_ia_monthly_cost)
+  d %>% select(name = name, X = longitude, Y = latitude, num_students, ia_bandwidth_per_student, meeting_2014_goal_no_oversub, new_connect_type_goals, total_ia_monthly_cost, monthly_ia_cost_per_mbps)
   #dp <- as.data.frame(data_points)
 })  
   
@@ -587,8 +595,11 @@ output$testing_leaflet <- renderLeaflet({
   
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
                     "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                    "IA Connection: ", school_districts()$new_connect_type_goals, "<br>",
-                    "Total IA monthly cost: $", format(school_districts()$total_ia_monthly_cost, big.mark = ",", scientific = FALSE))
+                    "IA connection: ", school_districts()$new_connect_type_goals, "<br>",
+                    "IA kbps/student: ", school_districts()$ia_bandwidth_per_student, "<br>",
+                    "100 kbps goal status: ", school_districts()$meeting_2014_goal_no_oversub, "<br>",
+                    "Total IA monthly cost: $", format(round(school_districts()$total_ia_monthly_cost, 2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
+                    "Total IA monthly cost/Mbps: $", format(round(school_districts()$monthly_ia_cost_per_mbps, 2),  big.mark = ",", nsmall = 2, scientific = FALSE))
   
   
   
@@ -635,6 +646,7 @@ output$choose_district <- renderPlot({
 })
 
 # map of districts 
+
 output$population_leaflet <- renderLeaflet({ 
   
   data <- district_subset() %>%
@@ -646,33 +658,50 @@ output$population_leaflet <- renderLeaflet({
     filter(not_all_scalable == 1)
 
   
-  
+  sd_info2 <- paste0("<b>", data$name, "</b><br>",
+                   "# of students:", format(data$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                    "IA connection: ", data$new_connect_type_goals, "<br>",
+                    "IA kbps/student: ", data$ia_bandwidth_per_student, "<br>",
+                    "100 kbps goal status: ", data$meeting_2014_goal_no_oversub, "<br>",
+                    "Total IA monthly cost: $", format(round(data$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
+                    "Total IA monthly cost/Mbps: $", format(round(data$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
+  #for unscalable districts:
+  sd_info3 <- paste0("<b>", ddt_unscalable$name, "</b><br>",
+                     "# of students:", format(ddt_unscalable$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                     "IA connection: ", ddt_unscalable$new_connect_type_goals, "<br>",
+                     "IA kbps/student: ", ddt_unscalable$ia_bandwidth_per_student, "<br>",
+                     "100 kbps goal status: ", ddt_unscalable$meeting_2014_goal_no_oversub, "<br>",
+                     "Total IA monthly cost: $", format(round(ddt_unscalable$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
+                     "Total IA monthly cost/Mbps: $", format(round(ddt_unscalable$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
+
+    
+    
   l1 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name))  
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2))  
   
   l2 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#fdb913", "#fff1d0"), 
-                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-            addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Clean Districts", "Dirty Districts"),
+            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#fdb913", "#cb2027"), 
+                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
+            addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Clean Districts", "Dirty Districts"),
                         title = "Cleanliness Status of District", opacity = 1)
   
   l3 <- leaflet(data) %>% 
            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting Goal", "#fdb913", "#cb2027"), 
-                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-           addLegend("bottomright", colors = c("#fdb913", "#cb2027"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
+                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
+           addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
               title = "Goal Status", opacity = 1)
   
   l4 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#fdb913", "#fff1d0"), 
-                                           stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-           addLegend("bottomright", colors = c("#fdb913", "#fff1d0"), labels = c("Meets 1Mbps/Student Goal", "Does Not Meet 1Mbps/Student Goal"),
+           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#fdb913", "#f26b23"), 
+                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
+           addLegend("topright", colors = c("#fdb913", "#f26b23"), labels = c("Meets 1Mbps/Student Goal", "Does Not Meet 1Mbps/Student Goal"),
               title = "Goal Status", opacity = 1)
   
   l5 <- leaflet(ddt_unscalable) %>% 
                      addProviderTiles(input$tile2) %>% 
-                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(as.factor(zero_build_cost_to_district) == 0, "#fff1d0", "#fdb913"), 
-                                      stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-                    addLegend("bottomright", colors = c("#fff1d0", "#fdb913"), labels = c("Upgrade at partial cost \n to district", "Upgrade at no cost \n to district \n"),
+                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(zero_build_cost_to_district == 0, "#009296", "#fdb913"), 
+                                      stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info3)) %>% 
+                    addLegend("topright", colors = c("#009296", "#fdb913", "black"), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district", "Missing E-rate discount rate"),
                                title = "Cost for Fiber Build", opacity = 1)
   
   #l6 <- leaflet(data) %>% 
@@ -690,9 +719,9 @@ output$population_leaflet <- renderLeaflet({
 
 })
 
+reac_map_pop <- reactive({
 
-
-output$map_population <- renderPlot({
+#output$map_population <- renderPlot({
   
   data <- district_subset() %>%
           filter(!(postal_cd %in% c('AK', 'HI')), 
@@ -729,19 +758,19 @@ output$map_population <- renderPlot({
        geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#fdb913"),
                                alpha = 0.7, size = 4)
       
-  qq <- q + coord_map()
+  qq <<- q + coord_map()
   
   r <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
                alpha = 0.7, size = 4) + scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#fdb913", "#fff1d0"))
-  rr <- r + coord_map()
+  rr <<- r + coord_map()
   
   
   s <- state_base + 
     geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
                alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 100kbps/Student Goal", 
                                                                       "Does Not Meet 100kbps/Student Goal"), values = c("#fdb913", "#cb2027"))
-  ss <- s + coord_map()
+  ss <<- s + coord_map()
   
   t <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
@@ -752,7 +781,7 @@ output$map_population <- renderPlot({
             legend.background = element_rect(fill = "white")
       )
   
-  tt <- t + coord_map()
+  tt <<- t + coord_map()
   
   ddt_unscalable <- data %>% 
     filter(not_all_scalable == 1)
@@ -764,7 +793,7 @@ output$map_population <- renderPlot({
     scale_color_manual(values = c("#fff1d0", "#fdb913"), 
                        breaks = c(0, 1), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district"))
   
-  uu <- u + coord_map()
+  uu <<- u + coord_map()
   
   
   v <- state_base + 
@@ -772,6 +801,7 @@ output$map_population <- renderPlot({
                  alpha = 0.7, size = 4)
   vv <- v + coord_map()
   
+
   switch(input$map_view,
          "All Districts" = print(qq),
          "Clean/Dirty Districts" = print(rr),
@@ -781,6 +811,12 @@ output$map_population <- renderPlot({
          #'Highest IA Connect Type' = print(vv))
   
 })
+
+output$map_population <- renderPlot({
+  print(reac_map_pop()$plot)
+})
+
+
 
 
 # Price Dispersion Map holding Circuit Size / Technology Constant
@@ -1056,7 +1092,8 @@ district_tooltip <- function(x) {
   paste0("<b>", "District Name: ", services_rec$recipient_name, "</b><br>",
          "Monthly Cost per Circuit: $", format(services_rec$monthly_cost_per_circuit, big.mark = ",", scientific = FALSE),"<br>",
          "# of Circuits: ", services_rec$quantity_of_lines_received_by_district, "<br>",
-         "Connect Type: ", services_rec$connect_type, "<br>")
+         "Connect Type: ", services_rec$connect_type, "<br>",
+         "Service Provider: ", services_rec$reporting_name, "<br>")
 }
 
 vis <- reactive({
@@ -1184,16 +1221,21 @@ plot2_data <- reactive({
     pct_mg <- round((nrow(mg)/nrow(d_sub))*100, digits = 2) #63%
     pct_hyp <-  round(((nrow(mg) + can_meet$n) / nrow(d_sub))*100, digits = 2)
     
+    med_price <- round(median(mg$monthly_ia_cost_per_mbps, na.rm=TRUE), digits = 2)
+    print(med_price)
+    
     pct_joined <- c(pct_mg, pct_hyp)
     pct_names <- c("% Districts Currently Meeting Goal", "% Districts Meeting Goal Under Hypothetical Pricing")
+    pricing <- c(med_price, input$set_price)
     
-    pct_joined2 <- cbind(pct_names, pct_joined)
+    pct_joined2 <- cbind(pct_names, pct_joined, pricing)
     
     pct_joined3 <- as.data.frame(pct_joined2)
-    colnames(pct_joined3) <- c("status", "breakdown")
+    colnames(pct_joined3) <- c("status", "breakdown", "pricing")
     pct_joined3$breakdown <- as.numeric(as.character(pct_joined3$breakdown))
     
     pct_joined3 #added
+    print(pct_joined3)
     }) #added
 
 
@@ -1206,7 +1248,7 @@ plot2 <- reactive({
       add_axis("x", title = "Meeting Goals w/ Hypothetical Pricing", title_offset = 50, grid = FALSE) %>% 
       add_axis("y", title = " ", ticks = 0, grid = FALSE, properties = axis_props(axis = list(strokeWidth = 0))) %>%
       scale_numeric("y", domain = c(0, 100)) %>% 
-      add_legend("fill", title = "testing") %>% 
+      add_legend("fill", title = "") %>% 
       set_options(width = 850, height = 500)
 
 })
@@ -1222,13 +1264,14 @@ observe({
 })
 
 
+
 output$table_hyp_cost <- renderDataTable({
   
   pct_joined4 <- plot2_data()
   pct_joined4$pct <- paste(format(pct_joined4$breakdown,  nsmall = 2), "%", sep = "")
-  pct_joined5 <- pct_joined4[,-2]
-  colnames(pct_joined5) <- c("variable", "percentage")
-
+  pct_joined4$cost <- paste("$", format(pct_joined4$pricing, nsmall=2), sep = "")
+  pct_joined5 <- pct_joined4[,-c(2:3)]
+  colnames(pct_joined5) <- c("status", "percentage", "pricing")
   
   validate(need(nrow(pct_joined5) > 0, ""))  
   datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))
@@ -1336,6 +1379,18 @@ output$downloadData <- downloadHandler(
     write.csv(datasetInput_maps(), file)
   }
 )
+
+
+#NEED TO FINISH FIXING THIS:
+output$downloadMapImage <- downloadHandler(
+  filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
+  content = function(file) {
+    ggsave(plot = reac_map_pop()$plot, file, type = "cairo-png")
+  }
+
+)
+  
+
 
 
 ####################################
