@@ -439,13 +439,9 @@ output$histogram_districts_ia_technology <- renderPlot({
   validate(need(nrow(data) > 0, "No district in given subset; please adjust your selection"))  
   
   plot_title <- ifelse(input$meeting_goal[1] == c("Meeting Goal") & input$meeting_goal[2] == c("Not Meeting Goal"), "All Districts", 
-                       "Districts Meeting Goals")
+                       "Districts Not Meeting Goals")
                        #ifelse(length(input$meeting_goal) == 1 & input$meeting_goal == "Meeting Goal", "Districts Meeting 100kbps/Student Goal",
                       #        "Districts Not Meeting 100kbps/Student Goal"))
-  
-  print(plot_title)
-  print(input$meeting_goal)
-  print(length(input$meeting_goal))
   
   q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
        geom_bar(fill = "#fdb913", stat = "identity", width = .5) +
@@ -586,11 +582,18 @@ output$table_projected_wan_needs <- renderDataTable({
 ## Fiber Section
 ######
 
+fiber_data <- reactive({
+  district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+                               locale3 %in% input$locale_fiber)
+})
+
 ## Districts and Students Meeting Goals
 output$histogram_schools_on_fiber <- renderPlot({
   
-  data1 <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
-                                        locale3 %in% input$locale_fiber)
+  #data1 <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+  #                                      locale3 %in% input$locale_fiber)
+  
+  data1 <- fiber_data()
   
   data <- data1 %>% 
           summarize(num_all_schools = sum(num_schools),
@@ -636,10 +639,13 @@ output$histogram_schools_on_fiber <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_schools_on_fiber <- renderDataTable({
   
-  data <- district_subset() %>% 
-          filter(district_size3 %in% input$district_size_fiber,
-                 locale3 %in% input$locale_fiber) %>% 
-           summarize(num_schools_on_fiber = round(sum(schools_on_fiber), 0),
+  #data <- district_subset() %>% 
+  #        filter(district_size3 %in% input$district_size_fiber,
+  #               locale3 %in% input$locale_fiber) %>% 
+  #fd <- fiber_data()
+  
+  
+  data <- fiber_data() %>% summarize(num_schools_on_fiber = round(sum(schools_on_fiber), 0),
                      num_schools_may_need_upgrades = round(sum(schools_may_need_upgrades), 0),
                      num_schools_need_upgrades = round(sum(schools_need_upgrades), 0),
                      num_all_schools = sum(num_schools_on_fiber, num_schools_may_need_upgrades, num_schools_need_upgrades),
@@ -664,8 +670,10 @@ output$table_schools_on_fiber <- renderDataTable({
 output$histogram_by_erate_discounts <- renderPlot({
   
   
-  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
-                                 locale3 %in% input$locale_fiber) %>% 
+  #data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+  #                               locale3 %in% input$locale_fiber) %>% 
+    
+  data <- fiber_data() %>%   
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
@@ -699,8 +707,10 @@ output$histogram_by_erate_discounts <- renderPlot({
 ## Table on distribution of schools by infrastructure type
 output$table_by_erate_discounts <- renderDataTable({
   
-  data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
-                                           locale3 %in% input$locale_fiber) %>% 
+ # data <- district_subset() %>% filter(district_size3 %in% input$district_size_fiber,
+ #                                           locale3 %in% input$locale_fiber) %>% 
+ 
+   data <- fiber_data() %>%   
           filter(!is.na(c1_discount_rate),
                  not_all_scalable == 1) %>% # only include districts that are unscalable
           group_by(c1_discount_rate) %>%
@@ -1260,7 +1270,7 @@ district_tooltip <- function(x) {
   paste0("<b>", "District Name: ", services_rec$recipient_name, "</b><br>",
          "Monthly Cost per Circuit: $", format(services_rec$monthly_cost_per_circuit, big.mark = ",", scientific = FALSE),"<br>",
          "# of Circuits: ", services_rec$quantity_of_lines_received_by_district, "<br>",
-         "Connect Type: ", services_rec$connect_type, "<br>",
+         "Connect Type: ", services_rec$new_connect_type, "<br>",
          "Service Provider: ", services_rec$reporting_name, "<br>")
 }
 
@@ -1473,6 +1483,14 @@ output$ia_tech_downloadData <- downloadHandler(
     paste('districts_by_ia_tech_dataset', '_20160711', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
+  }
+)
+
+output$fiber_downloadData <- downloadHandler(
+  filename = function(){
+    paste('fiber_dataset', '_20160711', '.csv', sep = '')},
+  content = function(file){
+    write.csv(fiber_data(), file)
   }
 )
 
