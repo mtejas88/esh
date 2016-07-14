@@ -232,7 +232,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           label = h2("Select District Locale(s)"),
                                                                           choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                                           selected = c("Rural", "Small Town", "Suburban", "Urban"))),
-                                                   actionButton("map_reset_all", "Reset All Filters"), br(),#
+                                                   actionButton("map_reset_all", "Reset All Filters"), #
                                                    downloadButton('downloadData', 'Download Underlying Data'), br(),
                                                    downloadButton('downloadMapImage', 'Download Map Image')), #'map_downloadData'
                                       mainPanel(
@@ -245,7 +245,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           #                       cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
                                           
                                           
-                                          leafletOutput("population_leaflet", height = "800px", "1200px"),
+                                          leafletOutput("population_leaflet", height = "700px", "1100px"),
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
                                           br(), textOutput("n_ddt"), br(), br(),
@@ -331,7 +331,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                             choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                             selected = c("Rural", "Small Town", "Suburban", "Urban"))),
                                          actionButton("goals_reset_all", "Reset All Filters"),
-                                        downloadButton('ia_tech_downloadData', 'Download')#
+                                        downloadButton('ia_tech_downloadData', 'Download Underlying Data')#
                                          ),
                                   mainPanel(
                                     wellPanel(
@@ -395,7 +395,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                                     label = h2("Select Locale(s)"),
                                                                                     choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                                                     selected = c("Rural", "Small Town", "Suburban", "Urban")),#,
-                                                actionButton("fiber_reset_all", "Reset All Filters")
+                                                actionButton("fiber_reset_all", "Reset All Filters"),
+                                                downloadButton('fiber_downloadData', 'Download Underlying Data')
                                        )),
                                    
                                     mainPanel( 
@@ -446,7 +447,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                            selected = c("Rural", "Small Town", "Suburban", "Urban"))),#
                                        
                                        actionButton("affordability_reset_all", "Reset All Filters"),  
-                                       downloadButton('affordability_downloadData', 'Download')), # closing sidebar panel,
+                                       downloadButton('affordability_downloadData', 'Download Underlying Data')), # closing sidebar panel,
                                      mainPanel(
                                          
                                     wellPanel(     
