@@ -1,9 +1,9 @@
-name: shiny
+name: Shiny
 account: educationsuperhighway
 server: shinyapps.io
 appId: 99031
-bundleId: 497129
+bundleId: 505009
 url: https://educationsuperhighway.shinyapps.io/shiny/
-when: 1467749726.39372
+when: 1468514201.14508
 asMultiple: FALSE
 asStatic: FALSE

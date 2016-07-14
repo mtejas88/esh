@@ -183,14 +183,18 @@ output$table_locale <- renderDataTable({
     need(input$state != 'All', "")
   )
 
-  data$n_locale <- as.character(data$n_locale)
-  data$n <- as.character(data$n)
   data$percent <- paste0(round(data$percent, 2), "%")
-  data <- data %>% group_by(postal_cd) %>% arrange(locale)
-  colnames(data) <- c("Postal Code", "Locale", "# of Districts in Locale", "# of Districts in the State", "% of Districts in Locale")
+  data <- data %>% 
+          group_by(postal_cd) %>% 
+          arrange(locale)
+          select(data, postal_cd, locale, n_districts_locale, n_districts,
+                 n_schools, n_students)
   
+  colnames(data) <- c("Postal Code", "Locale", "% of Districts in Locale", 
+                      "# of Districts in Locale", "# of Districts in the State", "# of Schools in the State",
+                      "# of Students in the State")
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
 
   })
   
@@ -242,9 +246,13 @@ output$table_size <- renderDataTable({
 
   data <- data %>% group_by(postal_cd) %>% arrange(district_size)
   data$percent <- paste(round(data$percent, 2), "%", sep ="")
-  colnames(data) <- c("Postal Code", "District Size", "# of Districts in Size Bucket", "# of Districts in the State", "% of Districts in Size Bucket")
+  data <- select(data, postal_cd, district_size, percent, n_districts_size, n_districts,
+                 n_schools, n_students)
+  colnames(data) <- c("Postal Code", "District Size", "% of Districts in Size Bucket", 
+                      "# of Districts in Size Bucket", "# of Districts in the State", 
+                      "# of Schools in the State", "# of Students in the State")
   
-  datatable(data, caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
+  datatable(format(data, big.mark = ",", scientific = FALSE), caption = 'Use the Search bar for the data table below.', rownames = FALSE, options = list(paging = FALSE))
 
 })
 
@@ -395,8 +403,9 @@ output$table_goals <- renderDataTable({
               n_stud_mg = sum(num_stud_mtg_goals),
               n_students = sum(num_students),
               percent_students_meeting_goals = paste0(round(100 * sum(meeting_goals_district * num_students) / sum(num_students), 2), "%"))
-  colnames(data) <- c("# of districts meeting goals", "# of clean districts", "% of districts meeting goals", 
-                      "# of students in districts meeting goals", "# of students in clean districts", "% of students meeting goals")
+  colnames(data) <- c("# of Districts Meeting Goals", "# of Clean Districts", "% of Districts Meeting Goals", 
+                      "# of Students in Districts Meeting Goals", "# of Students in Clean Districts", 
+                      "% of Students Meeting Goals")
 
   
   
@@ -1430,7 +1439,7 @@ output$table_hyp_cost <- renderDataTable({
   pct_joined4$pct <- paste(format(pct_joined4$breakdown,  nsmall = 2), "%", sep = "")
   pct_joined4$cost <- paste("$", format(pct_joined4$pricing, nsmall=2), sep = "")
   pct_joined5 <- pct_joined4[,-c(2:3)]
-  colnames(pct_joined5) <- c("status", "percentage", "pricing")
+  colnames(pct_joined5) <- c("Status", "Goal Meeting Percentage", "Pricing")
   
   validate(need(nrow(pct_joined5) > 0, ""))  
   datatable(pct_joined5, rownames = FALSE, options = list(paging = FALSE, searching = FALSE))

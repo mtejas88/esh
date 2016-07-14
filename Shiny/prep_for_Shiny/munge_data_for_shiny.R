@@ -21,7 +21,7 @@ schools_needing_wan <- read.csv("schools_needing_wan_20160624.csv", as.is = TRUE
 # filter the data, using proper conditions
 services <- services %>% 
   filter(shared_service == "District-dedicated" & 
-           dirty_status == "include clean" & exclude == "FALSE")
+           dirty_status == "include clean" & exclude == "FALSE" & exclude_from_analysis == "FALSE")
 
 # exclude rows that that contain duplicate line items
 services <- services[!duplicated(services$line_item_id), ]
@@ -202,31 +202,35 @@ data <- rbind(districts, districts_clean)
 
 n_all <- data %>%
          group_by(postal_cd) %>%
-         summarize(n = n())
+         summarize(n_districts = n(),
+                   n_schools = sum(num_schools),
+                   n_students = sum(num_students))
 
 # by locale
 locale_cuts <- data %>%
           group_by(postal_cd, locale) %>%
-          summarize(n_locale = n())
+          summarize(n_districts_locale = n())
 
 locale_cuts <- left_join(locale_cuts, n_all, by = c("postal_cd"))
 
-locale_cuts$percent <- 100 * locale_cuts$n_locale / locale_cuts$n
+locale_cuts$percent <- 100 * locale_cuts$n_districts_locale / locale_cuts$n_districts
 
 locale_cuts$locale <- factor(locale_cuts$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
 locale_cuts <- arrange(locale_cuts, postal_cd, locale)
+locale_cuts <- select(locale_cuts, postal_cd, locale, percent, n_districts_locale, n_districts, n_schools, n_students)
 
 # by district sizes
 size_cuts <- data %>%
                   group_by(postal_cd, district_size) %>%
-                  summarize(n_locale = n())
+                  summarize(n_districts_size = n())
 
 size_cuts <- left_join(size_cuts, n_all, by = c("postal_cd"))
 
-size_cuts$percent <- 100 * size_cuts$n_locale / size_cuts$n
+size_cuts$percent <- 100 * size_cuts$n_districts_size / size_cuts$n_districts
 
 size_cuts$district_size <- factor(size_cuts$district_size, levels = c("Mega", "Large", "Medium", "Small", "Tiny"))
 size_cuts <- arrange(size_cuts, postal_cd, district_size)
+size_cuts <- select(size_cuts, postal_cd, district_size, percent, n_districts_size, n_districts, n_schools, n_students)
 
 wd <- "~/Desktop/ficher/Shiny"
 setwd(wd)
