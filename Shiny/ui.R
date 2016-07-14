@@ -100,10 +100,12 @@ shinyUI(fluidPage(
 
                     div.outer {
                     position: fixed;
-                    top: 154px;
+                    top: 165px;
                     left: 0;
                     right: 0;
                     bottom: 0;
+                    overflow: hidden;
+                    padding: 0;
 
                     }
                     
@@ -203,18 +205,18 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                        
                                                        selectInput(inputId = "tile2",
                                                                    label = h2("Choose Map Background:"),
-                                                                   choices = c("Color1" = "MapQuestOpen.OSM",
-                                                                               "Color2" = "Esri.WorldStreetMap",
-                                                                               "Color3" = "Thunderforest.Transport",
-                                                                               "Color4" = "Thunderforest.OpenCycleMap",
-                                                                               "Gray1" = "CartoDB.Positron",
-                                                                               "Gray2" = "Stamen.TonerLite",
-                                                                               "Gray3" = "CartoDB.DarkMatter",
-                                                                               "Terrain1" =  "Thunderforest.Landscape",
-                                                                               "Terrain2" = "Stamen.TerrainBackground",
-                                                                               "Terrain3" = "Esri.WorldImagery",
-                                                                               "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                                   selected = "Gray1"), #
+                                                                   choices = c(
+                                                                               #"Color2" = "Esri.WorldStreetMap",
+                                                                               #"Color1" = "Thunderforest.Transport",
+                                                                               "Color" = "Thunderforest.OpenCycleMap",
+                                                                               "Grayscale" = "CartoDB.Positron",
+                                                                               #"Gray2" = "Stamen.TonerLite",
+                                                                              # "Gray3" = "CartoDB.DarkMatter",
+                                                                               #"Terrain2" = "Stamen.TerrainBackground",
+                                                                               "Satellite" = "Esri.WorldImagery"),
+                                                                               #"Terrain" =  "Thunderforest.Landscape"),
+                                                                               #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                                   selected = "Grayscale"), #
                                                        
                                                        checkboxGroupInput(inputId = "connection_districts", 
                                                                           h2("Select Highest IA Connection Type(s) for Districts"),
@@ -230,16 +232,20 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           label = h2("Select District Locale(s)"),
                                                                           choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                                           selected = c("Rural", "Small Town", "Suburban", "Urban"))),
-                                                   actionButton("map_reset_all", "Reset All Filters"),#
-                                                   downloadButton('downloadData', 'Download')), #'map_downloadData'
+                                                   actionButton("map_reset_all", "Reset All Filters"), br(),#
+                                                   downloadButton('downloadData', 'Download Underlying Data'), br(),
+                                                   downloadButton('downloadMapImage', 'Download Map Image')), #'map_downloadData'
                                       mainPanel(
                                         
                                         
                                         fluidRow(
-                                          htmlOutput("text_maps"), br(),  #  column(12, align = "left",   
-                                          column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
-                                                                 leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
-                                                                 cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
+                                          htmlOutput("text_maps"), #br(),  #  column(12, align = "left",   
+                                          #column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
+                                          #                       leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
+                                          #                       cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
+                                          
+                                          
+                                          leafletOutput("population_leaflet", height = "800px", "1200px"),
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
                                           br(), textOutput("n_ddt"), br(), br(),
@@ -247,30 +253,33 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           )) #end of fluidRow()
                                     )),
                            tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
-                                    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                    div(class = "outer", leafletOutput("testing_leaflet", width = '100%', height = '100%')), 
-                                    br(),
+                                    div(class="outer",
+                                    #tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+                                    tags$style(type = "text/css", ".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
+                                    leafletOutput("testing_leaflet", width = '100%', height = '100%'), 
+                                        br(),
+                                        
                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                  draggable = TRUE, top = 125, left = "auto", right = 20, bottom = "auto",
+                                                  draggable = TRUE, top = 175, left = "auto", right = 20, bottom = "auto",
                                                   width = 330, height = "auto",
                                                   
                                                   uiOutput("districtSelect"),
                                                   selectInput(inputId = "tile",
                                                               label = h2("Choose Map Background"),
-                                                              choices = c("Color1" = "MapQuestOpen.OSM",
-                                                                          "Color2" = "Esri.WorldStreetMap",
-                                                                          "Color3" = "Thunderforest.Transport",
-                                                                          "Color4" = "Thunderforest.OpenCycleMap",
-                                                                          "Gray1" = "CartoDB.Positron",
-                                                                          "Gray2" = "Stamen.TonerLite",
-                                                                          "Gray3" = "CartoDB.DarkMatter",
-                                                                          "Terrain1" =  "Thunderforest.Landscape",
-                                                                          "Terrain2" = "Stamen.TerrainBackground",
-                                                                          "Terrain3" = "Esri.WorldImagery",
-                                                                          "Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Gray1")) #
+                                                              choices = c(
+                                                                          #"Color2" = "Esri.WorldStreetMap",
+                                                                          #"Color1" = "Thunderforest.Transport",
+                                                                          "Color" = "Thunderforest.OpenCycleMap",
+                                                                          "Grayscale" = "CartoDB.Positron",
+                                                                          #"Gray2" = "Stamen.TonerLite",
+                                                                          #"Gray3" = "CartoDB.DarkMatter",
+                                                                          "Satellite" = "Esri.WorldImagery"),
+                                                                          #"Terrain" =  "Thunderforest.Landscape"),
+                                                                          #"Terrain2" = "Stamen.TerrainBackground",
+                                                                          #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
+                                                              selected = "Grayscale")) #
                                     
-                           ) #end of tabPanel() 
+                           )) #end of div() and tabPanel() 
                            
                            ), #end of navbarMenu() for Maps section
 
@@ -321,7 +330,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                             label = h2("Select District Locale(s)"),
                                                             choices = c("Rural", "Small Town", "Suburban", "Urban"),
                                                             selected = c("Rural", "Small Town", "Suburban", "Urban"))),
-                                         actionButton("goals_reset_all", "Reset All Filters")#
+                                         actionButton("goals_reset_all", "Reset All Filters"),
+                                        downloadButton('ia_tech_downloadData', 'Download')#
                                          ),
                                   mainPanel(
                                     wellPanel(
@@ -342,7 +352,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                               h2("Select whether District is Meeting the 2014 FCC Goal"),
                                                                               choices = c("Meeting Goal", "Not Meeting Goal"), 
                                                                               selected = c("Meeting Goal", "Not Meeting Goal")), br(), #) for ending conditionalPanel()
-                                          downloadButton('ia_tech_downloadData', 'Download'), br(),
+                                          
                                           plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology")), br(), br(), br(),
                                      
                                     wellPanel(
