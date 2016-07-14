@@ -339,6 +339,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                      p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
                                        Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
                                      plotOutput("histogram_goals"), br(), dataTableOutput("table_goals")), br(), br(), br(),
+                                     #imageOutput("myImage"), 
                                      
                                      wellPanel(
                                       h4("DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
