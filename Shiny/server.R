@@ -1480,7 +1480,7 @@ observeEvent(input$map_reset_all, {
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160711', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160715', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data(), file)
   }
@@ -1488,7 +1488,7 @@ output$ia_tech_downloadData <- downloadHandler(
 
 output$fiber_downloadData <- downloadHandler(
   filename = function(){
-    paste('fiber_dataset', '_20160711', '.csv', sep = '')},
+    paste('fiber_dataset', '_20160715', '.csv', sep = '')},
   content = function(file){
     write.csv(fiber_data(), file)
   }
@@ -1497,7 +1497,7 @@ output$fiber_downloadData <- downloadHandler(
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_20160711', '.csv', sep = '')},
+    paste('affordability_dataset', '_20160715', '.csv', sep = '')},
   content = function(file){
     write.csv(sr_all(), file)
   }
@@ -1560,7 +1560,7 @@ output$table_testing <- renderDataTable({
 
 output$downloadData <- downloadHandler(
   filename = function(){
-    paste(input$map_view, '_20160711', '.csv', sep = '')},
+    paste(input$map_view, '_20160715', '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput_maps(), file)
   }
@@ -1569,7 +1569,7 @@ output$downloadData <- downloadHandler(
 
 #NEED TO FINISH FIXING THIS:
 output$downloadMapImage <- downloadHandler(
-  filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
+  filename = function() {paste(input$map_view, '_20160715', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_pop()$plot, file, type = "cairo-png")
   }
