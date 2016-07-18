@@ -236,15 +236,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                    downloadButton('downloadData', 'Download Underlying Data'), br(),
                                                    downloadButton('downloadMapImage', 'Download Map Image')), #'map_downloadData'
                                       mainPanel(
-                                        
-                                        
                                         fluidRow(
-                                          htmlOutput("text_maps"), #br(),  #  column(12, align = "left",   
-                                          #column(12, splitLayout(cellWidths = c("50%", "50%"), plotOutput("map_population", height = "500px"), 
-                                          #                       leafletOutput("population_leaflet", height = "500px"), style="width: 125% ; height: 500px",
-                                          #                       cellArgs = list(style = "padding: 12px")), br(), br(), br(), br()), #end column() 
-                                          
-                                          
+                                          htmlOutput("text_maps"), 
                                           leafletOutput("population_leaflet", height = "700px", "1100px"),
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
@@ -264,6 +257,14 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                   width = 330, height = "auto",
                                                   
                                                   uiOutput("districtSelect"),
+                                                  selectInput(inputId = "map_view_lookup", 
+                                                              label = h2("Choose Map View:"),
+                                                              choices = c("All Districts", 
+                                                                          "Clean/Dirty Districts", 
+                                                                          "Goals: 100 kbps/Student", 
+                                                                          "Goals: 1 Mbps/Student",
+                                                                          "Fiber Build Cost to Districts"),
+                                                              selected = "All Districts"),
                                                   selectInput(inputId = "tile",
                                                               label = h2("Choose Map Background"),
                                                               choices = c(
@@ -277,7 +278,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           #"Terrain" =  "Thunderforest.Landscape"),
                                                                           #"Terrain2" = "Stamen.TerrainBackground",
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Grayscale")) #
+                                                              selected = "Grayscale"),
+                                                  downloadButton('downloadMapLookup', 'Download Map Image')) #
                                     
                            )) #end of div() and tabPanel() 
                            
