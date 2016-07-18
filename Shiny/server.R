@@ -736,20 +736,18 @@ output$districtSelect <- renderUI({
   
   districtSelect_data <- district_subset() 
   
-  validate(
-    need(nrow(districtSelect_data) > 0, "No districts in given subset")
-  )
+  validate(need(nrow(districtSelect_data) > 0, "No districts in given subset"))
 
   district_list <- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
 
-  selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
+  selectizeInput("pin_district", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
+
 
   })
 
 output$selected <- renderText({
-  paste(input$testing, collapse = ", ")
+  paste(input$pin_district, collapse = ", ")
 })
-
 
 
 #switch(input$map_view_lookup,
@@ -766,14 +764,14 @@ output$selected <- renderText({
 
 
 
+>>>>>>> master
 ##Trying leaflet: 
 #observe({
-school_districts <- eventReactive(input$testing, {
-  d <- district_subset() %>% filter(name %in% input$testing)
+school_districts <- eventReactive(input$pin_district, {
+  d <- district_subset() %>% filter(name %in% input$pin_district)
 
   d %>% select(name = name, X = longitude, Y = latitude, num_students, ia_bandwidth_per_student, meeting_2014_goal_no_oversub, new_connect_type_goals, total_ia_monthly_cost, monthly_ia_cost_per_mbps)
 
-  #dp <- as.data.frame(data_points)
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
@@ -793,43 +791,136 @@ output$testing_leaflet <- renderLeaflet({
 #})
 
 
-output$choose_district <- renderPlot({
+
+reac_map_lookup <- reactive({
   
-  choose_district_data <- district_subset() %>%
-          filter(!(postal_cd %in% c('AK', 'HI')))
-  
-  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
-  
-  choose_district_data <- choose_district_data %>% 
-          filter_(paste("name %in%", selected_district_list))
-  
+  data <- district_subset() %>%
+    filter(!(postal_cd %in% c('AK', 'HI')), 
+            name %in% input$pin_district)
+    #       new_connect_type_map %in% input$connection_districts,
+    #       district_size %in% input$district_size_maps,
+    #       locale %in% input$locale_maps)
+
   validate(
-    need(nrow(choose_district_data) > 0, "No districts in given subset")
+    need(nrow(data) > 0, "No districts in given subset")
   )
   
   state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
   state_df <- map_data("county", region = state_name)
+  #hdf <- get_map(state_name, source = 'stamen', maptype = 'toner', zoom = 7, crop = FALSE)
   
   set.seed(123) #to control jitter
   state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
-    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
-    theme_classic() +
-    theme(line = element_blank(), title = element_blank(), 
+    #ggmap(hdf) +
+    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'white', fill = "#d9d9d9") +
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white"),
+          line = element_blank(), title = element_blank(), 
           axis.text.x = element_blank(), axis.text.y = element_blank(),
-          legend.text = element_text(size=16), legend.position=c(0.5, 0.5)) +
+          legend.key = element_blank(),
+          legend.text = element_text(size=16, family="Lato"), 
+          legend.position= "bottom",
+          legend.direction="vertical") +
     guides(shape=guide_legend(override.aes=list(size=7))) 
   
+  
+  
   q <- state_base + 
-       geom_point(data = choose_district_data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
-                               alpha = 0.7, size = 6) 
+    geom_point(data = data, aes(x = longitude, y = latitude), colour = c("#fdb913"),
+               alpha = 0.7, size = 4)
   
-  print(q + coord_map())
+  qq <<- q + coord_map()
   
+  r <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = exclude_from_analysis), 
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Clean District", "Dirty District"), values = c("#fdb913", "#fff1d0"))
+  rr <<- r + coord_map()
+  
+  
+  s <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2014_goal_no_oversub), 
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 100kbps/Student Goal", 
+                                                                      "Does Not Meet 100kbps/Student Goal"), values = c("#fdb913", "#cb2027"))
+  ss <<- s + coord_map()
+  
+  t <- state_base + 
+    geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
+               alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
+                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#009296", "#fff1d0")) +
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          legend.background = element_rect(fill = "white")
+    )
+  
+  tt <<- t + coord_map()
+  
+  ddt_unscalable <- data %>% 
+    filter(not_all_scalable == 1)
+  
+  u <- state_base + 
+    geom_point(data = ddt_unscalable, 
+               aes(x = longitude, y = latitude, colour = as.factor(zero_build_cost_to_district)),
+               alpha = 0.8, size = 4) +
+    scale_color_manual(values = c("#fff1d0", "#fdb913"), 
+                       breaks = c(0, 1), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district"))
+  
+  uu <<- u + coord_map()
+  
+  switch(input$map_view_lookup,
+         "All Districts" = print(qq),
+         "Clean/Dirty Districts" = print(rr),
+         'Goals: 100 kbps/Student' = print(ss),
+         'Goals: 1 Mbps/Student' = print(tt),
+         'Fiber Build Cost to Districts' = print(uu)#,
+         #'Connect Category' = print(vv)
+  )
   
 })
 
-# map of districts 
 
+
+
+
+
+
+
+#output$choose_district <- renderPlot({
+  
+#  choose_district_data <- district_subset() %>%
+#          filter(!(postal_cd %in% c('AK', 'HI')))
+  
+#  selected_district_list <- paste0("c(",toString(paste0('\"', input$district_list, '\"')), ')')  
+  
+#  choose_district_data <- choose_district_data %>% 
+#          filter_(paste("name %in%", selected_district_list))
+  
+#  validate(
+#    need(nrow(choose_district_data) > 0, "No districts in given subset")
+#  )
+  
+#  state_name <- state_lookup$name[state_lookup$code == input$state] #input$state
+#  state_df <- map_data("county", region = state_name)
+  
+#  set.seed(123) #to control jitter
+#  state_base <-  ggplot(data = state_df, aes(x = long, y=lat)) + 
+#    geom_polygon(data = state_df, aes(x = long, y = lat, group = group), color = 'black', fill = NA) +
+#    theme_classic() +
+#    theme(line = element_blank(), title = element_blank(), 
+#          axis.text.x = element_blank(), axis.text.y = element_blank(),
+#          legend.text = element_text(size=16), legend.position=c(0.5, 0.5)) +
+#    guides(shape=guide_legend(override.aes=list(size=7))) 
+  
+#  q <- state_base + 
+#       geom_point(data = choose_district_data, aes(x = longitude, y = latitude), colour = c("#0073B6"),
+#                               alpha = 0.7, size = 6) 
+  
+#  print(q + coord_map())
+  
+  
+#})
+
+############ map of districts ################### 
 output$population_leaflet <- renderLeaflet({ 
   
   data <- district_subset() %>%
@@ -840,7 +931,7 @@ output$population_leaflet <- renderLeaflet({
   ddt_unscalable <- data %>% 
     filter(not_all_scalable == 1)
 
-  
+  #for all maps other than fiber build
   sd_info2 <- paste0("<b>", data$name, "</b><br>",
                    "# of students:", format(data$num_students, big.mark = ",", scientific = FALSE),"<br>",
                     "IA connection: ", data$new_connect_type_goals, "<br>",
@@ -857,8 +948,6 @@ output$population_leaflet <- renderLeaflet({
                      "Total IA monthly cost: $", format(round(ddt_unscalable$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
                      "Total IA monthly cost/Mbps: $", format(round(ddt_unscalable$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
 
-    
-    
   l1 <- leaflet(data) %>% 
             addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2))  
   
@@ -1576,7 +1665,8 @@ output$downloadData <- downloadHandler(
 )
 
 
-#For Population Maps:
+#For population maps:
+
 output$downloadMapImage <- downloadHandler(
   filename = function() {paste(input$map_view, '_20160715', '.png', sep='') },
   content = function(file) {
@@ -1584,7 +1674,7 @@ output$downloadMapImage <- downloadHandler(
   }
 
 )
-  
+
 #For District Look Up: blank pin point map
 output$downloadDistrictLookup <- downloadHandler(
   filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
