@@ -378,7 +378,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           and the percentage of districts
                                           that would be meeting the goal if districts currently not meeting the goal were to
                                   have access to more affordable internet access."), 
-                                     p("You can adjust the IA cost per Mbps assumption by using the scale."), br(),
+                                     p("Current pricing refers to the median cost per Mbps for selected districts. You can adjust the hypothetical IA cost per Mbps assumption by using the scale."), br(),
                                           sliderInput(width = '300px', inputId = "set_price", 
                                                   label = h2("Pricing Assumption: IA Cost per Mbps"), 
                                                   min=0, 
