@@ -67,6 +67,7 @@ shinyServer(function(input, output, session) {
   output$bandwidthSelect <- renderUI({
     sr_data <- services
     bandwidth_list <- c(unique(services$bandwidth_in_mbps))
+
     selectizeInput("bandwidth_list", h2("Select Circuit Size(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
@@ -738,11 +739,9 @@ output$districtSelect <- renderUI({
   validate(
     need(nrow(districtSelect_data) > 0, "No districts in given subset")
   )
-  
-#  #district_list <- c(unique(as.character(districtSelect_data$name)))
+
   district_list <- c(unique(as.character(districtSelect_data$name)), "SELECT ALL") #made global
 
-    #"district_list"
   selectizeInput("testing", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 
   })
@@ -750,6 +749,20 @@ output$districtSelect <- renderUI({
 output$selected <- renderText({
   paste(input$testing, collapse = ", ")
 })
+
+
+
+#switch(input$map_view_lookup,
+#       "All Districts" = print(l1),
+#       "Clean/Dirty Districts" = print(l2),
+#       'Goals: 100 kbps/Student' = print(l3),
+#       'Goals: 1 Mbps/Student' = print(l4),
+#       'Fiber Build Cost to Districts' = print(l5))
+
+
+
+
+
 
 
 
@@ -765,7 +778,6 @@ school_districts <- eventReactive(input$testing, {
   
 output$testing_leaflet <- renderLeaflet({ 
 
-  
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
                     "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
                     "IA connection: ", school_districts()$new_connect_type_goals, "<br>",
@@ -774,9 +786,6 @@ output$testing_leaflet <- renderLeaflet({
                     "Total IA monthly cost: $", format(round(school_districts()$total_ia_monthly_cost, 2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
                     "Total IA monthly cost/Mbps: $", format(round(school_districts()$monthly_ia_cost_per_mbps, 2),  big.mark = ",", nsmall = 2, scientific = FALSE))
 
-  
-  
-  
   leaflet() %>% addProviderTiles(input$tile) %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
   #default view of leaflet map is addTiles()
 })
@@ -1567,7 +1576,7 @@ output$downloadData <- downloadHandler(
 )
 
 
-#NEED TO FINISH FIXING THIS:
+#For Population Maps:
 output$downloadMapImage <- downloadHandler(
   filename = function() {paste(input$map_view, '_20160715', '.png', sep='') },
   content = function(file) {
@@ -1576,7 +1585,14 @@ output$downloadMapImage <- downloadHandler(
 
 )
   
-
+#For District Look Up: blank pin point map
+output$downloadDistrictLookup <- downloadHandler(
+  filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
+  content = function(file) {
+    ggsave(plot = reac_map_lookup()$plot, file, type = "cairo-png")
+  }
+  
+)
 
 
 ####################################
