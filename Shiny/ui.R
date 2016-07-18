@@ -264,6 +264,14 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                   width = 330, height = "auto",
                                                   
                                                   uiOutput("districtSelect"),
+                                                  selectInput(inputId = "map_view_lookup", 
+                                                              label = h2("Choose Map View:"),
+                                                              choices = c("All Districts", 
+                                                                          "Clean/Dirty Districts", 
+                                                                          "Goals: 100 kbps/Student", 
+                                                                          "Goals: 1 Mbps/Student",
+                                                                          "Fiber Build Cost to Districts"),
+                                                              selected = "All Districts"),
                                                   selectInput(inputId = "tile",
                                                               label = h2("Choose Map Background"),
                                                               choices = c(
@@ -277,7 +285,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           #"Terrain" =  "Thunderforest.Landscape"),
                                                                           #"Terrain2" = "Stamen.TerrainBackground",
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Grayscale")) #
+                                                              selected = "Grayscale"),
+                                                  downloadButton('downloadDistrictLookup', 'Download Map Image')) #
                                     
                            )) #end of div() and tabPanel() 
                            
