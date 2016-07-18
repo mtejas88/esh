@@ -67,6 +67,7 @@ shinyServer(function(input, output, session) {
   output$bandwidthSelect <- renderUI({
     sr_data <- services
     bandwidth_list <- c(unique(services$bandwidth_in_mbps))
+
     selectizeInput("bandwidth_list", h2("Select Circuit Size(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
@@ -741,6 +742,7 @@ output$districtSelect <- renderUI({
 
   selectizeInput("pin_district", h2("Input District Name(s)"), as.list(district_list), multiple = TRUE, options = list(placeholder = 'e.g. Cave Creek Unified District')) 
 
+
   })
 
 output$selected <- renderText({
@@ -748,6 +750,21 @@ output$selected <- renderText({
 })
 
 
+#switch(input$map_view_lookup,
+#       "All Districts" = print(l1),
+#       "Clean/Dirty Districts" = print(l2),
+#       'Goals: 100 kbps/Student' = print(l3),
+#       'Goals: 1 Mbps/Student' = print(l4),
+#       'Fiber Build Cost to Districts' = print(l5))
+
+
+
+
+
+
+
+
+>>>>>>> master
 ##Trying leaflet: 
 #observe({
 school_districts <- eventReactive(input$pin_district, {
@@ -758,6 +775,7 @@ school_districts <- eventReactive(input$pin_district, {
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
+
   sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
                     "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
                     "IA connection: ", school_districts()$new_connect_type_goals, "<br>",
@@ -1648,6 +1666,7 @@ output$downloadData <- downloadHandler(
 
 
 #For population maps:
+
 output$downloadMapImage <- downloadHandler(
   filename = function() {paste(input$map_view, '_20160715', '.png', sep='') },
   content = function(file) {
@@ -1656,9 +1675,9 @@ output$downloadMapImage <- downloadHandler(
 
 )
 
-#For district maps:  
-output$downloadMapLookup<- downloadHandler(
-  filename = function() {paste(input$map_view_lookup, '_20160715', '.png', sep='') },
+#For District Look Up: blank pin point map
+output$downloadDistrictLookup <- downloadHandler(
+  filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_lookup()$plot, file, type = "cairo-png")
   }

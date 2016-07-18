@@ -280,6 +280,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
                                                               selected = "Grayscale"),
                                                   downloadButton('downloadMapLookup', 'Download Map Image')) #
+
                                     
                            )) #end of div() and tabPanel() 
                            
