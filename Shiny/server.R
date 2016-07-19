@@ -757,14 +757,6 @@ output$selected <- renderText({
 #       'Goals: 1 Mbps/Student' = print(l4),
 #       'Fiber Build Cost to Districts' = print(l5))
 
-
-
-
-
-
-
-
->>>>>>> master
 ##Trying leaflet: 
 #observe({
 school_districts <- eventReactive(input$pin_district, {
