@@ -146,7 +146,7 @@ district_subset <- reactive({
     
     districts %>% 
       filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) #%>% 
+      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state)))
              
   })
 
@@ -1417,7 +1417,14 @@ vis %>% bind_shiny("plot1")
 
 output$plot1_table <- renderDataTable({
   
-  datatable(sr_all(), rownames = FALSE)
+  data <- sr_all() %>%
+          select(recipient_id, recipient_name, postal_cd, line_item_id, bandwidth_in_mbps,
+                 connect_category, new_connect_type, line_item_district_monthly_cost, line_item_total_monthly_cost, 
+                 cat.1_allocations_to_district, line_item_total_num_lines, applicant_id, 
+                 applicant_name, reporting_name, monthly_cost_per_circuit, monthly_cost_per_mbps
+          )
+          
+  datatable(data, rownames = FALSE)
   
 })
 
@@ -1584,18 +1591,32 @@ observeEvent(input$map_reset_all, {
 
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
+  
   filename = function(){
     paste('districts_by_ia_tech_dataset', '_20160725', '.csv', sep = '')},
   content = function(file){
-    write.csv(districts_ia_tech_data(), file)
+    write.csv(districts_ia_tech_data() %>%
+                select(nces_cd, name, locale, district_size, num_schools, num_students,
+                       frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                       ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                       monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                       schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable)
+              , file, row.names = FALSE)
   }
 )
 
 output$fiber_downloadData <- downloadHandler(
+  
   filename = function(){
     paste('fiber_dataset', '_20160725', '.csv', sep = '')},
   content = function(file){
-    write.csv(fiber_data(), file)
+    write.csv( fiber_data() %>%
+                 select(nces_cd, name, locale, district_size, num_schools, num_students,
+                        frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                        ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                        monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                        schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable), 
+               file, row.names = FALSE)
   }
 )
 
@@ -1604,7 +1625,12 @@ output$affordability_downloadData <- downloadHandler(
   filename = function(){
     paste('affordability_dataset', '_20160725', '.csv', sep = '')},
   content = function(file){
-    write.csv(sr_all(), file)
+    write.csv(sr_all() %>%
+                select(recipient_id, recipient_name, postal_cd, line_item_id, bandwidth_in_mbps,
+                       connect_category, new_connect_type, line_item_district_monthly_cost, line_item_total_monthly_cost, 
+                       cat.1_allocations_to_district, line_item_total_num_lines, applicant_id, 
+                       applicant_name, reporting_name, monthly_cost_per_circuit, monthly_cost_per_mbps), 
+                       file, row.names = FALSE)
   }
 )
 
@@ -1646,7 +1672,13 @@ output$table_testing <- renderDataTable({
     filter(!(postal_cd %in% c('AK', 'HI')),
            new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
-           locale %in% input$locale_maps)# %>% select(c(1:61, 78, 79))
+           locale %in% input$locale_maps) %>%
+    select(nces_cd, name, locale, district_size, num_schools, num_students,
+           frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+           ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+           monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+           schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable)
+  
   
   
   map_data2 <- map_data %>%
@@ -1664,10 +1696,17 @@ output$table_testing <- renderDataTable({
 })
 
 output$downloadData <- downloadHandler(
+  
   filename = function(){
     paste(input$map_view, '_20160725', '.csv', sep = '')},
   content = function(file){
-    write.csv(datasetInput_maps(), file)
+    write.csv(datasetInput_maps() %>%
+                select(nces_cd, name, locale, district_size, num_schools, num_students,
+                       frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                       ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                       monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                       schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable), 
+              file, row.names = FALSE)
   }
 )
 
