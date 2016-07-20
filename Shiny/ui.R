@@ -258,7 +258,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                   
                                                   uiOutput("districtSelect"),
                                                   selectInput(inputId = "map_view_lookup", 
-                                                              label = h2("Choose Map View:"),
+                                                              label = h2("Choose Map View for Download:"),
                                                               choices = c("All Districts", 
                                                                           "Clean/Dirty Districts", 
                                                                           "Goals: 100 kbps/Student", 
