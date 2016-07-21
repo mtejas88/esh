@@ -13,11 +13,11 @@ Note: original query located here: https://modeanalytics.com/educationsuperhighw
 --district_lookup: to attach the district id to all school and district recipients
 with district_lookup as (
        select esh_id, district_esh_id, postal_cd
-        from schools
+        from public.schools
         where (postal_cd = '{{state}}' or 'All' = '{{state}}')
         union
         select esh_id, esh_id as district_esh_id, postal_cd
-        from districts
+        from public.districts
         where (postal_cd = '{{state}}' or 'All' = '{{state}}')
 ),
 --lines_to_district_by_line_item: to aggregate counts of line items by district recipients
@@ -26,8 +26,8 @@ lines_to_district_by_line_item as (
          c.line_item_id,
          count(distinct ec.circuit_id) as allocation_lines
         
-  from entity_circuits ec
-  join circuits c
+  from public.entity_circuits ec
+  join public.circuits c
   on ec.circuit_id = c.id
   join district_lookup dl
   on ec.entity_id = dl.esh_id
@@ -47,7 +47,7 @@ eim.entity_id,
 
 from ag121a
 
-left join entity_nces_codes eim
+left join public.entity_nces_codes eim
 on rpad(ag121a.nces_cd,12,'0')=eim.nces_code
 
 where ("TYPE"=7 or "FIPST" = '59') 
@@ -57,15 +57,15 @@ and "LSTATE" not in ('PR','AS','GU','VI')),
 --they may be categorized as consortia and their schools may be categorized as other_locations
 dl_ca_1 as (
 select esh_id, district_esh_id, postal_cd
-        from schools
+        from public.schools
         where (postal_cd = '{{state}}' or 'All' = '{{state}}')
         union
         select esh_id, district_esh_id, postal_cd
-        from other_locations
+        from public.other_locations
         where (postal_cd = '{{state}}' or 'All' = '{{state}}')
         union 
         select esh_id, esh_id as district_esh_id, postal_cd
-        from consortia
+        from public.consortia
         where (postal_cd = '{{state}}' or 'All' = '{{state}}')),
         
 --dl_ca_2: limit dl_ca_1 by those districts in the charter_and_bie_agencies table
@@ -81,8 +81,8 @@ select dl_ca_2.district_esh_id,
          c.line_item_id,
          count(distinct ec.circuit_id) as allocation_lines
         
-  from entity_circuits ec
-  join circuits c
+  from public.entity_circuits ec
+  join public.circuits c
   on ec.circuit_id = c.id
   join dl_ca_2
   on ec.entity_id = dl_ca_2.esh_id
@@ -126,7 +126,7 @@ array_to_string(array_agg(LEFT(contract_end_date,9)), ',') as "ia_contract_end_d
 
 from combo_ldli ldli
 
-join line_items li
+join public.line_items li
   on ldli.line_item_id = li.id
   
 where (internet_conditions_met=true OR upstream_conditions_met=true)
@@ -151,7 +151,7 @@ array_to_string(array_agg(LEFT(contract_end_date,9)), ',') as "wan_contract_end_
 
 from combo_ldli ldli
 
-join line_items li
+join public.line_items li
   on ldli.line_item_id = li.id
   
 where wan_conditions_met=true
@@ -237,7 +237,7 @@ district_line_items as (
           min(to_timestamp(contract_end_date, 'MM/DD/YYYY HH:MI:SS AM')) as soonest_contract_end_date
 
   from combo_ldli ldli
-  join line_items li
+  join public.line_items li
   on ldli.line_item_id = li.id
 
   where broadband = true
@@ -271,7 +271,7 @@ select  district_esh_id,
         total_cost::numeric/num_lines::numeric as cost_per_circuit
         
 from combo_ldli ldli
-join line_items li
+join public.line_items li
 on ldli.line_item_id = li.id
 where exclude = false
 and (internet_conditions_met = true or upstream_conditions_met = true)
@@ -413,7 +413,7 @@ revised_demographics_MT as (
       num_schools::numeric,
       num_students::numeric
 
-  from districts
+  from public.districts
   where postal_cd='MT' 
   and include_in_universe_of_districts=true),
 
@@ -484,7 +484,7 @@ districts_charters as (
                   num_charter_schools,
                   num_students_all_schools,
                   ia_bandwidth_per_student
-          from districts
+          from public.districts
           left join demographics_updated
           on districts.nces_cd=demographics_updated.district_nces
           where include_in_universe_of_districts = true
@@ -515,7 +515,7 @@ districts_charters as (
 ad as (
         select district_esh_id, line_item_id
         from combo_ldli ldli
-        join line_items li
+        join public.line_items li
         on ldli.line_item_id = li.id
         where broadband = true
       ),
@@ -533,7 +533,7 @@ version_order as (
                                         order by version_id desc
                                         ) as row_num
                 
-                from line_item_notes
+                from public.line_item_notes
                 where note not like '%little magician%'
 ),
 
@@ -550,7 +550,7 @@ most_recent as (
                 from ad
                 left join version_order
                 on ad.line_item_id = version_order.fy2015_item21_services_and_cost_id
-                left join line_items
+                left join public.line_items
                 on ad.line_item_id = line_items.id
                 
                 where (row_num = 1
@@ -638,7 +638,7 @@ criteria as (
           ia_service_providers.*,
           wan_service_providers.*,
           district_line_items.applicants,
-          district_ia_prices_pct_max.pct_dists_same_cost_more_bw, 
+          district_ia_prices_pct_max.pct_dists_same_cost_more_bw,
           "NAME", 
           "PHONE", 
           "MSTREE", 
@@ -651,6 +651,7 @@ criteria as (
           "LZIP"
 
   from districts_charters dc
+  
   left join ag121a
   on dc.district_nces = ag121a.nces_cd
 
@@ -759,7 +760,7 @@ before_prior as (
             when pct_dists_same_cost_more_bw = 0
               then 'false'
             else 'true'
-          end as similar_priced_service_for_more_bw, 
+          end as similar_priced_service_for_more_bw,
           "NAME", 
           "PHONE", 
           "MSTREE", 
@@ -791,7 +792,7 @@ before_status as (
       when "Zero E-rated services"='Yes'
       or NOT(clean_status='clean')  
           then 'Priority 7'
---P10 has been updated to be the prioritization for all remaining clean line items         
+--P10 has been updated to be the prioritization for all remaining clean line items
       else
           'Priority 10'
     end as priority_status__c_f,
@@ -920,6 +921,7 @@ select  esh_id__c,
             'DQT Review Needed' 
         end as "StageName_A",
         null as ownerid,
+        null as batch__c,
         null as batch__c, 
         "NAME", 
         "PHONE", 
