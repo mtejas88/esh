@@ -1,4 +1,4 @@
-  select 
+select 
   --1) demographics
   districts.esh_id,
   districts.nces_cd,
@@ -361,7 +361,7 @@ end as meeting_2018_goal_oversub_fcc_25 -- TRUE if NOT ALL IA/upstream circuits 
               when isp_conditions_met = TRUE 
                 then service_provider_name
             end --order by service_provider_name
-          ), '; ') as "dedicated_isp_sp",
+          ), ', ') as "dedicated_isp_sp",
     --Circuits that affect goal meeting metrics under FCC's new broadband definition
     --no-fiber consideration in the definition per meeting with Evan on 7/15/16
       sum(case when (internet_conditions_met = true or upstream_conditions_met = true) and bandwidth_in_mbps < 25 
@@ -417,14 +417,14 @@ left join (
     when consortium_shared=false and internet_conditions_met=true
     then ' (dedicated Internet)'
     else ' (unknown purpose)'
-    end)end), '; ') as "ia_applicants",
-    array_to_string(array_agg(distinct case when ia_conditions_met=true and consortium_shared=true then applicant_name else null end), '; ') as "shared_ia_applicants",
-    array_to_string(array_agg(distinct case when isp_conditions_met=true and consortium_shared=false then applicant_name else null end), '; ') as "dedicated_isp_applicants",
-    array_to_string(array_agg(distinct case when internet_conditions_met=true and consortium_shared=false then applicant_name else null end), '; ') as "bundled_internet_applicants",
-    array_to_string(array_agg(distinct case when internet_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end), '; ') as "bundled_internet_bandwidth_li",
-    array_to_string(array_agg(distinct case when upstream_conditions_met=true and consortium_shared=false then applicant_name else null end), '; ') as "upstream_applicants",
-    array_to_string(array_agg(distinct case when upstream_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end), '; ') as "upstream_internet_bandwidth_li",
-    array_to_string(array_agg(distinct case when wan_conditions_met=true and consortium_shared=false then applicant_name end), '; ') as "wan_applicants",
+    end)end), ', ') as "ia_applicants",
+    array_to_string(array_agg(distinct case when ia_conditions_met=true and consortium_shared=true then applicant_name else null end), ', ') as "shared_ia_applicants",
+    array_to_string(array_agg(distinct case when isp_conditions_met=true and consortium_shared=false then applicant_name else null end), ', ') as "dedicated_isp_applicants",
+    array_to_string(array_agg(distinct case when internet_conditions_met=true and consortium_shared=false then applicant_name else null end), ', ') as "bundled_internet_applicants",
+    array_to_string(array_agg(distinct case when internet_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end), ', ') as "bundled_internet_bandwidth_li",
+    array_to_string(array_agg(distinct case when upstream_conditions_met=true and consortium_shared=false then applicant_name else null end), ', ') as "upstream_applicants",
+    array_to_string(array_agg(distinct case when upstream_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end), ', ') as "upstream_internet_bandwidth_li",
+    array_to_string(array_agg(distinct case when wan_conditions_met=true and consortium_shared=false then applicant_name end), ', ') as "wan_applicants",
     sum(distinct case when internet_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end) as "bundled_internet_bandwidth",
     sum(distinct case when upstream_conditions_met=true and consortium_shared=false then bandwidth_in_mbps else null end) as "upstream_bandwidth",
     --dedicated ISP
@@ -432,10 +432,10 @@ left join (
                 case when isp_conditions_met=true and consortium_shared=false
                     then 
                     concat(quantity_of_lines_received_by_district, ' ', ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "dedicated_isp_services",
+                    end), ', ') as "dedicated_isp_services",
                     
                     array_to_string(array_agg(case when isp_conditions_met=true and consortium_shared=false
-                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), '; ') as "dedicated_isp_contract_expiration",
+                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "dedicated_isp_contract_expiration",
     --bundled IA
     array_to_string(array_agg(
                 case when internet_conditions_met=true and consortium_shared=false
@@ -452,10 +452,10 @@ left join (
                         when connect_category='Copper'
                         and round(bandwidth_in_mbps::numeric, 1)=1.5 then 'T-1'
                     else connect_category end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "bundled_internet_connections",
+                    end), ', ') as "bundled_internet_connections",
                     
                     array_to_string(array_agg(case when internet_conditions_met=true and consortium_shared=false
-                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), '; ') as "bundled_internet_contract_expiration",
+                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "bundled_internet_contract_expiration",
     --upstream
     array_to_string(array_agg(
                 case when upstream_conditions_met=true and consortium_shared=false
@@ -472,9 +472,9 @@ left join (
                         when connect_category='Copper'
                         and round(bandwidth_in_mbps::numeric, 1)=1.5 then 'T-1'
                     else connect_category end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "upstream_connections",
+                    end), ', ') as "upstream_connections",
                     array_to_string(array_agg(case when upstream_conditions_met=true and consortium_shared=false
-                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), '; ') as "upstream_contract_expiration",
+                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "upstream_contract_expiration",
     --WAN                
     array_to_string(array_agg(
                 case when wan_conditions_met=true and consortium_shared=false
@@ -491,10 +491,10 @@ left join (
                         when connect_category='Copper'
                         and round(bandwidth_in_mbps::numeric, 1)=1.5 then 'T-1'
                     else connect_category end), ' line(s) at ', bandwidth_in_mbps, ' Mbps from ', service_provider_name, ' for $', line_item_district_monthly_cost, '/mth')
-                    end), '; ') as "wan_connections",
+                    end), ', ') as "wan_connections",
                     
                     array_to_string(array_agg(case when wan_conditions_met=true and consortium_shared=false
-                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), '; ') as "wan_contract_expiration"
+                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "wan_contract_expiration"
     from services_received_2015 svcs
     GROUP BY recipient_id
 ) pt
@@ -506,7 +506,7 @@ on districts.esh_id=pt.recipient_id
 Author: Justine Schott
 Created On Date: 2/9/2016
 Last Modified Date: 07/18/2016
-Name of QAing Analyst(s): Greg Kurzhals; last modified by Jess Seok
+Name of QAing Analyst(s): Greg Kurzhals, last modified by Jess Seok
 Purpose: Purpose: Districts table data pull with added columns
 Methodology: 
 1) IA goals: 2014 and 2018, with and without concurrency
