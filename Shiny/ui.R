@@ -143,7 +143,11 @@ shinyUI(fluidPage(
                     opacity: 0.95;
                     transition-delay: 0;
                     }
-
+                      
+                    .leaflet-container {
+                    background: #FFFFFF;
+                    }
+                    
 
                     "))
     ),
@@ -199,7 +203,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                    label = h2("Choose Map View:"),
                                                                    choices = c("All Districts", "Clean/Dirty Districts", 
                                                                                "Goals: 100 kbps/Student", "Goals: 1 Mbps/Student",
-                                                                               "Fiber Build Cost to Districts"),
+                                                                               "Fiber Build Cost to Districts",
+                                                                               "Monthly Cost Per Circuit"),
                                                                                #"Connect Category"),
                                                                    selected = "All Districts"),
                                                        
@@ -213,7 +218,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                                #"Gray2" = "Stamen.TonerLite",
                                                                               # "Gray3" = "CartoDB.DarkMatter",
                                                                                #"Terrain2" = "Stamen.TerrainBackground",
-                                                                               "Satellite" = "Esri.WorldImagery"),
+                                                                               "Satellite" = "Esri.WorldImagery",
+                                                                              "Senatorial Boundaries",
+                                                                              "House of Rep Boundaries"),
                                                                                #"Terrain" =  "Thunderforest.Landscape"),
                                                                                #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
                                                                    selected = "Grayscale"), #
@@ -237,8 +244,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                    downloadButton('downloadMapImage', 'Download Map Image')), #'map_downloadData'
                                       mainPanel(
                                         fluidRow(
-                                          htmlOutput("text_maps"), 
-                                          leafletOutput("population_leaflet", height = "700px", "1100px"),
+                                          htmlOutput("text_maps"),                    #"population_leaflet" #"leg_map
+                                          div(class = "leaflet-container", leafletOutput("pop_maps", height = "700px", "1100px")),
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
                                           br(), textOutput("n_ddt"), br(), br(),
@@ -274,12 +281,14 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           "Grayscale" = "CartoDB.Positron",
                                                                           #"Gray2" = "Stamen.TonerLite",
                                                                           #"Gray3" = "CartoDB.DarkMatter",
-                                                                          "Satellite" = "Esri.WorldImagery"),
+                                                                          "Satellite" = "Esri.WorldImagery",
+                                                                          "Senatorial Boundaries",
+                                                                          "House of Rep Boundaries"),
                                                                           #"Terrain" =  "Thunderforest.Landscape"),
                                                                           #"Terrain2" = "Stamen.TerrainBackground",
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
                                                               selected = "Grayscale"),
-                                                  downloadButton('downloadMapLookup', 'Download Map Image')) #
+                                                  downloadButton('downloadDistrictLookup', 'Download Map Image')) #
 
                                     
                            )) #end of div() and tabPanel() 

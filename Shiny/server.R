@@ -24,14 +24,15 @@ shinyServer(function(input, output, session) {
   library(shinydashboard)
   library(extrafontdb)
   library(extrafont)
-  
+  library(rgdal)
+  library(tigris) #tiger census data 
   
   #library(RPostgreSQL)
   
   #font_import(pattern="[L/l]ato")
   #font_import(pattern="MuseoSlabW01-700")
 
-  loadfonts()
+  #loadfonts()
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
@@ -84,6 +85,8 @@ shinyServer(function(input, output, session) {
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
       filter(bandwidth_in_mbps %in% selected_bandwidth_list)
   })  
+  
+
 
   ######
   ## reactive functions for ESH Sample section
@@ -761,22 +764,44 @@ output$selected <- renderText({
 #observe({
 school_districts <- eventReactive(input$pin_district, {
   d <- district_subset() %>% filter(name %in% input$pin_district)
-
-  d %>% select(name = name, X = longitude, Y = latitude, num_students, ia_bandwidth_per_student, meeting_2014_goal_no_oversub, new_connect_type_goals, total_ia_monthly_cost, monthly_ia_cost_per_mbps)
+  d %>% select(esh_id, nces_cd, name = name, postal_cd, X = longitude, Y = latitude, num_students, ia_bandwidth_per_student, meeting_2014_goal_no_oversub, new_connect_type_goals, total_ia_monthly_cost, monthly_ia_cost_per_mbps)
 
 })  
   
 output$testing_leaflet <- renderLeaflet({ 
 
-  sd_info <- paste0("<b>", school_districts()$name, "</b><br>",
-                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE),"<br>",
+  sd_url <- paste0('http://irt.educationsuperhighway.org/fy2015/districts/', school_districts()$esh_id)
+  sd <- school_districts()$name
+  
+  sd_info <- paste(paste0("<b><a href='", sd_url, "'>", sd, "</a></b> (click name to view in IRT)"), "<br>",
+                    "NCES code:", school_districts()$nces_cd, "<br>",
+                    "# of students:", format(school_districts()$num_students, big.mark = ",", scientific = FALSE), "<br>",
                     "IA connection: ", school_districts()$new_connect_type_goals, "<br>",
                     "IA kbps/student: ", school_districts()$ia_bandwidth_per_student, "<br>",
                     "100 kbps goal status: ", school_districts()$meeting_2014_goal_no_oversub, "<br>",
                     "Total IA monthly cost: $", format(round(school_districts()$total_ia_monthly_cost, 2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
                     "Total IA monthly cost/Mbps: $", format(round(school_districts()$monthly_ia_cost_per_mbps, 2),  big.mark = ",", nsmall = 2, scientific = FALSE))
-
+  
+  
+    if(input$tile == "Senatorial Boundaries" | input$tile == "House of Rep Boundaries"){
+    
+        if(input$tile == "Senatorial Boundaries"){
+          leg_bound <- state_legislative_districts(unique(school_districts()$postal_cd), "upper", cb =TRUE)
+        } else(
+          leg_bound <- state_legislative_districts(unique(school_districts()$postal_cd), "lower", cb =TRUE)
+        )
+      
+    #should we restrict for just one state here?
+        
+   # upper_house <- state_legislative_districts(unique(school_districts()$postal_cd), "upper", cb =TRUE)
+    leaflet(leg_bound) %>% addPolygons(fillColor = "white", fillOpacity = 1, color = "black", weight = 0.8) %>% 
+    addCircleMarkers(data = school_districts(), lng = ~X, lat = ~Y, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info))  
+    }
+  
+  
+    else(  
   leaflet() %>% addProviderTiles(input$tile) %>% addMarkers(data = school_districts(), lng = ~X, lat = ~Y, popup = ~paste(sd_info))#%>% addMarkers(data = d, lng = ~longitude, lat = ~latitude, popup = ~name) #popup = ~paste(content)) 
+    )
   #default view of leaflet map is addTiles()
 })
 
@@ -913,75 +938,143 @@ reac_map_lookup <- reactive({
 #})
 
 ############ map of districts ################### 
-output$population_leaflet <- renderLeaflet({ 
+
+map_subset <- reactive({
   
-  data <- district_subset() %>%
-           filter(new_connect_type_map %in% input$connection_districts,
+  # condition to subset based on whether user wants to see the fiber build map or all other maps
+#  if(input$map_view == "Fiber Build Cost to Districts"){
+  
+  data_fb <- district_subset() %>%
+    filter(not_all_scalable == 1, new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
            locale %in% input$locale_maps)
-  
-  ddt_unscalable <- data %>% 
-    filter(not_all_scalable == 1)
+#}else{
+  data_reg <- district_subset() %>%
+    filter(new_connect_type_map %in% input$connection_districts,
+           district_size %in% input$district_size_maps,
+           locale %in% input$locale_maps)
+#}
 
-  #for all maps other than fiber build
-  sd_info2 <- paste0("<b>", data$name, "</b><br>",
-                   "# of students:", format(data$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                    "IA connection: ", data$new_connect_type_goals, "<br>",
-                    "IA kbps/student: ", data$ia_bandwidth_per_student, "<br>",
-                    "100 kbps goal status: ", data$meeting_2014_goal_no_oversub, "<br>",
-                    "Total IA monthly cost: $", format(round(data$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
-                    "Total IA monthly cost/Mbps: $", format(round(data$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
-  #for unscalable districts:
-  sd_info3 <- paste0("<b>", ddt_unscalable$name, "</b><br>",
-                     "# of students:", format(ddt_unscalable$num_students, big.mark = ",", scientific = FALSE),"<br>",
-                     "IA connection: ", ddt_unscalable$new_connect_type_goals, "<br>",
-                     "IA kbps/student: ", ddt_unscalable$ia_bandwidth_per_student, "<br>",
-                     "100 kbps goal status: ", ddt_unscalable$meeting_2014_goal_no_oversub, "<br>",
-                     "Total IA monthly cost: $", format(round(ddt_unscalable$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
-                     "Total IA monthly cost/Mbps: $", format(round(ddt_unscalable$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
+  selected_state <- paste0('\"',input$state, '\"')
+  data_cpc <- services %>% 
+        filter(
+          new_connect_type %in% input$connection_districts,
+          district_size %in% input$district_size_maps,
+          locale %in% input$locale_maps) %>% 
+        filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) 
 
-  l1 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2))  
   
-  l2 <- leaflet(data) %>% 
-            addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#fdb913", "#cb2027"), 
-                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
-            addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Clean Districts", "Dirty Districts"),
-                        title = "Cleanliness Status of District", opacity = 1)
+  switch(input$map_view,
+         "All Districts" = data_reg,
+         "Clean/Dirty Districts" = data_reg,
+         'Goals: 100 kbps/Student' = data_reg,
+         'Goals: 1 Mbps/Student' = data_reg,
+         'Fiber Build Cost to Districts' = data_fb,
+         'Monthly Cost Per Circuit' = data_cpc)
+})
+
+
+output$pop_maps <- renderLeaflet({
+  data <- map_subset()
+  #sr_data <- sr_all()
+  ##sr_data <- sr_all()
   
-  l3 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting Goal", "#fdb913", "#cb2027"), 
-                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
-           addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
-              title = "Goal Status", opacity = 1)
+  #if(input$map_view == "Monthly Cost Per Circuit"){
+    
+  #  data <- sr_all()
+    #radius <- as.numeric(as.character(data$monthly_cost_per_circuit))
+    
+#  }else{data <- map_subset()}
   
-  l4 <- leaflet(data) %>% 
-           addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#fdb913", "#f26b23"), 
-                                           stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info2)) %>% 
-           addLegend("topright", colors = c("#fdb913", "#f26b23"), labels = c("Meets 1Mbps/Student Goal", "Does Not Meet 1Mbps/Student Goal"),
-              title = "Goal Status", opacity = 1)
+  if(input$map_view == "Monthly Cost Per Circuit"){
+    sd_url <- paste0('http://irt.educationsuperhighway.org/fy2015/districts/', data$recipient_id)
+    sd <- data$recipient_name
+    
+    sd_info_sr <- paste(paste0("<b><a href='", sd_url, "'>", sd, "</a></b> (click name to view in IRT)"), "<br>",
+                       "NCES code:", data$nces_cd, "<br>",
+                       "# of students:", format(data$quantity_of_lines_received_by_district, big.mark = ",", scientific = FALSE),"<br>",
+                       "IA connection: ", data$new_connect_type, "<br>",
+                       "Total IA monthly cost/Mbps: $", format(round(data$monthly_cost_per_circuit,2), big.mark = ",", nsmall = 2, scientific = FALSE))
+    
+    
+  } else {  
+  #for all maps (including fiber build)
+  sd_url <- paste0('http://irt.educationsuperhighway.org/fy2015/districts/', data$esh_id)
+  sd <- data$name
   
-  l5 <- leaflet(ddt_unscalable) %>% 
-                     addProviderTiles(input$tile2) %>% 
-                     addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(zero_build_cost_to_district == 0, "#009296", "#fdb913"), 
-                                      stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info3)) %>% 
-                    addLegend("topright", colors = c("#009296", "#fdb913", "black"), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district", "Missing E-rate discount rate"),
-                               title = "Cost for Fiber Build", opacity = 1)
+  sd_info5 <<- paste(paste0("<b><a href='", sd_url, "'>", sd, "</a></b> (click name to view in IRT)"), "<br>",
+                     "NCES code:", data$nces_cd, "<br>",
+                     "# of students:", format(data$num_students, big.mark = ",", scientific = FALSE),"<br>",
+                     "IA connection: ", data$new_connect_type_goals, "<br>",
+                     "IA kbps/student: ", data$ia_bandwidth_per_student, "<br>",
+                     "100 kbps goal status: ", data$meeting_2014_goal_no_oversub, "<br>",
+                     "Total IA monthly cost: $", format(round(data$total_ia_monthly_cost,2), big.mark = ",", nsmall = 2, scientific = FALSE), "<br>",
+                     "Total IA monthly cost/Mbps: $", format(round(data$monthly_ia_cost_per_mbps,2), big.mark = ",", nsmall = 2, scientific = FALSE))
+  }
   
+  
+  if(input$tile2 == "Senatorial Boundaries" | input$tile2 == "House of Rep Boundaries"){
+    if(input$tile2 == "Senatorial Boundaries"){
+      leg_bound <- state_legislative_districts(unique(data$postal_cd), "upper", cb =TRUE)
+    } else(
+      leg_bound <- state_legislative_districts(unique(data$postal_cd), "lower", cb =TRUE)
+    )
+ 
+  map_base <- leaflet(leg_bound) %>% addPolygons(fillColor = "#FFFFFF", color = "#000000", weight = 0.8,  fillOpacity = 0.3) #%>% 
+   # addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5))
+  
+  }else{
+  map_base <- leaflet(map_subset()) %>% addProviderTiles(input$tile2) #%>% 
+    #addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5))#}
+  }
+  
+  if (input$map_view == "Monthly Cost Per Circuit"){
+    l6 <- map_base %>% 
+      addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = ~(monthly_cost_per_circuit/500), color =  "#009296", 
+                       stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info_sr))  
+  } else {
+
+    
+    l1 <- map_base %>% addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = "#fdb913", stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5))
+    
+    
+    l2 <- map_base %>% addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(exclude_from_analysis == "FALSE", "#fdb913", "#cb2027"), 
+                                        stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5)) %>% 
+      addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Clean Districts", "Dirty Districts"),
+                title = "Cleanliness Status of District", opacity = 1)
+    
+    l3 <- map_base %>% addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2014_goal_no_oversub == "Meeting Goal", "#fdb913", "#cb2027"), 
+                                        stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5)) %>% 
+      addLegend("topright", colors = c("#fdb913", "#cb2027"), labels = c("Meets 100kbps/Student Goal", "Does Not Meet 100kbps/Student Goal"),
+                title = "Goal Status", opacity = 1)
+    
+    l4 <- map_base %>% addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(meeting_2018_goal_oversub == "Meeting 2018 Goals", "#fdb913", "#f26b23"), 
+                                        stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5)) %>% 
+      addLegend("topright", colors = c("#fdb913", "#f26b23"), labels = c("Meets 1Mbps/Student Goal", "Does Not Meet 1Mbps/Student Goal"),
+                title = "Goal Status", opacity = 1)
+    
+    l5 <- map_base %>% 
+      addCircleMarkers(data = data, lng = ~longitude, lat = ~latitude, radius = 6, color = ~ifelse(zero_build_cost_to_district == 0, "#009296", "#fdb913"), 
+                       stroke = FALSE, fillOpacity = 0.9, popup = ~paste(sd_info5)) %>% 
+      addLegend("topright", colors = c("#009296", "#fdb913", "black"), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district", "Missing E-rate discount rate"),
+                title = "Cost for Fiber Build", opacity = 1)
+    
+  }
   #l6 <- leaflet(data) %>% 
   #  addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~as.factor(new_connect_type_map), 
   #                                                     stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
   #  addLegend("bottomright", title = "Connect Category", opacity = 1)
-  
   
   switch(input$map_view,
          "All Districts" = print(l1),
          "Clean/Dirty Districts" = print(l2),
          'Goals: 100 kbps/Student' = print(l3),
          'Goals: 1 Mbps/Student' = print(l4),
-         'Fiber Build Cost to Districts' = print(l5))
+         'Fiber Build Cost to Districts' = print(l5),
+         'Monthly Cost Per Circuit' = print(l6))
 
-})
+    })
+
 
 reac_map_pop <- reactive({
 
@@ -1039,7 +1132,7 @@ reac_map_pop <- reactive({
   t <- state_base + 
        geom_point(data = data, aes(x = longitude, y = latitude, colour = meeting_2018_goal_oversub), 
                  alpha = 0.7, size = 4) + scale_color_manual(labels = c("Meets 1Mbps/Student Goal", 
-                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#009296", "#fff1d0")) +
+                                                                      "Does Not Meet 1Mbps/Student Goal"), values = c("#009296", "#cb2027")) +
       theme(plot.background = element_rect(fill = "white"),
             panel.background = element_rect(fill = "white"),
             legend.background = element_rect(fill = "white")
@@ -1357,11 +1450,16 @@ district_tooltip <- function(x) {
   all_sr <- isolate(sr_all())
   services_rec <- all_sr[all_sr$recipient_name == x$recipient_name,]
   
-  paste0("<b>", "District Name: ", services_rec$recipient_name, "</b><br>",
-         "Monthly Cost per Circuit: $", format(services_rec$monthly_cost_per_circuit, big.mark = ",", scientific = FALSE),"<br>",
-         "# of Circuits: ", services_rec$quantity_of_lines_received_by_district, "<br>",
-         "Connect Type: ", services_rec$new_connect_type, "<br>",
-         "Service Provider: ", services_rec$reporting_name, "<br>")
+  
+  
+  sr_url <- paste0('http://irt.educationsuperhighway.org/fy2015/districts/', services_rec$recipient_id)
+  sd <- services_rec$recipient_name
+  
+  sd_info2 <- paste(paste0("<b><a href='", sr_url, "'>", sd, "</a></b> (click name to view in IRT)"), "<br>",
+                    "Monthly Cost per Circuit: $", format(services_rec$monthly_cost_per_circuit, big.mark = ",", scientific = FALSE),"<br>",
+                    "# of Circuits: ", services_rec$quantity_of_lines_received_by_district, "<br>",
+                    "Connect Type: ", services_rec$new_connect_type, "<br>",
+                    "Service Provider: ", services_rec$reporting_name, "<br>")
 }
 
 vis <- reactive({
@@ -1374,7 +1472,7 @@ vis <- reactive({
         layer_points(size.hover := 200, fill = ~factor(bandwidth_in_mbps),
                      fillOpacity := 0.4, fillOpacity.hover := 0.75,
                      key := ~recipient_name) %>% 
-        add_tooltip(district_tooltip, "hover")  %>%
+        add_tooltip(district_tooltip, "click")  %>%
         add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
         add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
         scale_numeric("x", domain = c(0, starting_pt)) %>% 
@@ -1389,7 +1487,7 @@ vis <- reactive({
     layer_points(size := 100, size.hover := 200, fill = ~factor(bandwidth_in_mbps),
                fillOpacity := 0.4, fillOpacity.hover := 0.75,
                 key := ~recipient_name) %>% 
-    add_tooltip(district_tooltip, "hover")  %>%
+    add_tooltip(district_tooltip, "click")  %>%
     add_axis("x", title = "Bandwidth in Mbps", title_offset = 50, grid = FALSE) %>% 
     add_axis("y", title = "Monthly Cost per Circuit ($)", title_offset = 75, grid = FALSE) %>% 
     add_legend("fill", title = "") %>%         
@@ -1669,7 +1767,7 @@ output$downloadMapImage <- downloadHandler(
 
 #For District Look Up: blank pin point map
 output$downloadDistrictLookup <- downloadHandler(
-  filename = function() {paste(input$map_view, '_20160711', '.png', sep='') },
+  filename = function() {paste(input$map_view_lookup, '_20160711', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_lookup()$plot, file, type = "cairo-png")
   }

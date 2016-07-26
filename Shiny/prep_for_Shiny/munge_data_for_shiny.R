@@ -174,7 +174,7 @@ districts$schools_may_need_upgrades <- (districts$nga_v2_assumed_unscalable_camp
 districts$schools_need_upgrades <- (districts$nga_v2_known_unscalable_campuses / districts$num_campuses) * districts$num_schools
 
 # filter to relevant columns
-out <- which(names(districts) %in% c("esh_id", "ia_oversub_ratio", "district_type",
+out <- which(names(districts) %in% c("ia_oversub_ratio", "district_type",
                                  "num_campuses", "num_open_dirty_flags", "clean_categorization",
                                  "meeting_2014_goal_oversub", "meeting_2018_goal_no_oversub",
                                  "meeting_.3_per_mbps_affordability_target",
