@@ -23,28 +23,6 @@ fiber_maintenance_query as (
 select li.id,
 li.frn_complete,
 case when frn_line_items.function = 'Fiber Maintenance & Operations'
-then true
-else false
-end as "fiber_maintenance"
-
-from fy2016.line_items li
-left join fy2016.frn_line_items
-on li.frn_complete=frn_line_items.line_item
-
-left join fy2016.frns
-on fy2016.frn_line_items.frn=fy2016.frns.frn 
-
---js updated 7/28
-where frns.service_type='Data Transmission and/or Internet Access'
-and frn_line_items.function not in ('Cabinets', 'Cabling', 'Conduit', 'Connectors/Couplers', 
-'Patch Panels', 'Routers', 'Switches', 'UPS', 'Miscellaneous')
-),
-
-fiber_maintenance_query as (
-
-select li.id,
-li.frn_complete,
-case when frn_line_items.function = 'Fiber Maintenance & Operations'
 			and (li.isp_conditions_met = true or li.internet_conditions_met = true )
 then true
 else false
