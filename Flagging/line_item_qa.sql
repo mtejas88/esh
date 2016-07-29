@@ -1,3 +1,12 @@
+/*
+Author: Greg Kurzhals
+Created On Date: 05/23/2015
+Last Modified Date: 7/26/2016 (Justine)
+Name of QAing Analyst(s): N/A
+Purpose: To verify that the flags are being populated in the manner anticipated by SAT and to surface any discrepancies
+Methodology: Each flag has its own subqueries, and all subqueries are aggregated in the end with a comparison field
+*/
+
 with li_recipients as (
           select li.id,
           li.applicant_id,
@@ -21,7 +30,6 @@ with li_recipients as (
 fiber_maintenance_query as (
 
 select li.id,
-li.frn_complete,
 case when frn_line_items.function = 'Fiber Maintenance & Operations'
 			and (li.isp_conditions_met = true or li.internet_conditions_met = true )
 then true
@@ -30,7 +38,7 @@ end as "fiber_maintenance"
 
 from fy2016.line_items li
 left join fy2016.frn_line_items
-on li.frn_complete=frn_line_items.line_item
+on li.id=frn_line_items.id
 
 left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn 
@@ -84,7 +92,7 @@ frn_line_items.upload_speed_units
 from fy2016.line_items
 
 left join fy2016.frn_line_items
-on fy2016.line_items.frn_complete=fy2016.frn_line_items.line_item
+on fy2016.line_items.id=fy2016.frn_line_items.id
 ),
 
 /*function_conn_type_mismatch_query as (
@@ -208,7 +216,7 @@ end as "not_bundled_ia"
 
 from fy2016.line_items li
 left join fy2016.frn_line_items
-on li.frn_complete=frn_line_items.line_item
+on li.id=frn_line_items.id
 
 left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn 
@@ -237,7 +245,7 @@ end as "not_isp"
 
 from fy2016.line_items li
 left join fy2016.frn_line_items
-on li.frn_complete=frn_line_items.line_item
+on li.id=frn_line_items.id
 
 left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn 
@@ -272,7 +280,7 @@ end as "not_upstream"
 
 from fy2016.line_items li
 left join fy2016.frn_line_items
-on li.frn_complete=frn_line_items.line_item
+on li.id=frn_line_items.id
 
 left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn 
@@ -310,7 +318,7 @@ left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn
 
 left join fy2016.line_items li
-on fy2016.frn_line_items.line_item=li.frn_complete
+on fy2016.frn_line_items.id=li.id
 
 --js updated 7/28
 where frns.service_type='Data Transmission and/or Internet Access'
@@ -342,7 +350,7 @@ end as "extreme_one_time_cost"
 from fy2016.frn_line_items
 
 left join fy2016.line_items
-on fy2016.line_items.frn_complete=fy2016.frn_line_items.line_item
+on fy2016.line_items.id=fy2016.frn_line_items.id
 
 left join fy2016.frns
 on fy2016.line_items.frn=fy2016.frns.frn
@@ -414,7 +422,7 @@ left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn
 
 left join fy2016.line_items li
-on fy2016.frn_line_items.line_item=li.frn_complete
+on fy2016.frn_line_items.id=li.id
 
 --updated js 7/28
 where frns.service_type='Data Transmission and/or Internet Access'
@@ -451,7 +459,7 @@ left join fy2016.frns
 on fy2016.frn_line_items.frn=fy2016.frns.frn
 
 left join fy2016.line_items li
-on fy2016.frn_line_items.line_item=li.frn_complete
+on fy2016.frn_line_items.id=li.id
 
 --js updated 7/28
 where frns.service_type='Data Transmission and/or Internet Access'
@@ -645,7 +653,7 @@ tag_table.open_tags
 from fy2016.line_items li
 
 left join fiber_maintenance_query
-on li.frn_complete=fiber_maintenance_query.frn_complete
+on li.id=fiber_maintenance_query.id
 
 left join consortium_shared_query
 on li.id=consortium_shared_query.id
