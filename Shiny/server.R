@@ -6,6 +6,21 @@
 #wd <- "~/Desktop/ficher/Shiny"
 #setwd(wd)
 
+#install.packages("shiny")
+#install.packages("tidyr")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("scales")
+#install.packages("maps")
+#install.packages("ggmap")
+#install.packages("reshape")
+#install.packages("leaflet")
+#install.packages("ggvis")
+#install.packages("DT")
+#install.packages("shinydashboard")
+#install.packages("extrafontdb")
+#install.packages("extrafont")
+
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##

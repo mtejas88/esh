@@ -1,3 +1,7 @@
+
+#install.packages("shinyjs")
+#install.packages("mapview")
+
 library(leaflet)
 library(ggvis)
 library(shinydashboard)
