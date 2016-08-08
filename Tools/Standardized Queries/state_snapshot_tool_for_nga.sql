@@ -168,7 +168,8 @@ ad_broadband as (
   from public.allocations a
   left join public.district_lookup_2015 dl
   on a.recipient_id = dl.esh_id
-  where exists (select 1 from broadband_li where broadband_li.id = a.line_item_id)),
+  where exists (select 1 from broadband_li where broadband_li.id = a.line_item_id)
+  and district_esh_id is not null),
   
 ad_c1 as (
 select
@@ -177,7 +178,8 @@ select
   from public.allocations a
   left join public.district_lookup_2015 dl
   on a.recipient_id = dl.esh_id
-  where exists (select 1 from c1_li where c1_li.id = a.line_item_id)),
+  where exists (select 1 from c1_li where c1_li.id = a.line_item_id)
+  and district_esh_id is not null),
 
 districts_c2 as (
   select *
@@ -374,6 +376,7 @@ select dl.district_esh_id,
   
   where entity_type in ('School', 'District')
   and exclude_from_reporting = false
+  and district_esh_id is not null
   
   group by  district_esh_id,
          line_item_id
