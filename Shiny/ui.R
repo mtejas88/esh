@@ -175,7 +175,7 @@ shinyUI(fluidPage(
                               'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()  
 
   
-titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Warchild"),  #div(h1("Warchild"))
+titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Connectivity Dashboard"),  #div(h1("Warchild"))
 
   div(class = "manualmainpanel",
 
@@ -282,8 +282,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           #"Terrain" =  "Thunderforest.Landscape"),
                                                                           #"Terrain2" = "Stamen.TerrainBackground",
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Grayscale"),
-                                                  downloadButton('downloadMapLookup', 'Download Map Image')) #
+                                                              selected = "Grayscale")#,
+                                                  #downloadButton('downloadMapLookup', 'Download Map Image')
+                                                  ) #
 
                                     
                            )) #end of div() and tabPanel() 
