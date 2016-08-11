@@ -1,4 +1,6 @@
 ##packages
+#install.packages("randomForest")
+#install.packages("caret")
 library(randomForest)
 library(caret)
 #library(tree)
@@ -6,7 +8,7 @@ library(caret)
 #install.packages("party", 
 #                 repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
 
-setwd("C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2016/Data Strategy/Machine Learn Clean")
+setwd("\Google Drive\ESH Main Share\Strategic Analysis Team\2016\Org-wide Projects\Data Strategy\Machine Learn Clean")
 
 
 ##importing and merging 2015 verified files

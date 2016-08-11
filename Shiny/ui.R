@@ -342,18 +342,18 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                          ),
                                   mainPanel(
                                     wellPanel(
-                                     h4("DISTRICTS/STUDENTS MEETING THE 2014 FCC INTERNET ACCESS GOAL"), br(), 
-                                     p("A district is meeting the 2014 FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student. 
-                                       Percentage of students meeting goals represents the percentage of students in the districts meeting the 2014 goal."), br(),
+                                     h4("DISTRICTS/STUDENTS MEETING THE MINIMUM FCC INTERNET ACCESS GOAL"), br(), 
+                                     p("This chart shows the percentage of students in the district meeting the minimum
+                                        FCC goal. A school district is meeting the minimum FCC Goal if its total bandwidth is greater than or equal to 100 kbps per student."), br(),
                                      plotOutput("histogram_goals"), br(), dataTableOutput("table_goals")), br(), br(), br(),
                                      #imageOutput("myImage"), 
                                      
                                      wellPanel(
                                       h4("DISTRICTS, BROKEN OUT BY HIGHEST INTERNET ACCESS TECHNOLOGY"), br(), 
-                                         p("This chart shows the percentage of 2014 goal meeting districts, broken out by the highest internet
-                                            access technology in each district. (e.g. if the district has 1 fiber line and 1 DSL line, the district would be 
+                                         p("This chart shows the percentage of districts meeting the minimum FCC goal, broken out by the highest Internet
+                                            access technology in each district. (e.g., if the district has 1 fiber line and 1 DSL line, the district would be 
                                             accounted for in the fiber category)."), 
-                                         p("Unknown/Error will only apply districts that do not have clean data."), 
+                                         p("Unknown/Error will only apply to districts that do not have clean data."), 
                                           h2(strong("Note: this filter only affects this chart.")),
                                                            checkboxGroupInput(inputId = "meeting_goal", 
                                                                               h2("Select whether District is Meeting the 2014 FCC Goal"),
@@ -363,20 +363,20 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           plotOutput("histogram_districts_ia_technology"), br(), br(), dataTableOutput("table_districts_ia_technology")), br(), br(), br(),
                                      
                                     wellPanel(
-                                    h4("SCHOOLS THAT ARE CURRENTLY OR NEED TO BE MEETING THE FCC WAN GOAL"), br(),
-                                        p("Percentage of schools currently meeting the FCC WAN Goal is represented by the percentage of WAN connections that are at least 1 Gbps. 
-                                          Percentage of schools that should be meeting the FCC WAN Goal is estimated by the percentage of schools that have more than 100 students in 
-                                          school districts that have at least three schools."), 
-                                        p("Estimates for WAN needs may not be available for some states. Please reach out to Strategic Analysis Team for the estimate, if needed."), br(),
+                                    h4("CURRENT WAN GOAL MEETING PERCENTAGE AND PROJECTED WAN NEEDS"), br(),
+                                        p("The percentage of WAN goal meeting percentage is represented by the percentage of WAN connections 
+                                          that are at least 1 Gbps. The state's WAN need for 1 Gbps connections reflects the percentage of schools 
+                                          that have more than 100 students in districts that have at least three schools."), 
+                                        p("Estimates for WAN needs may not be available for some states. Please reach out to the Strategic Analysis Team for the estimate, if needed."), br(),
                                         plotOutput("histogram_projected_wan_needs"), br(), 
                                         dataTableOutput("table_projected_wan_needs")), br(), br(), br(),
                                     wellPanel(
-                                     h4(" HYPOTHETICAL PRICING ANALYSIS: DISTRICTS MEETING THE 2014 FCC GOAL"), br(),
-                                     p("This chart compares the percentage of districts currently meeting the 2014 FCC Goal
+                                     h4(" HYPOTHETICAL PRICING ANALYSIS: DISTRICTS MEETING THE MINIMUM FCC GOAL"), br(),
+                                     p("This chart compares the percentage of districts currently meeting the minimum FCC goal
                                           and the percentage of districts
                                           that would be meeting the goal if districts currently not meeting the goal were to
-                                  have access to more affordable internet access."), 
-                                     p("Current pricing refers to the median cost per Mbps for selected districts. You can adjust the hypothetical IA cost per Mbps assumption by using the scale."), br(),
+                                  have access to more affordable Internet access."), 
+                                     p("Current pricing refers to the median cost per Mbps for selected districts. You can adjust the hypothetical Internet access cost per Mbps assumption by using the scale."), br(),
                                           sliderInput(width = '300px', inputId = "set_price", 
                                                   label = h2("Pricing Assumption: IA Cost per Mbps"), 
                                                   min=0, 
@@ -411,7 +411,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                       wellPanel(
                                         h4("DISTRIBUTION OF SCHOOLS BY INFRASTRUCTURE TYPE"), br(), 
                                         p("This chart breaks out distribution of schools into the following buckets: Schools that have
-                                          associated fiber circuits or in districts assumed to have dark fiber, schools that may have
+                                          associated fiber circuits or are in districts assumed to have dark fiber, schools that may have
                                           associated cable, fixed wireless, or other circuits, and schools that only have associated 
                                           copper or DSL circuits."), br(),
                                             plotOutput("histogram_schools_on_fiber"), br(), 
@@ -419,8 +419,8 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                       
                                       wellPanel(
                                         h4("DISTRIBUTION OF UNSCALABLE SCHOOLS BY DISTRICT E-RATE DISCOUNT RATES"), br(), 
-                                        p("This chart shows the distribution of schools that need or may need upgrades 
-                                          according to the e-rate discount rates for C1 items."), br(),
+                                        p("This chart shows the distribution of schools that need or may need upgrades to fiber 
+                                          according to the E-rate discount rates for Category 1 items."), br(),
                                             plotOutput("histogram_by_erate_discounts"), br(), dataTableOutput("table_by_erate_discounts")))
                                         
                                     )), # close Fiber tabPanel
@@ -465,15 +465,15 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                      dataTableOutput("disp_cpc_table")), br(), br(), br(),
                                     
                                     wellPanel(
-                                      h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), br(), br(), br(),
+                                      h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), 
+                                      p("This chart shows the monthly cost per Mbps for selected services at the 25th, 50th (median), and 75th percentiles."), br(), br(), br(), br(), br(),
                                       column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px')),
                                       br(), dataTableOutput("disp_cpm_table"), 
                                      
                                      br(), br(), br(),
                                     
                                      h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(),#), 
-                                    p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
-                                       at different circuit sizes."),
+                                    p("This chart shows the monthly cost per circuit for selected services at the 25th, 50th (median), and 75th percentiles."),
                                     p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
                                                    about a particular district."))), br(),
                                      column(12, align = "center", ggvisOutput("plot1"), br()), 
