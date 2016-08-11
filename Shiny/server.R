@@ -1425,26 +1425,26 @@ output$plot1_table <- renderDataTable({
 output$text_maps <- renderUI({
     
   text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
-                   p("This map shows the location of all school districts in the ESH data.
-                     You can zoom in on specific districts by clicking on the map on the right."), br()))
+                   p("This map shows the location of all school districts in the United States based on NCES data.
+                     You can zoom in on specific districts by clicking the map on the right."), br()))
   text_clean <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND DATA CLEANLINESS STATUS"), br(), 
-                     p("This map shows the location of all school districts and cleanliness of the district data.
-                       You can zoom in on specific districts by clicking on the map on the right."), br()))
+                     p("This map shows the location of all school districts in the United States and cleanliness of the district data.
+                       You can zoom in on specific districts by clicking the map on the right."), br()))
   
-  text_2014goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2014 GOAL MEETING STATUS"), br(),
-                         p("This map shows the location of all school districts and the 2014 FCC goal meeting status. 
-                           A district is meeting the 2014 FCC goal if its total bandwidth is greater than or equal to 100 kbps per student.
+  text_2014goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND MINIMUM GOAL MEETING STATUS"), br(),
+                         p("This map shows the location of all school districts and the minimum goal meeting status. 
+                           A district is meeting the minimum goal if its total bandwidth is greater than or equal to 100 kbps per student.
                            You can zoom in on specific districts by clicking on the map on the right.")))
   
   text_2018goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2018 GOAL MEETING STATUS"), br(),
                          p("This map shows the location of all school districts and the 2018 FCC goal meeting status. 
-                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 Gbps per student.
+                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 Mbps per student.
                            You can zoom in on specific districts by clicking on the map on the right.")))
   
   text_fiber <- HTML(paste(h4("MAP OF UNSCALABLE SCHOOL DISTRICTS AND FIBER BUILD COSTS"), br(),
                      p("This map shows the location of school districts that have at least one school using unscalable technology. 
-                       It also shows whether districts can self-provision fiber with no cost to school districts, assuming
-                       20% state match fund.
+                       It also shows whether districts can self-provision fiber with no cost to school districts,
+                       assuming availability of a 20% state match fund.
                        You can zoom in on specific districts by clicking on the map on the right."), br()))
   
   switch(input$map_view,
