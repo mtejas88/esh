@@ -481,8 +481,10 @@ left join (
 ) dr_info									
 on	dr_info.entity_id::varchar	=	ldli.district_esh_id	
 where broadband = true
+and (not('canceled' = any(open_flag_labels) or 
         'video_conferencing' = any(open_flag_labels) or
         'exclude' = any(open_flag_labels))
+	    or open_flag_labels is null)
 group by	ldli.district_esh_id,
 					campus_count,
 					frl_percent,
