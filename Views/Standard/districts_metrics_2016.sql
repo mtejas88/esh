@@ -10,9 +10,6 @@ select	dd.*,
 						then num_schools
 					else da.campus_count
 				end as num_campuses,
-		        frl_percent,
-		        c1_discount_rate as discount_rate_c1,
-		        c2_discount_rate as discount_rate_c2,
 				da.flag_array,
 				da.tag_array,
 				flag_count,	
@@ -270,7 +267,10 @@ select	dd.*,
 			wan_applicants,
 			wan_sp,
 			wan_services,
-			wan_contract_expiration									
+			wan_contract_expiration,
+			frl_percent,
+		    c1_discount_rate as discount_rate_c1,
+		    c2_discount_rate as discount_rate_c2									
 												
 from	districts_demog_2016		 dd									
 left	join	district_aggregation_2016	da									
