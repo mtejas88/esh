@@ -1,4 +1,4 @@
-select  ldli.district_esh_id,
+select  		dd.esh_id as district_esh_id,
 --ia bw/student pieces											
 				sum(case											
 							when	'committed_information_rate'	=	any(open_tag_labels)								
@@ -406,8 +406,10 @@ select  ldli.district_esh_id,
 						c1_discount_rate,
 						c2_discount_rate
 
-from	lines_to_district_by_line_item_2016	ldli									
-join	fy2016.line_items	li									
+from	public.districts_demog_2016 dd
+left join public.lines_to_district_by_line_item_2016	ldli
+on 	dd.esh_id = ldli.district_esh_id							
+left join	fy2016.line_items	li									
 on	ldli.line_item_id	=	li.id								
 left join (
 		select	ldli.line_item_id,										
@@ -428,7 +430,7 @@ left join (
 		group	by	ldli.line_item_id	
 ) district_info_by_li									
 on	district_info_by_li.line_item_id	=	ldli.line_item_id
-full outer join (
+left join (
 		select	district_esh_id,
 				count(distinct 	case
 									when campus_id is null
@@ -444,30 +446,28 @@ full outer join (
 													
 		group	by	district_esh_id	
 ) school_info									
-on	school_info.district_esh_id	=	ldli.district_esh_id		
-full outer join (
+on	school_info.district_esh_id	=	dd.esh_id		
+left join (
 		select	flaggable_id,
 				array_agg(distinct label) as flag_array,
 				count(distinct label) as flag_count											
 													
 		from fy2016.flags
-		where status = 'open'
-		and flaggable_type = 'District'										
+		where status = 'open'									
 													
 		group	by	flaggable_id	
 ) flag_info									
-on	flag_info.flaggable_id::varchar	=	ldli.district_esh_id	
-full outer join (
+on	flag_info.flaggable_id::varchar	=	dd.esh_id		
+left join (
 		select	taggable_id,
 				array_agg(distinct label) as tag_array									
 													
 		from fy2016.tags
-		where deleted_at is null
-		and taggable_type = 'District'											
+		where deleted_at is null										
 													
 		group	by	taggable_id	
 ) tag_info									
-on	tag_info.taggable_id::varchar	=	ldli.district_esh_id								
+on	tag_info.taggable_id::varchar	=	dd.esh_id									
 left join (
 		select	entity_id,
 				min(parent_category_one_discount_rate) as c1_discount_rate,
@@ -479,20 +479,20 @@ left join (
 		on dc.parent_entity_ben = eim.ben
 		group by entity_id
 ) dr_info									
-on	dr_info.entity_id::varchar	=	ldli.district_esh_id	
+on	dr_info.entity_id::varchar	=	dd.esh_id		
 where broadband = true
 and (not('canceled' = any(open_flag_labels) or 
         'video_conferencing' = any(open_flag_labels) or
         'exclude' = any(open_flag_labels))
 	    or open_flag_labels is null)
-group by	ldli.district_esh_id,
-					campus_count,
-					frl_percent,
-					flag_array,
-					flag_count,
-					tag_array,
-					c1_discount_rate,
-					c2_discount_rate
+group by	dd.esh_id,
+			campus_count,
+			frl_percent,
+			flag_array,
+			flag_count,
+			tag_array,
+			c1_discount_rate,
+			c2_discount_rate
 
 /*
 Author: Justine Schott
