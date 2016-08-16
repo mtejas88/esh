@@ -12,7 +12,6 @@ select	dd.*,
 				end as num_campuses,
 				da.flag_array,
 				da.tag_array,
-				flag_count,	
 				broadband_internet_upstream_lines,							
 				case											
 					when	com_info_bandwidth	>	0								
@@ -270,7 +269,8 @@ select	dd.*,
 			wan_contract_expiration,
 			frl_percent,
 		    c1_discount_rate as discount_rate_c1,
-		    c2_discount_rate as discount_rate_c2									
+		    c2_discount_rate as discount_rate_c2,
+		    flag_count									
 												
 from	districts_demog_2016		 dd									
 left	join	district_aggregation_2016	da									
