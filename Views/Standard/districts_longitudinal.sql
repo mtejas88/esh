@@ -109,7 +109,7 @@ select
 		when ia_monthly_cost_per_mbps > 3
 			then false
 	end as meeting_3_per_mbps_affordability_target,
-	hierarchy_ia_connect_category,
+	hierarchy_connect_category as hierarchy_ia_connect_category,
 	all_ia_connectcat,
 	known_fiber_campuses as nga_known_scalable_campuses,
 	assumed_fiber_campuses as nga_assumed_scalable_campuses,

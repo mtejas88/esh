@@ -92,7 +92,7 @@ select	dd.*,
 			    			all_ia_connectcat ILIKE '%T-1%') then 'Copper' else NULL end,
 				case when (all_ia_connectcat ILIKE '%Satellite/LTE%') then 'Satellite/LTE' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Uncategorized%') then 'Uncategorized' else 'None - Error' end
-			) as hierarchy_ia_connect_category,
+			) as hierarchy_connect_category,
 			all_ia_connectcat,
 			case
 		      when case
