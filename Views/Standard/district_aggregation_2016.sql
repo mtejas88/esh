@@ -409,7 +409,15 @@ select  		dd.esh_id as district_esh_id,
 from	public.districts_demog_2016 dd
 left join public.lines_to_district_by_line_item_2016	ldli
 on 	dd.esh_id = ldli.district_esh_id							
-left join	fy2016.line_items	li									
+left join	(
+		select *
+		from fy2016.line_items
+		where broadband = true
+		and (not('canceled' = any(open_flag_labels) or 
+		        'video_conferencing' = any(open_flag_labels) or
+		        'exclude' = any(open_flag_labels))
+	    		or open_flag_labels is null)
+)	li									
 on	ldli.line_item_id	=	li.id								
 left join (
 		select	ldli.line_item_id,										
@@ -480,11 +488,6 @@ left join (
 		group by entity_id
 ) dr_info									
 on	dr_info.entity_id::varchar	=	dd.esh_id		
-where broadband = true
-and (not('canceled' = any(open_flag_labels) or 
-        'video_conferencing' = any(open_flag_labels) or
-        'exclude' = any(open_flag_labels))
-	    or open_flag_labels is null)
 group by	dd.esh_id,
 			campus_count,
 			frl_percent,
