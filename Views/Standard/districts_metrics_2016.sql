@@ -83,7 +83,6 @@ select	dd.*,
 				  when wan_lines_cost > 0									
 				    then  wan_monthly_cost/wan_lines_cost					
 			  end as	wan_monthly_cost_per_line,
-			  wan_monthly_cost,
 			COALESCE (
 			    case when (all_ia_connectcat ILIKE '%Fiber%') then 'Fiber' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Fixed Wireless%') then 'Fixed Wireless' else NULL end,
@@ -270,7 +269,8 @@ select	dd.*,
 			frl_percent,
 		    c1_discount_rate as discount_rate_c1,
 		    c2_discount_rate as discount_rate_c2,
-		    flag_count									
+		    flag_count,
+		    wan_monthly_cost									
 												
 from	districts_demog_2016		 dd									
 left	join	district_aggregation_2016	da									
