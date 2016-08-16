@@ -26,6 +26,14 @@ select d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
         end as locale,
+        case
+          when "TOTFRL"::numeric>0
+            then "TOTFRL"::numeric
+        end as frl_percentage_numerator,
+        case
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+            then sc131a."MEMBER"::numeric
+        end as frl_percentage_denomenator,
         ds.campus_id
 
 from public.sc131a 
@@ -38,7 +46,10 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join public.districts_schools ds
 on eim.entity_id = ds.school_id
-where sc131a."GSHI" != 'PK' 
+left join fy2016.tags 
+on eim.entity_id = tags.taggable_id
+where not(label = 'closed_school' and deleted_at is null)
+and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
@@ -73,6 +84,14 @@ select  d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
         end as locale,
+        case
+          when "TOTFRL"::numeric>0
+            then "TOTFRL"::numeric
+        end as frl_percentage_numerator,
+        case
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+            then sc131a."MEMBER"::numeric
+        end as frl_percentage_denomenator,
         ds.campus_id
 
 from public.sc131a 
@@ -87,7 +106,10 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join public.districts_schools ds
 on eim.entity_id = ds.school_id
-where sc131a."GSHI" != 'PK' 
+left join fy2016.tags 
+on eim.entity_id = tags.taggable_id
+where not(label = 'closed_school' and deleted_at is null)
+and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
@@ -123,6 +145,14 @@ select  d.esh_id as district_esh_id,
           when left(sc131a."ULOCAL",1) = '4' then 'Rural'
             else 'Unknown'
         end as locale,
+        case
+          when "TOTFRL"::numeric>0
+            then "TOTFRL"::numeric
+        end as frl_percentage_numerator,
+        case
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+            then sc131a."MEMBER"::numeric
+        end as frl_percentage_denomenator,
         ds.campus_id
         
 from public.sc131a 
@@ -135,7 +165,10 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join public.districts_schools ds
 on eim.entity_id = ds.school_id
-where sc131a."GSHI" != 'PK' 
+left join fy2016.tags 
+on eim.entity_id = tags.taggable_id
+where not(label = 'closed_school' and deleted_at is null)
+and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
@@ -144,7 +177,7 @@ and sc131a."LSTATE" = 'VT'
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 
+Last Modified Date: 8/15/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Schools demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before

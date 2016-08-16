@@ -12,7 +12,10 @@ select  case
         d."LSTREE" as address,
         d."LCITY" as city,
         d."LZIP" as zip,
+        d."CONAME" as county,
         d."LSTATE" as postal_cd,
+        d."LATCOD" as latitude,
+        d."LONCOD" as longitude,
         case 
           when "LSTATE" = 'VT' then sc_VT.student_count - sc_VT.student_pk_count 
           when "LSTATE" = 'MT' then sc_MT.student_count - sc_MT.student_pk_count
@@ -23,6 +26,7 @@ select  case
           when "LSTATE" = 'MT' then sc_MT.school_count
             else sc.school_count 
         end as num_schools,
+        "ULOCAL" as ulocal,
         case
           when left("ULOCAL",1) = '1' then 'Urban'
           when left("ULOCAL",1) = '2' then 'Suburban'
@@ -75,7 +79,12 @@ left join ( select  "LEAID",
                             else 0
                         end) as student_pk_count
             from public.sc131a 
-            where "GSHI" != 'PK' 
+            left join public.entity_nces_codes 
+            on sc131a."NCESSCH" = entity_nces_codes.nces_code
+            left join fy2016.tags 
+            on entity_nces_codes.entity_id = tags.taggable_id
+            where not(label = 'closed_school' and deleted_at is null)
+            and "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
             and "VIRTUALSTAT" != 'VIRTUALYES'
             and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
@@ -94,7 +103,12 @@ left join ( select  "UNION",
                         end) as student_pk_count,
                     count(distinct "LEAID") as district_count
             from public.sc131a 
-            where "GSHI" != 'PK' 
+            left join public.entity_nces_codes 
+            on sc131a."NCESSCH" = entity_nces_codes.nces_code
+            left join fy2016.tags 
+            on entity_nces_codes.entity_id = tags.taggable_id
+            where not(label = 'closed_school' and deleted_at is null)
+            and "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
             and "VIRTUALSTAT" != 'VIRTUALYES'
             and "TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
@@ -116,7 +130,12 @@ left join ( select  ag131a."LSTREE",
             from public.sc131a 
             join public.ag131a
             on sc131a."LEAID" = ag131a."LEAID"
-            where sc131a."GSHI" != 'PK' 
+            left join public.entity_nces_codes 
+            on sc131a."NCESSCH" = entity_nces_codes.nces_code
+            left join fy2016.tags 
+            on entity_nces_codes.entity_id = tags.taggable_id
+            where not(label = 'closed_school' and deleted_at is null)
+            and sc131a."GSHI" != 'PK' 
             and sc131a."STATUS" != '2' --closed schools
             and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
             and sc131a."TYPE" in ('1','2','3','4') --research is still outstanding to determine if type 4 schools should be included, 5's were decidedly excludeda
@@ -158,7 +177,7 @@ and case --only include the HS district when smushing MT districts (exclude the 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 
+Last Modified Date: 8/15/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
