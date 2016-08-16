@@ -481,6 +481,8 @@ left join (
 ) dr_info									
 on	dr_info.entity_id::varchar	=	ldli.district_esh_id	
 where broadband = true
+        'video_conferencing' = any(open_flag_labels) or
+        'exclude' = any(open_flag_labels))
 group by	ldli.district_esh_id,
 					campus_count,
 					frl_percent,
@@ -493,7 +495,7 @@ group by	ldli.district_esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/15/2016
+Last Modified Date: 8/16/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

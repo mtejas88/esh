@@ -24,9 +24,9 @@ select
 	latitude,
 	longitude,
 	case
-		when flag_array is null
-			then true
-		else false
+		when flag_array is null and district_type = 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
+			then false
+		else true
 	end as exclude_from_analysis,
 	case
 		when flag_array is null and ia_monthly_cost_per_mbps is not null
@@ -152,7 +152,7 @@ from public.districts_metrics_2016
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 
+Last Modified Date: 8/16/2016
 Name of QAing Analyst(s): 
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology: NOTE-- WIP -- need to merge 2015 districts and 2016 districts
