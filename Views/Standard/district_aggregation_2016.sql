@@ -320,7 +320,7 @@ select  ldli.district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end, '/mth')
-					                end), ', ') as bundled_internet_lines,
+					                end), ', ') as bundled_internet_services,
 	                    array_to_string(
 	                    	array_agg(case 
 	                    				when internet_conditions_met=true and consortium_shared=false
@@ -349,7 +349,7 @@ select  ldli.district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end, '/mth')
-					                end), ', ') as upstream_lines,
+					                end), ', ') as upstream_services,
 	                    array_to_string(
 	                    	array_agg(case 
 	                    				when upstream_conditions_met=true and consortium_shared=false
@@ -383,7 +383,7 @@ select  ldli.district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end, '/mth')
-					                end), ', ') as wan_lines,
+					                end), ', ') as wan_services,
 					    array_to_string(
 	                    	array_agg(case 
 	                    				when wan_conditions_met=true and consortium_shared=false
