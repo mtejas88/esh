@@ -10,8 +10,12 @@ select	dd.*,
 						then num_schools
 					else da.campus_count
 				end as num_campuses,
+		        frl_percent,
+		        discount_rate_c1,
+		        discount_rate_c2,
 				da.flag_array,
-				da.tag_array,	
+				da.tag_array,
+				flag_count,	
 				broadband_internet_upstream_lines,							
 				case											
 					when	com_info_bandwidth	>	0								
@@ -83,6 +87,7 @@ select	dd.*,
 				  when wan_lines_cost > 0									
 				    then  wan_monthly_cost/wan_lines_cost					
 			  end as	wan_monthly_cost_per_line,
+			  wan_monthly_cost,
 			COALESCE (
 			    case when (all_ia_connectcat ILIKE '%Fiber%') then 'Fiber' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Fixed Wireless%') then 'Fixed Wireless' else NULL end,
@@ -92,7 +97,7 @@ select	dd.*,
 			    			all_ia_connectcat ILIKE '%T-1%') then 'Copper' else NULL end,
 				case when (all_ia_connectcat ILIKE '%Satellite/LTE%') then 'Satellite/LTE' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Uncategorized%') then 'Uncategorized' else 'None - Error' end
-			) as hierarchy_connect_category,
+			) as hierarchy_ia_connect_category,
 			all_ia_connectcat,
 			case
 		      when case
