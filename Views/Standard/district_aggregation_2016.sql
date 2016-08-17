@@ -398,6 +398,13 @@ select  		dd.esh_id as district_esh_id,
 				                then service_provider_name
 				            end
 				          ), ', ') as wan_sp,
+						campus_count,
+						frl_percent,
+						flag_array,
+						flag_count,
+						tag_array,
+						c1_discount_rate,
+						c2_discount_rate,
 						sum(case											
 									when (num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))	
 									and ('cc_updated_15' = any(tag_array) or 
@@ -406,14 +413,7 @@ select  		dd.esh_id as district_esh_id,
 										 'bw_updated_15' = any(tag_array))
 										then allocation_lines								
 									else	0										
-								end) as machine_cleaned_lines,
-						campus_count,
-						frl_percent,
-						flag_array,
-						flag_count,
-						tag_array,
-						c1_discount_rate,
-						c2_discount_rate
+								end) as machine_cleaned_lines
 
 from	public.districts_demog_2016 dd
 left join public.lines_to_district_by_line_item_2016	ldli
