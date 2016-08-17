@@ -29,9 +29,9 @@ select
 		else true
 	end as exclude_from_analysis,
 	case
-		when flag_array is null and ia_monthly_cost_per_mbps is not null
+		when flag_array is null and ia_monthly_cost_per_mbps is not null and district_type = 'Traditional'
 			then 'clean_with_cost'
-		when flag_array is null
+		when flag_array is null and district_type = 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
 			then 'clean_no_cost'
 		else 'dirty'
 	end	as inclusion_status,
@@ -39,7 +39,8 @@ select
 	tag_array,
 	flag_count as num_open_district_flags,
 	case
-		when flag_array is not null --add further dimensioning of natively vs outreach needed? will dqs want to use this filter?
+		when flag_array is not null or district_type != 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
+		--add further dimensioning of natively vs outreach needed? will dqs want to use this filter?
 			then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
 			then  'outreach_confirmed'
@@ -51,6 +52,8 @@ select
 			then 'dqt_reviewed'
 		when 'dqt_reviewed' = any(tag_array)
 			then 'dqt_reviewed'
+		when machine_cleaned_lines > 0
+			then 'machine_cleaned'
 		else 'natively_clean' 
 	end as clean_categorization,
 	ia_bandwidth_per_student_kbps,

@@ -270,7 +270,8 @@ select	dd.*,
 		    c1_discount_rate as discount_rate_c1,
 		    c2_discount_rate as discount_rate_c2,
 		    flag_count,
-		    wan_monthly_cost									
+		    wan_monthly_cost,
+		    machine_cleaned_lines									
 												
 from	districts_demog_2016		 dd									
 left	join	district_aggregation_2016	da									

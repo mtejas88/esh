@@ -285,12 +285,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ', 
 								                        	bandwidth_in_mbps, ' Mbps from ', 
 								                        	service_provider_name, ' for $', 
-								                        	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
+								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
 																				/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end, '/mth')
+																				  end,2), '/mth')
 					                end), ', ') as dedicated_isp_services,					                    
 	                    array_to_string(
 	                    	array_agg(case 
@@ -314,12 +314,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ', 
 								                        	bandwidth_in_mbps, ' Mbps from ', 
 								                        	service_provider_name, ' for $', 
-								                        	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
+								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
 																				/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end, '/mth')
+																				  end,2), '/mth')
 					                end), ', ') as bundled_internet_services,
 	                    array_to_string(
 	                    	array_agg(case 
@@ -343,12 +343,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ', 
 								                        	bandwidth_in_mbps, ' Mbps from ', 
 								                        	service_provider_name, ' for $', 
-								                        	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
+								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
 																				/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end, '/mth')
+																				  end,2), '/mth')
 					                end), ', ') as upstream_services,
 	                    array_to_string(
 	                    	array_agg(case 
@@ -377,12 +377,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ', 
 								                        	bandwidth_in_mbps, ' Mbps from ', 
 								                        	service_provider_name, ' for $', 
-								                        	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
+								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
 																				/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end, '/mth')
+																				  end,2), '/mth')
 					                end), ', ') as wan_services,
 					    array_to_string(
 	                    	array_agg(case 
@@ -398,6 +398,15 @@ select  		dd.esh_id as district_esh_id,
 				                then service_provider_name
 				            end
 				          ), ', ') as wan_sp,
+						sum(case											
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))	
+									and ('cc_updated_15' = any(tag_array) or 
+										 'purpose_updated_15' = any(tag_array) or 
+										 'num_lines_updated_15' = any(tag_array) or 
+										 'bw_updated_15' = any(tag_array))
+										then allocation_lines								
+									else	0										
+								end) as machine_cleaned_lines,
 						campus_count,
 						frl_percent,
 						flag_array,
@@ -458,7 +467,11 @@ on	school_info.district_esh_id	=	dd.esh_id
 left join (
 		select	flaggable_id,
 				array_agg(distinct label) as flag_array,
-				count(distinct label) as flag_count											
+				case
+					when count(distinct label) is null
+						then 0
+					else count(distinct label)
+				end as flag_count											
 													
 		from fy2016.flags
 		where status = 'open'									
