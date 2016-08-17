@@ -407,10 +407,10 @@ select  		dd.esh_id as district_esh_id,
 						c2_discount_rate,
 						sum(case											
 									when (num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))	
-									and ('cc_updated_15' = any(tag_array) or 
-										 'purpose_updated_15' = any(tag_array) or 
-										 'num_lines_updated_15' = any(tag_array) or 
-										 'bw_updated_15' = any(tag_array))
+									and ('cc_updated_15' = any(open_tag_labels) or 
+										 'purpose_updated_15' = any(open_tag_labels) or 
+										 'num_lines_updated_15' = any(open_tag_labels) or 
+										 'bw_updated_15' = any(open_tag_labels))
 										then allocation_lines								
 									else	0										
 								end) as machine_cleaned_lines
