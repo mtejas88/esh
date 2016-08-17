@@ -131,7 +131,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case											
 									when	connect_category ilike '%fiber%'
 									and isp_conditions_met = false								
-									and	num_open_flags	=	0
+									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
 									and consortium_shared = false								
 										then	allocation_lines								
 									else	0										
@@ -139,7 +139,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case											
 									when	connect_category in ('Other Copper', 'T-1', 'DSL')
 									and isp_conditions_met = false								
-									and	num_open_flags	=	0
+									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
 									and consortium_shared = false							
 										then	allocation_lines								
 									else	0										
@@ -147,7 +147,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case											
 									when not(connect_category ilike '%fiber%')
 									and isp_conditions_met = false								
-									and	num_open_flags	=	0
+									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
 									and consortium_shared = false									
 										then	allocation_lines								
 									else	0										
@@ -281,8 +281,7 @@ select  		dd.esh_id as district_esh_id,
 					    array_to_string(
 					    	array_agg(case 
 					    				when isp_conditions_met=true and consortium_shared=false and num_lines != 'Unknown' and num_lines::numeric > 0
-					                    	then concat(	allocation_lines, ' ', 
-								                        	connect_category, ' line(s) at ', 
+					                    	then concat(	allocation_lines, ' line(s) at ', 
 								                        	bandwidth_in_mbps, ' Mbps from ', 
 								                        	service_provider_name, ' for $', 
 								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric) 
@@ -513,7 +512,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/16/2016
+Last Modified Date: 8/17/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
