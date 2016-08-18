@@ -122,7 +122,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       'n/a' as recipient_districts,
       case 
         when d.exclude_from_analysis = true
-        or number_of_dirty_line_item_flags = 0
+        or number_of_dirty_line_item_flags > 0
           then 'exclude dirty'
           else 'include clean'
       end as dirty_status,
