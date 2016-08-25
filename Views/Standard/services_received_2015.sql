@@ -156,8 +156,9 @@ students (e.g. num_students in district/num_students in ALL districts served by 
                   left join public.line_items li
                   on ldli.line_item_id = li.id
 
-                  where li.consortium_shared=true 
-                     OR 'backbone'=any(li.open_flags)
+                  where (li.consortium_shared=true 
+                     OR 'backbone'=any(li.open_flags))
+                      and d.num_students != 'No data'
 
                   group by ldli.line_item_id
           ) district_info_by_li
@@ -177,7 +178,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
 /*
 Author: Greg Kurzhals
 Created On Date: 11/01/2015
-Last Modified Date: 06/17/2015
+Last Modified Date: 08/25/2015
 Name of QAing Analyst(s): Justine Schott
 Purpose: To identify and display the broadband services (district-dedicated, shared IA, and backbone) received by each district, 
 or applied for by each entity
