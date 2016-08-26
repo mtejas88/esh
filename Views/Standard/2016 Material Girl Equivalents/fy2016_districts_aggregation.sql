@@ -522,6 +522,7 @@ left join (
 on	dr_info.entity_id::varchar	=	dd.esh_id		
 group by	dd.esh_id,
 			campus_count,
+			num_schools,
 			frl_percent,
 			flag_array,
 			flag_count,
