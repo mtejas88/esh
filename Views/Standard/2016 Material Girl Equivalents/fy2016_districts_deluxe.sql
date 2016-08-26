@@ -116,7 +116,7 @@ select
 	all_ia_connectcat,
 	nga_v2_known_scalable_campuses as nga_known_scalable_campuses,
 	nga_v2_assumed_scalable_campuses as nga_assumed_scalable_campuses,
-	nga_v2_unscalable_campuses as nga_known_unscalable_campuses,
+	nga_v2_known_unscalable_campuses as nga_known_unscalable_campuses,
 	nga_v2_assumed_unscalable_campuses as nga_assumed_unscalable_campuses,
 	known_scalable_campuses as sots_known_scalable_campuses,
 	assumed_scalable_campuses as sots_assumed_scalable_campuses,
