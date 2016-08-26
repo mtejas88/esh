@@ -228,7 +228,7 @@ select	dd.*,
 		    non_fiber_lines									
 												
 from	fy2016_districts_demog		 dd									
-left	join	fy2016_districts_agregation	da									
+left	join	fy2016_districts_aggregation	da									
 on	dd.esh_id	=	da.district_esh_id									
 
 /*
