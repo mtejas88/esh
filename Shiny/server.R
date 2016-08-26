@@ -713,8 +713,13 @@ output$histogram_by_erate_discounts <- renderPlot({
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              #axis.title.x=element_text("Distribution of campuses by E-rate discount rate (%)"),
-             axis.title.y=element_blank()) + 
-    xlab("\nDistribution of campuses by E-rate discount rate (%)\n\n") 
+             axis.title.y=element_blank(), 
+             plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("\nDistribution of campuses by E-rate discount rate (%)", "\n\n\n\n")) +
+    guides(fill=guide_legend(title.position="top",
+                             #keywidth = 0.35,
+                             #keyheight = 0.35,
+                             default.unit = "inch"))
   
   print(q)
   
@@ -1266,7 +1271,7 @@ output$cpc_sidebars <- renderPlot({
           legend.box = "horizontal",
           #legend.text.align = ,
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
-    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
+    #ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
     guides(fill=guide_legend(title.position="top",
       #keywidth = 0.35,
       #keyheight = 0.35,
@@ -1344,7 +1349,7 @@ output$price_disp_cpm_sidebars <- renderPlot({
           legend.box = "horizontal",
           text=element_text(size = 16, family="Lato"),
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
-    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
+    #ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
     guides(fill = guide_legend(title.position="top",
            default.unit = "inch")) 
   
@@ -1433,7 +1438,7 @@ output$text_maps <- renderUI({
     
   text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
                    p("This map shows the location of all school districts in the United States based on NCES data.
-                     You can zoom in on specific districts by clicking the map on the right."), br()))
+                     You can zoom in on specific districts by clicking on the map."), br()))
   text_clean <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND DATA CLEANLINESS STATUS"), br(), 
                      p("This map shows the location of all school districts in the United States and cleanliness of the district data.
                        You can zoom in on specific districts by clicking the map on the right."), br()))
@@ -1593,7 +1598,7 @@ observeEvent(input$map_reset_all, {
 output$ia_tech_downloadData <- downloadHandler(
   
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160811', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160826', '.csv', sep = '')},
   content = function(file){
     write.csv(districts_ia_tech_data() %>%
                 select(nces_cd, name, locale, district_size, num_schools, num_students,
@@ -1608,7 +1613,7 @@ output$ia_tech_downloadData <- downloadHandler(
 output$fiber_downloadData <- downloadHandler(
   
   filename = function(){
-    paste('fiber_dataset', '_20160811', '.csv', sep = '')},
+    paste('fiber_dataset', '_20160826', '.csv', sep = '')},
   content = function(file){
     write.csv( fiber_data() %>%
                  select(nces_cd, name, locale, district_size, num_schools, num_students,
@@ -1623,7 +1628,8 @@ output$fiber_downloadData <- downloadHandler(
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_20160811', '.csv', sep = '')},
+    paste('affordability_dataset', '_20160826
+          ', '.csv', sep = '')},
   content = function(file){
     write.csv(sr_all() %>%
                 select(recipient_id, recipient_name, postal_cd, line_item_id, bandwidth_in_mbps,
@@ -1698,7 +1704,7 @@ output$table_testing <- renderDataTable({
 output$downloadData <- downloadHandler(
   
   filename = function(){
-    paste(input$map_view, '_20160811', '.csv', sep = '')},
+    paste(input$map_view, '_20160826', '.csv', sep = '')},
   content = function(file){
     write.csv(datasetInput_maps() %>%
                 select(nces_cd, name, locale, district_size, num_schools, num_students,
@@ -1714,7 +1720,7 @@ output$downloadData <- downloadHandler(
 #For population maps:
 
 output$downloadMapImage <- downloadHandler(
-  filename = function() {paste(input$map_view, '_20160811', '.png', sep='') },
+  filename = function() {paste(input$map_view, '_20160826', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_pop()$plot, file, type = "cairo-png")
   }
@@ -1723,7 +1729,7 @@ output$downloadMapImage <- downloadHandler(
 
 #For District Look Up: blank pin point map
 output$downloadDistrictLookup <- downloadHandler(
-  filename = function() {paste(input$map_view, '_20160811', '.png', sep='') },
+  filename = function() {paste(input$map_view, '_20160826', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_lookup()$plot, file, type = "cairo-png")
   }
