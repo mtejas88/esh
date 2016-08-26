@@ -3,10 +3,7 @@ select
   districts.esh_id,
   districts.nces_cd,
   districts.name,
-  ag121a."UNION" as union_code,
-  null as state_senate_district,
-  null as state_assembly_district,
-  ag121a."ULOCAL" as ulocal,
+  ag121a."ULOCAL",
   districts.locale,
   districts.district_size,
   cdd_calc.ia_oversub_ratio,
@@ -14,9 +11,8 @@ select
   districts.num_schools,
   districts.num_campuses,
   districts.num_students,
+  districts.num_students_and_staff,
   (sc121a_frl.num_frl_students::numeric / sc121a_frl.num_tot_students::numeric) as FRL_Percent,
-  c1_discount_rate as discount_rate_c1,
-  c2_discount_rate as discount_rate_c2,
   districts.address,
   districts.city,
   districts.zip,
@@ -27,16 +23,7 @@ select
   
 --2) clean status  
   districts.exclude_from_analysis,
-  case
-    when exclude_from_analysis = false and not(districts.ia_cost_per_mbps in ('Insufficient data','Infinity', 'NaN'))
-      then 'clean_with_cost'
-    when exclude_from_analysis = false
-      then 'clean_no_cost'
-    else 'dirty'
-  end as inclusion_status,
-  flag_array,
-  tag_array,
-  districts.num_open_dirty_flags as num_open_district_flags,
+  districts.num_open_dirty_flags,
   district_contacted.clean_categorization, 
   
   --3) goals
@@ -53,12 +40,6 @@ select
       else false
   end as meeting_2014_goal_oversub,
   case 
-      when cdd_calc.ia_bandwidth_per_student >= 100   -- meetings bandwidth
-        and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps 
-        then TRUE
-        else FALSE 
-  end as meeting_2014_goal_no_oversub_fcc_25, 
-  case 
     when cdd_calc.ia_bandwidth_per_student >= 1000 
       then true
       else false 
@@ -68,38 +49,22 @@ select
       then true
       else false 
   end as meeting_2018_goal_oversub,
-  case 
-    when cdd_calc.ia_bandwidth_per_student * ia_oversub_ratio >= 1000   -- meetings bandwidth after taking account of oversubscription ratio
-      and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps & non-fiber connect type
-      then TRUE
-      else FALSE 
-  end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
+  districts.ia_cost_per_mbps,
   
   --4) affordability
   case 
     when cdd_calc.ia_cost_per_mbps is null 
       then districts.ia_cost_per_mbps 
       else (cdd_calc.ia_cost_per_mbps::numeric/12)::varchar
-  end as ia_monthly_cost_per_mbps,
-  (cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students as ia_bw_mbps_total, 
-  (cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students * cdd_calc.ia_cost_per_mbps/12 as ia_monthly_cost_total,
-  null as ia_monthly_cost_direct_to_district,
-  null as ia_monthly_cost_shared,
-  case
-    when districts.wan_cost_per_connection = 'Insufficient data'
-      then districts.wan_cost_per_connection
-    else (districts.wan_cost_per_connection::numeric/12)::varchar
-  end as wan_monthly_cost_per_line,
-  case
-    when districts.wan_cost_per_connection = 'Insufficient data'
-      then 0
-    else cdd_calc.wan_lines*districts.wan_cost_per_connection::numeric/12 
-  end as wan_monthly_cost_total,
+  end as "monthly_ia_cost_per_mbps",
+  (cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students as total_ia_bw_mbps, 
+  (cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students * cdd_calc.ia_cost_per_mbps/12 as total_ia_monthly_cost,
+
   case 
     when (cdd_calc.ia_cost_per_mbps::numeric/12)<=3 
       then true 
       else false 
-  end as meeting_3_per_mbps_affordability_target,
+  end as meeting_$3_per_mbps_affordability_target,
   
   --5) fiber
   COALESCE (
@@ -109,28 +74,35 @@ select
     case when (cdd_calc.all_IA_connectcat ILIKE '%DSL%' and cdd_calc.all_IA_connecttype ILIKE '%DSL%') then 'DSL' else NULL end,
     case when (cdd_calc.all_IA_connectcat ILIKE '%Copper%') then 'Copper' else NULL end,
     case when (cdd_calc.all_IA_connectcat ILIKE '%Other%') then 'Other/Uncategorized' else 'None - Error' end
-  ) as hierarchy_ia_connect_category,
+  ) as hierarchy_connect_category,
   cdd_calc.all_IA_connectcat,
-  cdd_calc.nga_v2_known_scalable_campuses as nga_known_scalable_campuses,
-  cdd_calc.nga_v2_assumed_scalable_campuses as nga_assumed_scalable_campuses,
-  cdd_calc.nga_v2_known_unscalable_campuses as nga_known_unscalable_campuses,
-  cdd_calc.nga_v2_assumed_unscalable_campuses as nga_assumed_unscalable_campuses,
+  cdd_calc.all_IA_connecttype,
+  cdd_calc.nga_v2_known_scalable_campuses,
+  cdd_calc.nga_v2_assumed_scalable_campuses,
+  cdd_calc.nga_v2_known_unscalable_campuses,
+  cdd_calc.nga_v2_assumed_unscalable_campuses,
   
-  cdd_calc.known_fiber_campuses as sots_known_fiber_campuses,
-  cdd_calc.assumed_fiber_campuses as sots_assumed_fiber_campuses,
-  cdd_calc.known_nonfiber_campuses as sots_known_nonfiber_campuses,
-  cdd_calc.assumed_nonfiber_campuses as sots_assumed_nonfiber_campuses,
+  cdd_calc.known_fiber_campuses,
+  cdd_calc.assumed_fiber_campuses,
+  cdd_calc.known_nonfiber_campuses,
+  cdd_calc.assumed_nonfiber_campuses,
+  
+  cdd_calc.fiber_lines, 
+  cdd_calc.fixed_wireless_lines,
+  cdd_calc.cable_lines,
+  cdd_calc.copper_dsl_lines,
+  cdd_calc.other_uncategorized_lines,
   
 --6) IA overview  
   cdd_calc.fiber_internet_upstream_lines,
   cdd_calc.fixed_wireless_internet_upstream_lines,
   cdd_calc.cable_internet_upstream_lines,
-  cdd_calc.copper_dsl_internet_upstream_lines as copper_internet_upstream_lines,
-  satellite_lte_internet_upstream_lines,
+  cdd_calc.copper_dsl_internet_upstream_lines,
   other_uncategorized_internet_upstream_lines,
   
 --7) WAN overview
   cdd_calc.wan_lines,
+  districts.wan_cost_per_connection,
   districts.wan_bandwidth_low,
   districts.wan_bandwidth_high,
   cdd_calc.gt_1g_wan_lines,
@@ -138,22 +110,37 @@ select
   cdd_calc.lt_1g_nonfiber_wan_lines,
 
 --8) Procurement
-  null as consortium_name,
   pt.ia_applicants,
-  cdd_calc.dedicated_isp_sp,
+  cdd_calc."dedicated_isp_sp",
   pt.dedicated_isp_services,
   pt.dedicated_isp_contract_expiration,
-  cdd_calc.bundled_internet_sp,
-  pt.bundled_internet_connections as bundled_internet_services,
+  --cdd_calc."Internet_SP_Parent",
+  cdd_calc."bundled_internet_sp",
+  pt.bundled_internet_connections,
   pt.bundled_internet_contract_expiration,
-  cdd_calc.upstream_sp,
-  pt.upstream_connections as upstream_services,
+  pt.upstream_applicants,
+  cdd_calc."upstream_sp",
+  pt.upstream_connections,
   pt.upstream_contract_expiration,
   pt.wan_applicants,
-  cdd_calc.wan_sp,
-  pt.wan_connections as wan_services,
+  cdd_calc."wan_sp",
+  pt.wan_connections,
   pt.wan_contract_expiration,
-  non_fiber_lines
+
+-- Columns that indicate whether district is meeting IA goals under new FCC broadband definition
+-- i.e. In addition to meeting the bandwidth floor, district must have at least one >=25 mbps IA/Upstream circuit
+case 
+    when cdd_calc.ia_bandwidth_per_student >= 100   -- meetings bandwidth
+      and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps 
+      then TRUE
+      else FALSE 
+end as meeting_2014_goal_no_oversub_fcc_25, 
+case 
+  when cdd_calc.ia_bandwidth_per_student * ia_oversub_ratio >= 1000   -- meetings bandwidth after taking account of oversubscription ratio
+    and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps & non-fiber connect type
+    then TRUE
+    else FALSE 
+end as meeting_2018_goal_oversub_fcc_25 -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
 
 
   from  public.districts
@@ -302,12 +289,9 @@ select
               then cd.allocation_lines
               else 0 
             end) as fiber_internet_upstream_lines,
-        sum(case when (internet_conditions_met = true or upstream_conditions_met = true) and connect_category = 'Fixed Wireless' and connect_type ilike '%microwave%'
+        sum(case when (internet_conditions_met = true or upstream_conditions_met = true) and connect_category = 'Fixed Wireless' 
               then cd.allocation_lines
             else 0 end) as fixed_wireless_internet_upstream_lines,
-        sum(case when (internet_conditions_met = true or upstream_conditions_met = true) and connect_category = 'Fixed Wireless' and not(connect_type ilike '%microwave%')
-              then cd.allocation_lines
-            else 0 end) as satellite_lte_internet_upstream_lines,
         sum(case when (internet_conditions_met = true or upstream_conditions_met = true) and 
         (li.connect_type != 'Cable Modem' and connect_category in ('Cable / DSL', 'Copper'))
         OR 
@@ -424,28 +408,16 @@ select
   
 left join (
     select recipient_id,
-    array_to_string(
-      array_agg(distinct 
-            case when   internet_conditions_met=true or
-                  upstream_conditions_met=true or
-                  isp_conditions_met=true
-              then 
-                concat(applicant_name,
-                    case when consortium_shared=true
-                        then ' (shared)'
-                      when consortium_shared=false and 
-                      isp_conditions_met=true
-                        then ' (dedicated ISP only)'
-                      when consortium_shared=false and 
-                      internet_conditions_met=true
-                        then ' (dedicated Internet)'
-                      when consortium_shared=false and 
-                      upstream_conditions_met=true
-                        then ' (dedicated Upstream)'
-                      else ' (unknown purpose)'
-                    end)
-            end)
-    , ', ') as ia_applicants,
+    array_to_string(array_agg(distinct case when ia_conditions_met=true then 
+    concat(applicant_name,
+    case when consortium_shared=true
+    then ' (shared)'
+    when consortium_shared=false and isp_conditions_met=true
+    then ' (dedicated ISP only)'
+    when consortium_shared=false and internet_conditions_met=true
+    then ' (dedicated Internet)'
+    else ' (unknown purpose)'
+    end)end), ', ') as "ia_applicants",
     array_to_string(array_agg(distinct case when ia_conditions_met=true and consortium_shared=true then applicant_name else null end), ', ') as "shared_ia_applicants",
     array_to_string(array_agg(distinct case when isp_conditions_met=true and consortium_shared=false then applicant_name else null end), ', ') as "dedicated_isp_applicants",
     array_to_string(array_agg(distinct case when internet_conditions_met=true and consortium_shared=false then applicant_name else null end), ', ') as "bundled_internet_applicants",
@@ -527,48 +499,14 @@ left join (
     GROUP BY recipient_id
 ) pt
 on districts.esh_id=pt.recipient_id
-left join (
-    select  entity_id,
-        array_agg(distinct label) as flag_array                   
-                          
-    from public.entity_flags
-    where status = 0
-    and dirty = true                 
-                          
-    group by entity_id  
-) flag_info 
-on districts.esh_id=flag_info.entity_id
-left join (
-    select  entity_id,
-        array_agg(distinct label) as tag_array                   
-                          
-    from public.entity_flags
-    where status = 0
-    and not(dirty = true)                 
-                          
-    group by entity_id  
-) tag_info 
-on districts.esh_id=tag_info.entity_id
-left join (
-    select  entity_id,
-        min("Cat 1 Disc Rate") as c1_discount_rate,
-        min("Cat 2 Disc Rate") as c2_discount_rate                
-                          
-    from public.fy2015_discount_calculations dc
-    join ( select distinct entity_id, ben
-            from public.entity_bens) eim
-    on dc."BEN" = eim.ben
-    group by entity_id
-) dr_info 
-on districts.esh_id=dr_info.entity_id
 
-where districts.include_in_universe_of_districts = TRUE
+  where districts.include_in_universe_of_districts = TRUE
 
 /*
 Author: Justine Schott
 Created On Date: 2/9/2016
-Last Modified Date: 08/26/2016
-Name of QAing Analyst(s): Greg Kurzhals, last modified by Justine Schott
+Last Modified Date: 08/25/2016
+Name of QAing Analyst(s): Greg Kurzhals, last modified by Jess Seok
 Purpose: Purpose: Districts table data pull with added columns
 Methodology: 
 1) IA goals: 2014 and 2018, with and without concurrency
