@@ -44,7 +44,7 @@ on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join public.districts_schools ds
+left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id
@@ -104,7 +104,7 @@ on ag131a."LSTREE" = d.address
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join public.districts_schools ds
+left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id
@@ -163,7 +163,7 @@ on sc131a."UNION" = d.union_code
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join public.districts_schools ds
+left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id

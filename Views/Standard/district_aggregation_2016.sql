@@ -137,6 +137,22 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as fiber_lines,
 						sum(case											
+									when	connect_category = 'Fixed Wireless'
+									and isp_conditions_met = false								
+									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
+									and consortium_shared = false								
+										then	allocation_lines								
+									else	0										
+								end) as fixed_wireless_lines,
+						sum(case											
+									when	connect_category = 'Cable'
+									and isp_conditions_met = false								
+									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
+									and consortium_shared = false								
+										then	allocation_lines								
+									else	0										
+								end) as cable_lines,
+						sum(case											
 									when	connect_category in ('Other Copper', 'T-1', 'DSL')
 									and isp_conditions_met = false								
 									and	(num_open_flags	=	0 or (num_open_flags	=	1 and 'exclude_for_cost_only'	=	any(open_flag_labels)))
@@ -397,7 +413,11 @@ select  		dd.esh_id as district_esh_id,
 				                then service_provider_name
 				            end
 				          ), ', ') as wan_sp,
-						campus_count,
+						case
+							when campus_count is null
+								then num_schools
+							else campus_count
+						end as campus_count,
 						frl_percent,
 						flag_array,
 						flag_count,
