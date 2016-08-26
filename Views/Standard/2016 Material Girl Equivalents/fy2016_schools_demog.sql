@@ -38,7 +38,7 @@ select d.esh_id as district_esh_id,
 
 from public.sc131a 
 join (select *
-      from districts_demog_2016
+      from fy2016_districts_demog
       where postal_cd not in ('MT', 'VT')) d --only want schools in districts universe
 on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
@@ -98,7 +98,7 @@ from public.sc131a
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
 join (select *
-      from districts_demog_2016
+      from fy2016_districts_demog
       where postal_cd = 'MT') d --only want schools in districts universe
 on ag131a."LSTREE" = d.address
 left join ( select distinct entity_id, nces_code
@@ -157,7 +157,7 @@ select  d.esh_id as district_esh_id,
         
 from public.sc131a 
 join (select *
-      from districts_demog_2016
+      from fy2016_districts_demog
       where postal_cd = 'VT') d
 on sc131a."UNION" = d.union_code
 left join ( select distinct entity_id, nces_code
@@ -177,7 +177,7 @@ and sc131a."LSTATE" = 'VT'
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/15/2016
+Last Modified Date: 8/26/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Schools demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before

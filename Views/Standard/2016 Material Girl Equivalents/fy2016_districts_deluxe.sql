@@ -151,12 +151,12 @@ select
 	wan_contract_expiration,
 	non_fiber_lines
 
-from public.districts_metrics_2016
+from public.fy2016_districts_metrics
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 8/17/2016
+Last Modified Date: 8/26/2016
 Name of QAing Analyst(s): 
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology: NOTE-- WIP -- need to merge 2015 districts and 2016 districts

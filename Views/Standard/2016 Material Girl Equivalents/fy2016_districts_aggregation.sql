@@ -434,8 +434,8 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as machine_cleaned_lines
 
-from	public.districts_demog_2016 dd
-left join public.lines_to_district_by_line_item_2016	ldli
+from	public.fy2016_districts_demog dd
+left join public.fy2016_lines_to_district_by_line_item	ldli
 on 	dd.esh_id = ldli.district_esh_id							
 left join	(
 		select *
@@ -451,9 +451,9 @@ left join (
 		select	ldli.line_item_id,										
 						sum(d.num_students::numeric)	as	num_students_served									
 													
-		from lines_to_district_by_line_item_2016	ldli									
+		from fy2016_lines_to_district_by_line_item	ldli									
 													
-		join districts_demog_2016	d									
+		join fy2016_districts_demog	d									
 		on ldli.district_esh_id	=	d.esh_id								
 													
 		join fy2016.line_items	li									
@@ -478,7 +478,7 @@ left join (
 						then sum(frl_percentage_numerator)/sum(frl_percentage_denomenator) 
 				end as frl_percent									
 													
-		from schools_demog_2016										
+		from fy2016_schools_demog										
 													
 		group	by	district_esh_id	
 ) school_info									
@@ -532,7 +532,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/17/2016
+Last Modified Date: 8/26/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
