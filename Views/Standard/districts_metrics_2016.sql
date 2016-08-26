@@ -9,7 +9,7 @@ select	dd.*,
 					when da.campus_count is null
 						then num_schools
 					else da.campus_count
-				end as campus_count,
+				end as num_campuses,
 				da.flag_array,
 				da.tag_array,
 				broadband_internet_upstream_lines,							
