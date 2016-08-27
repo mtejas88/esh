@@ -70,7 +70,7 @@ select
 	num_campuses,
 	exclude_from_analysis,
 	priority_status__c
-from public.districts_longitudinal d
+from public.fy2016_districts_deluxe d
 left join (
 	select 
 		account__esh_id__c, 
