@@ -115,11 +115,16 @@ select
   cdd_calc.nga_v2_assumed_scalable_campuses as nga_assumed_scalable_campuses,
   cdd_calc.nga_v2_known_unscalable_campuses as nga_known_unscalable_campuses,
   cdd_calc.nga_v2_assumed_unscalable_campuses as nga_assumed_unscalable_campuses,
+
+  cdd_calc.known_unscalable_campuses as sots_known_scalable_campuses,
+  cdd_calc.assumed_unscalable_campuses as sots_assumed_unscalable_campuses,
+  cdd_calc.known_unscalable_campuses as sots_known_scalable_campuses,
+  cdd_calc.assumed_unscalable_campuses as sots_assumed_unscalable_campuses,
   
-  cdd_calc.known_fiber_campuses as sots_known_fiber_campuses,
-  cdd_calc.assumed_fiber_campuses as sots_assumed_fiber_campuses,
-  cdd_calc.known_nonfiber_campuses as sots_known_nonfiber_campuses,
-  cdd_calc.assumed_nonfiber_campuses as sots_assumed_nonfiber_campuses,
+  cdd_calc.known_fiber_campuses,
+  cdd_calc.assumed_fiber_campuses,
+  cdd_calc.known_nonfiber_campuses,
+  cdd_calc.assumed_nonfiber_campuses,
   
 --6) IA overview  
   cdd_calc.fiber_internet_upstream_lines,
@@ -238,7 +243,69 @@ select
                 then 0
                 else num_campuses - (fiber_lines + non_fiber_lines)
             end
-      end as assumed_nonfiber_campuses
+      end as assumed_nonfiber_campuses,
+        case
+          when num_campuses < fiber_lines + fixed_wireless_lines +  case 
+                                          when num_students < 100 
+                                            then cable_lines 
+                                          else 0 
+                                        end
+            then num_campuses 
+            else fiber_lines + fixed_wireless_lines +   case 
+                                when num_students < 100 
+                                  then cable_lines 
+                                else 0 
+                              end
+        end as known_scalable_campuses,
+        case 
+          when num_schools > 5 and wan_lines = 0 
+            then 
+              case 
+                when num_campuses > fiber_lines + fixed_wireless_lines +  case 
+                                          when num_students < 100 
+                                            then cable_lines 
+                                          else 0 
+                                        end
+                  then num_campuses - fiber_lines + fixed_wireless_lines +  case 
+                                          when num_students < 100 
+                                            then cable_lines 
+                                          else 0 
+                                        end
+                  else 0
+              end
+            else 0
+        end as assumed_scalable_campuses,
+        case
+          when num_students < 100 and copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
+            then 
+              case
+                when num_campuses < (fiber_lines + fixed_wireless_lines + cable_lines)
+                  then 0
+                when num_campuses - (fiber_lines + fixed_wireless_lines + cable_lines) < copper_dsl_lines
+                  then num_campuses - (fiber_lines + fixed_wireless_lines + cable_lines)
+                  else copper_dsl_lines
+              end
+          when num_students >= 100 and (copper_dsl_lines + cable_lines)> 0  and not(num_schools > 5 and wan_lines = 0 ) 
+            then
+              case
+                when num_campuses < (fiber_lines + fixed_wireless_lines)
+                  then 0
+                when num_campuses - (fiber_lines + fixed_wireless_lines ) < copper_dsl_lines + cable_lines
+                  then num_campuses - (fiber_lines + fixed_wireless_lines)
+                  else copper_dsl_lines + cable_lines
+              end
+            else 0
+        end as known_unscalable_campuses,
+        case 
+          when num_schools > 5 and wan_lines = 0 
+            then 0 
+            else 
+              case
+                when num_campuses < (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
+                  then 0
+                  else num_campuses - (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
+              end
+        end as assumed_unscalable_campuses
     from (
         select d.esh_id as district_esh_id,
         d.postal_cd,
@@ -263,6 +330,8 @@ select
               else 0
             end) as fixed_wireless_lines,
         sum(case when li.connect_category not in ('Fiber', 'Other / Uncategorized') 
+              OR
+              'ethernet_copper'=any(li.open_flags)
               then cd.allocation_lines
               else 0
             end) as non_fiber_lines,
