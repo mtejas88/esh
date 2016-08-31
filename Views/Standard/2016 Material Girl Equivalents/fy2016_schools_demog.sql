@@ -53,19 +53,28 @@ and sc131a."GSHI" != 'PK'
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
-and not("SCHNAM" ilike '%jjaep%'
-        or "SCHNAM" ilike '%j j a e p%'
-        or "SCHNAM" ilike '%juvenile%'
-        or "SCHNAM" ilike '%detention%'
-        or "SCHNAM" ilike '%correction%'
-        or "SCHNAM" ilike '%jail%'
-        or "SCHNAM" ilike '%adult%'
-        or "SCHNAM" ilike '%continuation%'
-        or "SCHNAM" ilike '%online%'
-        or "SCHNAM" ilike '%virtual%'
-        or "SCHNAM" ilike '%family%'
-        or "SCHNAM" ilike '%ami kids%'
-        or "SCHNAM" ilike '%amikids%')
+and case
+      when "SCHNAM" ilike '%charter%'
+        then true
+      else 
+        not("SCHNAM" ilike '%jjaep%'
+          or "SCHNAM" ilike '%j j a e p%'
+          or "SCHNAM" ilike '%juvenile%'
+          or "SCHNAM" ilike '%detention%'
+          or "SCHNAM" ilike '%correction%'
+          or "SCHNAM" ilike '%jail%'
+          or "SCHNAM" ilike '%adult%'
+          or "SCHNAM" ilike '%continuation%'
+          or "SCHNAM" ilike '%online%'
+          or "SCHNAM" ilike '%virtual%'
+          or "SCHNAM" ilike '%family%'
+          or "SCHNAM" ilike '%ami kids%'
+          or "SCHNAM" ilike '%amikids%')
+    end
+and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
+                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
+                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
+                      '220030001513', '120051002601', '170016605647')
 
 UNION
 
@@ -127,20 +136,28 @@ and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'MT'
-and not("SCHNAM" ilike '%jjaep%'
-        or "SCHNAM" ilike '%j j a e p%'
-        or "SCHNAM" ilike '%juvenile%'
-        or "SCHNAM" ilike '%detention%'
-        or "SCHNAM" ilike '%correction%'
-        or "SCHNAM" ilike '%jail%'
-        or "SCHNAM" ilike '%adult%'
-        or "SCHNAM" ilike '%continuation%'
-        or "SCHNAM" ilike '%online%'
-        or "SCHNAM" ilike '%virtual%'
-        or "SCHNAM" ilike '%family%'
-        or "SCHNAM" ilike '%ami kids%'
-        or "SCHNAM" ilike '%amikids%')
-
+and case
+      when "SCHNAM" ilike '%charter%'
+        then true
+      else 
+        not("SCHNAM" ilike '%jjaep%'
+          or "SCHNAM" ilike '%j j a e p%'
+          or "SCHNAM" ilike '%juvenile%'
+          or "SCHNAM" ilike '%detention%'
+          or "SCHNAM" ilike '%correction%'
+          or "SCHNAM" ilike '%jail%'
+          or "SCHNAM" ilike '%adult%'
+          or "SCHNAM" ilike '%continuation%'
+          or "SCHNAM" ilike '%online%'
+          or "SCHNAM" ilike '%virtual%'
+          or "SCHNAM" ilike '%family%'
+          or "SCHNAM" ilike '%ami kids%'
+          or "SCHNAM" ilike '%amikids%')
+    end
+and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
+                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
+                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
+                      '220030001513', '120051002601', '170016605647')
 UNION
 
 select  d.esh_id as district_esh_id,
@@ -199,19 +216,28 @@ and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'VT'
-and not("SCHNAM" ilike '%jjaep%'
-        or "SCHNAM" ilike '%j j a e p%'
-        or "SCHNAM" ilike '%juvenile%'
-        or "SCHNAM" ilike '%detention%'
-        or "SCHNAM" ilike '%correction%'
-        or "SCHNAM" ilike '%jail%'
-        or "SCHNAM" ilike '%adult%'
-        or "SCHNAM" ilike '%continuation%'
-        or "SCHNAM" ilike '%online%'
-        or "SCHNAM" ilike '%virtual%'
-        or "SCHNAM" ilike '%family%'
-        or "SCHNAM" ilike '%ami kids%'
-        or "SCHNAM" ilike '%amikids%')
+and case
+      when "SCHNAM" ilike '%charter%'
+        then true
+      else 
+        not("SCHNAM" ilike '%jjaep%'
+          or "SCHNAM" ilike '%j j a e p%'
+          or "SCHNAM" ilike '%juvenile%'
+          or "SCHNAM" ilike '%detention%'
+          or "SCHNAM" ilike '%correction%'
+          or "SCHNAM" ilike '%jail%'
+          or "SCHNAM" ilike '%adult%'
+          or "SCHNAM" ilike '%continuation%'
+          or "SCHNAM" ilike '%online%'
+          or "SCHNAM" ilike '%virtual%'
+          or "SCHNAM" ilike '%family%'
+          or "SCHNAM" ilike '%ami kids%'
+          or "SCHNAM" ilike '%amikids%')
+    end
+and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
+                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
+                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
+                      '220030001513', '120051002601', '170016605647')
 
 /*
 Author: Justine Schott
