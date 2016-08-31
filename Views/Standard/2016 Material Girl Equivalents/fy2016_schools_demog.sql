@@ -53,6 +53,19 @@ and sc131a."GSHI" != 'PK'
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
+and not(name ilike '%jjaep%'
+        or name ilike '%j j a e p%'
+        or name ilike '%juvenile%'
+        or name ilike '%detention%'
+        or name ilike '%correction%'
+        or name ilike '%jail%'
+        or name ilike '%adult%'
+        or name ilike '%continuation%'
+        or name ilike '%online%'
+        or name ilike '%virtual%'
+        or name ilike '%family%'
+        or name ilike '%ami kids%'
+        or name ilike '%amikids%')
 
 UNION
 
@@ -114,6 +127,19 @@ and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'MT'
+and not(name ilike '%jjaep%'
+        or name ilike '%j j a e p%'
+        or name ilike '%juvenile%'
+        or name ilike '%detention%'
+        or name ilike '%correction%'
+        or name ilike '%jail%'
+        or name ilike '%adult%'
+        or name ilike '%continuation%'
+        or name ilike '%online%'
+        or name ilike '%virtual%'
+        or name ilike '%family%'
+        or name ilike '%ami kids%'
+        or name ilike '%amikids%')
 
 UNION
 
@@ -173,6 +199,19 @@ and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'VT'
+and not(name ilike '%jjaep%'
+        or name ilike '%j j a e p%'
+        or name ilike '%juvenile%'
+        or name ilike '%detention%'
+        or name ilike '%correction%'
+        or name ilike '%jail%'
+        or name ilike '%adult%'
+        or name ilike '%continuation%'
+        or name ilike '%online%'
+        or name ilike '%virtual%'
+        or name ilike '%family%'
+        or name ilike '%ami kids%'
+        or name ilike '%amikids%')
 
 /*
 Author: Justine Schott
