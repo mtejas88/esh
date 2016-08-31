@@ -117,8 +117,8 @@ select
   cdd_calc.nga_v2_assumed_unscalable_campuses as nga_assumed_unscalable_campuses,
 
   cdd_calc.known_scalable_campuses as sots_known_scalable_campuses,
-  cdd_calc.assumed_scalable_campuses as sots_assumed_unscalable_campuses,
-  cdd_calc.known_unscalable_campuses as sots_known_scalable_campuses,
+  cdd_calc.assumed_scalable_campuses as sots_assumed_scalable_campuses,
+  cdd_calc.known_unscalable_campuses as sots_known_unscalable_campuses,
   cdd_calc.assumed_unscalable_campuses as sots_assumed_unscalable_campuses,
   
   cdd_calc.known_fiber_campuses,
