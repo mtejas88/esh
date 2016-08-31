@@ -40,7 +40,7 @@ select
   district_contacted.clean_categorization, 
   
   --3) goals
-  districts.ia_bandwidth_per_student,
+  districts.ia_bandwidth_per_student as ia_bandwidth_per_student_kbps,
   case 
     when cdd_calc.ia_bandwidth_per_student >= 100 
       then true
