@@ -3,7 +3,7 @@ select
 	case when non_fiber_lines_w_dirty > 0 then																			--row 1
 		case when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then									--row 2
 			case when 	exclude_from_analysis = false then																--row 3
-				'CLOSED LOST 3/4/5' else 'dont update 3/4/5' end 														--rows 4,5
+				'CLOSED LOST' else 'dont update' end 																	--rows 4,5
 		else	
 			case when district_specif_recip_nonfiber_lines > 0 and campuses_specif_recip_nonfiber_lines = 0 then		--row 6
 					case when 	non_fiber_lines_w_dirty > 0 then														--row 7
@@ -12,16 +12,16 @@ select
 								case 	when 	exclude_from_analysis = false and 
 												priority_status__c not in ('Priority 1','Priority 3') and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'CLOSED LOST 11/12'
+												or flag_array is null) then 'CLOSED LOST'
 										when 	exclude_from_analysis = true and 
 												priority_status__c not in ('Priority 1','Priority 3') and
-												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 11/12'	--row 10
-								 		else 'dont update 11/12' end													--rows 11,12
+												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'			--row 10
+								 		else 'dont update' end															--rows 11,12
 							else 
 								case when 	district_recip_clean_nonfiber_lines > 0 and 
 											(not('district_missing_ia' = any(flag_array)) or flag_array is null) and
 											(not('district_isp_missing_upstream' = any(flag_array)) or flag_array is null) then
-									'FIBER TARGET 13/14/15' else 'dont update 13/14/15' end	
+									'FIBER TARGET' else 'dont update' end	
 							end																							--rows 13,14,15
 						else 
 							case when 	num_campuses = campuses_specif_recip_fiber_internet_upstream_lines and
@@ -29,27 +29,27 @@ select
 								case 	when 	exclude_from_analysis = false and 
 												priority_status__c not in ('Priority 1','Priority 3') and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'CLOSED LOST 18/19'
+												or flag_array is null) then 'CLOSED LOST'
 										when 	exclude_from_analysis = true and 
 												priority_status__c not in ('Priority 1','Priority 3') and
-												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 18/19'	--row 17
-								 		else 'dont update 18/19' end													--rows 18,19
+												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'			--row 17
+								 		else 'dont update' end															--rows 18,19
 							else 
 								case when 	district_recip_clean_nonfiber_lines > 0 and 
 											(not('district_missing_ia' = any(flag_array)) or flag_array is null) and
 											(not('district_isp_missing_upstream' = any(flag_array)) or flag_array is null) then
-									'FIBER TARGET 20/21/22' else 'dont update 20/21/22' end	
+									'FIBER TARGET' else 'dont update' end	
 							end																							--rows 20,21,22
 						end
 					else
 						case 	when 	exclude_from_analysis = false and 
 										priority_status__c not in ('Priority 1','Priority 3') and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 24/25'
+										or flag_array is null) then 'CLOSED LOST'
 								when 	exclude_from_analysis = true and 
 										priority_status__c not in ('Priority 1','Priority 3') and
-										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 24/25'			--row 23
-						 		else 'dont update 24/25' end															--rows 24,25
+										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'					--row 23
+						 		else 'dont update' end																	--rows 24,25
 					end
 			else
 				case when campuses_specif_recip_nonfiber_not_wan_lines_alloc = 0 then									--row 26
@@ -57,32 +57,32 @@ select
 						case 	when 	exclude_from_analysis = false and 
 										priority_status__c not in ('Priority 1','Priority 3') and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 29/30'
+										or flag_array is null) then 'CLOSED LOST'
 								when 	exclude_from_analysis = true and 
 										priority_status__c not in ('Priority 1','Priority 3') and
-										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 29/30'			--row 28
-						 		else 'dont update 29/30' end															--rows 29,30
+										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'					--row 28
+						 		else 'dont update' end																	--rows 29,30
 					else 
 						case when 	district_recip_clean_nonfiber_lines > 0 and 
 									(not('district_missing_ia' = any(flag_array)) or flag_array is null) and
 									(not('district_isp_missing_upstream' = any(flag_array)) or flag_array is null) then
-							'FIBER TARGET 31/32/33' else 'dont update 31/32/33' end	
+							'FIBER TARGET' else 'dont update' end	
 					end																									--rows 31,32,33
 				else 
 					case when campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0 then								--row 34
 						case 	when 	exclude_from_analysis = false and 
 										priority_status__c not in ('Priority 1','Priority 3') and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 36/37'
+										or flag_array is null) then 'CLOSED LOST'
 								when 	exclude_from_analysis = true and 
 										priority_status__c not in ('Priority 1','Priority 3') and
-										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 36/37'			--row 35
-						 		else 'dont update 36/37' end															--rows 36,37
+										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'					--row 35
+						 		else 'dont update' end																	--rows 36,37
 					else 
 						case when 	district_recip_clean_nonfiber_lines > 0 and 
 									(not('district_missing_ia' = any(flag_array)) or flag_array is null) and
 									(not('district_isp_missing_upstream' = any(flag_array)) or flag_array is null) then
-							'FIBER TARGET 38/39/40' else 'dont update 38/39/40' end	
+							'FIBER TARGET' else 'dont update' end	
 					end																									--rows 38,39,40
 				end
 			end
@@ -91,11 +91,11 @@ select
 		case 	when 	exclude_from_analysis = false and 
 						priority_status__c not in ('Priority 1','Priority 3') and
 						(not(array_to_string(flag_array,',') ilike '%wan%')
-						or flag_array is null) then 'CLOSED LOST 42/43'
+						or flag_array is null) then 'CLOSED LOST'
 				when 	exclude_from_analysis = true and 
 						priority_status__c not in ('Priority 1','Priority 3') and
-						array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 42/43'							--row 41
-		 		else 'dont update 42/43' end																			--rows 42,43
+						array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL'									--row 41
+		 		else 'dont update' end																					--rows 42,43
 	end as stage_indicator,
 	non_fiber_lines_w_dirty,
 	non_fiber_internet_upstream_lines_w_dirty,
