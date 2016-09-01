@@ -456,10 +456,33 @@ select  		dd.esh_id as district_esh_id,
 										 'bw_updated_15' = any(open_tag_labels))
 										then allocation_lines								
 									else	0										
-								end) as machine_cleaned_lines
+								end) as machine_cleaned_lines,
+--clean and dirty for stage_indicator
+						sum(case											
+									when not(connect_category ilike '%fiber%')
+									and isp_conditions_met = false
+									and backbone_conditions_met = false								
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as non_fiber_lines_w_dirty,
+						sum(case											
+									when not(connect_category ILIKE '%fiber%')
+									and (internet_conditions_met = true or upstream_conditions_met = true)						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as non_fiber_internet_upstream_lines_w_dirty,
+						sum(case											
+									when connect_category ILIKE '%Fiber%'
+									and (internet_conditions_met = true or upstream_conditions_met = true)						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as fiber_internet_upstream_lines_w_dirty
 
-from	public.fy2016_districts_demog_m dd
-left join public.fy2016_lines_to_district_by_line_item_m	ldli
+from	public.fy2016_districts_demog_ma dd
+left join public.fy2016_lines_to_district_by_line_item_ma	ldli
 on 	dd.esh_id = ldli.district_esh_id							
 left join	(
 		select *
@@ -475,9 +498,9 @@ left join (
 		select	ldli.line_item_id,										
 						sum(d.num_students::numeric)	as	num_students_served									
 													
-		from fy2016_lines_to_district_by_line_item_m	ldli									
+		from fy2016_lines_to_district_by_line_item_ma	ldli									
 													
-		join fy2016_districts_demog	d									
+		join fy2016_districts_demog_ma	d									
 		on ldli.district_esh_id	=	d.esh_id								
 													
 		join fy2016.line_items	li									
@@ -502,7 +525,7 @@ left join (
 						then sum(frl_percentage_numerator)/sum(frl_percentage_denomenator) 
 				end as frl_percent									
 													
-		from fy2016_schools_demog										
+		from fy2016_schools_demog_ma										
 													
 		group	by	district_esh_id	
 ) school_info									

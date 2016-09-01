@@ -155,7 +155,7 @@ select
   wan_contract_expiration,
   non_fiber_lines
 
-from public.fy2016_districts_metrics_m
+from public.fy2016_districts_metrics_ma
 
 /*
 Author: Justine Schott

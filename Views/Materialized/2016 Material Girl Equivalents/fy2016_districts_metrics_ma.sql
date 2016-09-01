@@ -264,8 +264,8 @@ select	dd.*,
 		    machine_cleaned_lines,
 		    non_fiber_lines									
 												
-from	fy2016_districts_demog_m		 dd									
-left	join	fy2016_districts_aggregation_m	da									
+from	fy2016_districts_demog_ma		 dd									
+left	join	fy2016_districts_aggregation_ma	da									
 on	dd.esh_id	=	da.district_esh_id									
 
 /*

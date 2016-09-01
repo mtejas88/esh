@@ -1,8 +1,8 @@
 select esh_id, esh_id as district_esh_id
-from fy2016_districts_demog_m
+from fy2016_districts_demog_ma
   union
 select school_esh_id as esh_id, district_esh_id
-from fy2016_schools_demog_m
+from fy2016_schools_demog_ma
 
 /*
 Author:                       Justine Schott

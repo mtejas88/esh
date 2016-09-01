@@ -5,7 +5,7 @@ select dl.district_esh_id,
 from fy2016.entity_circuits ec
 join fy2016.circuits c
 on ec.circuit_id = c.id
-join fy2016_district_lookup_m dl
+join fy2016_district_lookup_ma dl
 on ec.entity_id::varchar = dl.esh_id
 
 group by  district_esh_id,
