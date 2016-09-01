@@ -153,7 +153,10 @@ select
   wan_sp,
   wan_services,
   wan_contract_expiration,
-  non_fiber_lines
+  non_fiber_lines,
+  non_fiber_lines_w_dirty,
+  non_fiber_internet_upstream_lines_w_dirty,
+  fiber_internet_upstream_lines_w_dirty
 
 from public.fy2016_districts_metrics_ma
 

@@ -262,7 +262,10 @@ select	dd.*,
 		    flag_count,
 		    wan_monthly_cost,
 		    machine_cleaned_lines,
-		    non_fiber_lines									
+		    non_fiber_lines,
+		    non_fiber_lines_w_dirty,
+		    non_fiber_internet_upstream_lines_w_dirty,
+		    fiber_internet_upstream_lines_w_dirty									
 												
 from	fy2016_districts_demog_ma		 dd									
 left	join	fy2016_districts_aggregation_ma	da									
