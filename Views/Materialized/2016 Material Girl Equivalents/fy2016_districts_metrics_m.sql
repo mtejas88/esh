@@ -193,6 +193,43 @@ select	dd.*,
 		                else campus_count - (fiber_lines + copper_dsl_lines)
 		            end
 		      end as nga_v2_assumed_unscalable_campuses,
+      case
+        when campus_count < fiber_lines
+          then campus_count 
+          else fiber_lines
+      end as known_fiber_campuses,
+      case 
+        when num_schools > 5 and wan_lines = 0 
+          then 
+            case 
+              when campus_count > fiber_lines 
+                then campus_count - fiber_lines
+                else 0
+            end
+          else 0
+      end as assumed_fiber_campuses,
+      case
+        when non_fiber_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
+          then 
+            case
+              when campus_count < fiber_lines
+                then 0
+              when campus_count - fiber_lines < non_fiber_lines
+                then campus_count - fiber_lines 
+                else non_fiber_lines
+            end
+          else 0
+      end as known_nonfiber_campuses,
+      case 
+        when num_schools > 5 and wan_lines = 0 
+          then 0 
+          else 
+            case
+              when campus_count < fiber_lines + non_fiber_lines
+                then 0
+                else campus_count - (fiber_lines + non_fiber_lines)
+            end
+      end as assumed_nonfiber_campuses,
 			fiber_internet_upstream_lines,
 			fixed_wireless_internet_upstream_lines,
 			cable_internet_upstream_lines,
