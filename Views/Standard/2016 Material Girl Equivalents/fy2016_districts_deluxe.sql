@@ -24,22 +24,26 @@ select
 	latitude,
 	longitude,
 	case
-		when flag_array is null and district_type = 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
+		when flag_array is null
 			then false
 		else true
 	end as exclude_from_analysis,
 	case
-		when flag_array is null and ia_monthly_cost_per_mbps is not null and district_type = 'Traditional'
+		when flag_array is null and ia_monthly_cost_per_mbps is not null
 			then 'clean_with_cost'
-		when flag_array is null and district_type = 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
+		when flag_array is null
 			then 'clean_no_cost'
+		when flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%' and ia_monthly_cost_per_mbps is not null
+			then 'clean_except_wan_with_cost'
+		when flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'
+			then 'clean_except_wan_no_cost'
 		else 'dirty'
 	end	as inclusion_status,
 	flag_array,
 	tag_array,
 	flag_count as num_open_district_flags,
 	case
-		when flag_array is not null or district_type != 'Traditional' --note, on 8/16 flagging is not compatible with charters or BIEs
+		when flag_array is not null
 		--add further dimensioning of natively vs outreach needed? will dqs want to use this filter?
 			then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
@@ -48,8 +52,6 @@ select
 			then 'line_items_outreach_confirmed'
 		when 'outreach_confirmed_auto' = any(tag_array)
 			then 'line_items_verified'
-		when 'dqt_reviewed' = any(tag_array)
-			then 'dqt_reviewed'
 		when 'dqt_reviewed' = any(tag_array)
 			then 'dqt_reviewed'
 		when machine_cleaned_lines > 0
@@ -160,8 +162,8 @@ from public.fy2016_districts_metrics
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 8/26/2016
+Last Modified Date: 9/01/2016
 Name of QAing Analyst(s): 
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
-Methodology: NOTE-- WIP -- need to merge 2015 districts and 2016 districts
+Methodology:
 */
