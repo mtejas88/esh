@@ -270,7 +270,7 @@ select	dd.*,
 		    fiber_wan_lines_w_dirty,
 		    lines_w_dirty									
 												
-from	fy2016_districts_demog_mat		 dd									
+from	fy2016_districts_demog_m		 dd									
 left	join	fy2016_districts_aggregation_mat	da									
 on	dd.esh_id	=	da.district_esh_id									
 
