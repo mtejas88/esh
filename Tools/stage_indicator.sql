@@ -304,7 +304,7 @@ on d.esh_id = district_alloc_recips.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 9/02/2016
+Last Modified Date: 9/06/2016
 Name of QAing Analyst(s): 
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query 
