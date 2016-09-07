@@ -459,7 +459,8 @@ select  		dd.esh_id as district_esh_id,
 								end) as machine_cleaned_lines,
 --clean and dirty for stage_indicator
 						sum(case											
-									when not(connect_category ilike '%fiber%')
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
 									and isp_conditions_met = false
 									and backbone_conditions_met = false								
 									and consortium_shared = false									
@@ -467,7 +468,8 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as non_fiber_lines_w_dirty,
 						sum(case											
-									when not(connect_category ILIKE '%fiber%')
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
 									and (internet_conditions_met = true or upstream_conditions_met = true)						
 									and consortium_shared = false									
 										then	allocation_lines								
@@ -475,6 +477,7 @@ select  		dd.esh_id as district_esh_id,
 								end) as non_fiber_internet_upstream_lines_w_dirty,
 						sum(case											
 									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
 									and (internet_conditions_met = true or upstream_conditions_met = true)						
 									and consortium_shared = false									
 										then	allocation_lines								
@@ -482,6 +485,7 @@ select  		dd.esh_id as district_esh_id,
 								end) as fiber_internet_upstream_lines_w_dirty,
 						sum(case											
 									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
 									and wan_conditions_met = true						
 									and consortium_shared = false									
 										then	allocation_lines								
