@@ -568,7 +568,8 @@ group by	dd.esh_id,
 			flag_count,
 			tag_array,
 			c1_discount_rate,
-			c2_discount_rate
+			c2_discount_rate,
+			num_self_procuring_charters
 
 /*
 Author: Justine Schott
