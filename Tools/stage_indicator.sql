@@ -103,8 +103,10 @@ select
 						array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 42/43'							--row 41
 		 		else 'dont update 42/43' end																			--rows 42,43
 	end as stage_indicator,
+	lines_w_dirty,
 	non_fiber_lines_w_dirty,
 	non_fiber_internet_upstream_lines_w_dirty,
+	fiber_wan_lines_w_dirty,
 	fiber_internet_upstream_lines_w_dirty,
 	district_specif_recip_nonfiber_lines,
 	campuses_specif_recip_nonfiber_lines,
@@ -112,12 +114,16 @@ select
 	campuses_specif_recip_fiber_internet_upstream_lines,
 	campuses_specif_recip_nonfiber_not_wan_lines_alloc,
 	campuses_specif_recip_nonfiber_not_ia_lines_alloc,
+	sum_alloc_wan_fiber_lines,
+	count_ben_wan_fiber_lines,
+	sum_alloc_ia_fiber_lines,
+	count_ben_ia_fiber_lines,
 	district_recip_clean_nonfiber_lines,
 	num_campuses,
 	exclude_from_analysis,
 	priority_status__c,
 	flag_array
-from public.fy2016_districts_deluxe_ma d
+from public.fy2016_districts_deluxe_mat d
 left join (
 	select 
 		account__esh_id__c, 
@@ -300,9 +306,9 @@ or (postal_cd = 'AZ' and district_type = 'Charter')
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 8/31/2016
+Last Modified Date: 9/02/2016
 Name of QAing Analyst(s): 
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
-Methodology: Utilizes fy2016_districts_deluxe_ma -- the districts deluxe materialized version, because the query 
+Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query 
 took too long to run. Need to brainstorm a solution when implementing.
 */
