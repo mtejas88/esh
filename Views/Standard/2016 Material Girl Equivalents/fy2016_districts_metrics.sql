@@ -263,7 +263,7 @@ select	dd.*,
 		    wan_monthly_cost,
 		    machine_cleaned_lines,
 		    non_fiber_lines,
-		    num_self_procuring_charters									
+		    dd.num_self_procuring_charters									
 												
 from	fy2016_districts_demog		 dd									
 left	join	fy2016_districts_aggregation	da									
