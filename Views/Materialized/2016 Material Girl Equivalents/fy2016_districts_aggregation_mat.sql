@@ -500,7 +500,7 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as lines_w_dirty
 
-from	public.fy2016_districts_demog_mat dd
+from	public.fy2016_districts_demog_m dd
 left join public.fy2016_lines_to_district_by_line_item_mat	ldli
 on 	dd.esh_id = ldli.district_esh_id							
 left join	(

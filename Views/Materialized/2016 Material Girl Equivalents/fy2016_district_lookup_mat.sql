@@ -1,5 +1,5 @@
 select esh_id, esh_id as district_esh_id
-from fy2016_districts_demog_mat
+from fy2016_districts_demog_m
   union
 select school_esh_id as esh_id, district_esh_id
 from fy2016_schools_demog_mat
