@@ -43,7 +43,7 @@ select d.esh_id as district_esh_id,
 
 from public.sc131a 
 join (select *
-      from fy2016_districts_demog_mat
+      from fy2016_districts_demog_ma
       where postal_cd not in ('MT', 'VT')) d --only want schools in districts universe
 on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
@@ -51,41 +51,24 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
-left join fy2016.tags 
-on eim.entity_id = tags.taggable_id
+left join (
+  select distinct taggable_id, label
+  from fy2016.tags
+  where label = 'closed_school'
+  and deleted_at is null
+) t
+on eim.entity_id = t.taggable_id
 left join (
   select distinct applicant_id
   from fy2016.line_items
   where broadband = true
 ) applicants
 on eim.entity_id = applicants.applicant_id
-where not(label = 'closed_school' and deleted_at is null)
+where label is null
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
-and case
-      when "SCHNAM" ilike '%charter%'
-        then true
-      else 
-        not("SCHNAM" ilike '%jjaep%'
-          or "SCHNAM" ilike '%j j a e p%'
-          or "SCHNAM" ilike '%juvenile%'
-          or "SCHNAM" ilike '%detention%'
-          or "SCHNAM" ilike '%correction%'
-          or "SCHNAM" ilike '%jail%'
-          or "SCHNAM" ilike '%adult%'
-          or "SCHNAM" ilike '%continuation%'
-          or "SCHNAM" ilike '%online%'
-          or "SCHNAM" ilike '%virtual%'
-          or "SCHNAM" ilike '%family%'
-          or "SCHNAM" ilike '%ami kids%'
-          or "SCHNAM" ilike '%amikids%')
-    end
-and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
-                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
-                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
-                      '220030001513', '120051002601', '170016605647')
 
 UNION
 
@@ -136,7 +119,7 @@ from public.sc131a
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
 join (select *
-      from fy2016_districts_demog_mat
+      from fy2016_districts_demog_ma
       where postal_cd = 'MT') d --only want schools in districts universe
 on ag131a."LSTREE" = d.address
 left join ( select distinct entity_id, nces_code
@@ -144,42 +127,26 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
-left join fy2016.tags 
-on eim.entity_id = tags.taggable_id
+left join (
+  select distinct taggable_id, label
+  from fy2016.tags
+  where label = 'closed_school'
+  and deleted_at is null
+) t
+on eim.entity_id = t.taggable_id
 left join (
   select distinct applicant_id
   from fy2016.line_items
   where broadband = true
 ) applicants
 on eim.entity_id = applicants.applicant_id
-where not(label = 'closed_school' and deleted_at is null)
+where label is null
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'MT'
-and case
-      when "SCHNAM" ilike '%charter%'
-        then true
-      else 
-        not("SCHNAM" ilike '%jjaep%'
-          or "SCHNAM" ilike '%j j a e p%'
-          or "SCHNAM" ilike '%juvenile%'
-          or "SCHNAM" ilike '%detention%'
-          or "SCHNAM" ilike '%correction%'
-          or "SCHNAM" ilike '%jail%'
-          or "SCHNAM" ilike '%adult%'
-          or "SCHNAM" ilike '%continuation%'
-          or "SCHNAM" ilike '%online%'
-          or "SCHNAM" ilike '%virtual%'
-          or "SCHNAM" ilike '%family%'
-          or "SCHNAM" ilike '%ami kids%'
-          or "SCHNAM" ilike '%amikids%')
-    end
-and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
-                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
-                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
-                      '220030001513', '120051002601', '170016605647')
+
 UNION
 
 select  d.esh_id as district_esh_id,
@@ -227,7 +194,7 @@ select  d.esh_id as district_esh_id,
         
 from public.sc131a 
 join (select *
-      from fy2016_districts_demog_mat
+      from fy2016_districts_demog_ma
       where postal_cd = 'VT') d
 on sc131a."UNION" = d.union_code
 left join ( select distinct entity_id, nces_code
@@ -235,42 +202,25 @@ left join ( select distinct entity_id, nces_code
 on sc131a."NCESSCH" = eim.nces_code
 left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
-left join fy2016.tags 
-on eim.entity_id = tags.taggable_id
+left join (
+  select distinct taggable_id, label
+  from fy2016.tags
+  where label = 'closed_school'
+  and deleted_at is null
+) t
+on eim.entity_id = t.taggable_id
 left join (
   select distinct applicant_id
   from fy2016.line_items
   where broadband = true
 ) applicants
 on eim.entity_id = applicants.applicant_id
-where not(label = 'closed_school' and deleted_at is null)
+where label is null
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
 and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
 and sc131a."TYPE" in ('1','2','3','4')
 and sc131a."LSTATE" = 'VT'
-and case
-      when "SCHNAM" ilike '%charter%'
-        then true
-      else 
-        not("SCHNAM" ilike '%jjaep%'
-          or "SCHNAM" ilike '%j j a e p%'
-          or "SCHNAM" ilike '%juvenile%'
-          or "SCHNAM" ilike '%detention%'
-          or "SCHNAM" ilike '%correction%'
-          or "SCHNAM" ilike '%jail%'
-          or "SCHNAM" ilike '%adult%'
-          or "SCHNAM" ilike '%continuation%'
-          or "SCHNAM" ilike '%online%'
-          or "SCHNAM" ilike '%virtual%'
-          or "SCHNAM" ilike '%family%'
-          or "SCHNAM" ilike '%ami kids%'
-          or "SCHNAM" ilike '%amikids%')
-    end
-and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000843', '268093001254', '360106106343', '480002507411',
-                      '350015000785', '220117001937', '120051003062', '480816008318', '120192005749', '550960000856', '440090000055', 
-                      '262802001772', '460207001130', '120015003025', '63720008649',  '120039005495', '120198004458', '120009003291', 
-                      '220030001513', '120051002601', '170016605647')
 
 /*
 Author: Justine Schott
