@@ -34,7 +34,12 @@ select d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id
+        ds.campus_id,
+        case
+          when applicant_id is not null and sc131a."CHARTR" = '1' 
+            then true
+          else false
+        end as self_procuring_charter
 
 from public.sc131a 
 join (select *
@@ -48,6 +53,12 @@ left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id
+left join (
+  select distinct applicant_id
+  from fy2016.line_items
+  where broadband = true
+) applicants
+on eim.entity_id = applicants.applicant_id
 where not(label = 'closed_school' and deleted_at is null)
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
@@ -114,7 +125,12 @@ select  d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id
+        ds.campus_id,
+        case
+          when applicant_id is not null and sc131a."CHARTR" = '1' 
+            then true
+          else false
+        end as self_procuring_charter
 
 from public.sc131a 
 join public.ag131a
@@ -130,6 +146,12 @@ left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id
+left join (
+  select distinct applicant_id
+  from fy2016.line_items
+  where broadband = true
+) applicants
+on eim.entity_id = applicants.applicant_id
 where not(label = 'closed_school' and deleted_at is null)
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
@@ -196,7 +218,12 @@ select  d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id
+        ds.campus_id,
+        case
+          when applicant_id is not null and sc131a."CHARTR" = '1' 
+            then true
+          else false
+        end as self_procuring_charter
         
 from public.sc131a 
 join (select *
@@ -210,6 +237,12 @@ left join fy2016.districts_schools ds
 on eim.entity_id = ds.school_id
 left join fy2016.tags 
 on eim.entity_id = tags.taggable_id
+left join (
+  select distinct applicant_id
+  from fy2016.line_items
+  where broadband = true
+) applicants
+on eim.entity_id = applicants.applicant_id
 where not(label = 'closed_school' and deleted_at is null)
 and sc131a."GSHI" != 'PK' 
 and sc131a."STATUS" != '2' --closed schools
@@ -242,7 +275,7 @@ and "NCESSCH" not in ('120144007785', '80336001724',  '120165003505', '550960000
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/26/2016
+Last Modified Date: 9/06/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Schools demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before

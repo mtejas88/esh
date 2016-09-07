@@ -22,9 +22,9 @@ select  case
             else sc.student_count - sc.student_pk_count 
         end as num_students,
         case
-          when d."LSTATE" = 'VT' then sc_VT.school_count
-          when d."LSTATE" = 'MT' then sc_MT.school_count
-            else sc.school_count 
+          when d."LSTATE" = 'VT' then sc_VT.school_count - sc_VT.self_procuring_charter_count
+          when d."LSTATE" = 'MT' then sc_MT.school_count - sc_MT.self_procuring_charter_count
+            else sc.school_count - sc.self_procuring_charter_count
         end as num_schools,
         "ULOCAL" as ulocal,
         case
@@ -36,31 +36,36 @@ select  case
         end as locale,
         case
           when d."LSTATE" = 'VT' then case
-                                      when sc_VT.school_count=1 then 'Tiny'
-                                      when sc_VT.school_count>1 and sc_VT.school_count<=5 then 'Small'
-                                      when sc_VT.school_count>5 and sc_VT.school_count<=15 then 'Medium'
-                                      when sc_VT.school_count>15 and sc_VT.school_count<=50 then 'Large'
-                                      when sc_VT.school_count>50 then 'Mega'
+                                      when sc_VT.school_count - sc_VT.self_procuring_charter_count=1 then 'Tiny'
+                                      when sc_VT.school_count - sc_VT.self_procuring_charter_count>1 and sc_VT.school_count - sc_VT.self_procuring_charter_count<=5 then 'Small'
+                                      when sc_VT.school_count - sc_VT.self_procuring_charter_count>5 and sc_VT.school_count - sc_VT.self_procuring_charter_count<=15 then 'Medium'
+                                      when sc_VT.school_count - sc_VT.self_procuring_charter_count>15 and sc_VT.school_count - sc_VT.self_procuring_charter_count<=50 then 'Large'
+                                      when sc_VT.school_count - sc_VT.self_procuring_charter_count>50 then 'Mega'
                                         else 'Unknown'
                                     end
           when d."LSTATE" = 'MT' then case
-                                      when sc_MT.school_count=1 then 'Tiny'
-                                      when sc_MT.school_count>1 and sc_MT.school_count<=5 then 'Small'
-                                      when sc_MT.school_count>5 and sc_MT.school_count<=15 then 'Medium'
-                                      when sc_MT.school_count>15 and sc_MT.school_count<=50 then 'Large'
-                                      when sc_MT.school_count>50 then 'Mega'
+                                      when sc_MT.school_count - sc_MT.self_procuring_charter_count=1 then 'Tiny'
+                                      when sc_MT.school_count - sc_MT.self_procuring_charter_count>1 and sc_MT.school_count - sc_MT.self_procuring_charter_count<=5 then 'Small'
+                                      when sc_MT.school_count - sc_MT.self_procuring_charter_count>5 and sc_MT.school_count - sc_MT.self_procuring_charter_count<=15 then 'Medium'
+                                      when sc_MT.school_count - sc_MT.self_procuring_charter_count>15 and sc_MT.school_count - sc_MT.self_procuring_charter_count<=50 then 'Large'
+                                      when sc_MT.school_count - sc_MT.self_procuring_charter_count>50 then 'Mega'
                                         else 'Unknown'
                                     end
             else  case
-                    when sc.school_count=1 then 'Tiny'
-                    when sc.school_count>1 and sc.school_count<=5 then 'Small'
-                    when sc.school_count>5 and sc.school_count<=15 then 'Medium'
-                    when sc.school_count>15 and sc.school_count<=50 then 'Large'
-                    when sc.school_count>50 then 'Mega'
+                    when sc.school_count - sc.self_procuring_charter_count=1 then 'Tiny'
+                    when sc.school_count - sc.self_procuring_charter_count>1 and sc.school_count - sc.self_procuring_charter_count<=5 then 'Small'
+                    when sc.school_count - sc.self_procuring_charter_count>5 and sc.school_count - sc.self_procuring_charter_count<=15 then 'Medium'
+                    when sc.school_count - sc.self_procuring_charter_count>15 and sc.school_count - sc.self_procuring_charter_count<=50 then 'Large'
+                    when sc.school_count - sc.self_procuring_charter_count>50 then 'Mega'
                       else 'Unknown'
                   end
         end as district_size,
-        d."UNION" as union_code
+        d."UNION" as union_code,
+        case
+          when d."LSTATE" = 'VT' then sc_VT.self_procuring_charter_count
+          when d."LSTATE" = 'MT' then sc_MT.self_procuring_charter_count
+            else sc.self_procuring_charter_count
+        end as num_self_procuring_charters
         
 from public.ag131a d
 left join ( select distinct entity_id, nces_code
@@ -69,13 +74,17 @@ on RPAD(d."LEAID",12,'0')=eim.nces_code
 
 left join ( select  "LEAID",
                     count(*) as school_count,
-                    count(case when "TYPE" = '1' then 1 end) as school_type_1_count,
+                    count(case when applicant_id is not null and sc131a."CHARTR" = '1' then 1 end) as self_procuring_charter_count,
+                    count(case when not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                    and "TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when "MEMBER"::numeric > 0 then "MEMBER"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count
             from public.sc131a 
@@ -83,6 +92,12 @@ left join ( select  "LEAID",
             on sc131a."NCESSCH" = entity_nces_codes.nces_code
             left join fy2016.tags 
             on entity_nces_codes.entity_id = tags.taggable_id
+            left join (
+              select distinct applicant_id
+              from fy2016.line_items
+              where broadband = true
+            ) applicants
+            on entity_nces_codes.entity_id = applicants.applicant_id
             where not(label = 'closed_school' and deleted_at is null)
             and "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
@@ -92,21 +107,31 @@ left join ( select  "LEAID",
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
                     count(*) as school_count,
-                    count(case when "TYPE" = '1' then 1 end) as school_type_1_count,
+                    count(case when applicant_id is not null and sc131a."CHARTR" = '1' then 1 end) as self_procuring_charter_count,
+                    count(case when not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                    and "TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when "MEMBER"::numeric > 0 then "MEMBER"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count,
-                    count(distinct "LEAID") as district_count
+                    count(distinct case when not(applicant_id is not null and sc131a."CHARTR" = '1') then "LEAID" end) as district_count
             from public.sc131a 
             left join public.entity_nces_codes 
             on sc131a."NCESSCH" = entity_nces_codes.nces_code
             left join fy2016.tags 
             on entity_nces_codes.entity_id = tags.taggable_id
+            left join (
+              select distinct applicant_id
+              from fy2016.line_items
+              where broadband = true
+            ) applicants
+            on entity_nces_codes.entity_id = applicants.applicant_id
             where not(label = 'closed_school' and deleted_at is null)
             and "GSHI" != 'PK' 
             and "STATUS" != '2' --closed schools
@@ -119,16 +144,20 @@ on d."UNION"=sc_VT."UNION"
 left join ( select  ag131a."LSTREE",
                     ag131a."LSTATE",
                     count(*) as school_count,
-                    count(case when sc131a."TYPE" = '1' then 1 end) as school_type_1_count,
+                    count(case when applicant_id is not null and sc131a."CHARTR" = '1' then 1 end) as self_procuring_charter_count,
+                    count(case when not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                    and sc131a."TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+                          when  not(applicant_id is not null and sc131a."CHARTR" = '1')
+                                and sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
                             else 0
                         end) as student_pk_count,
-                    count(distinct ag131a."LEAID") as district_count
+                    count(distinct case when not(applicant_id is not null and sc131a."CHARTR" = '1') then sc131a."LEAID" end) as district_count
             from public.sc131a 
             join public.ag131a
             on sc131a."LEAID" = ag131a."LEAID"
@@ -136,6 +165,12 @@ left join ( select  ag131a."LSTREE",
             on sc131a."NCESSCH" = entity_nces_codes.nces_code
             left join fy2016.tags 
             on entity_nces_codes.entity_id = tags.taggable_id
+            left join (
+              select distinct applicant_id
+              from fy2016.line_items
+              where broadband = true
+            ) applicants
+            on entity_nces_codes.entity_id = applicants.applicant_id
             where not(label = 'closed_school' and deleted_at is null)
             and sc131a."GSHI" != 'PK' 
             and sc131a."STATUS" != '2' --closed schools
@@ -155,7 +190,7 @@ where ( --all states except VT include districts of type 1,2 (traditional), or 7
         --in RI and MA we also include 4's with majority type 1 schools.    
         or (d."LSTATE" in ('RI', 'MA')    
             and "TYPE" = '4'    
-            and sc.school_type_1_count/sc.school_count::numeric >= .75 )    
+            and sc.school_type_1_count/(sc.school_count - sc.self_procuring_charter_count)::numeric >= .75 )    
         --in NY we also include 3's, in VT we only include 3's    
         or (d."LSTATE" in ('VT', 'NY')    
             and "TYPE" = '3') )
@@ -165,9 +200,9 @@ and ( sc.student_count - sc.student_pk_count  >0
       or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0) 
       or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
       or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts 
-and ( sc.school_count > 0 
-      or (d."LSTATE" = 'MT' and sc_MT.school_count>0)  
-      or (d."LSTATE" = 'VT' and sc_VT.school_count>0) ) --want to include districts with at least 1 school 
+and ( (sc.school_count - sc.self_procuring_charter_count) > 0 
+      or (d."LSTATE" = 'MT' and (sc_MT.school_count - sc_MT.self_procuring_charter_count)>0)  
+      or (d."LSTATE" = 'VT' and (sc_VT.school_count - sc_VT.self_procuring_charter_count)>0) ) --want to include districts with at least 1 school 
 and "BOUND" != '2' --closed districts
 and case --only include the HS district when smushing MT districts (exclude the ELEM)
       when sc_MT.district_count > 1
@@ -181,7 +216,7 @@ and case --only include the HS district when smushing MT districts (exclude the 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/15/2016
+Last Modified Date: 9/06/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
