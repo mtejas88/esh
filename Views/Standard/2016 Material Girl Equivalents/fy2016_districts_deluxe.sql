@@ -159,6 +159,8 @@ select
 	num_self_procuring_charters
 
 from public.fy2016_districts_metrics
+where district_type = 'Traditional'
+or (postal_cd = 'AZ' and district_type = 'Charter')
 
 /*
 Author: Justine Schott

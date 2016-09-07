@@ -164,6 +164,8 @@ select
 	lines_w_dirty
 
 from public.fy2016_districts_metrics_mat
+where district_type = 'Traditional'
+or (postal_cd = 'AZ' and district_type = 'Charter')
 
 /*
 Author: Justine Schott
