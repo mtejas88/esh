@@ -519,7 +519,7 @@ left join (
 													
 		from fy2016_lines_to_district_by_line_item_mat	ldli									
 													
-		join fy2016_districts_demog_mat	d									
+		join fy2016_districts_demog_m	d									
 		on ldli.district_esh_id	=	d.esh_id								
 													
 		join fy2016.line_items	li									
