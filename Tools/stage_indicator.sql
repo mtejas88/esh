@@ -123,7 +123,7 @@ select
 	exclude_from_analysis,
 	priority_status__c,
 	flag_array
-from public.fy2016_districts_deluxe_mat d
+from public.fy2016_districts_deluxe_m d
 left join (
 	select 
 		account__esh_id__c, 
@@ -206,8 +206,8 @@ left join (
 												)
 										then ec.circuit_id
 								end) as specif_recip_clean_nonfiber_lines
-		from fy2016_districts_demog_ma d
-		left join public.fy2016_district_lookup_ma dl
+		from fy2016_districts_demog_m d
+		left join public.fy2016_district_lookup_mat dl
 		on d.esh_id = dl.district_esh_id
 		left join (
 				select 	school_id::varchar,
@@ -277,8 +277,8 @@ left join (
 										and li.connect_category ilike '%Fiber%'		
 										then alloc.recipient_ben
 								end) as count_ben_ia_fiber_lines
-		from fy2016_districts_demog_ma d
-		left join public.fy2016_lines_to_district_by_line_item_ma ldli
+		from fy2016_districts_demog_m d
+		left join public.fy2016_lines_to_district_by_line_item_mat ldli
 		on d.esh_id = ldli.district_esh_id
 		left join fy2016.line_items li
 		on ldli.line_item_id = li.id
@@ -300,8 +300,6 @@ left join (
 		group by d.esh_id		
 ) district_alloc_recips
 on d.esh_id = district_alloc_recips.esh_id
-where district_type = 'Traditional'
-or (postal_cd = 'AZ' and district_type = 'Charter')
 
 /*
 Author: Justine Schott
