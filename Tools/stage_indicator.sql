@@ -271,8 +271,8 @@ left join (
 							then alloc.original_num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines,
 				sum(case
-						when (c.num_open_flags	=	0 or (c.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(c.open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(c.open_flag_labels))))
+						when (li.num_open_flags	=	0 or (li.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(li.open_flag_labels) or
+																						'exclude_for_cost_only_restricted'	=	any(li.open_flag_labels))))
 							and li.wan_conditions_met = true 
 							and li.connect_category ilike '%Fiber%'	
 							then alloc.original_num_lines_to_allocate
@@ -292,8 +292,8 @@ left join (
 										then alloc.recipient_ben
 								end) as count_ben_wan_fiber_lines,
 				count(distinct 	case
-									when (c.num_open_flags	=	0 or (c.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(c.open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(c.open_flag_labels))))
+									when (li.num_open_flags	=	0 or (li.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(li.open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(li.open_flag_labels))))
 										and li.wan_conditions_met = true 
 										and li.connect_category ilike '%Fiber%'	
 										then alloc.recipient_ben
