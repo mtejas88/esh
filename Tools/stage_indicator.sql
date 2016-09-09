@@ -46,8 +46,8 @@ select
 							fiber_wan_lines_w_dirty >= count_ben_wan_fiber_lines then						--row 26
 					case when fiber_internet_upstream_lines_w_dirty > 0 then 											--row 27
 						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 or
-										lt_1g_fiber_wan_lines+gt_1g_wan_lines >= sum_alloc_wan_fiber_lines_clean or 
-										lt_1g_fiber_wan_lines+gt_1g_wan_lines >= count_ben_wan_fiber_lines_clean) and 
+										fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or 
+										fiber_wan_lines >= count_ben_wan_fiber_lines_clean) and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
@@ -114,7 +114,7 @@ select
 	campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean,
 	sum_alloc_wan_fiber_lines_clean,
 	count_ben_wan_fiber_lines_clean,
-	lt_1g_fiber_wan_lines+gt_1g_wan_lines as fiber_wan_lines,
+	fiber_wan_lines,
 	non_fiber_lines,
 	num_campuses,
 	exclude_from_analysis,
@@ -204,13 +204,16 @@ left join (
 										then ec.circuit_id
 								end) as specif_recip_clean_nonfiber_lines,
 				count(distinct 	case
-									when not(c.connect_category ilike '%Fiber%') and li.exclude = false
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and not(c.connect_category ilike '%Fiber%')
 										then ec.circuit_id
 								end) as clean_specif_recip_nonfiber_lines,
 				count(distinct 	case
-									when c.wan_conditions_met = true 
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and c.wan_conditions_met = true 
 									and c.connect_category ilike '%Fiber%'
-									and li.exclude = false
 									and num_lines != 'Unknown'
 									and (	num_lines::numeric = li.num_recipients or 
 											num_lines::numeric = alloc.alloc
@@ -271,9 +274,10 @@ left join (
 							then alloc.original_num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines,
 				sum(case
-						when li.wan_conditions_met = true 
+						when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and li.wan_conditions_met = true 
 							and li.connect_category ilike '%Fiber%'	
-							and li.exclude = false	
 							then alloc.original_num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines_clean,
 				sum(case
@@ -291,9 +295,10 @@ left join (
 										then alloc.recipient_ben
 								end) as count_ben_wan_fiber_lines,
 				count(distinct 	case
-									when li.wan_conditions_met = true 
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+										and li.wan_conditions_met = true 
 										and li.connect_category ilike '%Fiber%'	
-										and li.exclude = false	
 										then alloc.recipient_ben
 								end) as count_ben_wan_fiber_lines_clean,
 				count(distinct 	case
@@ -328,7 +333,7 @@ on d.esh_id = district_alloc_recips.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 9/06/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query 

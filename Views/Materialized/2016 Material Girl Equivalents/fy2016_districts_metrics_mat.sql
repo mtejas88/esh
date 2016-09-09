@@ -267,7 +267,8 @@ select	dd.*,
 		    non_fiber_internet_upstream_lines_w_dirty,
 		    fiber_internet_upstream_lines_w_dirty,
 		    fiber_wan_lines_w_dirty,
-		    lines_w_dirty									
+		    lines_w_dirty,
+		    fiber_wan_lines									
 												
 from	fy2016_districts_demog_m		 dd									
 left	join	fy2016_districts_aggregation_mat	da									
@@ -276,7 +277,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/06/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables

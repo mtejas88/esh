@@ -161,7 +161,8 @@ select
     non_fiber_internet_upstream_lines_w_dirty,
     fiber_internet_upstream_lines_w_dirty,
     fiber_wan_lines_w_dirty,
-	lines_w_dirty
+	lines_w_dirty,
+	fiber_wan_lines
 
 from public.fy2016_districts_metrics_mat
 where district_type = 'Traditional'
@@ -170,7 +171,7 @@ or (postal_cd = 'AZ' and district_type = 'Charter')
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 9/06/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
