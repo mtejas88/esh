@@ -457,7 +457,58 @@ select  		dd.esh_id as district_esh_id,
 										then allocation_lines								
 									else	0										
 								end) as machine_cleaned_lines,
-						num_self_procuring_charters
+						num_self_procuring_charters,
+--clean and dirty for stage_indicator
+						sum(case											
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
+									and isp_conditions_met = false
+									and backbone_conditions_met = false								
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as non_fiber_lines_w_dirty,
+						sum(case											
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
+									and (internet_conditions_met = true or upstream_conditions_met = true)						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as non_fiber_internet_upstream_lines_w_dirty,
+						sum(case											
+									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+									and (internet_conditions_met = true or upstream_conditions_met = true)						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as fiber_internet_upstream_lines_w_dirty,
+						sum(case											
+									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+									and wan_conditions_met = true						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as fiber_wan_lines_w_dirty,
+						sum(case											
+									when isp_conditions_met = false
+									and backbone_conditions_met = false								
+									and consortium_shared = false										
+										then	allocation_lines								
+									else	0										
+								end) as lines_w_dirty,
+						sum(case											
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+									and wan_conditions_met = true						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as fiber_wan_lines
 
 from	public.fy2016_districts_demog dd
 left join public.fy2016_lines_to_district_by_line_item	ldli
@@ -574,7 +625,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/06/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
