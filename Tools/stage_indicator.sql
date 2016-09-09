@@ -14,7 +14,8 @@ select
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
-												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 11/12'	--row 10
+												(array_to_string(flag_array,',') ilike '%wan%'
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 11/12'	--row 10
 								 		else 'dont update 11/12' end													--rows 11,12
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -31,7 +32,8 @@ select
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
-												array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 18/19'	--row 17
+												(array_to_string(flag_array,',') ilike '%wan%'
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 18/19'	--row 17
 								 		else 'dont update 18/19' end													--rows 18,19
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -53,7 +55,8 @@ select
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
-										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 29/30'			--row 28
+										(array_to_string(flag_array,',') ilike '%wan%'
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 29/30'			--row 28
 						 		else 'dont update 29/30' end															--rows 29,30
 					else 
 						case when 	non_fiber_lines > 0 then
@@ -71,7 +74,8 @@ select
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
-										array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 36/37'			--row 35
+										(array_to_string(flag_array,',') ilike '%wan%'
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 36/37'			--row 35
 						 		else 'dont update 36/37' end															--rows 36,37
 					else 
 						case when 	non_fiber_lines > 0  then
@@ -88,7 +92,8 @@ select
 				when 	exclude_from_analysis = true and 
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
-						array_to_string(flag_array,',') ilike '%wan%' then 'POTENTIAL 42/43'							--row 41
+						(array_to_string(flag_array,',') ilike '%wan%'
+						or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 42/43'							--row 41
 		 		else 'dont update 42/43' end																			--rows 42,43
 	end as stage_indicator,
 	lines_w_dirty,
