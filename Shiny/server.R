@@ -44,9 +44,9 @@ shinyServer(function(input, output, session) {
   #library(RPostgreSQL)
   
   #font_import(pattern="[L/l]ato")
-  #font_import(pattern="MuseoSlabW01-700")
+  #font_import(pattern="Museo Slab W01 700")
 
-  loadfonts()
+  #loadfonts()
   
   services <- read.csv("services_received_shiny.csv", as.is = TRUE)
   districts <- read.csv("districts_shiny.csv", as.is = TRUE)
@@ -80,9 +80,12 @@ shinyServer(function(input, output, session) {
 
   ##Main data set to use to any Services Recieved related work: 
   output$bandwidthSelect <- renderUI({
+    #services$bw_mbps <- services$bandwidth_in_mbps
+    
     sr_data <- services
     bandwidth_list <- c(unique(services$bandwidth_in_mbps))
-
+    #bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
+    
     selectizeInput("bandwidth_list", h2("Select Circuit Size(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   })
   
@@ -98,6 +101,7 @@ shinyServer(function(input, output, session) {
              locale %in% input$locale_affordability) %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
       filter(bandwidth_in_mbps %in% selected_bandwidth_list)
+      #filter(bw_mbps %in% selected_bandwidth_list)
   })  
 
   ######
@@ -1153,7 +1157,7 @@ general_monthly_cpm <- reactive({
   
 })
 
-general_monthly_cpm %>% bind_shiny("gen_m_cpm")
+#general_monthly_cpm %>% bind_shiny("gen_m_cpm")
 
 
 #not using ggvis since side-by-side bar chart is not possible
@@ -1213,12 +1217,12 @@ price_disp_cpc <- reactive({
   
 })
 
-price_disp_cpc %>% bind_shiny("price_disp_cpc")
+#price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
 
 output$cpc_sidebars <- renderPlot({
 
-  
+  print("entering cpc_sidebars")
   validate(
     need(length(unique(sr_all()$bandwidth_in_mbps)) > 0, "Please select circuit size(s) through the side panel.")
   )
@@ -1233,7 +1237,9 @@ output$cpc_sidebars <- renderPlot({
   percentile <- "percentiles"
   dispersion <- c("p25th", "Median", "p75th")
   
-  b <- gather_(a, bw, percentile, dispersion)
+  #b <- gather_(a, bw, percentile, dispersion)
+  #b <- gather(a, bw, percentile, dispersion)
+  b <- gather(a, bw, percentile, c(2:4))
   colnames(b) <- c("bw_mbps", "percentile", "cost" )
   b$percentile <- factor(b$percentile, levels = c("p25th", "Median", "p75th"))
   b$cost_label <- paste0("$", round(b$cost, 2))
@@ -1245,7 +1251,6 @@ output$cpc_sidebars <- renderPlot({
   
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge", width = 0.75) + 
-
     geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
     #scale_x_discrete(limits = positions) +
     scale_x_discrete(
@@ -1315,10 +1320,11 @@ output$price_disp_cpm_sidebars <- renderPlot({
   percentile <- "percentiles"
   dispersion <- c("p25th", "Median", "p75th")
   
-  b2 <- gather_(c, bw, percentile, dispersion)
+  #b2 <- gather_(c, bw, percentile, dispersion)
+  b2 <- gather(c, bw, percentile, c(2:4))
   colnames(b2) <- c("bw_mbps", "percentile", "cost" )
   b2$percentile <- factor(b2$percentile, levels = c("p25th", "Median", "p75th"))
-  print(b2)
+  #print(b2)
   
   positions <- c("p25th", "Median", "p75th")
   
