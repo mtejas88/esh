@@ -1222,7 +1222,7 @@ price_disp_cpc <- reactive({
 
 output$cpc_sidebars <- renderPlot({
 
-  print("entering cpc_sidebars")
+  #print("entering cpc_sidebars")
   validate(
     need(length(unique(sr_all()$bandwidth_in_mbps)) > 0, "Please select circuit size(s) through the side panel.")
   )
