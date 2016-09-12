@@ -457,9 +457,11 @@ select  		dd.esh_id as district_esh_id,
 										then allocation_lines								
 									else	0										
 								end) as machine_cleaned_lines,
+						num_self_procuring_charters,
 --clean and dirty for stage_indicator
 						sum(case											
-									when not(connect_category ilike '%fiber%')
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
 									and isp_conditions_met = false
 									and backbone_conditions_met = false								
 									and consortium_shared = false									
@@ -467,7 +469,8 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as non_fiber_lines_w_dirty,
 						sum(case											
-									when not(connect_category ILIKE '%fiber%')
+									when (not(connect_category ilike '%fiber%')
+										or connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)'))
 									and (internet_conditions_met = true or upstream_conditions_met = true)						
 									and consortium_shared = false									
 										then	allocation_lines								
@@ -475,6 +478,7 @@ select  		dd.esh_id as district_esh_id,
 								end) as non_fiber_internet_upstream_lines_w_dirty,
 						sum(case											
 									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
 									and (internet_conditions_met = true or upstream_conditions_met = true)						
 									and consortium_shared = false									
 										then	allocation_lines								
@@ -482,6 +486,7 @@ select  		dd.esh_id as district_esh_id,
 								end) as fiber_internet_upstream_lines_w_dirty,
 						sum(case											
 									when connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
 									and wan_conditions_met = true						
 									and consortium_shared = false									
 										then	allocation_lines								
@@ -493,10 +498,20 @@ select  		dd.esh_id as district_esh_id,
 									and consortium_shared = false										
 										then	allocation_lines								
 									else	0										
-								end) as lines_w_dirty
+								end) as lines_w_dirty,
+						sum(case											
+									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
+																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and connect_category ILIKE '%Fiber%'
+									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+									and wan_conditions_met = true						
+									and consortium_shared = false									
+										then	allocation_lines								
+									else	0										
+								end) as fiber_wan_lines
 
-from	public.fy2016_districts_demog_ma dd
-left join public.fy2016_lines_to_district_by_line_item_ma	ldli
+from	public.fy2016_districts_demog_m dd
+left join public.fy2016_lines_to_district_by_line_item_mat	ldli
 on 	dd.esh_id = ldli.district_esh_id							
 left join	(
 		select *
@@ -512,9 +527,9 @@ left join (
 		select	ldli.line_item_id,										
 						sum(d.num_students::numeric)	as	num_students_served									
 													
-		from fy2016_lines_to_district_by_line_item_ma	ldli									
+		from fy2016_lines_to_district_by_line_item_mat	ldli									
 													
-		join fy2016_districts_demog_ma	d									
+		join fy2016_districts_demog_m	d									
 		on ldli.district_esh_id	=	d.esh_id								
 													
 		join fy2016.line_items	li									
@@ -530,16 +545,31 @@ on	district_info_by_li.line_item_id	=	ldli.line_item_id
 left join (
 		select	district_esh_id,
 				count(distinct 	case
-									when campus_id is null
-										then address
-									else campus_id
+									when self_procuring_charter = false
+										then 	case
+													when campus_id is null
+														then address
+													else campus_id
+												end
 								end) as campus_count,
 				case
-					when sum(frl_percentage_denomenator) > 0
-						then sum(frl_percentage_numerator)/sum(frl_percentage_denomenator) 
+					when sum(	case
+									when self_procuring_charter = false
+										then frl_percentage_denomenator
+									else 0
+								end) > 0
+						then sum(case
+									when self_procuring_charter = false
+										then frl_percentage_numerator
+									else 0
+								end)/sum(	case
+												when self_procuring_charter = false
+													then frl_percentage_denomenator
+												else 0
+											end) 
 				end as frl_percent									
 													
-		from fy2016_schools_demog_ma										
+		from fy2016_schools_demog_mat										
 													
 		group	by	district_esh_id	
 ) school_info									
@@ -589,12 +619,13 @@ group by	dd.esh_id,
 			flag_count,
 			tag_array,
 			c1_discount_rate,
-			c2_discount_rate
+			c2_discount_rate,
+			num_self_procuring_charters
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/26/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

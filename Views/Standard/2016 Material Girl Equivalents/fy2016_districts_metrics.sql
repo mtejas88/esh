@@ -262,7 +262,13 @@ select	dd.*,
 		    flag_count,
 		    wan_monthly_cost,
 		    machine_cleaned_lines,
-		    non_fiber_lines									
+		    non_fiber_lines,
+		    non_fiber_lines_w_dirty,
+		    non_fiber_internet_upstream_lines_w_dirty,
+		    fiber_internet_upstream_lines_w_dirty,
+		    fiber_wan_lines_w_dirty,
+		    lines_w_dirty,
+		    fiber_wan_lines										
 												
 from	fy2016_districts_demog		 dd									
 left	join	fy2016_districts_aggregation	da									
@@ -271,7 +277,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/26/2016
+Last Modified Date: 9/09/2016
 Name of QAing Analyst(s): 
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables
