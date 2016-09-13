@@ -1,7 +1,7 @@
 select 
 	d.esh_id,
-	case when lines_w_dirty = 0 then 'FIBER TARGET'																	--per brad, dqs cleaning standards
-	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'CLOSED LOST'							--per brad, dqs cleaning standards
+	case when lines_w_dirty = 0 then 'Target'																	--per brad, dqs cleaning standards
+	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not a Target'							--per brad, dqs cleaning standards
 	when non_fiber_lines_w_dirty > 0 then																			--row 1
 			case when district_specif_recip_nonfiber_lines > 0 and campuses_specif_recip_nonfiber_lines = 0 then		--row 6
 						case when num_campuses = campuses_specif_recip_fiber_wan_lines then 							--row 8
@@ -10,16 +10,16 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'CLOSED LOST 11/12'
+												or flag_array is null) then 'Not a Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 11/12'	--row 10
-								 		else 'dont update 11/12' end													--rows 11,12
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 10
+								 		else 'Uncertain' end													--rows 11,12
 							else 
 								case when 	non_fiber_lines > 0 then
-									'FIBER TARGET 13/14/15' else 'dont update 13/14/15' end	
+									'Target' else 'Uncertain' end	
 							end																							--rows 13,14,15
 						else 
 							case when 	num_campuses = campuses_specif_recip_fiber_internet_upstream_lines and
@@ -28,16 +28,16 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'CLOSED LOST 18/19'
+												or flag_array is null) then 'Not a Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 18/19'	--row 17
-								 		else 'dont update 18/19' end													--rows 18,19
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 17
+								 		else 'Uncertain' end													--rows 18,19
 							else 
 								case when 	non_fiber_lines > 0 then
-									'FIBER TARGET 20/21/22' else 'dont update 20/21/22' end	
+									'Target' else 'Uncertain' end	
 							end																							--rows 20,21,22
 						end
 			else
@@ -56,11 +56,11 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 29/30'			--row 28
-						 		else 'dont update 29/30' end															--rows 29,30
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 28
+						 		else 'Uncertain' end															--rows 29,30
 					else 
 						case when 	non_fiber_lines > 0 then
-							'FIBER TARGET 31/32/33' else 'dont update 31/32/33' end	
+							'Target' else 'Uncertain' end	
 					end																									--rows 31,32,33
 				else 
 					case when 	campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0  or
@@ -70,16 +70,16 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 36/37'
+										or flag_array is null) then 'Not a Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 36/37'			--row 35
-						 		else 'dont update 36/37' end															--rows 36,37
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 35
+						 		else 'Uncertain' end															--rows 36,37
 					else 
 						case when 	non_fiber_lines > 0  then
-							'FIBER TARGET 38/39/40' else 'dont update 38/39/40' end	
+							'Target' else 'Uncertain' end	
 					end																									--rows 38,39,40
 				end
 			end
@@ -88,13 +88,13 @@ select
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(not(array_to_string(flag_array,',') ilike '%wan%')
-						or flag_array is null) then 'CLOSED LOST 42/43'
+						or flag_array is null) then 'Not a Target'
 				when 	exclude_from_analysis = true and 
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(array_to_string(flag_array,',') ilike '%wan%'
-						or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'POTENTIAL 42/43'							--row 41
-		 		else 'dont update 42/43' end																			--rows 42,43
+						or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'							--row 41
+		 		else 'Uncertain' end																			--rows 42,43
 	end as stage_indicator,
 	lines_w_dirty,
 	non_fiber_lines_w_dirty,
@@ -119,7 +119,9 @@ select
 	num_campuses,
 	exclude_from_analysis,
 	priority_status__c,
-	flag_array
+	flag_array,
+	postal_cd,
+	nces_cd
 from public.fy2016_districts_deluxe_m d
 left join (
 	select 
