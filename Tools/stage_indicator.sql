@@ -1,6 +1,7 @@
 select 
 	d.esh_id,
-	case when lines_w_dirty = 0 then 'Target'																	--per brad, dqs cleaning standards
+	case when lines_w_dirty = 0 and postal_cd in ('AZ',	'CO', 'IL', 'MD', 'MA',	'MT', 'NH',	'NM', 'OK',	'TX', 'VA') then 'Target' --per brad, dqs cleaning standards
+	when lines_w_dirty = 0 then 'Potential Target'																	--per Yasmin, after brainstorming CCK12 implications with KS
 	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not a Target'							--per brad, dqs cleaning standards
 	when non_fiber_lines_w_dirty > 0 then																			--row 1
 			case when district_specif_recip_nonfiber_lines > 0 and campuses_specif_recip_nonfiber_lines = 0 then		--row 6
@@ -332,7 +333,7 @@ on d.esh_id = district_alloc_recips.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 9/09/2016
+Last Modified Date: 9/14/2016
 Name of QAing Analyst(s): 
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query 
