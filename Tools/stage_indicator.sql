@@ -16,7 +16,7 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 10
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 10
 								 		else 'Uncertain' end													--rows 11,12
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -34,7 +34,7 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 17
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 17
 								 		else 'Uncertain' end													--rows 18,19
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -52,12 +52,12 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 29/30'
+										or flag_array is null) then 'Not a Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 28
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 28
 						 		else 'Uncertain' end															--rows 29,30
 					else 
 						case when 	non_fiber_lines > 0 then
@@ -76,7 +76,7 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 35
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 35
 						 		else 'Uncertain' end															--rows 36,37
 					else 
 						case when 	non_fiber_lines > 0  then
@@ -94,7 +94,7 @@ select
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(array_to_string(flag_array,',') ilike '%wan%'
-						or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'							--row 41
+						or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'							--row 41
 		 		else 'Uncertain' end																			--rows 42,43
 	end as stage_indicator,
 	lines_w_dirty,
