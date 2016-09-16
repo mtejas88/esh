@@ -1,7 +1,7 @@
 select 
 	d.esh_id,
 	case when lines_w_dirty = 0 then 'No Data'																	--per Yasmin, after brainstorming CCK12 implications with KS
-	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not a Target'							--per brad, dqs cleaning standards
+	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not Target'							--per brad, dqs cleaning standards
 	when non_fiber_lines_w_dirty > 0 then																			--row 1
 			case when district_specif_recip_nonfiber_lines > 0 and campuses_specif_recip_nonfiber_lines = 0 then		--row 6
 						case when num_campuses = campuses_specif_recip_fiber_wan_lines then 							--row 8
@@ -10,7 +10,7 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not a Target'
+												or flag_array is null) then 'Not Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
@@ -28,7 +28,7 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not a Target'
+												or flag_array is null) then 'Not Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
@@ -51,7 +51,7 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'Not a Target'
+										or flag_array is null) then 'Not Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
@@ -70,7 +70,7 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'Not a Target'
+										or flag_array is null) then 'Not Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
@@ -88,7 +88,7 @@ select
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(not(array_to_string(flag_array,',') ilike '%wan%')
-						or flag_array is null) then 'Not a Target'
+						or flag_array is null) then 'Not Target'
 				when 	exclude_from_analysis = true and 
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
