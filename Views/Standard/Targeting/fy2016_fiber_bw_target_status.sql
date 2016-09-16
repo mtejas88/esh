@@ -1,6 +1,6 @@
 select 	*,
 		case
-			when 	fiber_target_status in ('Target', 'Potential Target')
+			when fiber_target_status in ('Target', 'Potential Target')
 					and bw_target_status in ('Target', 'Potential Target')
 				then 'Fiber & BW Target'
 			when 	fiber_target_status in ('Target', 'Potential Target')
@@ -10,48 +10,34 @@ select 	*,
 			when 	fiber_target_status = 'Not Target'
 					and bw_target_status = 'Not Target'
 				then 'Not Target'
-			else 'Error'
-		end salesforce_status
+			else 'No Data'
+		end aggregate_status
 
 
 from( select 	si.esh_id,
-/*				si.stage_indicator,
-				ps.fiber_priority_status,*/ --not needed at this time
+				si.postal_cd,
+				si.exclude_from_analysis,
+				si.stage_indicator,
+				ps.fiber_priority_status,
 				case --note: still need to add IRT Manual Override to this case-when statement, once its storage location is known
-					when si.stage_indicator = 'Uncertain'
-						then 	case
-									when ps.fiber_priority_status is null
-										then 'No Data'
-									when fiber_priority_status in ('Priority 1', 'Priority 3')
+					when si.stage_indicator in ('Uncertain', 'No Data') and fiber_priority_status in ('Priority 1', 'Priority 3')
 										then 'Target'
-									when fiber_priority_status in ('Priority 10', 'Priority 0')
+					when si.stage_indicator in ('Uncertain', 'No Data') and fiber_priority_status in ('Priority 10', 'Priority 0')
 										then 'Not Target'
-									else
-										'Potential Target'
-								end
-						else
-							si.stage_indicator
+					when si.stage_indicator ='Uncertain'
+										then 'Potential Target'
+					when si.stage_indicator ='No Data'
+										then 'No Data'
+					else
+										si.stage_indicator
 				end as fiber_target_status,
 				case
-					when si.stage_indicator = 'No Data' and case --note: still need to add IRT Manual Override to this case-when statement, once its storage location is known
-																when si.stage_indicator = 'Uncertain'
-																	then 	case
-																				when ps.fiber_priority_status is null
-																					then 'No Data'
-																				when fiber_priority_status in ('Priority 1', 'Priority 3')
-																					then 'Target'
-																				when fiber_priority_status in ('Priority 10', 'Priority 0')
-																					then 'Not Target'
-																				else
-																					'Potential Target'
-																			end
-																	else
-																		si.stage_indicator
-															end = 'Potential Target' 
+					when 	si.stage_indicator = 'No Data' 
+							and (ia_bandwidth_per_student_kbps_2015 = 'Insufficient data' or ia_bandwidth_per_student_kbps_2015 is null)
+							and bw_indicator = 'Potential Target' 
 						then 'No Data'
 					else bw_indicator
 				end as bw_target_status
-
 
 				from public.fy2016_stage_indicator si
 				left join (
