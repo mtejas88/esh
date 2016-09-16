@@ -457,7 +457,6 @@ select  		dd.esh_id as district_esh_id,
 										then allocation_lines								
 									else	0										
 								end) as machine_cleaned_lines,
-						num_self_procuring_charters,
 --clean and dirty for stage_indicator
 						sum(case											
 									when (not(connect_category ilike '%fiber%')

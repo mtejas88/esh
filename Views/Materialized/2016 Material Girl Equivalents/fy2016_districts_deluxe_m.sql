@@ -156,7 +156,6 @@ select
 	wan_services,
 	wan_contract_expiration,
 	non_fiber_lines,
-	num_self_procuring_charters,
     non_fiber_lines_w_dirty,
     non_fiber_internet_upstream_lines_w_dirty,
     fiber_internet_upstream_lines_w_dirty,
@@ -165,7 +164,7 @@ select
 	fiber_wan_lines
 
 from public.fy2016_districts_metrics_mat
-where district_type = 'Traditional'
+where  district_type != 'Charter'
 or (postal_cd = 'AZ' and district_type = 'Charter')
 
 /*
