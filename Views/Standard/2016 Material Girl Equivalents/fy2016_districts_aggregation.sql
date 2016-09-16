@@ -547,7 +547,7 @@ left join (
 									when campus_id is null
 										then address
 									else campus_id
-								endd) as campus_count,
+								end) as campus_count,
 				case
 					when sum(	frl_percentage_denomenator) > 0
 						then sum(frl_percentage_numerator)/sum(	 frl_percentage_denomenator) 
