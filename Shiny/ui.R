@@ -174,8 +174,9 @@ shinyUI(fluidPage(
                               'SD','TN','TX','UT','VA',
                               'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()  
 
-  
+
 titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Connectivity Dashboard"),  #div(h1("Warchild"))
+
 
   div(class = "manualmainpanel",
 
