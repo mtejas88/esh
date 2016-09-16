@@ -117,16 +117,9 @@ shinyUI(fluidPage(
                     
                     div.horizontalformatting1{
                     float: right;
-                    right:  0;
+                    right: 0;
                     bottom: 0;
 
-                    }
-
-                    div.horizontalformatting2{
-                    float: right;
-                    right: 0;
-                    bottom:0;
-  
                     }
                     
                     #controls {
@@ -151,12 +144,11 @@ shinyUI(fluidPage(
 
                     "))
     ),
-
   
-  div(class = 'horizontalformatting2', #style = 'display:inline-block',  #; horizontal-align: text-top;' 
+  div(class = 'horizontalformatting1', #style = 'display:inline-block',  #; horizontal-align: text-top;' 
       selectInput("dataset",
                   h2("Select Data Cleanliness"),
-                  choices = c('All', 'Clean'), selected = 'Clean', width='200px')), 
+                  choices = c('All', 'Clean'), selected = 'Clean', width='180px')), 
   
   #end selectInput() and div()
   div(class = 'horizontalformatting1', #style='display:inline-block', #vertical-align: text-top;',           
@@ -172,10 +164,13 @@ shinyUI(fluidPage(
                               'NV','NY','OH','OK',
                               'OR','PA','RI','SC',
                               'SD','TN','TX','UT','VA',
-                              'WA','WI','WV','WY'), selected='All', width='200px')), #end selectInput() and div()  
-
+                              'WA','WI','WV','WY'), selected ='All', width ='110px')), #end selectInput() and div()  
   
-titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Warchild"),  #div(h1("Warchild"))
+  div(class = 'horizontalformatting1',
+      selectInput("year", h2("Select Year"),
+                  choices = c('2015' = 1, '2016' = 2, 'Multi-Year' = 3), selected = 1, width = '110px')),
+  
+titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Nell's Connectivity Dashboard"),  #div(h1("Warchild"))
 
   div(class = "manualmainpanel",
 
@@ -223,14 +218,63 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                               "House of Rep Boundaries"),
                                                                                #"Terrain" =  "Thunderforest.Landscape"),
                                                                                #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                                   selected = "Grayscale"), #
-                                                       
-                                                       checkboxGroupInput(inputId = "connection_districts", 
+                                                                   selected = "CartoDB.Positron"), #
+                                                       #conditionalPanel for Fiber Build Cost to District Only:
+                                                      conditionalPanel(
+                                                         condition = "input.map_view == 'Fiber Build Cost to Districts'",
+                                                         radioButtons("fb_colors", label = h2("Color Code Districts By:"),
+                                                                    choices = list("Fiber Build Cost to District" = 1, "100kbps/student Goal Status" = 2,
+                                                                                   "Fiber vs. Not Fiber" = 3),
+                                                                    selected = 1),
+                                                         
+                                                         checkboxGroupInput(inputId = "goal_status_fb", 
+                                                                            label = h2("Select Goal Status"),
+                                                                            choices = c('Meeting 100kbps/Student Goal' = "Meeting Goal", 'Not Meeting 100kbps/Student Goal' = "Not Meeting Goal"),
+                                                                            selected = c('Meeting Goal', 'Not Meeting Goal'))
+                                                         
+                                                         ),
+
+                                                       #conditionalPanel for Monthly Cost Per Circuit Only
+                                                       conditionalPanel(
+                                                         condition = "input.map_view == 'Monthly Cost Per Circuit'",
+                                                         
+                                                         radioButtons("bw_subset","",
+                                                                      choices = c("All Circuit Sizes", "Select Circuit Sizes"),
+                                                                      selected = "All Circuit Sizes"),
+                                                        # conditionalPanel(
+                                                        # condition = "input.bw_subset == 'All Circuit Sizes'",
+                                                              
+                                                        #),   
+                                                        conditionalPanel(
+                                                           condition = "input.bw_subset == 'Select Circuit Sizes'",
+                                                           uiOutput("bandwidthSelect_maps") 
+                                                         ),
+
+                                                         checkboxGroupInput(inputId = "purpose_maps", 
+                                                                            label = h2("Select Purpose(s)"),
+                                                                            choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
+                                                                            selected = c('Internet'))
+                                                       ), #closing conditional 
+                                                    
+                                                      
+                                                      conditionalPanel(
+                                                        condition = "input.map_view == 'Monthly Cost Per Circuit'",
+                                                        checkboxGroupInput(inputId = "connection_districts", 
+                                                                         h2("Select Highest IA Connection Type(s) for Districts"),
+                                                                         choices = c("Lit Fiber", "Dark Fiber", "Cable", "DSL",
+                                                                                     "Fixed Wireless", "Copper", "Other / Uncategorized"), 
+                                                                         selected = c("Lit Fiber"))  
+                                                      ),
+                                                      conditionalPanel(
+                                                        condition = "input.map_view != 'Monthly Cost Per Circuit'",
+                                                        checkboxGroupInput(inputId = "connection_districts", 
                                                                           h2("Select Highest IA Connection Type(s) for Districts"),
                                                                           choices = c("Fiber", "Cable", "DSL",
                                                                                       "Fixed Wireless", "Copper", "Other / Uncategorized"), 
                                                                           selected = c("Fiber", "Cable", "DSL", "Fixed Wireless",
-                                                                                       "Copper", "Other / Uncategorized")), 
+                                                                                       "Copper", "Other / Uncategorized"))
+                                                      ),  
+                                                        
                                                        checkboxGroupInput(inputId = "district_size_maps", 
                                                                           label = h2("Select District Size(s)"),
                                                                           choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
@@ -249,7 +293,17 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                           p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), 
                                                         " to see more information  about a particular district."))),
                                           br(), textOutput("n_ddt"), br(), br(),
-                                          div(dataTableOutput("table_testing"), style = "height:100px;;font-size:60%"), br(), br()
+                                          radioButtons("metrics_table","Select Table View:",
+                                                       choices = c("Districts Data", "Senatorial Metrics"),
+                                                       selected = "Districts Data"),
+                                          conditionalPanel(
+                                            condition = "input.metrics_table == 'Districts Data'",
+                                            div(dataTableOutput("table_testing"), style = "height:100px;font-size:75%")
+                                          ),
+                                          conditionalPanel(
+                                            condition = "input.metrics_table == 'Senatorial Metrics'",
+                                            div(uiOutput('senTable'), style = "height:100px;font-size:75%")
+                                          )
                                           )) #end of fluidRow()
                                     )),
                            tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
@@ -287,7 +341,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                           #"Terrain" =  "Thunderforest.Landscape"),
                                                                           #"Terrain2" = "Stamen.TerrainBackground",
                                                                           #"Cool!" = "NASAGIBS.ViirsEarthAtNight2012"),
-                                                              selected = "Grayscale"),
+                                                              selected = "CartoDB.Positron"),
                                                   downloadButton('downloadDistrictLookup', 'Download Map Image')) #
 
                                     
@@ -297,7 +351,6 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
 
                  #navbarMenu("Demographics",
                             tabPanel("Demographics", br(),
-                                     
                             wellPanel(
                                       fluidRow(
                                         column(12, align = "left", h4("DISTRICT LOCALE DISTRIBUTION: ALL VS. CLEAN"), br(), 
@@ -325,6 +378,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                        sidebarPanel(width = 3,            
                                        div(id = "goals_filters", 
                                            h2(strong("Any filters and selections applied will affect all charts on this tab.")),
+                                        radioButtons("multi_yr_goals", label = h2("Select Viz View:"),
+                                                        choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                                        selected = 1), 
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
                                                             h2("Select Highest IA Connection Type(s) for Districts"),
                                                             choices = c("Fiber", "Cable", "DSL",
@@ -399,14 +455,17 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                        sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
                                                     h2(strong("Any filters and selections applied will affect all charts on this tab.")),
-                                                                 checkboxGroupInput(inputId = "district_size_fiber", 
-                                                                                    label = h2("Select District Size(s)"),
-                                                                                    choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
-                                                                                    selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
-                                                                 checkboxGroupInput(inputId = "locale_fiber", 
-                                                                                    label = h2("Select Locale(s)"),
-                                                                                    choices = c("Rural", "Small Town", "Suburban", "Urban"),
-                                                                                    selected = c("Rural", "Small Town", "Suburban", "Urban")),#,
+                                                    radioButtons("multi_yr_fiber", label = h2("Select Viz View:"),
+                                                                 choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                                                 selected = 1),    
+                                                    checkboxGroupInput(inputId = "district_size_fiber", 
+                                                                       label = h2("Select District Size(s)"),
+                                                                       choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
+                                                                       selected = c("Tiny", "Small", "Medium", "Large", "Mega")),#),
+                                                    checkboxGroupInput(inputId = "locale_fiber", 
+                                                                       label = h2("Select Locale(s)"),
+                                                                       choices = c("Rural", "Small Town", "Suburban", "Urban"),
+                                                                       selected = c("Rural", "Small Town", "Suburban", "Urban")),#,
                                                 actionButton("fiber_reset_all", "Reset All Filters"),
                                                 downloadButton('fiber_downloadData', 'Download Underlying Data')
                                        )),
@@ -435,9 +494,10 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                                                         lit fiber Internet pricing.")), 
                                                               h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                   div(id = "affordability_filters", 
+                                      radioButtons("multi_yr_afford", label = h2("Select Viz View:"),
+                                                   choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                                   selected = 1),    
                                         uiOutput("bandwidthSelect"), 
-                                       
-                                        
                                         checkboxGroupInput(inputId = "purpose", 
                                                         label = h2("Select Purpose(s)"),
                                                         choices = c('Internet', 'Upstream', 'WAN', 'ISP Only'),
@@ -472,17 +532,18 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "W
                                     wellPanel(
                                       h4("DISTRIBUTION OF MONTHLY COST PER MBPS"), br(), br(), br(), br(),
                                       column(12, align = "center", plotOutput("price_disp_cpm_sidebars", width = '800px', height = '500px')),
-                                      br(), dataTableOutput("disp_cpm_table"), 
+                                      br(), dataTableOutput("disp_cpm_table")), 
                                      
                                      br(), br(), br(),
                                     
-                                     h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(),#), 
+                                    wellPanel( 
+                                    h4("SCATTERPLOT OF MONTHLY COST PER CIRCUIT"), br(),
                                     p("This vertical scatterplot shows the entire distribution of monthly cost per circuit for selected services
                                        at different circuit sizes."),
                                     p(HTML(paste0("Please visit the ", a("IRT", href = "http://irt.educationsuperhighway.org", target = "_blank"), " to see more information
                                                    about a particular district."))), br(),
                                      column(12, align = "center", ggvisOutput("plot1"), br()), 
-                                     div(dataTableOutput("plot1_table"), style = "font-size:60%"), br(), br(), br() 
+                                     div(dataTableOutput("plot1_table"), style = "font-size:40%"), br(), br(), br() 
                                      ))
                             )
                 ) # close affordability tabPanel  
