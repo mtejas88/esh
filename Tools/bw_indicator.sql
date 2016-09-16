@@ -12,7 +12,10 @@ select
           and d16.postal_cd in ('AZ',  'CO', 'IL', 'MD', 'MA', 'MT', 'NH', 'NM', 'OK', 'RI','TX', 'VA')
             then 'Target'
     when  (d15.ia_bandwidth_per_student_kbps = 'Insufficient data' or d15.ia_bandwidth_per_student_kbps is null) 
+          and (d16.ia_applicants is null or d16.ia_applicants = '')
             then 'Potential Target'
+    when  (d15.ia_bandwidth_per_student_kbps = 'Insufficient data' or d15.ia_bandwidth_per_student_kbps is null) 
+            then 'No Data'
     when  d15.ia_bandwidth_per_student_kbps::numeric >= 100 
             then 'Not Target'
     when  d15.ia_bandwidth_per_student_kbps::numeric < 100 
