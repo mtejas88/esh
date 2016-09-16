@@ -544,28 +544,13 @@ on	district_info_by_li.line_item_id	=	ldli.line_item_id
 left join (
 		select	district_esh_id,
 				count(distinct 	case
-									when self_procuring_charter = false
-										then 	case
-													when campus_id is null
-														then address
-													else campus_id
-												end
+									when campus_id is null
+										then address
+									else campus_id
 								end) as campus_count,
 				case
-					when sum(	case
-									when self_procuring_charter = false
-										then frl_percentage_denomenator
-									else 0
-								end) > 0
-						then sum(case
-									when self_procuring_charter = false
-										then frl_percentage_numerator
-									else 0
-								end)/sum(	case
-												when self_procuring_charter = false
-													then frl_percentage_denomenator
-												else 0
-											end) 
+					when sum(	frl_percentage_denomenator) > 0
+						then sum(frl_percentage_numerator)/sum(frl_percentage_denomenator) 
 				end as frl_percent									
 													
 		from fy2016_schools_demog_mat										
@@ -618,13 +603,12 @@ group by	dd.esh_id,
 			flag_count,
 			tag_array,
 			c1_discount_rate,
-			c2_discount_rate,
-			num_self_procuring_charters
+			c2_discount_rate
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/09/2016
+Last Modified Date: 9/16/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
