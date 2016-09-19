@@ -1,7 +1,7 @@
 select 
 	d.esh_id,
-	case when lines_w_dirty = 0 then 'Target'																	--per brad, dqs cleaning standards
-	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not a Target'							--per brad, dqs cleaning standards
+	case when lines_w_dirty = 0 then 'No Data'																	--per Yasmin, after brainstorming CCK12 implications with KS
+	when num_campuses = 1 and fiber_internet_upstream_lines_w_dirty > 0 then 'Not Target'							--per brad, dqs cleaning standards
 	when non_fiber_lines_w_dirty > 0 then																			--row 1
 			case when district_specif_recip_nonfiber_lines > 0 and campuses_specif_recip_nonfiber_lines = 0 then		--row 6
 						case when num_campuses = campuses_specif_recip_fiber_wan_lines then 							--row 8
@@ -10,12 +10,12 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not a Target'
+												or flag_array is null) then 'Not Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 10
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 10
 								 		else 'Uncertain' end													--rows 11,12
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -28,12 +28,12 @@ select
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not a Target'
+												or flag_array is null) then 'Not Target'
 										when 	exclude_from_analysis = true and 
 												(priority_status__c not in ('Priority 1','Priority 3') 
 												or priority_status__c is null) and
 												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'	--row 17
+												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 17
 								 		else 'Uncertain' end													--rows 18,19
 							else 
 								case when 	non_fiber_lines > 0 then
@@ -51,12 +51,12 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'CLOSED LOST 29/30'
+										or flag_array is null) then 'Not Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 28
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 28
 						 		else 'Uncertain' end															--rows 29,30
 					else 
 						case when 	non_fiber_lines > 0 then
@@ -70,12 +70,12 @@ select
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'Not a Target'
+										or flag_array is null) then 'Not Target'
 								when 	exclude_from_analysis = true and 
 										(priority_status__c not in ('Priority 1','Priority 3') 
 										or priority_status__c is null) and
 										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'			--row 35
+										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 35
 						 		else 'Uncertain' end															--rows 36,37
 					else 
 						case when 	non_fiber_lines > 0  then
@@ -88,12 +88,12 @@ select
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(not(array_to_string(flag_array,',') ilike '%wan%')
-						or flag_array is null) then 'Not a Target'
+						or flag_array is null) then 'Not Target'
 				when 	exclude_from_analysis = true and 
 						(priority_status__c not in ('Priority 1','Priority 3') 
 						or priority_status__c is null) and
 						(array_to_string(flag_array,',') ilike '%wan%'
-						or (num_schools >= 6 and wan_lines = 0 and wan_lines/num_schools<.75)) then 'Potential Target'							--row 41
+						or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'							--row 41
 		 		else 'Uncertain' end																			--rows 42,43
 	end as stage_indicator,
 	lines_w_dirty,
@@ -332,7 +332,7 @@ on d.esh_id = district_alloc_recips.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 9/09/2016
+Last Modified Date: 9/14/2016
 Name of QAing Analyst(s): 
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query 
