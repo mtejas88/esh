@@ -72,12 +72,12 @@ FROM (
             dd.district_size AS recipient_district_size,
             dd.exclude_from_analysis AS recipient_exclude_from_analysis,
             d.consortium_member AS recipient_consortium_member
-          FROM endpoint.fy2016_lines_to_district_by_line_item lid
+          FROM public.fy2016_lines_to_district_by_line_item lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
           LEFT OUTER JOIN public.service_provider_categories spc
           ON spc.name = li.service_provider_name
-          LEFT OUTER JOIN endpoint.fy2016_districts_deluxe dd
+          LEFT OUTER JOIN public.fy2016_districts_deluxe dd
           ON dd.esh_id = lid.district_esh_id
           LEFT OUTER JOIN fy2016.districts d
           ON dd.esh_id::numeric = d.esh_id
@@ -87,9 +87,9 @@ left join (
           select  ldli.line_item_id,
                   sum(d.num_students::numeric) as num_students_served
 
-          from endpoint.fy2016_lines_to_district_by_line_item ldli
+          from public.fy2016_lines_to_district_by_line_item ldli
 
-          left join endpoint.fy2016_districts_demog d
+          left join public.fy2016_districts_demog d
           on ldli.district_esh_id = d.esh_id
 
           left join fy2016.line_items li
