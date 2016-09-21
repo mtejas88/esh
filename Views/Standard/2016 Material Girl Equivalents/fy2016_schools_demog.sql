@@ -34,12 +34,7 @@ select d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id,
-        case
-          when applicant_id is not null and sc131a."CHARTR" = '1' 
-            then true
-          else false
-        end as self_procuring_charter
+        ds.campus_id
 
 from public.sc131a 
 join (select *
@@ -54,7 +49,7 @@ on eim.entity_id = ds.school_id
 left join (
   select distinct taggable_id, label
   from fy2016.tags
-  where label = 'closed_school'
+  where label in ('closed_school', 'non_school', 'charter_school')
   and deleted_at is null
 ) t
 on eim.entity_id = t.taggable_id
@@ -65,10 +60,6 @@ left join (
 ) applicants
 on eim.entity_id = applicants.applicant_id
 where label is null
-and sc131a."GSHI" != 'PK' 
-and sc131a."STATUS" != '2' --closed schools
-and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4')
 
 UNION
 
@@ -108,12 +99,7 @@ select  d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id,
-        case
-          when applicant_id is not null and sc131a."CHARTR" = '1' 
-            then true
-          else false
-        end as self_procuring_charter
+        ds.campus_id
 
 from public.sc131a 
 join public.ag131a
@@ -130,7 +116,7 @@ on eim.entity_id = ds.school_id
 left join (
   select distinct taggable_id, label
   from fy2016.tags
-  where label = 'closed_school'
+  where label in ('closed_school', 'non_school', 'charter_school')
   and deleted_at is null
 ) t
 on eim.entity_id = t.taggable_id
@@ -141,11 +127,6 @@ left join (
 ) applicants
 on eim.entity_id = applicants.applicant_id
 where label is null
-and sc131a."GSHI" != 'PK' 
-and sc131a."STATUS" != '2' --closed schools
-and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4')
-and sc131a."LSTATE" = 'MT'
 
 UNION
 
@@ -185,12 +166,7 @@ select  d.esh_id as district_esh_id,
           when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
-        ds.campus_id,
-        case
-          when applicant_id is not null and sc131a."CHARTR" = '1' 
-            then true
-          else false
-        end as self_procuring_charter
+        ds.campus_id
         
 from public.sc131a 
 join (select *
@@ -205,7 +181,7 @@ on eim.entity_id = ds.school_id
 left join (
   select distinct taggable_id, label
   from fy2016.tags
-  where label = 'closed_school'
+  where label in ('closed_school', 'non_school', 'charter_school')
   and deleted_at is null
 ) t
 on eim.entity_id = t.taggable_id
@@ -216,11 +192,6 @@ left join (
 ) applicants
 on eim.entity_id = applicants.applicant_id
 where label is null
-and sc131a."GSHI" != 'PK' 
-and sc131a."STATUS" != '2' --closed schools
-and sc131a."VIRTUALSTAT" != 'VIRTUALYES'
-and sc131a."TYPE" in ('1','2','3','4')
-and sc131a."LSTATE" = 'VT'
 
 /*
 Author: Justine Schott

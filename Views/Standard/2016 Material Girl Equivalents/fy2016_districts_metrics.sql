@@ -268,7 +268,9 @@ select	dd.*,
 		    fiber_internet_upstream_lines_w_dirty,
 		    fiber_wan_lines_w_dirty,
 		    lines_w_dirty,
-		    fiber_wan_lines										
+		    fiber_wan_lines,
+		    consortium_affiliation,
+		    ia_procurement_type										
 												
 from	fy2016_districts_demog		 dd									
 left	join	fy2016_districts_aggregation	da									
