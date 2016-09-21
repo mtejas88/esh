@@ -514,12 +514,12 @@ array_to_string(array_agg(distinct
 								when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
 										and applicant_id::varchar!=ldli.district_esh_id
 										and applicant_type!='School'
-										and applicant_id::varchar not in (	select esh_id
+										and applicant_id not in (	select esh_id
 																	from fy2016.districts
 																	where include_in_universe_of_districts=true)
 											then applicant_name 
 								when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-										and applicant_id::varchar not in (	select esh_id
+										and applicant_id not in (	select esh_id
 																	from fy2016.districts
 																	where esh_id::varchar!=ldli.district_esh_id)
 										and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
@@ -534,7 +534,7 @@ case
 					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
 							and applicant_type!='School'
 							and applicant_id::varchar!=ldli.district_esh_id
-							and applicant_id::varchar not in (	select esh_id
+							and applicant_id not in (	select esh_id
 														from fy2016.districts
 														where include_in_universe_of_districts=true) 
 								then 1 
@@ -568,7 +568,7 @@ case
 					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
 							and applicant_type!='School'
 							and applicant_id::varchar!=ldli.district_esh_id
-							and applicant_id::varchar not in (	select esh_id
+							and applicant_id not in (	select esh_id
 														from fy2016.districts
 														where include_in_universe_of_districts=true) 
 								then 1 
