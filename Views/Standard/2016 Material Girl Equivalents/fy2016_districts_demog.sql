@@ -79,8 +79,17 @@ left join ( select  "LEAID",
                             else 0
                         end) as student_pk_count
             from public.sc131a 
-            join fy2016.schools
-            on sc131a."NCESSCH" = schools.school_nces_cd
+            left join ( select distinct entity_id, nces_code
+                        from public.entity_nces_codes) eim
+            on sc131a."NCESSCH" = eim.nces_code
+            left join (
+              select distinct taggable_id, label
+              from fy2016.tags
+              where label in ('closed_school', 'non_school', 'charter_school')
+              and deleted_at is null
+            ) t
+            on eim.entity_id = t.taggable_id
+            where label is null
             group by "LEAID" ) sc
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
@@ -96,9 +105,18 @@ left join ( select  "UNION",
                         end) as student_pk_count,
                     count(distinct sc131a."LEAID") as district_count
             from public.sc131a 
-            join fy2016.schools
-            on sc131a."NCESSCH" = schools.school_nces_cd
-            where "LSTATE" = 'VT' --only smushing by UNION for districts in VT
+            left join ( select distinct entity_id, nces_code
+                        from public.entity_nces_codes) eim
+            on sc131a."NCESSCH" = eim.nces_code
+            left join (
+              select distinct taggable_id, label
+              from fy2016.tags
+              where label in ('closed_school', 'non_school', 'charter_school')
+              and deleted_at is null
+            ) t
+            on eim.entity_id = t.taggable_id
+            where label is null
+            and "LSTATE" = 'VT' --only smushing by UNION for districts in VT
             group by "UNION" ) sc_VT
 on d."UNION"=sc_VT."UNION"
 
@@ -118,9 +136,18 @@ left join ( select  ag131a."LSTREE",
             from public.sc131a 
             left join public.ag131a
             on sc131a."LEAID" = ag131a."LEAID"
-            join fy2016.schools
-            on sc131a."NCESSCH" = schools.school_nces_cd
-            where sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
+            left join ( select distinct entity_id, nces_code
+                        from public.entity_nces_codes) eim
+            on sc131a."NCESSCH" = eim.nces_code
+            left join (
+              select distinct taggable_id, label
+              from fy2016.tags
+              where label in ('closed_school', 'non_school', 'charter_school')
+              and deleted_at is null
+            ) t
+            on eim.entity_id = t.taggable_id
+            where label is null
+            and sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
             group by  ag131a."LSTREE",
                       ag131a."LSTATE" ) sc_MT
 on d."LSTREE"=sc_MT."LSTREE"
