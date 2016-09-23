@@ -83,13 +83,13 @@ left join ( select  "LEAID",
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct taggable_id, label
-              from fy2016.tags
+              select distinct flaggable_id
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
-              and deleted_at is null
+              and status = 'open'
             ) t
-            on eim.entity_id = t.taggable_id
-            where label is null
+            on eim.entity_id = t.flaggable_id
+            where flaggable_id is null
             group by "LEAID" ) sc
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
@@ -110,13 +110,13 @@ left join ( select  "UNION",
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct taggable_id, label
-              from fy2016.tags
+              select distinct flaggable_id
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
-              and deleted_at is null
+              and status = 'open'
             ) t
-            on eim.entity_id = t.taggable_id
-            where label is null
+            on eim.entity_id = t.flaggable_id
+            where flaggable_id is null
             and "LSTATE" = 'VT' --only smushing by UNION for districts in VT
             group by  "UNION",
                       "LSTATE" ) sc_VT
@@ -143,13 +143,13 @@ left join ( select  ag131a."LSTREE",
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct taggable_id, label
-              from fy2016.tags
+              select distinct flaggable_id
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
-              and deleted_at is null
+              and status = 'open'
             ) t
-            on eim.entity_id = t.taggable_id
-            where label is null
+            on eim.entity_id = t.flaggable_id
+            where flaggable_id is null
             and sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
             group by  ag131a."LSTREE",
                       ag131a."LSTATE" ) sc_MT
