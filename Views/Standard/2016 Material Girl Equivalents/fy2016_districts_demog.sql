@@ -93,6 +93,7 @@ left join ( select  "LEAID",
             group by "LEAID" ) sc
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
+                    "LSTATE",
                     count(*) as school_count,
                     count(case when sc131a."TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
@@ -117,8 +118,10 @@ left join ( select  "UNION",
             on eim.entity_id = t.taggable_id
             where label is null
             and "LSTATE" = 'VT' --only smushing by UNION for districts in VT
-            group by "UNION" ) sc_VT
+            group by  "UNION",
+                      "LSTATE" ) sc_VT
 on d."UNION"=sc_VT."UNION"
+and d."LSTATE"=sc_VT."LSTATE"
 
 left join ( select  ag131a."LSTREE",
                     ag131a."LSTATE",

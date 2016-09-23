@@ -44,22 +44,17 @@ on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join fy2016.districts_schools ds
+left join ( select distinct school_id, campus_id 
+            from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
-  select distinct taggable_id, label
-  from fy2016.tags
+  select distinct flaggable_id
+  from fy2016.flags
   where label in ('closed_school', 'non_school', 'charter_school')
-  and deleted_at is null
+  and status = 'open'
 ) t
-on eim.entity_id = t.taggable_id
-left join (
-  select distinct applicant_id
-  from fy2016.line_items
-  where broadband = true
-) applicants
-on eim.entity_id = applicants.applicant_id
-where label is null
+on eim.entity_id = t.flaggable_id
+where flaggable_id is null
 
 UNION
 
@@ -108,25 +103,21 @@ join (select *
       from fy2016_districts_demog
       where postal_cd = 'MT') d --only want schools in districts universe
 on ag131a."LSTREE" = d.address
+and sc131a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join fy2016.districts_schools ds
+left join ( select distinct school_id, campus_id 
+            from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
-  select distinct taggable_id, label
-  from fy2016.tags
+  select distinct flaggable_id
+  from fy2016.flags
   where label in ('closed_school', 'non_school', 'charter_school')
-  and deleted_at is null
+  and status = 'open'
 ) t
-on eim.entity_id = t.taggable_id
-left join (
-  select distinct applicant_id
-  from fy2016.line_items
-  where broadband = true
-) applicants
-on eim.entity_id = applicants.applicant_id
-where label is null
+on eim.entity_id = t.flaggable_id
+where flaggable_id is null
 
 UNION
 
@@ -173,30 +164,26 @@ join (select *
       from fy2016_districts_demog
       where postal_cd = 'VT') d
 on sc131a."UNION" = d.union_code
+and sc131a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join fy2016.districts_schools ds
+left join ( select distinct school_id, campus_id 
+            from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
-  select distinct taggable_id, label
-  from fy2016.tags
+  select distinct flaggable_id
+  from fy2016.flags
   where label in ('closed_school', 'non_school', 'charter_school')
-  and deleted_at is null
+  and status = 'open'
 ) t
-on eim.entity_id = t.taggable_id
-left join (
-  select distinct applicant_id
-  from fy2016.line_items
-  where broadband = true
-) applicants
-on eim.entity_id = applicants.applicant_id
-where label is null
+on eim.entity_id = t.flaggable_id
+where flaggable_id is null
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/06/2016
+Last Modified Date: 9/23/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Schools demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
