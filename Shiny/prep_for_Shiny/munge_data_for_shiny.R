@@ -462,6 +462,8 @@ locale_cuts16 <- left_join(locale_cuts16, n_all16, by = c("postal_cd"))
 
 locale_cuts16$percent <- 100 * locale_cuts16$n_districts_locale / locale_cuts16$n_districts
 
+#Rename locale "Town" to "Small Town"
+locale_cuts16$locale[locale_cuts16$locale %in% c("Town")] <- "Small Town"
 locale_cuts16$locale <- factor(locale_cuts16$locale, levels = c("Urban", "Suburban", "Small Town", "Rural"))
 locale_cuts16 <- arrange(locale_cuts16, postal_cd, locale)
 locale_cuts16 <- select(locale_cuts16, postal_cd, locale, percent, n_districts_locale, n_districts, n_schools, n_students)

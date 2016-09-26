@@ -300,16 +300,16 @@ output$histogram_goals <- renderPlot({
       
   data <- melt(data)
   
-  if(input$multi_yr_goals == 2){
-   q <- ggplot(data = data) + 
+# if(input$multi_yr_goals == 2){
+#   q <- ggplot(data = data) + 
                                         #fill should be "year" once we get longitudinal data
-         geom_bar(aes(x = variable, y = value, fill= variable), width = .5, stat = "identity") +
-         geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
-         scale_x_discrete(breaks=c("percent_districts_meeting_goals", "percent_students_meeting_goals"),
-                       labels=c("Districts", "Students")) +
-         scale_y_continuous(limits = c(0, 110)) 
+#         geom_bar(aes(x = variable, y = value, fill= variable), width = .5, stat = "identity") +
+#         geom_text(aes(label = paste0(value, "%"), x = variable, y = value), vjust = -1, size = 6) +
+#         scale_x_discrete(breaks=c("percent_districts_meeting_goals", "percent_students_meeting_goals"),
+#                       labels=c("Districts", "Students")) +
+#         scale_y_continuous(limits = c(0, 110)) 
     
-  }else{
+#  }else{
     
     q <- ggplot(data = data) +
          geom_bar(aes(x = variable, y = value), width = .5, fill="#fdb913", stat = "identity") +
@@ -318,7 +318,7 @@ output$histogram_goals <- renderPlot({
                      labels=c("Districts", "Students")) +
          scale_y_continuous(limits = c(0, 110)) 
         
-  }
+#  }
   
   goals_hist <- q + geom_hline(yintercept = 0, colour= "#899DA4") +
                     theme(plot.background = element_rect(fill = "white"),
@@ -398,17 +398,17 @@ output$histogram_districts_ia_technology <- renderPlot({
                        "Districts Not Meeting Goals")
   
   
-  if(input$multi_yr_goals == 2){
+#  if(input$multi_yr_goals == 2){
   
-  q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
-       geom_bar(aes(fill = new_connect_type_goals), stat = "identity", width = .5) +
-       geom_text(aes(label = paste0(n_percent_districts, "%")), 
-                 vjust = -1, size = 6) +
-       scale_y_continuous(limits = c(0, 110)) +
-       scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
-       geom_hline(yintercept = 0, colour= "#899DA4") 
+#  q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
+#       geom_bar(aes(fill = new_connect_type_goals), stat = "identity", width = .5) +
+#       geom_text(aes(label = paste0(n_percent_districts, "%")), 
+#                 vjust = -1, size = 6) +
+#       scale_y_continuous(limits = c(0, 110)) +
+#       scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
+#       geom_hline(yintercept = 0, colour= "#899DA4") 
   
-  }else{
+#  }else{
     
     q <- ggplot(data = data, aes(x = new_connect_type_goals, y = n_percent_districts)) +
       geom_bar(fill = "#fdb913", stat = "identity", width = .5) +
@@ -418,7 +418,7 @@ output$histogram_districts_ia_technology <- renderPlot({
       scale_x_discrete(limits = c("Other / Uncategorized", "Cable", "DSL", "Copper", "Fixed Wireless", "Fiber")) +
       geom_hline(yintercept = 0, colour= "#899DA4") 
     
-  }
+ # }
   
   
       highest_ia_chart <- q + theme(plot.background = element_rect(fill = "white"),
@@ -482,17 +482,17 @@ output$histogram_projected_wan_needs <- renderPlot({
   
   data <- melt(data)
   
-  if(input$multi_yr_goals == 2){
+ # if(input$multi_yr_goals == 2){
     
-    q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),]) +
-      geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
-      geom_text(aes(label = paste0(value, "%"), x = variable, y = value),  vjust =-1, size = 6) +
-      scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
-                       labels=c("Schools that Currently Have >= 1G WAN", "Schools that Need >= 1G WAN")) +
-      scale_y_continuous(limits = c(0, 110)) +
-      geom_hline(yintercept = 0, colour= "#899DA4") 
+#    q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),]) +
+#      geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
+#      geom_text(aes(label = paste0(value, "%"), x = variable, y = value),  vjust =-1, size = 6) +
+#      scale_x_discrete(breaks=c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs"),
+#                       labels=c("Schools that Currently Have >= 1G WAN", "Schools that Need >= 1G WAN")) +
+#      scale_y_continuous(limits = c(0, 110)) +
+#      geom_hline(yintercept = 0, colour= "#899DA4") 
     
-  }else{
+#  }else{
     
     q <- ggplot(data = data[which(data$variable %in% c("percent_current_wan_goals", "percent_schools_with_proj_wan_needs")),]) +
       geom_bar(aes(x = variable, y = value, fill=variable), stat = "identity", width = .5) +
@@ -503,7 +503,7 @@ output$histogram_projected_wan_needs <- renderPlot({
       scale_fill_manual(values = c("#fdb913", "#f09221")) + 
       geom_hline(yintercept = 0, colour= "#899DA4") 
     
-  }
+# }
   
   
   
@@ -577,17 +577,17 @@ output$histogram_schools_on_fiber <- renderPlot({
   
   data <- melt(data)
   
-  if(input$multi_yr_fiber == 2){
-    q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades")), ],
-              aes(x = variable, y = value)) +
-       geom_bar(aes(fill=variable), stat = "identity", width = .5) +
-       geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
-       scale_x_discrete(breaks=c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades"),
-                     labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
-       scale_y_continuous(limits = c(0, 110)) +
-       geom_hline(yintercept = 0, colour= "#899DA4") 
+ # if(input$multi_yr_fiber == 2){
+#    q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades")), ],
+#              aes(x = variable, y = value)) +
+#       geom_bar(aes(fill=variable), stat = "identity", width = .5) +
+#       geom_text(aes(label = paste0(value, "%")), vjust =-1, size = 6) +
+#       scale_x_discrete(breaks=c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades"),
+#                     labels=c("Have Fiber", "May Need Upgrades", "Need Upgrades")) +
+#       scale_y_continuous(limits = c(0, 110)) +
+#       geom_hline(yintercept = 0, colour= "#899DA4") 
     
-  } else{
+#  } else{
     q <- ggplot(data = data[which(data$variable %in% c("percent_on_fiber", "percent_may_need_upgrades", "percent_need_upgrades")), ],
                 aes(x = variable, y = value)) +
       geom_bar(fill="#fdb913", stat = "identity", width = .5) +
@@ -597,7 +597,7 @@ output$histogram_schools_on_fiber <- renderPlot({
       scale_y_continuous(limits = c(0, 110)) +
       geom_hline(yintercept = 0, colour= "#899DA4") 
     
-  }  
+#  }  
   
     infra_chart <- q + theme(plot.background = element_rect(fill = "white"),
              panel.background = element_rect(fill = "white"),
@@ -1119,11 +1119,7 @@ output$pop_maps <- renderLeaflet({
    
     
   }
-  #l6 <- leaflet(data) %>% 
-  #  addProviderTiles(input$tile2) %>% addCircleMarkers(lng = ~longitude, lat = ~latitude, radius = 6, color = ~as.factor(new_connect_type_map), 
-  #                                                     stroke = FALSE, fillOpacity = 0.7, popup = ~as.character(name)) %>% 
-  #  addLegend("bottomright", title = "Connect Category", opacity = 1)
-  
+
   switch(input$map_view,
          "All Districts" = print(l1),
          "Clean/Dirty Districts" = print(l2),
@@ -1210,15 +1206,7 @@ reac_map_pop <- reactive({
                        breaks = c(0, 1), labels = c("Upgrade at partial cost to district", "Upgrade at no cost to district"))
   
   uu <<- u + coord_map()
-  
-  
 
-  #v <- state_base + 
-  #    geom_point(data = data, aes(x = longitude, y = latitude, colour = factor(hierarchy_connect_category)),
-  #               alpha = 0.7, size = 4)
-  #vv <- v + coord_map()
-
-  
 
   switch(input$map_view,
          "All Districts" = print(qq),
@@ -1561,11 +1549,11 @@ vis %>% bind_shiny("plot1")
 
 output$plot1_table <- renderDataTable({
   
-  sr_data_table <- sr_all() #%>% select(c(1:2,4,11,15,48:52))
-  #colnames(sr_data_table) <- c("Recipient ID", "Recipient Name", "Line Item ID",
-  #                         "Bandwidth in Mbps", "Line Item Total Num Lines", 
-  #                         "Reporting Name", "New Purpose", "Monthly Cost Per Circuit", 
-  #                         "Monthly Cost Per Mbps", "New Connect Type")
+  sr_data_table <- sr_all() %>% select(c(1:2,4,15,48:52))
+  colnames(sr_data_table) <- c("Recipient ID", "Recipient Name", "Line Item ID",
+                           "Cat1 Allocations to District", 
+                           "Reporting Name", "Purpose", "Monthly Cost Per Circuit", 
+                           "Monthly Cost Per Mbps", "New Connect Type")
   
   datatable(sr_data_table, rownames = FALSE)
   
@@ -1849,17 +1837,31 @@ datasetInput_maps <- reactive({
 })
 
 output$table_testing <- renderDataTable({
-  map_data <- district_subset() %>%
+  map_data0 <- district_subset() %>%
     filter(!(postal_cd %in% c('AK', 'HI')),
            new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
-           locale %in% input$locale_maps)# %>% select(c(1:61, 78, 79))
+           locale %in% input$locale_maps) #%>% select(c(1,2,6:10,12,14,30))#,59:63))
+
+  map_data <- map_data0 #subset(map_data0, select = c("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students", "not_all_scalable"))
+  #map_data <- map_data %>% select("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students")
+  #colnames(map_data) <- c("ESH ID", "District Name", "County", "Locale", "District Size", "# of Schools", "# of Students")
+  print(names(map_data))
+  
+  map_data2 <- map_data0 %>% filter(not_all_scalable == 1) 
+  #map_data2 <- subset(map_data2, select = c("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students"))
+  print(names(map_data2))
+  
+  map_data3 <- map_subset() #subset(map_subset(), select = c("recipient_id", "recipient_name", "line_item_id", "cat1.allocations_to_district", "reporting_name", "new_purpose",
+                            #                   "monthly_cost_per_circuit", "monthly_cost_per_mbps", "new_connect_type")) #%>% select(c(1:2,4,15,48:52))
+  print(names(map_data3))
+  
+  #colnames(map_data3) <- c("Recipient ID", "Recipient Name", "Line Item ID",
+  #                             "Cat1 Allocations to District", 
+  #                             "Reporting Name", "Purpose", "Monthly Cost Per Circuit", 
+  #                             "Monthly Cost Per Mbps", "New Connect Type")
   
   
-  map_data2 <- map_data %>%
-    filter(not_all_scalable == 1)
-  
-  map_data3 <- map_subset() 
   
   
   switch(input$map_view,

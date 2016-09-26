@@ -100,13 +100,13 @@ shinyUI(fluidPage(
 
                     div.outer {
                     position: fixed;
-                    top: 165px;
+                    top: 175px;
                     left: 0;
                     right: 0;
                     bottom: 0;
                     overflow: hidden;
-                    padding: 0;
-
+                    padding: 10px;
+                    
                     }
                     
                     div.manualmainpanel{
@@ -168,7 +168,7 @@ shinyUI(fluidPage(
   
   div(class = 'horizontalformatting1',
       selectInput("year", h2("Select Year"),
-                  choices = c('2015' = 1, '2016' = 2, 'Multi-Year' = 3), selected = 1, width = '110px')),
+                  choices = c('2015' = 1, '2016' = 2), selected = 1, width = '110px')), #, 'Multi-Year' = 3
   
 titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "Nell's Connectivity Dashboard"),  #div(h1("Warchild"))
 
@@ -306,13 +306,12 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "N
                                           )
                                           )) #end of fluidRow()
                                     )),
-                           tabPanel("District Lookup", br(),#htmlOutput("helptext_leaflet_map"), br(), br(),
+                           tabPanel("District Lookup", br(), #htmlOutput("helptext_leaflet_map"), br(), br(),
                                     div(class="outer",
                                     #tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-                                    tags$style(type = "text/css", ".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
+                                    #tags$style(type = "text/css", ".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
                                     leafletOutput("testing_leaflet", width = '100%', height = '100%'), 
-                                        br(),
-                                        
+                                     
                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                                                   draggable = TRUE, top = 175, left = "auto", right = 20, bottom = "auto",
                                                   width = 330, height = "auto",
@@ -378,9 +377,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "N
                                        sidebarPanel(width = 3,            
                                        div(id = "goals_filters", 
                                            h2(strong("Any filters and selections applied will affect all charts on this tab.")),
-                                        radioButtons("multi_yr_goals", label = h2("Select Viz View:"),
-                                                        choices = list("Single Year" = 1, "Multi-Year" = 2),
-                                                        selected = 1), 
+                                        #radioButtons("multi_yr_goals", label = h2("Select Viz View:"),
+                                        #                choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                        #                selected = 1), 
                                          checkboxGroupInput(inputId = "connection_districts_goals", 
                                                             h2("Select Highest IA Connection Type(s) for Districts"),
                                                             choices = c("Fiber", "Cable", "DSL",
@@ -455,9 +454,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "N
                                        sidebarPanel(width = 3,
                                                 div(id = "fiber_filters", 
                                                     h2(strong("Any filters and selections applied will affect all charts on this tab.")),
-                                                    radioButtons("multi_yr_fiber", label = h2("Select Viz View:"),
-                                                                 choices = list("Single Year" = 1, "Multi-Year" = 2),
-                                                                 selected = 1),    
+                                                    #radioButtons("multi_yr_fiber", label = h2("Select Viz View:"),
+                                                    #             choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                                    #             selected = 1),    
                                                     checkboxGroupInput(inputId = "district_size_fiber", 
                                                                        label = h2("Select District Size(s)"),
                                                                        choices = c("Tiny", "Small", "Medium", "Large", "Mega"),
@@ -494,9 +493,9 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "N
                                                                         lit fiber Internet pricing.")), 
                                                               h2(strong("Any filters and selections applied will affect all charts on this tab.")),
                                   div(id = "affordability_filters", 
-                                      radioButtons("multi_yr_afford", label = h2("Select Viz View:"),
-                                                   choices = list("Single Year" = 1, "Multi-Year" = 2),
-                                                   selected = 1),    
+                                      #radioButtons("multi_yr_afford", label = h2("Select Viz View:"),
+                                      #             choices = list("Single Year" = 1, "Multi-Year" = 2),
+                                      #             selected = 1),    
                                         uiOutput("bandwidthSelect"), 
                                         checkboxGroupInput(inputId = "purpose", 
                                                         label = h2("Select Purpose(s)"),
