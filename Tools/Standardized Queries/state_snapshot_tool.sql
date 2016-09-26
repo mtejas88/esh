@@ -1,7 +1,7 @@
 /*
 Author: Justine Schott
 Created On Date: 12/29/2015
-Last Modified Date: 08/08/2016
+Last Modified Date: 02/10/2016
 Name of QAing Analyst(s):  
 Purpose: To display all state snapshot metrics and QA metrics, with addition of state-level broadband spending
 Methodology: Each metrics grouping begins with a comment. Any table that begins with "states" is calculating metrics at the state level, then 
@@ -12,18 +12,13 @@ clean_goal_fiber (ie, clean), and clean_afford (ie, clean and has cost informati
 --state profile metrics
 with universe_districts as (
   select *
-  from public.districts
+  from districts
   where include_in_universe_of_districts = true
 ),
 
 states_nces as (
   select
     postal_cd,
-    sum(case
-          when num_students::numeric*150 < 9200
-            then 9200
-          else num_students::numeric*150 
-        end) as overall_budget_floor,
     sum(num_students::numeric) as overall_student_count,
     sum(case when locale in ('Rural') then num_students::numeric else 0 end) as num_students_rural,
     sum(case when locale in ('Small Town') then num_students::numeric else 0 end) as num_students_town,
@@ -49,18 +44,18 @@ states_nces as (
 --wifi metrics
 c2_li as (
   select *
-  from public.line_items
+  from line_items
   where service_category ilike '%internal%'
 ),
 
 broadband_li as (
 select *
-from public.line_items
+from line_items
 where broadband=true),
 
 c1_li as (
   select *
-  from public.line_items
+  from line_items
   where broadband=true OR service_category='VOICE SERVICES'), 
 
 distinct_application_entities as (
@@ -70,7 +65,7 @@ distinct_application_entities as (
     "Full/Part Count",
     "Cat 2 Disc Rate"
 
-  from public.fy2015_discount_calculations dc
+  from fy2015_discount_calculations dc
 
   where "Stud NSLP Perc" != '0' and "Cat 2 Disc Rate"::numeric >0
 ),
@@ -82,7 +77,7 @@ select distinct
     "Full/Part Count",
     "Cat 1 Disc Rate"
 
-  from public.fy2015_discount_calculations dc
+  from fy2015_discount_calculations dc
   --we want to exclude applications where every FRN is voice services (and thus neither broadband nor C2) 
   left join lateral (
   select "Application Number",
@@ -104,7 +99,7 @@ select distinct
     "Full/Part Count",
     "Cat 1 Disc Rate"
 
-  from public.fy2015_discount_calculations dc
+  from fy2015_discount_calculations dc
 
   where "Stud NSLP Perc" != '0' and "Cat 1 Disc Rate"::numeric >0),
 
@@ -141,37 +136,42 @@ select
 
   group by postal_cd),
 
+district_lookup as (
+  select esh_id, esh_id as district_esh_id
+  from universe_districts
+  union
+  select schools.esh_id, district_esh_id
+  from schools
+  inner join universe_districts sd
+  on sd.esh_id = schools.district_esh_id
+),
 ad as (
   select
     a.line_item_id,
-    dl.district_esh_id,
-    a.cat_2_cost
-  from public.allocations a
-  left join public.district_lookup_2015 dl
+    dl.district_esh_id
+  from allocations a
+  left join district_lookup dl
   on a.recipient_id = dl.esh_id
   where exists (select 1 from c2_li where c2_li.id = a.line_item_id)
-  and district_esh_id is not null
 ),
 
 ad_broadband as (
   select
     a.line_item_id,
     dl.district_esh_id
-  from public.allocations a
-  left join public.district_lookup_2015 dl
+  from allocations a
+  left join district_lookup dl
   on a.recipient_id = dl.esh_id
-  where exists (select 1 from broadband_li where broadband_li.id = a.line_item_id)
-  and district_esh_id is not null),
+  where exists (select 1 from broadband_li where broadband_li.id = a.line_item_id)),
   
 ad_c1 as (
 select
     a.line_item_id,
     dl.district_esh_id
-  from public.allocations a
-  left join public.district_lookup_2015 dl
+  from allocations a
+  left join district_lookup dl
   on a.recipient_id = dl.esh_id
-  where exists (select 1 from c1_li where c1_li.id = a.line_item_id)
-  and district_esh_id is not null),
+  where exists (select 1 from c1_li where c1_li.id = a.line_item_id)),
 
 districts_c2 as (
   select *
@@ -277,6 +277,8 @@ clean_goal_fiber_districts as (
   where exclude_from_analysis = false
 --there are 6 districts whose IA line items were all "cancelled" and are not marked as dirty
     and ia_bandwidth_per_student != 'Insufficient data' 
+--portland, ME should have been marked dirty
+    and esh_id not in ('917448') 
 ),
 
 states_goals as (
@@ -328,15 +330,14 @@ select dl.district_esh_id,
          c.line_item_id,
          count(distinct circuit_id) as allocation_lines
         
-  from public.entity_circuits ec
-  join public.circuits c
+  from entity_circuits ec
+  join circuits c
   on ec.circuit_id = c.id
-  join public.district_lookup_2015 dl
+  join district_lookup dl
   on ec.entity_id = dl.esh_id
   
   where entity_type in ('School', 'District')
   and exclude_from_reporting = false
-  and dl.district_esh_id is not null
   
   group by  district_esh_id,
          line_item_id
@@ -380,7 +381,7 @@ cdd as (
         from clean_goal_fiber_districts cgfd
         left join cd
         on cd.district_esh_id = cgfd.esh_id
-        left join public.line_items li
+        left join line_items li
         on cd.line_item_id = li.id
         
         group by cgfd.esh_id, cgfd.num_students, cgfd.num_schools, cgfd.postal_cd, cgfd.locale, cgfd.num_campuses
@@ -502,12 +503,12 @@ states_afford as (
 select
   sn.postal_cd,
 --Broadband/Wifi metrics   
-  (((sn.overall_budget_floor) - sap.c2_cost)/1000000)*(sadr.agg_c2_discount_rate/100) as "$M remaining E-Rate funds to support Wi-Fi and other internal connectivity equipment purchases",
+  (((sn.overall_student_count*150) - sap.c2_cost)/1000000)*(sadr.agg_c2_discount_rate/100) as "$M remaining E-Rate funds to support Wi-Fi and other internal connectivity equipment purchases",
   sc1.pct_receiving_c1 as "% of districts that are receiving c1 services this year",
   sb.pct_receiving_broadband as "% of districts that are receiving broadband this year",
   sr.pct_receiving_c2 as "% of districts that have requested any funding for Wi-Fi and other internal connectivity equipment this year",
-  (sn.overall_budget_floor)/1000000 as c2_budget_of_esh_district_population,
-  ((sn.overall_budget_floor) - sap.c2_cost)/1000000 as c2_cost_remaining,
+  (sn.overall_student_count*150)/1000000 as c2_budget_of_esh_district_population,
+  ((sn.overall_student_count*150) - sap.c2_cost)/1000000 as c2_cost_remaining,
   sc1a.c1_cost/1000000 as cost_of_all_c1_applications,
   sba.broadband_cost/1000000 as cost_of_all_broadband_applications,
   sap.c2_cost/1000000 as cost_of_all_c2_applications,
