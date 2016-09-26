@@ -6,6 +6,21 @@
 #wd <- "~/Desktop/ficher/Shiny"
 #setwd(wd)
 
+#install.packages("shiny")
+#install.packages("tidyr")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("scales")
+#install.packages("maps")
+#install.packages("ggmap")
+#install.packages("reshape")
+#install.packages("leaflet")
+#install.packages("ggvis")
+#install.packages("DT")
+#install.packages("shinydashboard")
+#install.packages("extrafontdb")
+#install.packages("extrafont")
+
 shinyServer(function(input, output, session) {
   
   ## Create reactive functions for both services received and districts table ##
@@ -32,7 +47,7 @@ shinyServer(function(input, output, session) {
   #library(RPostgreSQL)
   
   #font_import(pattern="[L/l]ato")
-  #font_import(pattern="MuseoSlabW01-700")
+  #font_import(pattern="Museo Slab W01 700")
 
   #loadfonts()
   
@@ -89,10 +104,11 @@ shinyServer(function(input, output, session) {
 
   ##Main data set to use to any Services Recieved related work: 
   output$bandwidthSelect <- renderUI({
-    
+
     if(input$year == 1){sr_data <- services}else { sr_data <- services16 }
     #bandwidth_list <- c(unique(services$bandwidth_in_mbps))
     bandwidth_list <- c(unique(sr_data$bandwidth_in_mbps))
+
     selectizeInput("bandwidth_list", h2("Select Circuit Size(s) (in Mbps)"), as.list(sort(bandwidth_list)), multiple = T, options = list(placeholder = 'e.g. 100'))
   
   })
@@ -112,6 +128,7 @@ shinyServer(function(input, output, session) {
              locale %in% input$locale_affordability) %>%
       filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) %>% 
       filter(bandwidth_in_mbps %in% selected_bandwidth_list)
+      #filter(bw_mbps %in% selected_bandwidth_list)
   })  
 
   ######
@@ -165,9 +182,9 @@ district_subset <- reactive({
     districts$new_connect_type_map <- districts$new_connect_type_goals
     
     districts %>% 
-      filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>% 
-      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state))) #%>% 
-    # filter_(ifelse(input$year == 'Multi-Year', "1==1", paste("year ==", selected_year)))
+      filter_(ifelse(input$dataset == 'All', "1==1", paste("exclude ==", selected_dataset))) %>%
+      filter_(ifelse(input$state == 'All', "1==1", paste("postal_cd ==", selected_state)))
+
              
   })
 
@@ -678,8 +695,13 @@ output$histogram_by_erate_discounts <- renderPlot({
              axis.text.y = element_blank(),
              axis.ticks = element_blank(),
              #axis.title.x=element_text("Distribution of campuses by E-rate discount rate (%)"),
-             axis.title.y=element_blank()) + 
-    xlab("\nDistribution of campuses by E-rate discount rate (%)\n\n") 
+             axis.title.y=element_blank(), 
+             plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
+    ggtitle(paste("\nDistribution of campuses by E-rate discount rate (%)", "\n\n\n\n")) +
+    guides(fill=guide_legend(title.position="top",
+                             #keywidth = 0.35,
+                             #keyheight = 0.35,
+                             default.unit = "inch"))
   
   print(q)
   
@@ -1273,7 +1295,7 @@ general_monthly_cpm <- reactive({
   
 })
 
-general_monthly_cpm %>% bind_shiny("gen_m_cpm")
+#general_monthly_cpm %>% bind_shiny("gen_m_cpm")
 
 
 #not using ggvis since side-by-side bar chart is not possible
@@ -1333,12 +1355,12 @@ price_disp_cpc <- reactive({
   
 })
 
-price_disp_cpc %>% bind_shiny("price_disp_cpc")
+#price_disp_cpc %>% bind_shiny("price_disp_cpc")
 
 
 output$cpc_sidebars <- renderPlot({
 
-  
+  #print("entering cpc_sidebars")
   validate(
     need(length(unique(sr_all()$bandwidth_in_mbps)) > 0, "Please select circuit size(s) through the side panel.")
   )
@@ -1354,6 +1376,9 @@ output$cpc_sidebars <- renderPlot({
   dispersion <- c("p25th", "Median", "p75th")
   
   #b <- gather_(a, bw, percentile, dispersion)
+
+  #b <- gather(a, bw, percentile, dispersion)
+
   b <- gather(a, bw, percentile, c(2:4))
   colnames(b) <- c("bw_mbps", "percentile", "cost" )
   b$percentile <- factor(b$percentile, levels = c("p25th", "Median", "p75th"))
@@ -1366,7 +1391,6 @@ output$cpc_sidebars <- renderPlot({
   
   v <- ggplot(data = b, aes(x=percentile, y=cost,fill = factor(bw_mbps))) +
     geom_bar(stat="identity", position = "dodge", width = 0.75) + 
-
     geom_text(aes(label = paste("$", round(cost, digits = 2), sep="")), vjust = -0.5, position = position_dodge(width = 0.9), size = 5, colour = "#636363") +
     #scale_x_discrete(limits = positions) +
     scale_x_discrete(
@@ -1392,7 +1416,7 @@ output$cpc_sidebars <- renderPlot({
           legend.box = "horizontal",
           #legend.text.align = ,
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
-    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
+    #ggtitle(paste("Price Dispersion: \nMonthly Cost Per Circuit for", input$connection_services, input$purpose, "\n")) + 
     guides(fill=guide_legend(title.position="top",
       #keywidth = 0.35,
       #keyheight = 0.35,
@@ -1440,7 +1464,7 @@ output$price_disp_cpm_sidebars <- renderPlot({
   b2 <- gather(c, bw, percentile, c(2:4))
   colnames(b2) <- c("bw_mbps", "percentile", "cost" )
   b2$percentile <- factor(b2$percentile, levels = c("p25th", "Median", "p75th"))
-  print(b2)
+  #print(b2)
   
   positions <- c("p25th", "Median", "p75th")
   
@@ -1471,7 +1495,7 @@ output$price_disp_cpm_sidebars <- renderPlot({
           legend.box = "horizontal",
           text=element_text(size = 16, family="Lato"),
           plot.title = element_text(size = 22, family="MuseoSlabW01-700")) +
-    ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
+    #ggtitle(paste("Price Dispersion: \nMonthly Cost Per Mbps for", input$connection_services, input$purpose, "\n")) +
     guides(fill = guide_legend(title.position="top",
            default.unit = "inch")) 
   
@@ -1548,14 +1572,16 @@ vis <- reactive({
 vis %>% bind_shiny("plot1")
 
 output$plot1_table <- renderDataTable({
-  
-  sr_data_table <- sr_all() %>% select(c(1:2,4,15,48:52))
-  colnames(sr_data_table) <- c("Recipient ID", "Recipient Name", "Line Item ID",
-                           "Cat1 Allocations to District", 
-                           "Reporting Name", "Purpose", "Monthly Cost Per Circuit", 
-                           "Monthly Cost Per Mbps", "New Connect Type")
-  
-  datatable(sr_data_table, rownames = FALSE)
+
+  data <- sr_all() %>%
+          select(recipient_id, recipient_name, postal_cd, line_item_id, bandwidth_in_mbps,
+                 connect_category, new_connect_type, line_item_district_monthly_cost, line_item_total_monthly_cost, 
+                 cat.1_allocations_to_district, line_item_total_num_lines, applicant_id, 
+                 applicant_name, reporting_name, monthly_cost_per_circuit, monthly_cost_per_mbps
+          )
+          
+  datatable(data, rownames = FALSE)
+
   
 })
 
@@ -1563,26 +1589,26 @@ output$plot1_table <- renderDataTable({
 output$text_maps <- renderUI({
     
   text_all <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS"), br(), 
-                   p("This map shows the location of all school districts in the ESH data.
-                     You can zoom in on specific districts by clicking on the map on the right."), br()))
+                   p("This map shows the location of all school districts in the United States based on NCES data.
+                     You can zoom in on specific districts by clicking on the map."), br()))
   text_clean <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND DATA CLEANLINESS STATUS"), br(), 
-                     p("This map shows the location of all school districts and cleanliness of the district data.
-                       You can zoom in on specific districts by clicking on the map on the right."), br()))
+                     p("This map shows the location of all school districts in the United States and cleanliness of the district data.
+                       You can zoom in on specific districts by clicking the map on the right."), br()))
   
-  text_2014goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2014 GOAL MEETING STATUS"), br(),
-                         p("This map shows the location of all school districts and the 2014 FCC goal meeting status. 
-                           A district is meeting the 2014 FCC goal if its total bandwidth is greater than or equal to 100 kbps per student.
+  text_2014goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND MINIMUM GOAL MEETING STATUS"), br(),
+                         p("This map shows the location of all school districts and the minimum goal meeting status. 
+                           A district is meeting the minimum goal if its total bandwidth is greater than or equal to 100 kbps per student.
                            You can zoom in on specific districts by clicking on the map on the right.")))
   
   text_2018goals <- HTML(paste(h4("MAP OF SCHOOL DISTRICTS AND 2018 GOAL MEETING STATUS"), br(),
                          p("This map shows the location of all school districts and the 2018 FCC goal meeting status. 
-                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 Gbps per student.
+                           A district is meeting the 2018 FCC goal if its total bandwidth is greater than or equal to 1 Mbps per student.
                            You can zoom in on specific districts by clicking on the map on the right.")))
   
   text_fiber <- HTML(paste(h4("MAP OF UNSCALABLE SCHOOL DISTRICTS AND FIBER BUILD COSTS"), br(),
                      p("This map shows the location of school districts that have at least one school using unscalable technology. 
-                       It also shows whether districts can self-provision fiber with no cost to school districts, assuming
-                       20% state match fund.
+                       It also shows whether districts can self-provision fiber with no cost to school districts,
+                       assuming availability of a 20% state match fund.
                        You can zoom in on specific districts by clicking on the map on the right."), br()))
   
   switch(input$map_view,
@@ -1722,27 +1748,47 @@ observeEvent(input$map_reset_all, {
 
 #For downloadable subsets:
 output$ia_tech_downloadData <- downloadHandler(
+  
   filename = function(){
-    paste('districts_by_ia_tech_dataset', '_20160725', '.csv', sep = '')},
+    paste('districts_by_ia_tech_dataset', '_20160912', '.csv', sep = '')},
   content = function(file){
-    write.csv(districts_ia_tech_data(), file)
+    write.csv(districts_ia_tech_data() %>%
+                select(nces_cd, name, locale, district_size, num_schools, num_students,
+                       frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                       ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                       monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                       schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable)
+              , file, row.names = FALSE)
   }
 )
 
 output$fiber_downloadData <- downloadHandler(
+  
   filename = function(){
-    paste('fiber_dataset', '_20160725', '.csv', sep = '')},
+    paste('fiber_dataset', '_20160912', '.csv', sep = '')},
   content = function(file){
-    write.csv(fiber_data(), file)
+    write.csv( fiber_data() %>%
+                 select(nces_cd, name, locale, district_size, num_schools, num_students,
+                        frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                        ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                        monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                        schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable), 
+               file, row.names = FALSE)
   }
 )
 
 
 output$affordability_downloadData <- downloadHandler(
   filename = function(){
-    paste('affordability_dataset', '_20160725', '.csv', sep = '')},
+    paste('affordability_dataset', '_20160912
+          ', '.csv', sep = '')},
   content = function(file){
-    write.csv(sr_all(), file)
+    write.csv(sr_all() %>%
+                select(recipient_id, recipient_name, postal_cd, line_item_id, bandwidth_in_mbps,
+                       connect_category, new_connect_type, line_item_district_monthly_cost, line_item_total_monthly_cost, 
+                       cat.1_allocations_to_district, line_item_total_num_lines, applicant_id, 
+                       applicant_name, reporting_name, monthly_cost_per_circuit, monthly_cost_per_mbps), 
+                       file, row.names = FALSE)
   }
 )
 
@@ -1841,25 +1887,12 @@ output$table_testing <- renderDataTable({
     filter(!(postal_cd %in% c('AK', 'HI')),
            new_connect_type_map %in% input$connection_districts,
            district_size %in% input$district_size_maps,
-           locale %in% input$locale_maps) #%>% select(c(1,2,6:10,12,14,30))#,59:63))
-
-  map_data <- map_data0 #subset(map_data0, select = c("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students", "not_all_scalable"))
-  #map_data <- map_data %>% select("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students")
-  #colnames(map_data) <- c("ESH ID", "District Name", "County", "Locale", "District Size", "# of Schools", "# of Students")
-  print(names(map_data))
-  
-  map_data2 <- map_data0 %>% filter(not_all_scalable == 1) 
-  #map_data2 <- subset(map_data2, select = c("esh_id", "name", "county", "locale", "district_size", "num_schools", "num_students"))
-  print(names(map_data2))
-  
-  map_data3 <- map_subset() #subset(map_subset(), select = c("recipient_id", "recipient_name", "line_item_id", "cat1.allocations_to_district", "reporting_name", "new_purpose",
-                            #                   "monthly_cost_per_circuit", "monthly_cost_per_mbps", "new_connect_type")) #%>% select(c(1:2,4,15,48:52))
-  print(names(map_data3))
-  
-  #colnames(map_data3) <- c("Recipient ID", "Recipient Name", "Line Item ID",
-  #                             "Cat1 Allocations to District", 
-  #                             "Reporting Name", "Purpose", "Monthly Cost Per Circuit", 
-  #                             "Monthly Cost Per Mbps", "New Connect Type")
+           locale %in% input$locale_maps) %>%
+    select(nces_cd, name, locale, district_size, num_schools, num_students,
+           frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+           ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+           monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+           schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable)
   
   
   
@@ -1876,23 +1909,25 @@ output$table_testing <- renderDataTable({
 })
 
 output$downloadData <- downloadHandler(
+  
   filename = function(){
-    paste(input$map_view, '_20160725', '.csv', sep = '')},
+    paste(input$map_view, '_20160912', '.csv', sep = '')},
   content = function(file){
-    if(input$metrics_table == 'Senatorial Metrics'){
-      map_data_download <- sen_table
-    } else {
-      map_data_download <- map_subset()
-    }
-    
-    write.csv(map_data_download, file)
+
+    write.csv(datasetInput_maps() %>%
+                select(nces_cd, name, locale, district_size, num_schools, num_students,
+                       frl_percent, address, city, zip, county, postal_cd, latitude, longitude, exclude_from_analysis,
+                       ia_bandwidth_per_student, meeting_2014_goal_no_oversub, meeting_2018_goal_oversub,
+                       monthly_ia_cost_per_mbps, total_ia_bw_mbps, total_ia_monthly_cost, c1_discount_rate,
+                       schools_on_fiber, schools_may_need_upgrades, schools_need_upgrades, not_all_scalable), 
+              file, row.names = FALSE)
   }
 )
 
 
 #For population maps:
 output$downloadMapImage <- downloadHandler(
-  filename = function() {paste(input$map_view, '_20160725', '.png', sep='') },
+  filename = function() {paste(input$map_view, '_20160912', '.png', sep='') },
   content = function(file) {
     ggsave(plot = reac_map_pop()$plot, file, type = "cairo-png")
   }
@@ -1901,7 +1936,8 @@ output$downloadMapImage <- downloadHandler(
 
 #For District Look Up: blank pin point map
 output$downloadDistrictLookup <- downloadHandler(
-  filename = function() {paste(input$map_view_lookup, '_20160711', '.png', sep='') },
+  filename = function() {paste(input$map_view, '_20160912', '.png', sep='') },
+
   content = function(file) {
     ggsave(plot = reac_map_lookup()$plot, file, type = "cairo-png")
   }

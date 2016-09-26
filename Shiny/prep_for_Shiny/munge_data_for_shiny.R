@@ -11,11 +11,9 @@ sapply(lib, function(x) require(x, character.only = TRUE))
 wd <- "~/Desktop/ficher/Shiny/prep_for_Shiny"
 setwd(wd)
 
-services <- read.csv("services_received_20160725.csv", as.is = TRUE) # services received '15
-services16 <- read.csv("2016_services_received_20160916.csv", as.is = TRUE) # services received '16
 
-districts <- read.csv("deluxe_districts_20160831.csv", as.is = TRUE) # deluxe districts '15
-districts16 <- read.csv("2016_deluxe_districts_20160916.csv", as.is = TRUE) # deluxe districts '16
+services <- read.csv("services_received_20160912.csv", as.is = TRUE)
+districts <- read.csv("deluxe_districts_20160912.csv", as.is = TRUE)
 
 discounts <- read.csv("district_discount_rates_20160414.csv", as.is = TRUE)
 usac_matrix <- read.csv("usac_discount_matrix.csv", as.is = TRUE)
