@@ -509,98 +509,111 @@ select  		dd.esh_id as district_esh_id,
 									else	0										
 								end) as fiber_wan_lines,
 --consortium
-array_to_string(array_agg(distinct
-							case 
-								when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-										and applicant_id::varchar!=ldli.district_esh_id
-										and applicant_type!='School'
-										and applicant_id not in (	select esh_id
-																	from fy2016.districts
-																	where include_in_universe_of_districts=true)
-											then applicant_name 
-								when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-										and applicant_id not in (	select esh_id
-																	from fy2016.districts
-																	where esh_id::varchar!=ldli.district_esh_id)
+						array_to_string(array_agg(distinct
+													case 
+														when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
+																and applicant_id::varchar!=ldli.district_esh_id
+																and applicant_type!='School'
+																and applicant_id not in (	select esh_id
+																							from fy2016.districts
+																							where include_in_universe_of_districts=true)
+																	then applicant_name 
+														when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
+																and applicant_id not in (	select esh_id
+																							from fy2016.districts
+																							where esh_id::varchar!=ldli.district_esh_id)
+																and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
+																							7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
+																							8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
+																							8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
+																							10565, 10632)
+																	then service_provider_name 
+													end), ', ') as consortium_affiliation,
+						case 
+							when ( 	sum(case 
+											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
+													and applicant_type!='School'
+													and applicant_id::varchar!=ldli.district_esh_id
+													and applicant_id not in (	select esh_id
+																				from fy2016.districts
+																				where include_in_universe_of_districts=true) 
+														then 1 
+											else 0 
+										end)>0
+								OR 
+									sum(case 
+											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
+													and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
+																				7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
+																				8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
+																				8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
+																				10565, 10632)
+
+														then 1 
+											else 0 
+										end)>0)
+								and sum(case 
+											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
+													and applicant_id::varchar=ldli.district_esh_id
+													and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
+																					7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
+																					8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
+																					8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
+																					10565, 10632)
+														then 1 
+											else 0 
+										end)=0
+									then 'Consortium-provided'
+							when (sum(	case 
+											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
+													and applicant_type!='School'
+													and applicant_id::varchar!=ldli.district_esh_id
+													and applicant_id not in (	select esh_id
+																				from fy2016.districts
+																				where include_in_universe_of_districts=true) 
+														then 1 
+											else 0 
+										end)>0
+								OR 
+								sum(case 
+										when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
 										and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
 																	7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
 																	8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
 																	8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
 																	10565, 10632)
-											then service_provider_name 
-							end), ', ') as consortium_affiliation,
-case 
-	when ( 	sum(case 
-					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-							and applicant_type!='School'
-							and applicant_id::varchar!=ldli.district_esh_id
-							and applicant_id not in (	select esh_id
-														from fy2016.districts
-														where include_in_universe_of_districts=true) 
-								then 1 
-					else 0 
-				end)>0
-		OR 
-			sum(case 
-					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-							and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-														7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-														8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
-														8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-														10565, 10632)
 
-								then 1 
-					else 0 
-				end)>0)
-		and sum(case 
-					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-							and applicant_id::varchar=ldli.district_esh_id
-							and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-															7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-															8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
-															8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-															10565, 10632)
-								then 1 
-					else 0 
-				end)=0
-			then 'Consortium-provided'
-	when (sum(	case 
-					when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-							and applicant_type!='School'
-							and applicant_id::varchar!=ldli.district_esh_id
-							and applicant_id not in (	select esh_id
-														from fy2016.districts
-														where include_in_universe_of_districts=true) 
-								then 1 
-					else 0 
-				end)>0
-		OR 
-		sum(case 
-				when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-				and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-											7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-											8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
-											8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-											10565, 10632)
+											then 1 
+										else 0 
+									end)>0)
+								and sum(case 
+											when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
+											and applicant_id::varchar=ldli.district_esh_id
+											and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
+																	7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
+																	8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
+																	8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
+																	10565, 10632)
 
-					then 1 
-				else 0 
-			end)>0)
-		and sum(case 
-					when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true) 
-					and applicant_id::varchar=ldli.district_esh_id
-					and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-											7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-											8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920, 
-											8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-											10565, 10632)
-
-						then 1 
-					else 0 
-				end)>0
-			then 'Consortium+District' 
-	else 'Self-procured'
-end as ia_procurement_type
+												then 1 
+											else 0 
+										end)>0
+									then 'Consortium+District' 
+							else 'Self-procured'
+						end as ia_procurement_type,
+--cleanliness
+						sum(case											
+									when ('exclude_for_cost_only_free' = any(open_flag_labels) or 'exclude_for_cost_only_restricted'= any(open_flag_labels))	
+									and (internet_conditions_met or upstream_conditions_met or isp_conditions_met or backbone_conditions_met) 
+										then allocation_lines								
+									else	0										
+								end) as ia_no_cost_lines,
+						sum(case											
+									when ('exclude_for_cost_only_free' = any(open_flag_labels) or 'exclude_for_cost_only_restricted'= any(open_flag_labels))	
+									and wan_conditions_met
+										then allocation_lines								
+									else	0										
+								end) as wan_no_cost_lines
 
 from	public.fy2016_districts_demog dd
 left join public.fy2016_lines_to_district_by_line_item	ldli
@@ -701,7 +714,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/16/2016
+Last Modified Date: 9/26/2016
 Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

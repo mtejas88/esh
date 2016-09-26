@@ -24,6 +24,30 @@ select
 	latitude,
 	longitude,
 	case
+		when  	flag_array is null or
+				(flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%')
+			then false
+		else true
+	end as exclude_from_ia_analysis,
+	case
+		when 	(flag_array is null or
+				(flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'))
+				and ia_no_cost_lines = 0
+			then false
+		else true
+	end as exclude_from_ia_cost_analysis,
+	case
+		when 	flag_array is null
+			then false
+		else true
+	end as exclude_from_wan_analysis,
+	case
+		when 	flag_array is null
+				and wan_no_cost_lines = 0
+			then false
+		else true
+	end as exclude_from_wan_cost_analysis,
+/*	case
 		when flag_array is null
 			then false
 		else true
@@ -38,13 +62,13 @@ select
 		when flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'
 			then 'clean_except_wan_no_cost'
 		else 'dirty'
-	end	as inclusion_status,
+	end	as inclusion_status,*/
 	flag_array,
 	tag_array,
 	flag_count as num_open_district_flags,
 	case
-		when flag_array is not null
-		--add further dimensioning of natively vs outreach needed? will dqs want to use this filter?
+		when 	(flag_array is not null or
+				not(flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'))
 			then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
 			then  'outreach_confirmed'
@@ -166,12 +190,12 @@ select
 
 from public.fy2016_districts_metrics
 where district_type != 'Charter'
-or (postal_cd = 'AZ' and district_type = 'Charter')
+or postal_cd = 'AZ'
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 9/09/2016
+Last Modified Date: 9/26/2016
 Name of QAing Analyst(s): 
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

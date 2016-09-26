@@ -68,14 +68,24 @@ left join ( select distinct entity_id, nces_code
 on RPAD(d."LEAID",12,'0')=eim.nces_code
 
 left join ( select  "LEAID",
-                    count(*) as school_count,
-                    count(case when "TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when  "MEMBER"::numeric > 0 then "MEMBER"::numeric
+                            when flaggable_id is null
+                              then 1
+                            else 0
+                          end) as school_count,
+                    sum(case
+                            when flaggable_id is null and "TYPE" = '1'
+                              then 1
+                            else 0
+                          end) as school_type_1_count,
+                    sum(case
+                          when (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when  "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
+                          when  (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count
             from public.sc131a 
@@ -83,41 +93,62 @@ left join ( select  "LEAID",
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct flaggable_id
+              select  flaggable_id,
+                      count(case
+                              when label = 'closed_school'
+                                then 1
+                            end) as include_students
               from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
+              group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where flaggable_id is null
             group by "LEAID" ) sc
 on d."LEAID"=sc."LEAID"
 left join ( select  "UNION",
                     "LSTATE",
-                    count(*) as school_count,
-                    count(case when sc131a."TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when  sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
+                            when flaggable_id is null
+                              then 1
+                            else 0
+                          end) as school_count,
+                    sum(case
+                            when flaggable_id is null and "TYPE" = '1'
+                              then 1
+                            else 0
+                          end) as school_type_1_count,
+                    sum(case
+                          when (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when  sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+                          when  (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count,
-                    count(distinct sc131a."LEAID") as district_count
+                    count(distinct  case
+                                      when flaggable_id is null
+                                        then sc131a."LEAID"
+                                    end) as district_count
             from public.sc131a 
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct flaggable_id
+              select  flaggable_id,
+                      count(case
+                              when label = 'closed_school'
+                                then 1
+                            end) as include_students
               from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
+              group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where flaggable_id is null
-            and "LSTATE" = 'VT' --only smushing by UNION for districts in VT
+            where "LSTATE" = 'VT' --only smushing by UNION for districts in VT
             group by  "UNION",
                       "LSTATE" ) sc_VT
 on d."UNION"=sc_VT."UNION"
@@ -125,32 +156,47 @@ and d."LSTATE"=sc_VT."LSTATE"
 
 left join ( select  ag131a."LSTREE",
                     ag131a."LSTATE",
-                    count(*) as school_count,
-                    count(case when sc131a."TYPE" = '1' then 1 end) as school_type_1_count,
                     sum(case
-                          when  sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
+                            when flaggable_id is null
+                              then 1
+                            else 0
+                          end) as school_count,
+                    sum(case
+                            when flaggable_id is null and "TYPE" = '1'
+                              then 1
+                            else 0
+                          end) as school_type_1_count,
+                    sum(case
+                          when (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when  sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+                          when  (flaggable_id is null or include_students > 0)
+                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count,
-                    count(distinct sc131a."LEAID") as district_count
+                    count(distinct  case
+                                      when flaggable_id is null
+                                        then sc131a."LEAID"
+                                    end) as district_count
             from public.sc131a 
-            left join public.ag131a
-            on sc131a."LEAID" = ag131a."LEAID"
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
             left join (
-              select distinct flaggable_id
+              select  flaggable_id,
+                      count(case
+                              when label = 'closed_school'
+                                then 1
+                            end) as include_students
               from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
+              group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where flaggable_id is null
-            and sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
+            where sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
             group by  ag131a."LSTREE",
                       ag131a."LSTATE" ) sc_MT
 on d."LSTREE"=sc_MT."LSTREE"
@@ -190,10 +236,9 @@ and case --only include the HS district when smushing MT districts (exclude the 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/16/2016
+Last Modified Date: 9/26/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
-metrics aggregation so school-district association can be created.
-Aligned with ENG until school flags implemented.
+metrics aggregation so school-district association can be created. Excluded schools have flags to be removed from the population.
 */

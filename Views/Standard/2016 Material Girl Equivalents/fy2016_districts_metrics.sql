@@ -270,7 +270,9 @@ select	dd.*,
 		    lines_w_dirty,
 		    fiber_wan_lines,
 		    consortium_affiliation,
-		    ia_procurement_type										
+		    ia_procurement_type,
+		    ia_no_cost_lines,
+		    wan_no_cost_lines										
 												
 from	fy2016_districts_demog		 dd									
 left	join	fy2016_districts_aggregation	da									
