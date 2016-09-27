@@ -70,7 +70,10 @@ FROM (
             dd.longitude AS recipient_longitude,
             dd.locale AS recipient_locale,
             dd.district_size AS recipient_district_size,
-            dd.exclude_from_analysis AS recipient_exclude_from_analysis,
+            dd.exclude_from_ia_analysis AS recipient_exclude_from_ia_analysis,
+            dd.exclude_from_ia_cost_analysis AS recipient_exclude_from_ia_cost_analysis,
+            dd.exclude_from_wan_analysis AS recipient_exclude_from_wan_analysis,
+            dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
             d.consortium_member AS recipient_consortium_member
           FROM public.fy2016_lines_to_district_by_line_item lid
           LEFT OUTER JOIN fy2016.line_items li
