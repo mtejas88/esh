@@ -14,12 +14,10 @@ FROM (
             CASE
               WHEN 'exclude' = any(li.open_flag_labels)
                 THEN 'dqs_excluded'
+              WHEN 'exclude_for_cost_only_free' = any(li.open_tag_labels) OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) and num_open_flags = 0
+                THEN 'clean_no_cost'
               WHEN li.num_open_flags > 0
-                THEN CASE
-                  WHEN ('exclude_for_cost_only_free' = any(li.open_flag_labels) OR 'exclude_for_cost_only_restricted' = any(li.open_flag_labels)) AND li.num_open_flags = 1
-                    THEN 'clean_no_cost'
-                  ELSE 'dirty'
-                END
+                THEN  'dirty'
               ELSE 'clean_with_cost'
             END AS inclusion_status,
             li.open_tag_labels AS open_tags,
