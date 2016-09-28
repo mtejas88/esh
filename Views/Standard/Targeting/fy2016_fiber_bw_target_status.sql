@@ -16,7 +16,7 @@ select 	*,
 
 from( select 	si.esh_id,
 				si.postal_cd,
-				si.exclude_from_analysis,
+				si.exclude_from_wan_analysis as exclude_from_analysis,
 				si.stage_indicator,
 				ps.fiber_priority_status,
 				case
