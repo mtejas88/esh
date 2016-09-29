@@ -95,32 +95,32 @@ select	dd.*,
 			) as hierarchy_connect_category,
 			all_ia_connectcat,
 		    case
-		      when campus_count < fiber_lines + fixed_wireless_lines + 	case
-		      																when num_students < 100
-		      																	then cable_lines
-		      																else 0
-		      															end
+		      when campus_count < fiber_lines + fixed_wireless_lines + satellite_lte_lines + 	case
+								      																when num_students < 100
+								      																	then cable_lines
+								      																else 0
+								      															end
 		        then campus_count
-		        else fiber_lines + fixed_wireless_lines + 	case
-																when num_students < 100
-																	then cable_lines
-																else 0
-															end
+		        else fiber_lines + fixed_wireless_lines + satellite_lte_lines +	case
+																					when num_students < 100
+																						then cable_lines
+																					else 0
+																				end
 		    end as sots_known_scalable_campuses,
 		    case
 		      when num_schools > 5 and wan_lines = 0
 		        then
 		          case
-		            when campus_count > fiber_lines + fixed_wireless_lines + 	case
-																					when num_students < 100
-																						then cable_lines
-																					else 0
-																				end
-		              then campus_count - fiber_lines + fixed_wireless_lines + 	case
-																					when num_students < 100
-																						then cable_lines
-																					else 0
-																				end
+		            when campus_count > fiber_lines + fixed_wireless_lines + satellite_lte_lines + case
+																										when num_students < 100
+																											then cable_lines
+																										else 0
+																									end
+		              then campus_count - fiber_lines + fixed_wireless_lines + satellite_lte_lines 	case
+																										when num_students < 100
+																											then cable_lines
+																										else 0
+																									end
 		              else 0
 		          end
 		        else 0
@@ -129,19 +129,19 @@ select	dd.*,
 		      when num_students < 100 and copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
 		        then
 		          case
-		            when campus_count < (fiber_lines + fixed_wireless_lines + cable_lines)
+		            when campus_count < (fiber_lines + fixed_wireless_lines + satellite_lte_lines + cable_lines)
 		              then 0
-		            when campus_count - (fiber_lines + fixed_wireless_lines + cable_lines) < copper_dsl_lines
-		              then campus_count - (fiber_lines + fixed_wireless_lines + cable_lines)
+		            when campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines + cable_lines) < copper_dsl_lines
+		              then campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines + cable_lines)
 		              else copper_dsl_lines
 		          end
 		      when num_students >= 100 and (copper_dsl_lines + cable_lines)> 0  and not(num_schools > 5 and wan_lines = 0 )
 		        then
 		          case
-		            when campus_count < (fiber_lines + fixed_wireless_lines)
+		            when campus_count < (fiber_lines + fixed_wireless_lines + satellite_lte_lines)
 		              then 0
-		            when campus_count - (fiber_lines + fixed_wireless_lines ) < copper_dsl_lines + cable_lines
-		              then campus_count - (fiber_lines + fixed_wireless_lines)
+		            when campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines) < copper_dsl_lines + cable_lines
+		              then campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines)
 		              else copper_dsl_lines + cable_lines
 		          end
 		        else 0
@@ -151,9 +151,9 @@ select	dd.*,
 		        then 0
 		        else
 		          case
-		            when campus_count < (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
+		            when campus_count < (fiber_lines + fixed_wireless_lines + satellite_lte_lines + copper_dsl_lines + cable_lines)
 		              then 0
-		              else campus_count - (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
+		              else campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines + copper_dsl_lines + cable_lines)
 		          end
 		    end as sots_assumed_unscalable_campuses,
 		      case

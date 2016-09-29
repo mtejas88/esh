@@ -2,8 +2,7 @@ select  		dd.esh_id as district_esh_id,
 --ia bw/student pieces
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)
-							and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
@@ -11,8 +10,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	internet_conditions_met	=	TRUE
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-							and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
@@ -20,8 +18,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	upstream_conditions_met	=	TRUE
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-							and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
@@ -29,8 +26,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	isp_conditions_met	=	TRUE
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-							and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
@@ -38,8 +34,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	(upstream_conditions_met	=	TRUE or internet_conditions_met = TRUE)
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-							and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+							and	num_open_flags	=	0
 							and consortium_shared = false
 							and bandwidth_in_mbps >= 25
 								then	allocation_lines
@@ -49,13 +44,19 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)
 							and	num_open_flags	=	0
+							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+										or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	com_info_bandwidth_cost,
 				sum(case
 							when	internet_conditions_met	=	TRUE
-							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_flag_labels	is	null)
+							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -63,7 +64,10 @@ select  		dd.esh_id as district_esh_id,
 						end)	as	internet_bandwidth_cost,
 				sum(case
 							when	upstream_conditions_met	=	TRUE
-							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_flag_labels	is	null)
+							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -71,7 +75,10 @@ select  		dd.esh_id as district_esh_id,
 						end)	as	upstream_bandwidth_cost,
 				sum(case
 							when	isp_conditions_met	=	TRUE
-							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_flag_labels	is	null)
+							and (not(	'committed_information_rate'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -83,6 +90,9 @@ select  		dd.esh_id as district_esh_id,
 												or	upstream_conditions_met	=	TRUE
 												or	'committed_information_rate'	=	any(open_tag_labels))
 									and	num_open_flags	=	0
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
 										then	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
@@ -104,7 +114,10 @@ select  		dd.esh_id as district_esh_id,
 -- wan cost/connection pieces
 						sum(case
 									when	wan_conditions_met = true
-									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 									and num_lines::numeric>0
@@ -118,7 +131,10 @@ select  		dd.esh_id as district_esh_id,
 								end)	as	wan_monthly_cost,
 						sum(case
 									when	wan_conditions_met = true
-									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
+												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 										then allocation_lines
@@ -128,8 +144,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then allocation_lines
 									else	0
@@ -137,8 +152,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	connect_category ilike '%fiber%'
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -146,8 +161,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	connect_category = 'Fixed Wireless'
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -155,8 +170,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	connect_category = 'Cable'
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -164,8 +179,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	connect_category in ('Other Copper', 'T-1', 'DSL')
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -173,8 +188,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	connect_category = 'Satellite/LTE'
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -182,8 +197,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when not(connect_category ilike '%fiber%')
 									and isp_conditions_met = false
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and backbone_conditions_met = false
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -193,8 +208,7 @@ select  		dd.esh_id as district_esh_id,
 				          array_agg( distinct
 				            case
 								when	(upstream_conditions_met	=	TRUE or internet_conditions_met = TRUE)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 				                then connect_category
 				            end
@@ -202,8 +216,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when connect_category ILIKE '%Fiber%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -211,8 +224,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when connect_category ILIKE '%Fixed Wireless%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -220,8 +232,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when connect_category ILIKE '%Cable%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -231,8 +242,7 @@ select  		dd.esh_id as district_esh_id,
 						    				connect_category ILIKE '%Copper%' or
 						    				connect_category ILIKE '%T-1%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -240,8 +250,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when connect_category ILIKE '%Satellite/LTE%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -249,8 +258,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when connect_category ILIKE '%Uncategorized%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
-									and (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and num_open_flags	=	0
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
@@ -258,24 +266,21 @@ select  		dd.esh_id as district_esh_id,
 						min(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then bandwidth_in_mbps
 								end) as wan_bandwidth_low,
 						max(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 										then bandwidth_in_mbps
 								end) as wan_bandwidth_high,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 									and bandwidth_in_mbps >= 1000
 										then allocation_lines
@@ -284,8 +289,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 									and connect_category ILIKE '%Fiber%'
 									and bandwidth_in_mbps < 1000
@@ -295,8 +299,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and	(num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																								'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									and	num_open_flags	=	0
 									and consortium_shared = false
 									and not(connect_category ILIKE '%Fiber%')
 									and bandwidth_in_mbps < 1000
@@ -457,8 +460,7 @@ select  		dd.esh_id as district_esh_id,
 						c1_discount_rate,
 						c2_discount_rate,
 						sum(case
-									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									when num_open_flags	=	0
 									and ('cc_updated_15' = any(open_tag_labels) or
 										 'purpose_updated_15' = any(open_tag_labels) or
 										 'num_lines_updated_15' = any(open_tag_labels) or
@@ -508,8 +510,7 @@ select  		dd.esh_id as district_esh_id,
 									else	0
 								end) as lines_w_dirty,
 						sum(case
-									when (num_open_flags	=	0 or (num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(open_flag_labels))))
+									when num_open_flags	=	0
 									and connect_category ILIKE '%Fiber%'
 									and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
 									and wan_conditions_met = true
@@ -523,14 +524,12 @@ select  		dd.esh_id as district_esh_id,
 														when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
 																and applicant_id::varchar!=ldli.district_esh_id
 																and applicant_type!='School'
-																and applicant_id not in (	select esh_id
-																							from fy2016.districts
+																and applicant_id::varchar not in (	select esh_id
+																							from public.fy2016_districts_demog
 																							where include_in_universe_of_districts=true)
 																	then applicant_name
 														when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-																and applicant_id not in (	select esh_id
-																							from fy2016.districts
-																							where esh_id::varchar!=ldli.district_esh_id)
+																and applicant_id::varchar !=ldli.district_esh_id
 																and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
 																							7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
 																							8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
@@ -543,8 +542,8 @@ select  		dd.esh_id as district_esh_id,
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
 													and applicant_type!='School'
 													and applicant_id::varchar!=ldli.district_esh_id
-													and applicant_id not in (	select esh_id
-																				from fy2016.districts
+													and applicant_id::varchar not in (	select esh_id
+																				from public.fy2016_districts_demog
 																				where include_in_universe_of_districts=true)
 														then 1
 											else 0
@@ -577,8 +576,8 @@ select  		dd.esh_id as district_esh_id,
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
 													and applicant_type!='School'
 													and applicant_id::varchar!=ldli.district_esh_id
-													and applicant_id not in (	select esh_id
-																				from fy2016.districts
+													and applicant_id::varchar not in (	select esh_id
+																				from public.fy2016_districts_demog
 																				where include_in_universe_of_districts=true)
 														then 1
 											else 0
@@ -608,17 +607,24 @@ select  		dd.esh_id as district_esh_id,
 											else 0
 										end)>0
 									then 'Consortium+District'
+							when sum(case
+									when isp_conditions_met = false
+									and backbone_conditions_met = false
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) = 0 then 'Unknown'
 							else 'Self-procured'
 						end as ia_procurement_type,
 --cleanliness
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_flag_labels) or 'exclude_for_cost_only_restricted'= any(open_flag_labels))
+									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and (internet_conditions_met or upstream_conditions_met or isp_conditions_met or backbone_conditions_met)
 										then allocation_lines
 									else	0
 								end) as ia_no_cost_lines,
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_flag_labels) or 'exclude_for_cost_only_restricted'= any(open_flag_labels))
+									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and wan_conditions_met
 										then allocation_lines
 									else	0
