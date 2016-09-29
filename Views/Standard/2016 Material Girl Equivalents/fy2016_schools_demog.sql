@@ -5,9 +5,12 @@ select d.esh_id as district_esh_id,
         end as school_esh_id,
         sc131a."LEAID" as nces_cd,
         sc131a."NCESSCH" as school_nces_code,
+        d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         sc131a."SCHNAM" as name,
         case
           when sc131a."CHARTR" = '1' then 'Charter'
+          when d.district_type = 'Other Agency'
+            then 'Other School'
           else 'Traditional'
         end as school_type,
         sc131a."LSTREE" as address,
@@ -31,20 +34,20 @@ select d.esh_id as district_esh_id,
             then "TOTFRL"::numeric
         end as frl_percentage_numerator,
         case
-          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
         ds.campus_id
 
-from public.sc131a 
+from public.sc131a
 join (select *
       from fy2016_districts_demog
-      where postal_cd not in ('MT', 'VT')) d --only want schools in districts universe
+      where postal_cd not in ('MT', 'VT')) d
 on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join ( select distinct school_id, campus_id 
+left join ( select distinct school_id, campus_id
             from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
@@ -65,9 +68,12 @@ select  d.esh_id as district_esh_id,
         end as school_esh_id,
         d.nces_cd,
         sc131a."NCESSCH" as school_nces_code,
+        d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         sc131a."SCHNAM" as name,
         case
           when sc131a."CHARTR" = '1' then 'Charter'
+          when d.district_type = 'Other Agency'
+            then 'Other School'
           else 'Traditional'
         end as school_type,
         sc131a."LSTREE" as address,
@@ -91,23 +97,23 @@ select  d.esh_id as district_esh_id,
             then "TOTFRL"::numeric
         end as frl_percentage_numerator,
         case
-          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
         ds.campus_id
 
-from public.sc131a 
+from public.sc131a
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
 join (select *
       from fy2016_districts_demog
-      where postal_cd = 'MT') d --only want schools in districts universe
+      where postal_cd = 'MT') d
 on ag131a."LSTREE" = d.address
 and sc131a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join ( select distinct school_id, campus_id 
+left join ( select distinct school_id, campus_id
             from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
@@ -128,9 +134,12 @@ select  d.esh_id as district_esh_id,
         end as school_esh_id,
         d.nces_cd,
         sc131a."NCESSCH" as school_nces_code,
+        d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         sc131a."SCHNAM" as name,
         case
           when sc131a."CHARTR" = '1' then 'Charter'
+          when d.district_type = 'Other Agency'
+            then 'Other School'
           else 'Traditional'
         end as school_type,
         sc131a."LSTREE" as address,
@@ -154,12 +163,12 @@ select  d.esh_id as district_esh_id,
             then "TOTFRL"::numeric
         end as frl_percentage_numerator,
         case
-          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0 
+          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0
             then sc131a."MEMBER"::numeric
         end as frl_percentage_denomenator,
         ds.campus_id
-        
-from public.sc131a 
+
+from public.sc131a
 join (select *
       from fy2016_districts_demog
       where postal_cd = 'VT') d
@@ -168,7 +177,7 @@ and sc131a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc131a."NCESSCH" = eim.nces_code
-left join ( select distinct school_id, campus_id 
+left join ( select distinct school_id, campus_id
             from fy2016.districts_schools ) ds
 on eim.entity_id = ds.school_id
 left join (
