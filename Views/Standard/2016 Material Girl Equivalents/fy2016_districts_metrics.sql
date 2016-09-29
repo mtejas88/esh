@@ -1,10 +1,10 @@
 select	dd.*,
-				case 
+				case
 		          when dd.district_size in ('Tiny', 'Small') then 1
 		          when dd.district_size = 'Medium' then 1.5
 		          when dd.district_size = 'Large' then 1.75
 		          when dd.district_size = 'Mega' then 2.25
-		        end as ia_oversub_ratio,	
+		        end as ia_oversub_ratio,
 				case
 					when da.campus_count is null
 						then num_schools
@@ -12,122 +12,122 @@ select	dd.*,
 				end as num_campuses,
 				da.flag_array,
 				da.tag_array,
-				broadband_internet_upstream_lines,							
-				case											
-					when	com_info_bandwidth	>	0								
-						then	com_info_bandwidth										
-					when	upstream_bandwidth	=	0								
-						then	isp_bandwidth										
-					when	isp_bandwidth	=	0								
-						then	upstream_bandwidth										
-					when	upstream_bandwidth	>	isp_bandwidth								
-						then	isp_bandwidth										
-					else	upstream_bandwidth										
-				end	+	internet_bandwidth	as	ia_bandwidth,							
+				broadband_internet_upstream_lines,
+				case
+					when	com_info_bandwidth	>	0
+						then	com_info_bandwidth
+					when	upstream_bandwidth	=	0
+						then	isp_bandwidth
+					when	isp_bandwidth	=	0
+						then	upstream_bandwidth
+					when	upstream_bandwidth	>	isp_bandwidth
+						then	isp_bandwidth
+					else	upstream_bandwidth
+				end	+	internet_bandwidth	as	ia_bandwidth,
 				case
 					when num_students != 0
-						then (case											
-										when	com_info_bandwidth	>	0								
-											then	com_info_bandwidth										
-										when	upstream_bandwidth	=	0								
-											then	isp_bandwidth										
-										when	isp_bandwidth	=	0								
-											then	upstream_bandwidth										
-										when	upstream_bandwidth	>	isp_bandwidth								
-											then	isp_bandwidth										
-										else	upstream_bandwidth										
+						then (case
+										when	com_info_bandwidth	>	0
+											then	com_info_bandwidth
+										when	upstream_bandwidth	=	0
+											then	isp_bandwidth
+										when	isp_bandwidth	=	0
+											then	upstream_bandwidth
+										when	upstream_bandwidth	>	isp_bandwidth
+											then	isp_bandwidth
+										else	upstream_bandwidth
 									end	+	internet_bandwidth)/num_students*1000
-				end as ia_bandwidth_per_student_kbps,								
-				case											
-					when	com_info_bandwidth_cost	>	0								
-						then	com_info_bandwidth_cost										
-					when	upstream_bandwidth_cost	=	0								
-						then	isp_bandwidth_cost										
-					when	isp_bandwidth_cost	=	0								
-						then	upstream_bandwidth_cost										
-					when	upstream_bandwidth_cost	>	isp_bandwidth_cost								
-						then	isp_bandwidth_cost										
-					else	upstream_bandwidth_cost										
-				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,	
-				ia_monthly_cost_direct_to_district	+	
+				end as ia_bandwidth_per_student_kbps,
+				case
+					when	com_info_bandwidth_cost	>	0
+						then	com_info_bandwidth_cost
+					when	upstream_bandwidth_cost	=	0
+						then	isp_bandwidth_cost
+					when	isp_bandwidth_cost	=	0
+						then	upstream_bandwidth_cost
+					when	upstream_bandwidth_cost	>	isp_bandwidth_cost
+						then	isp_bandwidth_cost
+					else	upstream_bandwidth_cost
+				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,
+				ia_monthly_cost_direct_to_district	+
 				    			(ia_monthly_cost_per_student_backbone_pieces*num_students) as ia_monthly_cost,
 				ia_monthly_cost_direct_to_district,
-				ia_monthly_cost_per_student_backbone_pieces*num_students as ia_monthly_cost_shared,    													
-				case											
-				  when (case											
-			          	when	com_info_bandwidth_cost	>	0								
-			          	then	com_info_bandwidth_cost										
-			          	when	upstream_bandwidth_cost	=	0								
-			          	then	isp_bandwidth_cost										
-			          	when	isp_bandwidth_cost	=	0								
-			          	then	upstream_bandwidth_cost										
-			          	when	upstream_bandwidth_cost	>	isp_bandwidth_cost								
-			          	then	isp_bandwidth_cost										
-			          	else	upstream_bandwidth_cost										
-			          end	+	internet_bandwidth_cost) > 0									
-				    then  (ia_monthly_cost_direct_to_district	+	
+				ia_monthly_cost_per_student_backbone_pieces*num_students as ia_monthly_cost_shared,
+				case
+				  when (case
+			          	when	com_info_bandwidth_cost	>	0
+			          	then	com_info_bandwidth_cost
+			          	when	upstream_bandwidth_cost	=	0
+			          	then	isp_bandwidth_cost
+			          	when	isp_bandwidth_cost	=	0
+			          	then	upstream_bandwidth_cost
+			          	when	upstream_bandwidth_cost	>	isp_bandwidth_cost
+			          	then	isp_bandwidth_cost
+			          	else	upstream_bandwidth_cost
+			          end	+	internet_bandwidth_cost) > 0
+				    then  (ia_monthly_cost_direct_to_district	+
 				    			(ia_monthly_cost_per_student_backbone_pieces*num_students))/
-				    				(case									
-                    	when	com_info_bandwidth_cost	>	0								
-                    	then	com_info_bandwidth_cost										
-                    	when	upstream_bandwidth_cost	=	0								
-                    	then	isp_bandwidth_cost										
-                    	when	isp_bandwidth_cost	=	0								
-                    	then	upstream_bandwidth_cost										
-                    	when	upstream_bandwidth_cost	>	isp_bandwidth_cost								
-                    	then	isp_bandwidth_cost										
-                    	else	upstream_bandwidth_cost										
-                    end	+	internet_bandwidth_cost)					
+				    				(case
+                    	when	com_info_bandwidth_cost	>	0
+                    	then	com_info_bandwidth_cost
+                    	when	upstream_bandwidth_cost	=	0
+                    	then	isp_bandwidth_cost
+                    	when	isp_bandwidth_cost	=	0
+                    	then	upstream_bandwidth_cost
+                    	when	upstream_bandwidth_cost	>	isp_bandwidth_cost
+                    	then	isp_bandwidth_cost
+                    	else	upstream_bandwidth_cost
+                    end	+	internet_bandwidth_cost)
 			  end as	ia_monthly_cost_per_mbps,
-				case											
-				  when wan_lines_cost > 0									
-				    then  wan_monthly_cost/wan_lines_cost					
+				case
+				  when wan_lines_cost > 0
+				    then  wan_monthly_cost/wan_lines_cost
 			  end as	wan_monthly_cost_per_line,
 			COALESCE (
 			    case when (all_ia_connectcat ILIKE '%Fiber%') then 'Fiber' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Fixed Wireless%') then 'Fixed Wireless' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Cable%') then 'Cable' else NULL end,
-			    case when ( all_ia_connectcat ILIKE '%DSL%' or 
-			    			all_ia_connectcat ILIKE '%Copper%' or 
+			    case when ( all_ia_connectcat ILIKE '%DSL%' or
+			    			all_ia_connectcat ILIKE '%Copper%' or
 			    			all_ia_connectcat ILIKE '%T-1%') then 'Copper' else NULL end,
 				case when (all_ia_connectcat ILIKE '%Satellite/LTE%') then 'Satellite/LTE' else NULL end,
 			    case when (all_ia_connectcat ILIKE '%Uncategorized%') then 'Uncategorized' else 'None - Error' end
 			) as hierarchy_connect_category,
 			all_ia_connectcat,
 		    case
-		      when campus_count < fiber_lines + fixed_wireless_lines + 	case 
-		      																when num_students < 100 
-		      																	then cable_lines 
-		      																else 0 
+		      when campus_count < fiber_lines + fixed_wireless_lines + 	case
+		      																when num_students < 100
+		      																	then cable_lines
+		      																else 0
 		      															end
-		        then campus_count 
-		        else fiber_lines + fixed_wireless_lines + 	case 
-																when num_students < 100 
-																	then cable_lines 
-																else 0 
+		        then campus_count
+		        else fiber_lines + fixed_wireless_lines + 	case
+																when num_students < 100
+																	then cable_lines
+																else 0
 															end
-		    end as known_scalable_campuses,
-		    case 
-		      when num_schools > 5 and wan_lines = 0 
-		        then 
-		          case 
-		            when campus_count > fiber_lines + fixed_wireless_lines + 	case 
-																					when num_students < 100 
-																						then cable_lines 
-																					else 0 
+		    end as sots_known_scalable_campuses,
+		    case
+		      when num_schools > 5 and wan_lines = 0
+		        then
+		          case
+		            when campus_count > fiber_lines + fixed_wireless_lines + 	case
+																					when num_students < 100
+																						then cable_lines
+																					else 0
 																				end
-		              then campus_count - fiber_lines + fixed_wireless_lines + 	case 
-																					when num_students < 100 
-																						then cable_lines 
-																					else 0 
+		              then campus_count - fiber_lines + fixed_wireless_lines + 	case
+																					when num_students < 100
+																						then cable_lines
+																					else 0
 																				end
 		              else 0
 		          end
 		        else 0
-		    end as assumed_scalable_campuses,
+		    end as sots_assumed_scalable_campuses,
 		    case
 		      when num_students < 100 and copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
-		        then 
+		        then
 		          case
 		            when campus_count < (fiber_lines + fixed_wireless_lines + cable_lines)
 		              then 0
@@ -135,7 +135,7 @@ select	dd.*,
 		              then campus_count - (fiber_lines + fixed_wireless_lines + cable_lines)
 		              else copper_dsl_lines
 		          end
-		      when num_students >= 100 and (copper_dsl_lines + cable_lines)> 0  and not(num_schools > 5 and wan_lines = 0 ) 
+		      when num_students >= 100 and (copper_dsl_lines + cable_lines)> 0  and not(num_schools > 5 and wan_lines = 0 )
 		        then
 		          case
 		            when campus_count < (fiber_lines + fixed_wireless_lines)
@@ -145,91 +145,66 @@ select	dd.*,
 		              else copper_dsl_lines + cable_lines
 		          end
 		        else 0
-		    end as known_unscalable_campuses,
-		    case 
-		      when num_schools > 5 and wan_lines = 0 
-		        then 0 
-		        else 
+		    end as sots_known_unscalable_campuses,
+		    case
+		      when num_schools > 5 and wan_lines = 0
+		        then 0
+		        else
 		          case
 		            when campus_count < (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
 		              then 0
 		              else campus_count - (fiber_lines + fixed_wireless_lines + copper_dsl_lines + cable_lines)
 		          end
-		    end as assumed_unscalable_campuses,
+		    end as sots_assumed_unscalable_campuses,
 		      case
-		        when campus_count < fiber_lines 
-		          then campus_count 
-		          else fiber_lines 
-		      end as nga_v2_known_scalable_campuses,
-		      case 
-		        when num_schools > 5 and wan_lines = 0 
-		          then 
-		            case 
-		              when campus_count > fiber_lines 
-		                then campus_count - fiber_lines 
-		                else 0
-		            end
-		          else 0
-		      end as nga_v2_assumed_scalable_campuses,
+		        when campus_count < fiber_lines
+		          then campus_count
+		          else fiber_lines
+		      end as current_known_scalable_campuses,
 		      case
-		        when copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
-		          then 
+		        when copper_dsl_lines + satellite_lte_lines > 0
+		          then
 		            case
 		              when campus_count < (fiber_lines )
 		                then 0
-		              when campus_count - (fiber_lines ) < copper_dsl_lines
+		              when campus_count - (fiber_lines ) < copper_dsl_lines + satellite_lte_lines
 		                then campus_count - (fiber_lines)
-		                else copper_dsl_lines
+		                else copper_dsl_lines + satellite_lte_lines
 		            end
 		          else 0
-		      end as nga_v2_known_unscalable_campuses,
-		      case 
-		        when num_schools > 5 and wan_lines = 0 
-		          then 0 
-		          else 
+		      end as current_known_unscalable_campuses,
+		      case --all campuses that have a specific fixed wireless or cable line
+		        when fixed_wireless_lines + cable_lines > 0
+		          then
 		            case
-		              when campus_count < (fiber_lines + copper_dsl_lines)
+		              when campus_count < fiber_lines + copper_dsl_lines + satellite_lte_lines
 		                then 0
-		                else campus_count - (fiber_lines + copper_dsl_lines)
+		              when campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines ) < fixed_wireless_lines + cable_lines
+		                then campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines )
+		                else fixed_wireless_lines + cable_lines
 		            end
-		      end as nga_v2_assumed_unscalable_campuses,
-      case
-        when campus_count < fiber_lines
-          then campus_count 
-          else fiber_lines
-      end as known_fiber_campuses,
-      case 
-        when num_schools > 5 and wan_lines = 0 
-          then 
-            case 
-              when campus_count > fiber_lines 
-                then campus_count - fiber_lines
-                else 0
-            end
-          else 0
-      end as assumed_fiber_campuses,
-      case
-        when non_fiber_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
-          then 
-            case
-              when campus_count < fiber_lines
-                then 0
-              when campus_count - fiber_lines < non_fiber_lines
-                then campus_count - fiber_lines 
-                else non_fiber_lines
-            end
-          else 0
-      end as known_nonfiber_campuses,
-      case 
-        when num_schools > 5 and wan_lines = 0 
-          then 0 
-          else 
-            case
-              when campus_count < fiber_lines + non_fiber_lines
-                then 0
-                else campus_count - (fiber_lines + non_fiber_lines)
-            end
-      end as assumed_nonfiber_campuses,
+		          else 0
+		      end +
+		      case --all campuses that don't have a specific line spoken for them, if they have <6 schools (or >=6 schools with >1 WAN line)
+		        when num_schools > 5 and wan_lines = 0
+		          then 0
+		          else
+		            case
+		              when campus_count < (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines)
+		                then 0
+		                else campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines)
+		            end
+		      end as current_assumed_unscalable_campuses,
+		      case
+		        when not(num_schools > 5 and wan_lines = 0)
+		          then 0
+		          else
+		            case
+		              when campus_count < (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines)
+		                then 0
+		                else campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines)
+		            end
+		      end as current_assumed_scalable_campuses,
 			fiber_internet_upstream_lines,
 			fixed_wireless_internet_upstream_lines,
 			cable_internet_upstream_lines,
@@ -272,17 +247,19 @@ select	dd.*,
 		    consortium_affiliation,
 		    ia_procurement_type,
 		    ia_no_cost_lines,
-		    wan_no_cost_lines										
-												
-from	fy2016_districts_demog		 dd									
-left	join	fy2016_districts_aggregation	da									
-on	dd.esh_id	=	da.district_esh_id									
+		    wan_no_cost_lines,
+			most_recent_ia_contract_end_date,
+			include_in_universe_of_districts
+
+from	fy2016_districts_demog		 dd
+left	join	fy2016_districts_aggregation	da
+on	dd.esh_id	=	da.district_esh_id
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/09/2016
-Name of QAing Analyst(s): 
+Last Modified Date: 9/28/2016
+Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables
 */

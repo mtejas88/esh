@@ -7,7 +7,20 @@ select  case
         case
           when "TYPE" = '7' then 'Charter'
           when "FIPST" = '59' then 'BIE'
-          else 'Traditional'
+          when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
+                  (case
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
+                      else false
+                    end )
+                  --in RI and MA we also include 4's with majority type 1 schools.
+                  or (d."LSTATE" in ('RI', 'MA')
+                      and "TYPE" = '4'
+                      and sc.school_type_1_count/sc.school_count::numeric >= .75 )
+                  --in NY we also include 3's, in VT we only include 3's
+                  or (d."LSTATE" in ('VT', 'NY')
+                      and "TYPE" = '3') )
+            then 'Traditional'
+          else 'Other Agency'
         end as district_type,
         d."LSTREE" as address,
         d."LCITY" as city,
@@ -16,15 +29,39 @@ select  case
         d."LSTATE" as postal_cd,
         d."LATCOD" as latitude,
         d."LONCOD" as longitude,
-        case 
-          when d."LSTATE" = 'VT' then sc_VT.student_count - sc_VT.student_pk_count 
-          when d."LSTATE" = 'MT' then sc_MT.student_count - sc_MT.student_pk_count
-            else sc.student_count - sc.student_pk_count 
+        case
+          when d."LSTATE" = 'VT' then case
+                                        when sc_VT.student_count - sc_VT.student_pk_count is null
+                                          then 0
+                                        else sc_VT.student_count - sc_VT.student_pk_count
+                                      end
+          when d."LSTATE" = 'MT' then case
+                                        when sc_MT.student_count - sc_MT.student_pk_count is null
+                                          then 0
+                                        else sc_MT.student_count - sc_MT.student_pk_count
+                                      end
+            else  case
+                    when sc.student_count - sc.student_pk_count is null
+                      then 0
+                    else sc.student_count - sc.student_pk_count
+                  end
         end as num_students,
         case
-          when d."LSTATE" = 'VT' then sc_VT.school_count
-          when d."LSTATE" = 'MT' then sc_MT.school_count
-            else sc.school_count
+          when d."LSTATE" = 'VT' then case
+                                        when sc_VT.school_count is null
+                                          then 0
+                                        else sc_VT.school_count
+                                      end
+          when d."LSTATE" = 'MT' then case
+                                        when sc_MT.school_count is null
+                                          then 0
+                                        else sc_MT.school_count
+                                      end
+            else  case
+                    when sc.school_count is null
+                      then 0
+                    else sc.school_count
+                  end
         end as num_schools,
         "ULOCAL" as ulocal,
         case
@@ -60,8 +97,38 @@ select  case
                       else 'Unknown'
                   end
         end as district_size,
-        d."UNION" as union_code
-        
+        d."UNION" as union_code,
+        case
+          when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
+                  (case
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
+                      else false
+                    end )
+                  --in RI and MA we also include 4's with majority type 1 schools.
+                  or (d."LSTATE" in ('RI', 'MA')
+                      and "TYPE" = '4'
+                      and sc.school_type_1_count/sc.school_count::numeric >= .75 )
+                  --in NY we also include 3's, in VT we only include 3's
+                  or (d."LSTATE" in ('VT', 'NY')
+                      and "TYPE" = '3') )
+          and d."LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
+          and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
+          and ( sc.student_count - sc.student_pk_count  >0
+                or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
+                or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
+                or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts
+          and ( (sc.school_count) > 0
+                or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)
+                or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
+          and "BOUND" != '2' --closed districts
+            then  case
+                    when "TYPE" != '7' or d."LSTATE" = 'AZ'
+                      then true
+                    else false
+                  end
+          else false
+        end as include_in_universe_of_districts
+
 from public.ag131a d
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
@@ -88,7 +155,7 @@ left join ( select  "LEAID",
                                 and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count
-            from public.sc131a 
+            from public.sc131a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
@@ -132,7 +199,7 @@ left join ( select  "UNION",
                                       when flaggable_id is null
                                         then sc131a."LEAID"
                                     end) as district_count
-            from public.sc131a 
+            from public.sc131a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
@@ -162,25 +229,27 @@ left join ( select  ag131a."LSTREE",
                             else 0
                           end) as school_count,
                     sum(case
-                            when flaggable_id is null and "TYPE" = '1'
+                            when flaggable_id is null and sc131a."TYPE" = '1'
                               then 1
                             else 0
                           end) as school_type_1_count,
                     sum(case
                           when (flaggable_id is null or include_students > 0)
-                                and "MEMBER"::numeric > 0 then "MEMBER"::numeric
+                                and sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
                           when  (flaggable_id is null or include_students > 0)
-                                and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
+                                and sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
                             else 0
                         end) as student_pk_count,
                     count(distinct  case
                                       when flaggable_id is null
                                         then sc131a."LEAID"
                                     end) as district_count
-            from public.sc131a 
+            from public.sc131a
+            left join ag131a
+            on sc131a."LEAID" = ag131a."LEAID"
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
             on sc131a."NCESSCH" = eim.nces_code
@@ -202,41 +271,20 @@ left join ( select  ag131a."LSTREE",
 on d."LSTREE"=sc_MT."LSTREE"
 and d."LSTATE"=sc_MT."LSTATE"
 
-where ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
-        (case   
-            when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')    
-            else false    
-          end )   
-        --in RI and MA we also include 4's with majority type 1 schools.    
-        or (d."LSTATE" in ('RI', 'MA')    
-            and "TYPE" = '4'    
-            and sc.school_type_1_count/sc.school_count::numeric >= .75 )    
-        --in NY we also include 3's, in VT we only include 3's    
-        or (d."LSTATE" in ('VT', 'NY')    
-            and "TYPE" = '3') )
-and d."LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
-and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
-and ( sc.student_count - sc.student_pk_count  >0 
-      or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0) 
-      or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
-      or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts 
-and ( (sc.school_count) > 0 
-      or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)  
-      or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school 
-and "BOUND" != '2' --closed districts
-and case --only include the HS district when smushing MT districts (exclude the ELEM)
-      when sc_MT.district_count > 1
-        then  right(d."NAME",3) =' HS'
-              or right(d."NAME",4) =' H S'
-              or right(d."NAME",12) =' HIGH SCHOOL'
-              or right(d."NAME",13) = ' K-12 SCHOOLS'
-      else true
-    end
+where case --only include the HS district when smushing MT districts (exclude the ELEM)
+        when sc_MT.district_count > 1
+          then  right(d."NAME",3) =' HS'
+                or right(d."NAME",4) =' H S'
+                or right(d."NAME",12) =' HIGH SCHOOL'
+                or right(d."NAME",13) = ' K-12 SCHOOLS'
+        else true
+      end
+and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/26/2016
+Last Modified Date: 9/28/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before

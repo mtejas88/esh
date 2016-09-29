@@ -72,11 +72,15 @@ FROM (
             dd.exclude_from_ia_cost_analysis AS recipient_exclude_from_ia_cost_analysis,
             dd.exclude_from_wan_analysis AS recipient_exclude_from_wan_analysis,
             dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
+            dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
             d.consortium_member AS recipient_consortium_member
           FROM public.fy2016_lines_to_district_by_line_item lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
-          LEFT OUTER JOIN public.service_provider_categories spc
+          LEFT OUTER JOIN (
+            select distinct name, reporting_name
+            from fy2016.service_providers
+          ) spc
           ON spc.name = li.service_provider_name
           LEFT OUTER JOIN public.fy2016_districts_deluxe dd
           ON dd.esh_id = lid.district_esh_id

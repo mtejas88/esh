@@ -1,4 +1,4 @@
-select 
+select
 	esh_id,
 	nces_cd,
 	name,
@@ -47,22 +47,7 @@ select
 			then false
 		else true
 	end as exclude_from_wan_cost_analysis,
-/*	case
-		when flag_array is null
-			then false
-		else true
-	end as exclude_from_analysis,
-	case
-		when flag_array is null and ia_monthly_cost_per_mbps is not null
-			then 'clean_with_cost'
-		when flag_array is null
-			then 'clean_no_cost'
-		when flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%' and ia_monthly_cost_per_mbps is not null
-			then 'clean_except_wan_with_cost'
-		when flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'
-			then 'clean_except_wan_no_cost'
-		else 'dirty'
-	end	as inclusion_status,*/
+	include_in_universe_of_districts,
 	flag_array,
 	tag_array,
 	flag_count as num_open_district_flags,
@@ -80,29 +65,29 @@ select
 			then 'dqt_reviewed'
 		when machine_cleaned_lines > 0
 			then 'machine_cleaned'
-		else 'natively_clean' 
+		else 'natively_clean'
 	end as clean_categorization,
 	ia_bandwidth_per_student_kbps,
 	case
 		when ia_bandwidth_per_student_kbps >= 100
 			then true
-		when ia_bandwidth_per_student_kbps < 100 
+		when ia_bandwidth_per_student_kbps < 100
 			then false
 	end as meeting_2014_goal_no_oversub,
 	case
 		when ia_bandwidth_per_student_kbps*ia_oversub_ratio >= 100
 			then true
-		when ia_bandwidth_per_student_kbps*ia_oversub_ratio < 100 
+		when ia_bandwidth_per_student_kbps*ia_oversub_ratio < 100
 			then false
 	end as meeting_2014_goal_oversub,
-	case 
+	case
     	when ia_bandwidth_per_student_kbps >= 100
       	and broadband_internet_upstream_lines > 0
       		then TRUE
     	when ia_bandwidth_per_student_kbps < 100
     	or broadband_internet_upstream_lines = 0
     	or broadband_internet_upstream_lines is null
-      		then FALSE 
+      		then FALSE
 	end as meeting_2014_goal_no_oversub_fcc_25,
 	case
 		when ia_bandwidth_per_student_kbps >= 1000
@@ -116,14 +101,14 @@ select
 		when ia_bandwidth_per_student_kbps*ia_oversub_ratio < 1000
 			then false
 	end as meeting_2018_goal_oversub,
-	case 
+	case
     	when ia_bandwidth_per_student_kbps >= 1000
       	and broadband_internet_upstream_lines > 0
       		then TRUE
     	when ia_bandwidth_per_student_kbps < 1000
     	or broadband_internet_upstream_lines = 0
     	or broadband_internet_upstream_lines is null
-      		then FALSE 
+      		then FALSE
 	end as meeting_2018_goal_no_oversub_fcc_25,
 	ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
@@ -140,18 +125,14 @@ select
 	end as meeting_3_per_mbps_affordability_target,
 	hierarchy_connect_category as hierarchy_ia_connect_category,
 	all_ia_connectcat,
-	nga_v2_known_scalable_campuses as nga_known_scalable_campuses,
-	nga_v2_assumed_scalable_campuses as nga_assumed_scalable_campuses,
-	nga_v2_known_unscalable_campuses as nga_known_unscalable_campuses,
-	nga_v2_assumed_unscalable_campuses as nga_assumed_unscalable_campuses,
-	known_scalable_campuses as sots_known_scalable_campuses,
-	assumed_scalable_campuses as sots_assumed_scalable_campuses,
-	known_unscalable_campuses as sots_known_unscalable_campuses,
-	assumed_unscalable_campuses as sots_assumed_unscalable_campuses,
-	known_fiber_campuses,
-	assumed_fiber_campuses,
-	known_nonfiber_campuses,
-	assumed_nonfiber_campuses,
+	current_known_scalable_campuses,
+	current_assumed_scalable_campuses,
+	current_known_unscalable_campuses,
+	current_assumed_unscalable_campuses,
+	sots_known_scalable_campuses,
+	sots_assumed_scalable_campuses,
+	sots_known_unscalable_campuses,
+	sots_assumed_unscalable_campuses,
 	fiber_internet_upstream_lines,
 	fixed_wireless_internet_upstream_lines,
 	cable_internet_upstream_lines,
@@ -186,17 +167,16 @@ select
     fiber_internet_upstream_lines_w_dirty,
     fiber_wan_lines_w_dirty,
 	lines_w_dirty,
-	fiber_wan_lines
+	fiber_wan_lines,
+	most_recent_ia_contract_end_date
 
 from public.fy2016_districts_metrics
-where district_type != 'Charter'
-or postal_cd = 'AZ'
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 9/26/2016
-Name of QAing Analyst(s): 
+Last Modified Date: 9/28/2016
+Name of QAing Analyst(s):
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
 */
