@@ -248,8 +248,7 @@ select	dd.*,
 		    ia_procurement_type,
 		    ia_no_cost_lines,
 		    wan_no_cost_lines,
-			most_recent_ia_contract_end_date,
-			dd.include_in_universe_of_districts
+			most_recent_ia_contract_end_date
 
 from	fy2016_districts_demog		 dd
 left	join	fy2016_districts_aggregation	da
