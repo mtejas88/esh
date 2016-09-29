@@ -21,7 +21,7 @@ select
   d15.ia_bandwidth_per_student_kbps as ia_bandwidth_per_student_kbps_2015,
   d16.ia_bandwidth_per_student_kbps as ia_bandwidth_per_student_kbps_2016,
   d15.exclude_from_analysis as exclude_from_analysis_2015,
-  d16.exclude_from_analysis as exclude_from_analysis_2016,
+  d16.exclude_from_ia_analysis as exclude_from_analysis_2016,
   d16.ia_applicants
 
 from fy2016_districts_deluxe_m d16
