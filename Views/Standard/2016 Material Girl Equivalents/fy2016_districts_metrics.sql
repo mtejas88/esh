@@ -116,11 +116,11 @@ select	dd.*,
 																											then cable_lines
 																										else 0
 																									end
-		              then campus_count - fiber_lines + fixed_wireless_lines + satellite_lte_lines 	case
+		              then campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines + 	case
 																										when num_students < 100
 																											then cable_lines
 																										else 0
-																									end
+																									end)
 		              else 0
 		          end
 		        else 0
@@ -249,7 +249,7 @@ select	dd.*,
 		    ia_no_cost_lines,
 		    wan_no_cost_lines,
 			most_recent_ia_contract_end_date,
-			include_in_universe_of_districts
+			dd.include_in_universe_of_districts
 
 from	fy2016_districts_demog		 dd
 left	join	fy2016_districts_aggregation	da
