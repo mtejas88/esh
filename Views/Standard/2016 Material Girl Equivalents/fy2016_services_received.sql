@@ -6,7 +6,9 @@ select base.*,
         then null
       WHEN base.line_item_total_num_lines = 'Unknown'
         THEN null
-      ELSE (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
+      when base.line_item_total_num_lines > 0
+        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
+      ELSE NULL
     END AS line_item_district_monthly_cost
 FROM (
           SELECT
@@ -106,3 +108,12 @@ left join (
           group by ldli.line_item_id
 ) district_info_by_li
 on base.line_item_id=district_info_by_li.line_item_id
+
+/*
+Author:                   Justine Schott
+Created On Date:
+Last Modified Date:       9/30/2016
+Name of QAing Analyst(s):
+Purpose:                  2016 district data in terms of 2016 methodology
+Methodology:
+*/
