@@ -5,7 +5,7 @@ select dl.district_esh_id,
 from fy2016.entity_circuits ec
 join fy2016.circuits c
 on ec.circuit_id = c.id
-join district_lookup_2016 dl
+join fy2016_district_lookup dl
 on ec.entity_id::varchar = dl.esh_id
 
 group by  district_esh_id,
@@ -14,7 +14,7 @@ group by  district_esh_id,
 /*
 Author:                       Justine Schott
 Created On Date:              06/16/2016
-Last Modified Date: 		  
+Last Modified Date: 		  08/26/2016
 Name of QAing Analyst(s):  
 Purpose:                      To aggregate services received by all instructional facilities to the appropriate district. (2016)
 */

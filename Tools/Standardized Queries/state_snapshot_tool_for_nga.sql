@@ -19,12 +19,12 @@ with universe_districts as (
 states_nces as (
   select
     postal_cd,
+    sum(num_students::numeric) as overall_student_count,
     sum(case
           when num_students::numeric*150 < 9200
             then 9200
           else num_students::numeric*150 
         end) as overall_budget_floor,
-    sum(num_students::numeric) as overall_student_count,
     sum(case when locale in ('Rural') then num_students::numeric else 0 end) as num_students_rural,
     sum(case when locale in ('Small Town') then num_students::numeric else 0 end) as num_students_town,
     sum(case when locale in ('Suburban') then num_students::numeric else 0 end) as num_students_suburban,
@@ -152,6 +152,14 @@ ad as (
   where exists (select 1 from c2_li where c2_li.id = a.line_item_id)
   and district_esh_id is not null
 ),
+ali as (
+  select
+    line_item_id,
+    sum(cat_2_cost) as cat_2_cost,
+    count(distinct district_esh_id) as cat_2_district_count
+  from ad
+  group by line_item_id
+),
 
 ad_broadband as (
   select
@@ -178,7 +186,31 @@ districts_c2 as (
   from universe_districts sd
   where exists (select 1 from ad where ad.district_esh_id = sd.esh_id)
 ),
+districts_c2_cost as (
+  select  d.postal_cd,
+          ad.district_esh_id,
+          sum((case
+                when ali.cat_2_cost = 0
+                  then 1/cat_2_district_count::numeric
+                  else ad.cat_2_cost/ali.cat_2_cost::numeric
+              end)*
+              (case 
+                when c2_li.total_cost is null
+                  then 0
+                  else c2_li.total_cost
+              end)) as assumed_cat_2_cost,
+          d.num_students::numeric * 150 as cat_2_budget
 
+  from ad
+  join ali
+  on ad.line_item_id = ali.line_item_id
+  join c2_li
+  on ad.line_item_id = c2_li.id
+  join districts_c2 d
+  on ad.district_esh_id = d.esh_id
+
+  group by d.postal_cd, ad.district_esh_id, d.num_students
+),
 districts_broadband as (
   select *
   from universe_districts sd
@@ -219,14 +251,22 @@ states_c2_recipient as (
     count(*)::numeric / (
       select count(*)
       from universe_districts sd
-      where sd.postal_cd = districts_c2.postal_cd
+      where sd.postal_cd = districts_c2_cost.postal_cd
     )::numeric as pct_receiving_c2,
+    count(case 
+            when cat_2_budget <= assumed_cat_2_cost
+              then 1 
+          end)::numeric / (
+      select count(*)
+      from universe_districts sd
+      where sd.postal_cd = districts_c2_cost.postal_cd
+    )::numeric as pct_exceeding_c2_budget,
     (
       select count(*)
       from universe_districts sd
-      where sd.postal_cd = districts_c2.postal_cd
+      where sd.postal_cd = districts_c2_cost.postal_cd
     ) as count_districts    
-  from districts_c2
+  from districts_c2_cost
   group by postal_cd
 ),
 
@@ -336,7 +376,7 @@ select dl.district_esh_id,
   
   where entity_type in ('School', 'District')
   and exclude_from_reporting = false
-  and dl.district_esh_id is not null
+  and district_esh_id is not null
   
   group by  district_esh_id,
          line_item_id
@@ -348,20 +388,20 @@ cdd as (
         cgfd.num_schools::numeric,
         cgfd.num_campuses,
         cgfd.locale,
-        sum(case when li.connect_category in ('Fiber', 'Fixed Wireless') 
+        sum(case when li.connect_category = 'Fiber' 
               then case when cd.allocation_lines < li.num_lines 
                     then cd.allocation_lines
                     else li.num_lines 
                   end
               else 0
-            end) as fiber_equiv_lines,
-        sum(case when li.connect_type = 'Cable Modem' 
+            end) as fiber_lines,
+        sum(case when li.connect_type = 'Cable Modem' or li.connect_category = 'Fiber' 
               then case when cd.allocation_lines < li.num_lines 
                     then cd.allocation_lines
                     else li.num_lines 
                   end
               else 0
-            end) as cable_lines,
+            end) as cable_equiv_lines,
         sum(case when li.connect_type != 'Cable Modem' and li.connect_category in ('Copper', 'Cable / DSL') 
               then case when cd.allocation_lines < li.num_lines 
                     then cd.allocation_lines
@@ -369,7 +409,7 @@ cdd as (
                   end
               else 0
             end) as copper_dsl_lines,
-        sum(case when li.wan_conditions_met = true and exclude = false
+        sum(case when li.wan_conditions_met = true and exclude = false and (not('backbone'=any(open_flags)) or open_flags is null)
               then case when cd.allocation_lines < li.num_lines 
                     then cd.allocation_lines
                     else li.num_lines 
@@ -388,38 +428,29 @@ cdd as (
 cdd_calc as (
     select *,
     case
-      when num_campuses < fiber_equiv_lines + case when num_students < 100 then cable_lines else 0 end
+      when num_campuses < fiber_lines 
         then num_campuses 
-        else fiber_equiv_lines + case when num_students < 100 then cable_lines else 0 end
+        else fiber_lines 
     end as known_scalable_campuses,
     case 
       when num_schools > 5 and wan_lines = 0 
         then 
           case 
-            when num_campuses > fiber_equiv_lines + case when num_students < 100 then cable_lines else 0 end
-              then num_campuses - fiber_equiv_lines + case when num_students < 100 then cable_lines else 0 end
+            when num_campuses > fiber_lines 
+              then num_campuses - fiber_lines 
               else 0
           end
         else 0
     end as assumed_scalable_campuses,
     case
-      when num_students < 100 and copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
+      when copper_dsl_lines > 0 and not(num_schools > 5 and wan_lines = 0 )
         then 
           case
-            when num_campuses < (fiber_equiv_lines + cable_lines)
+            when num_campuses < (fiber_lines )
               then 0
-            when num_campuses - (fiber_equiv_lines + cable_lines) < copper_dsl_lines
-              then num_campuses - (fiber_equiv_lines + cable_lines)
+            when num_campuses - (fiber_lines ) < copper_dsl_lines
+              then num_campuses - (fiber_lines)
               else copper_dsl_lines
-          end
-      when num_students >= 100 and (copper_dsl_lines + cable_lines)> 0  and not(num_schools > 5 and wan_lines = 0 ) 
-        then
-          case
-            when num_campuses < (fiber_equiv_lines)
-              then 0
-            when num_campuses - (fiber_equiv_lines ) < copper_dsl_lines + cable_lines
-              then num_campuses - (fiber_equiv_lines)
-              else copper_dsl_lines + cable_lines
           end
         else 0
     end as known_unscalable_campuses,
@@ -428,9 +459,9 @@ cdd_calc as (
         then 0 
         else 
           case
-            when num_campuses < (fiber_equiv_lines + copper_dsl_lines + cable_lines)
+            when num_campuses < (fiber_lines + copper_dsl_lines)
               then 0
-              else num_campuses - (fiber_equiv_lines + copper_dsl_lines + cable_lines)
+              else num_campuses - (fiber_lines + copper_dsl_lines)
           end
     end as assumed_unscalable_campuses
   
@@ -503,88 +534,24 @@ select
   sn.postal_cd,
 --Broadband/Wifi metrics   
   (((sn.overall_budget_floor) - sap.c2_cost)/1000000)*(sadr.agg_c2_discount_rate/100) as "$M remaining E-Rate funds to support Wi-Fi and other internal connectivity equipment purchases",
-  sc1.pct_receiving_c1 as "% of districts that are receiving c1 services this year",
-  sb.pct_receiving_broadband as "% of districts that are receiving broadband this year",
   sr.pct_receiving_c2 as "% of districts that have requested any funding for Wi-Fi and other internal connectivity equipment this year",
-  (sn.overall_budget_floor)/1000000 as c2_budget_of_esh_district_population,
-  ((sn.overall_budget_floor) - sap.c2_cost)/1000000 as c2_cost_remaining,
-  sc1a.c1_cost/1000000 as cost_of_all_c1_applications,
-  sba.broadband_cost/1000000 as cost_of_all_broadband_applications,
-  sap.c2_cost/1000000 as cost_of_all_c2_applications,
-  sadrc1.agg_c1_discount_rate as dr_of_all_c1_applications,
-  sadrb.agg_broadband_discount_rate as dr_of_all_broadband_applications,
-  sadr.agg_c2_discount_rate as dr_of_all_c2_applications,
 --goals metric
   sg.pct_districts_meeting_current_goal_unadj,
---goals QA metrics
-  sg.pct_students_meeting_current_goal_unadj,
-  sg.pct_districts_meeting_2018_goal_unadj,
-  sg.pct_students_meeting_2018_goal_unadj,
-  sg.pct_districts_meeting_2018_goal,
-  sg.pct_students_meeting_2018_goal,
-  sg.pct_districts_meeting_current_goal,
-  sg.pct_students_meeting_current_goal,
 --fiber metrics
-  sf."STUS: % of campuses that do not have fiber connections (or an equivalent)",
+  1- sf."STUS: % of campuses that do not have fiber connections (or an equivalent)" as "STUS: % of campuses that have fiber connections (or an equivalent)",
   sf."OPPR: % of Rural & Small Town schools of those that do not have fiber connections",
---fiber QA metrics
-  sf.known_scalable_campuses,
-  sf.assumed_scalable_campuses,
-  sf.known_unscalable_campuses,
-  sf.assumed_unscalable_campuses,
 --affordability metrics
   sa.pct_districts_meeting_ia_affordability_target as "% meet the IA affordability target",
   round((sa.hypothetical_pct_students_meeting_current_goal_unadj-sa.pct_students_meeting_current_goal_unadj)*sn.overall_student_count,0) 
     as "# of additional students meeting 100 kbps per student target without oversubscription if district met IA affordability target",
---affordability QA metrics
-  sa.sample_ia_cost,
-  sa.sample_ia_cost_per_student_month,
-  sa.sample_ia_cost_per_mbps_month,
-  sa.hypothetical_students_meeting_current_goal_unadj,
-  round(sa.pct_students_under_connectivity_and_affordability_targets*sn.overall_student_count,0) 
-    as extrapolated_students_under_connectivity_and_affordability_targets,
-  sa.sample_students_under_connectivity_and_affordability_targets,
 --sample metrics
   sg.sample_students,
-  sg.rural_sample_students,
-  sg.town_sample_students,
-  sg.suburban_sample_students,
-  sg.urban_sample_students,
   sg.sample_schools,
-  sg.rural_sample_schools,
-  sg.town_sample_schools,
-  sg.suburban_sample_schools,
-  sg.urban_sample_schools,
-  sg.sample_campuses,
-  sg.rural_sample_campuses,
-  sg.town_sample_campuses,
-  sg.suburban_sample_campuses,
-  sg.urban_sample_campuses,
   sg.sample_districts,
-  sg.rural_sample_districts,
-  sg.town_sample_districts,
-  sg.suburban_sample_districts,
-  sg.urban_sample_districts,
-  sg.sample_districts_without_wan,
 --state profile metrics
-  sn.num_students_rural,
-  sn.num_students_town,
-  sn.num_students_suburban,
-  sn.num_students_urban,
-  sn.num_schools_rural,
-  sn.num_schools_town,
-  sn.num_schools_suburban,
-  sn.num_schools_urban,
-  sn.num_campuses_rural,
-  sn.num_campuses_town,
-  sn.num_campuses_suburban,
-  sn.num_campuses_urban,
-  sn.num_districts_rural,
-  sn.num_districts_town,
-  sn.num_districts_suburban,
-  sn.num_districts_urban
-
-
+  sn.num_students_rural+sn.num_students_town+sn.num_students_suburban+sn.num_students_urban as pop_students,
+  sn.num_schools_rural+sn.num_schools_town+sn.num_schools_suburban+sn.num_schools_urban as pop_schools,
+  sn.num_districts_rural+sn.num_districts_town+sn.num_districts_suburban+sn.num_districts_urban as pop_districts
 
 --state profile metrics
 from states_nces sn

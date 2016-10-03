@@ -1650,14 +1650,13 @@ plot2_data <- reactive({
   
     price <- input$set_price
 
-    
     nmg_data <- d_sub %>% filter(meeting_2014_goal_no_oversub == "Not Meeting Goal") 
-
+    print(names(nmg_data))
     nmg_data2 <- nmg_data %>% mutate(need_kbps = num_students*100,
                                      need_mbps = need_kbps / 1000,
                                      hyp_cost = need_mbps*price,
                                      can_mt_goals = ifelse(hyp_cost <= total_ia_monthly_cost, "Can Meet 100kbps/Student", "Cannot Meet 100kbps/Student"))
-
+    
     nmg_table <- nmg_data2 %>% group_by(can_mt_goals) %>% summarise(n = n())
     nmg_table <- as.data.frame(na.omit(nmg_table))
     

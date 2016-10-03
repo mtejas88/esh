@@ -552,7 +552,7 @@ titlePanel(title=div(img(src="ESH_logo.png", width = '25%', height = '10%')), "N
                                      ))
                             )
                 ) # close affordability tabPanel  
-      ))#closing tabsetPanel()  #close  div()
+      )#)closing tabsetPanel()  #close  div()
 
   
 )) #closing fluidPage() and shinyUI()
