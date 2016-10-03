@@ -122,7 +122,7 @@ select
 	flag_array,
 	postal_cd,
 	nces_cd
-from public.fy2016_districts_deluxe_m d
+from public.fy2016_districts_deluxe_matr d
 left join (
 	select
 		account__esh_id__c,

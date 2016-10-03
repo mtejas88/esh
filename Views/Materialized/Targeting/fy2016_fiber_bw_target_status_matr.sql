@@ -40,7 +40,7 @@ from( select 	si.esh_id,
 					else bw_indicator
 				end as bw_target_status
 
-				from fy2016_stage_indicator_matr si
+				from fy2016_stage_indicator_mat si
 				left join (
 					select esh_id__c as esh_id,
 							case
