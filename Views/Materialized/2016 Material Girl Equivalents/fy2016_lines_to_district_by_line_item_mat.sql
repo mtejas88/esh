@@ -1,2 +1,0 @@
-select *
-from public.fy2016_lines_to_district_by_line_item

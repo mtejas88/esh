@@ -220,8 +220,8 @@ left join (
 										then ec.circuit_id
 								end) as clean_specif_recip_fiber_wan_lines_alloc
 
-		from fy2016_districts_demog_m d
-		left join public.fy2016_district_lookup_mat dl
+		from fy2016_districts_demog_matr d
+		left join public.fy2016_district_lookup_matr dl
 		on d.esh_id = dl.district_esh_id
 		left join (
 				select 	school_id::varchar,
@@ -306,8 +306,8 @@ left join (
 										and li.connect_category ilike '%Fiber%'
 										then alloc.recipient_ben
 								end) as count_ben_ia_fiber_lines
-		from fy2016_districts_demog_m d
-		left join public.fy2016_lines_to_district_by_line_item_mat ldli
+		from fy2016_districts_demog_matr d
+		left join public.fy2016_lines_to_district_by_line_item_matr ldli
 		on d.esh_id = ldli.district_esh_id
 		left join fy2016.line_items li
 		on ldli.line_item_id = li.id

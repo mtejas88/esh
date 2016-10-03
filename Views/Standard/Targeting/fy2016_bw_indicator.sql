@@ -24,7 +24,7 @@ select
   d16.exclude_from_ia_analysis as exclude_from_analysis_2016,
   d16.ia_applicants
 
-from fy2016_districts_deluxe_m d16
+from fy2016_districts_deluxe_matr d16
 left join fy2015_districts_deluxe_m d15
 on d16.esh_id = d15.esh_id::varchar
 where include_in_universe_of_districts
