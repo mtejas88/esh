@@ -6,7 +6,7 @@ select base.*,
         then null
       WHEN base.line_item_total_num_lines = 'Unknown'
         THEN null
-      when base.line_item_total_num_lines > 0
+      when base.line_item_total_num_lines::numeric > 0
         THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
       ELSE NULL
     END AS line_item_district_monthly_cost
