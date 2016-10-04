@@ -7,7 +7,7 @@ select
     when  d16.exclude_from_ia_analysis = false
           and d16.ia_bandwidth_per_student_kbps >= 100
             then 'Not Target'
-    when  d15.ia_bandwidth_per_student::numeric >= 100
+    when  d15.ia_bandwidth_per_student != 'Insufficient data' and d15.ia_bandwidth_per_student::numeric >= 100
             then 'Not Target'
     when  d16.ia_applicants is null or d16.ia_applicants = ''
             then 'No Data'
