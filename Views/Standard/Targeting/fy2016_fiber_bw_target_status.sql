@@ -30,7 +30,7 @@ from( select 	si.esh_id,
 					else
 										si.stage_indicator
 				end as fiber_target_status,
-				bw_target_status
+				bw_indicator as bw_target_status
 
 				from fy2016_stage_indicator si
 				left join (
