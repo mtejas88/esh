@@ -525,7 +525,7 @@ select  		dd.esh_id as district_esh_id,
 																and applicant_id::varchar!=ldli.district_esh_id
 																and applicant_type!='School'
 																and applicant_id::varchar not in (	select esh_id
-																							from public.fy2016_districts_demog
+																							from public.fy2016_districts_demog_matr
 																							where include_in_universe_of_districts=true)
 																	then applicant_name
 														when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
@@ -543,7 +543,7 @@ select  		dd.esh_id as district_esh_id,
 													and applicant_type!='School'
 													and applicant_id::varchar!=ldli.district_esh_id
 													and applicant_id::varchar not in (	select esh_id
-																				from public.fy2016_districts_demog
+																				from public.fy2016_districts_demog_matr
 																				where include_in_universe_of_districts=true)
 														then 1
 											else 0
@@ -577,7 +577,7 @@ select  		dd.esh_id as district_esh_id,
 													and applicant_type!='School'
 													and applicant_id::varchar!=ldli.district_esh_id
 													and applicant_id::varchar not in (	select esh_id
-																				from public.fy2016_districts_demog
+																				from public.fy2016_districts_demog_matr
 																				where include_in_universe_of_districts=true)
 														then 1
 											else 0
@@ -640,8 +640,8 @@ select  		dd.esh_id as district_esh_id,
 										 then contract_end_date
 								  end ) as most_recent_ia_contract_end_date
 
-from	public.fy2016_districts_demog dd
-left join public.fy2016_lines_to_district_by_line_item	ldli
+from	public.fy2016_districts_demog_matr dd
+left join public.fy2016_lines_to_district_by_line_item_matr	ldli
 on 	dd.esh_id = ldli.district_esh_id
 left join	(
 		select *
@@ -657,9 +657,9 @@ left join (
 		select	ldli.line_item_id,
 						sum(d.num_students::numeric)	as	num_students_served
 
-		from fy2016_lines_to_district_by_line_item	ldli
+		from fy2016_lines_to_district_by_line_item_matr	ldli
 
-		join fy2016_districts_demog	d
+		join fy2016_districts_demog_matr	d
 		on ldli.district_esh_id	=	d.esh_id
 
 		join fy2016.line_items	li

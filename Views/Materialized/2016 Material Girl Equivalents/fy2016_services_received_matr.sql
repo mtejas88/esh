@@ -1,12 +1,12 @@
 select base.*,
     CASE
-      WHEN district_info_by_li.num_students_served > 0 and consortium_shared=true OR purpose = 'Backbone'
+      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
             then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_total_monthly_cost
       WHEN consortium_shared=true OR purpose = 'Backbone'
         then null
       WHEN base.line_item_total_num_lines = 'Unknown'
         THEN null
-      when base.line_item_total_num_lines > 0
+      when base.line_item_total_num_lines::numeric > 0
         THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
       ELSE NULL
     END AS line_item_district_monthly_cost
@@ -44,9 +44,9 @@ FROM (
             li.num_lines AS line_item_total_num_lines,
             li.connect_category AS connect_category,
             CASE
-              WHEN li.months_of_service = 0 OR li.months_of_service IS NULL
-                THEN li.total_cost / 12
-              ELSE li.total_cost / li.months_of_service
+              WHEN li.months_of_service > 0
+                THEN li.total_cost / li.months_of_service
+              ELSE li.total_cost / 12
             END AS line_item_total_monthly_cost,
             li.total_cost AS line_item_total_cost,
             li.rec_elig_cost AS line_item_recurring_elig_cost,
@@ -76,7 +76,7 @@ FROM (
             dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
             dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
             d.consortium_member AS recipient_consortium_member
-          FROM public.fy2016_lines_to_district_by_line_item lid
+          FROM public.fy2016_lines_to_district_by_line_item_matr lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
           LEFT OUTER JOIN (
@@ -84,7 +84,7 @@ FROM (
             from fy2016.service_providers
           ) spc
           ON spc.name = li.service_provider_name
-          LEFT OUTER JOIN public.fy2016_districts_deluxe dd
+          LEFT OUTER JOIN public.fy2016_districts_deluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
           LEFT OUTER JOIN fy2016.districts d
           ON dd.esh_id::numeric = d.esh_id
@@ -94,9 +94,9 @@ left join (
           select  ldli.line_item_id,
                   sum(d.num_students::numeric) as num_students_served
 
-          from public.fy2016_lines_to_district_by_line_item ldli
+          from public.fy2016_lines_to_district_by_line_item_matr ldli
 
-          left join public.fy2016_districts_demog d
+          left join public.fy2016_districts_demog_matr d
           on ldli.district_esh_id = d.esh_id
 
           left join fy2016.line_items li

@@ -170,7 +170,7 @@ select
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date
 
-from public.fy2016_districts_metrics
+from public.fy2016_districts_metrics_matr
 
 /*
 Author: Justine Schott

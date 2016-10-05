@@ -41,7 +41,7 @@ select d.esh_id as district_esh_id,
 
 from public.sc131a
 join (select *
-      from fy2016_districts_demog
+      from fy2016_districts_demog_matr
       where postal_cd not in ('MT', 'VT')) d
 on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
@@ -106,7 +106,7 @@ from public.sc131a
 join public.ag131a
 on sc131a."LEAID" = ag131a."LEAID"
 join (select *
-      from fy2016_districts_demog
+      from fy2016_districts_demog_matr
       where postal_cd = 'MT') d
 on ag131a."LSTREE" = d.address
 and sc131a."LSTATE" = d.postal_cd
@@ -170,7 +170,7 @@ select  d.esh_id as district_esh_id,
 
 from public.sc131a
 join (select *
-      from fy2016_districts_demog
+      from fy2016_districts_demog_matr
       where postal_cd = 'VT') d
 on sc131a."UNION" = d.union_code
 and sc131a."LSTATE" = d.postal_cd
