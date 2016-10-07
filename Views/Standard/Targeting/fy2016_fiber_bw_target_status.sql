@@ -4,27 +4,20 @@ select 	si.esh_id,
 		si.exclude_from_wan_analysis,
 		si.stage_indicator,
 		ps.fiber_priority_status,
-		case --note: still need to add IRT Manual Override to this case-when statement, once its storage location is known
-			when si.stage_indicator in ('Uncertain', 'No Data') and fiber_priority_status in ('Priority 10', 'Priority 0')
-								then 'Not Target'
-			when si.stage_indicator ='Uncertain'
-								then 'Potential Target'
-			when si.stage_indicator ='No Data'
-								then 'No Data'
-			else
-								si.stage_indicator
-		end as fiber_target_status,
-		bw_indicator as bw_target_status
+		--note: still need to add IRT Manual Override to this case-when statement, once its storage location is known
+		si.stage_indicator fiber_target_status,
+		bw_indicator as bw_target_status,
+		null as aggregate_status
 
 		from fy2016_stage_indicator si
 		left join (
-			select esh_id__c as esh_id,
+			select esh_id,
 					case
-						when priority_status__c_f is null
+						when fiber_priority_status is null
 							then 'Priority 0'
-						else priority_status__c_f
+						else fiber_priority_status
 					end as fiber_priority_status
-			from districts.priority_status) ps
+			from endpoint.district_priority_status) ps
 		on si.esh_id = ps.esh_id::varchar
 		left join fy2016_bw_indicator bi
 		on si.esh_id = bi.esh_id
