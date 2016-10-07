@@ -98,7 +98,7 @@ select
 from public.fy2016_districts_deluxe_matr d
 left join (
 	select 	esh_id as account__esh_id__c,
-			fiber_priority_status as priority_status__c
+			fiber_priority_status::varchar as priority_status__c
 	from endpoint.district_priority_status
 ) opp
 on d.esh_id = opp.account__esh_id__c::varchar
