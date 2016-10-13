@@ -33,6 +33,8 @@ select
 		when 	(flag_array is null or
 				(flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'))
 				and ia_no_cost_lines = 0
+				and ia_monthly_cost > 0
+				and ia_monthly_cost_per_mbps > 0
 			then false
 		else true
 	end as exclude_from_ia_cost_analysis,
@@ -44,6 +46,8 @@ select
 	case
 		when 	flag_array is null
 				and wan_no_cost_lines = 0
+				and wan_monthly_cost > 0
+				and wan_monthly_cost_per_line > 0
 			then false
 		else true
 	end as exclude_from_wan_cost_analysis,
@@ -53,7 +57,7 @@ select
 	flag_count as num_open_district_flags,
 	case
 		when 	(flag_array is not null or
-				not(flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%'))
+				flag_count = 1 and array_to_string(flag_array,',') ilike '%wan%')
 			then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
 			then  'outreach_confirmed'
@@ -175,7 +179,7 @@ from public.fy2016_districts_metrics_matr
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 9/28/2016
+Last Modified Date: 10/13/2016
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
