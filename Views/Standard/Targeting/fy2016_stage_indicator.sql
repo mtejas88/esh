@@ -7,37 +7,27 @@ select
 						case when num_campuses = campuses_specif_recip_fiber_wan_lines then 							--row 8
 							case when fiber_internet_upstream_lines_w_dirty > 0 then									--row 9
 								case 	when 	exclude_from_wan_analysis = false and
-												(priority_status__c not in ('Priority 1','Priority 3')
-												or priority_status__c is null) and
-												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not Target'
-										when 	exclude_from_wan_analysis = true and
-												(priority_status__c not in ('Priority 1','Priority 3')
-												or priority_status__c is null) and
-												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 10
-								 		else 'Uncertain' end													--rows 11,12
+												priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
+										else 'Potential Target' end													--rows 11,12
 							else
-								case when 	non_fiber_lines > 0 then
-									'Target' else 'Uncertain' end
+								case when 	non_fiber_lines > 0 then 'Target'
+								else case 	when 	exclude_from_wan_analysis = false and
+													priority_status__c = 'Priority 10' then 'Not Target'
+											else 'Potential Target' end
+								end
 							end																							--rows 13,14,15
 						else
 							case when 	num_campuses = campuses_specif_recip_fiber_internet_upstream_lines and
 										num_campuses <= fiber_internet_upstream_lines_w_dirty then						--row 16
 								case 	when 	exclude_from_wan_analysis = false and
-												(priority_status__c not in ('Priority 1','Priority 3')
-												or priority_status__c is null) and
-												(not(array_to_string(flag_array,',') ilike '%wan%')
-												or flag_array is null) then 'Not Target'
-										when 	exclude_from_wan_analysis = true and
-												(priority_status__c not in ('Priority 1','Priority 3')
-												or priority_status__c is null) and
-												(array_to_string(flag_array,',') ilike '%wan%'
-												or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'	--row 17
-								 		else 'Uncertain' end													--rows 18,19
+												priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
+										else 'Potential Target' end														--rows 18,19
 							else
-								case when 	non_fiber_lines > 0 then
-									'Target' else 'Uncertain' end
+								case when 	non_fiber_lines > 0 then 'Target'
+								else case 	when 	exclude_from_wan_analysis = false and
+													priority_status__c = 'Priority 10' then 'Not Target'
+											else 'Potential Target' end
+								end
 							end																							--rows 20,21,22
 						end
 			else
@@ -48,53 +38,36 @@ select
 						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 or
 										fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or
 										fiber_wan_lines >= count_ben_wan_fiber_lines_clean) and
-										(priority_status__c not in ('Priority 1','Priority 3')
-										or priority_status__c is null) and
-										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'Not Target'
-								when 	exclude_from_wan_analysis = true and
-										(priority_status__c not in ('Priority 1','Priority 3')
-										or priority_status__c is null) and
-										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 28
-						 		else 'Uncertain' end															--rows 29,30
+										priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') and
+										(not(array_to_string(flag_array,',') ilike '%wan%') or array_to_string(flag_array,',') is null) then 'Not Target'
+								else 'Potential Target' end															--rows 29,30
 					else
-						case when 	non_fiber_lines > 0 then
-							'Target' else 'Uncertain' end
+						case when 	non_fiber_lines > 0 then 'Target'
+						else case 	when 	exclude_from_wan_analysis = false and
+											priority_status__c = 'Priority 10' then 'Not Target'
+									else 'Potential Target' end
+						end
 					end																									--rows 31,32,33
 				else
 					case when 	campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0  or
 								fiber_internet_upstream_lines_w_dirty >= sum_alloc_ia_fiber_lines or
 								fiber_internet_upstream_lines_w_dirty >= count_ben_ia_fiber_lines then								--row 34
 						case 	when 	exclude_from_wan_analysis = false and
-										(priority_status__c not in ('Priority 1','Priority 3')
-										or priority_status__c is null) and
-										(not(array_to_string(flag_array,',') ilike '%wan%')
-										or flag_array is null) then 'Not Target'
-								when 	exclude_from_wan_analysis = true and
-										(priority_status__c not in ('Priority 1','Priority 3')
-										or priority_status__c is null) and
-										(array_to_string(flag_array,',') ilike '%wan%'
-										or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'			--row 35
-						 		else 'Uncertain' end															--rows 36,37
+										priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
+								else 'Potential Target' end																--rows 36,37
 					else
-						case when 	non_fiber_lines > 0  then
-							'Target' else 'Uncertain' end
+						case when 	non_fiber_lines > 0 then 'Target'
+						else case 	when 	exclude_from_wan_analysis = false and
+											priority_status__c = 'Priority 10' then 'Not Target'
+									else 'Potential Target' end
+						end
 					end																									--rows 38,39,40
 				end
 			end
 	else
 		case 	when 	exclude_from_wan_analysis = false and
-						(priority_status__c not in ('Priority 1','Priority 3')
-						or priority_status__c is null) and
-						(not(array_to_string(flag_array,',') ilike '%wan%')
-						or flag_array is null) then 'Not Target'
-				when 	exclude_from_wan_analysis = true and
-						(priority_status__c not in ('Priority 1','Priority 3')
-						or priority_status__c is null) and
-						(array_to_string(flag_array,',') ilike '%wan%'
-						or (num_schools >= 6 and wan_lines = 0 and wan_lines::numeric/num_schools::numeric<.75)) then 'Potential Target'							--row 41
-		 		else 'Uncertain' end																			--rows 42,43
+						priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
+				else 'Potential Target' end
 	end as stage_indicator,
 	lines_w_dirty,
 	non_fiber_lines_w_dirty,
@@ -124,13 +97,11 @@ select
 	nces_cd
 from public.fy2016_districts_deluxe_matr d
 left join (
-	select
-		account__esh_id__c,
-		priority_status__c
-	from salesforce.opportunity opp
-	where priority_status__c ilike '%priority%'
+	select 	esh_id as account__esh_id__c,
+			fiber_priority_status::varchar as priority_status__c
+	from endpoint.district_priority_status
 ) opp
-on d.esh_id = opp.account__esh_id__c
+on d.esh_id = opp.account__esh_id__c::varchar
 left join (
 	select esh_id,
 			count(case
