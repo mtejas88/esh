@@ -95,22 +95,28 @@ select  		dd.esh_id as district_esh_id,
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																	/ case
+										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
 																		else months_of_service
-																	  end
+																	  end*/
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district,
 						sum(case
-									when	((consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true))
-													or backbone_conditions_met = true)
+									when	backbone_conditions_met = true
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	total_cost::numeric	/ (district_info_by_li.num_students_served::numeric * months_of_service )
+										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
+						sum(case
+									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
+									and	num_open_flags	=	0
+									and district_info_by_li.num_students_served::numeric > 0
+										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+									else	0
+								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- wan cost/connection pieces
 						sum(case
 									when	wan_conditions_met = true
@@ -121,12 +127,12 @@ select  		dd.esh_id as district_esh_id,
 									and	num_open_flags	=	0
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																	/ case
+										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
 																		else months_of_service
-																	  end
+																	  end*/
 									else	0
 								end)	as	wan_monthly_cost,
 						sum(case
@@ -335,12 +341,12 @@ select  		dd.esh_id as district_esh_id,
 					                    	then concat(	allocation_lines, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																				/ case
+								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end,2), '/mth')
+																				  end*/, '/mth')
 					                end), ', ') as dedicated_isp_services,
 	                    array_to_string(
 	                    	array_agg(case
@@ -364,12 +370,13 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																				/ case
+								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end,2), '/mth')
+																				  end*/, '/mth')
+
 					                end), ', ') as bundled_internet_services,
 	                    array_to_string(
 	                    	array_agg(case
@@ -393,12 +400,13 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																				/ case
+								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end,2), '/mth')
+																				  end*/, '/mth')
+
 					                end), ', ') as upstream_services,
 	                    array_to_string(
 	                    	array_agg(case
@@ -427,12 +435,13 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(total_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																				/ case
+								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
-																				  end,2), '/mth')
+																				  end*/, '/mth')
+
 					                end), ', ') as wan_services,
 					    array_to_string(
 	                    	array_agg(case
@@ -740,7 +749,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/28/2016
+Last Modified Date: 10/17/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

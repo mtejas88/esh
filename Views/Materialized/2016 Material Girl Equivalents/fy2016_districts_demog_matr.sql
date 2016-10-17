@@ -146,12 +146,12 @@ left join ( select  "LEAID",
                             else 0
                           end) as school_type_1_count,
                     sum(case
-                          when (flaggable_id is null or include_students > 0)
+                          when (flaggable_id is null or closed_school_count = removed_school_count)
                                 and "MEMBER"::numeric > 0 then "MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
-                          when  (flaggable_id is null or include_students > 0)
+                          when  (flaggable_id is null or closed_school_count = removed_school_count)
                                 and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count
@@ -164,7 +164,8 @@ left join ( select  "LEAID",
                       count(case
                               when label = 'closed_school'
                                 then 1
-                            end) as include_students
+                            end) as closed_school_count,
+                      count(*) as removed_school_count
               from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
@@ -284,7 +285,7 @@ and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 wh
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/28/2016
+Last Modified Date: 10/17/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
