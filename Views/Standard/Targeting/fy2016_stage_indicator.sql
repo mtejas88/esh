@@ -148,7 +148,7 @@ left join (
 									when c.wan_conditions_met = true
 									and c.connect_category ilike '%Fiber%'
 									and num_lines != 'Unknown'
-									and (	num_lines::numeric = li.num_recipients or
+									and (	num_lines::numeric = alloc.recipients or
 											num_lines::numeric = alloc.alloc
 										)
 										then ec.circuit_id
@@ -162,30 +162,27 @@ left join (
 									when (c.internet_conditions_met = true or c.upstream_conditions_met = true)
 									and c.connect_category ilike '%Fiber%'
 									and num_lines != 'Unknown'
-									and (	num_lines::numeric = li.num_recipients or
+									and (	num_lines::numeric = alloc.recipients or
 											num_lines::numeric = alloc.alloc
 										)
 										then ec.circuit_id
 								end) as specif_recip_fiber_internet_upstream_lines_alloc,
 				count(distinct 	case
 									when 	not(c.connect_category ilike '%Fiber%')
-											and	(c.num_open_flags	=	0 or (c.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(c.open_flag_labels) or
-																											'exclude_for_cost_only_restricted'	=	any(c.open_flag_labels))))
+											and	(c.num_open_flags	=	0
 										then ec.circuit_id
 								end) as specif_recip_clean_nonfiber_lines,
 				count(distinct 	case
-									when (c.num_open_flags	=	0 or (c.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(c.open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(c.open_flag_labels))))
+									when (c.num_open_flags	=	0
 									and not(c.connect_category ilike '%Fiber%')
 										then ec.circuit_id
 								end) as clean_specif_recip_nonfiber_lines,
 				count(distinct 	case
-									when (c.num_open_flags	=	0 or (c.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(c.open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(c.open_flag_labels))))
+									when (c.num_open_flags	=	0
 									and c.wan_conditions_met = true
 									and c.connect_category ilike '%Fiber%'
 									and num_lines != 'Unknown'
-									and (	num_lines::numeric = li.num_recipients or
+									and (	num_lines::numeric = alloc.recipients or
 											num_lines::numeric = alloc.alloc
 										)
 										then ec.circuit_id
@@ -212,7 +209,8 @@ left join (
 		on c.line_item_id = li.id
 		left join (
 			select 	line_item_id,
-					sum(num_lines_to_allocate) as alloc
+					sum(num_lines_to_allocate) as alloc,
+					count(distinct recipient_ben) as recipients
 			from fy2016.allocations
 			where broadband = true
 			group by line_item_id
@@ -245,8 +243,7 @@ left join (
 							then alloc.num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines,
 				sum(case
-						when (li.num_open_flags	=	0 or (li.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(li.open_flag_labels) or
-																						'exclude_for_cost_only_restricted'	=	any(li.open_flag_labels))))
+						when (li.num_open_flags	=	0
 							and li.wan_conditions_met = true
 							and li.connect_category ilike '%Fiber%'
 							then alloc.num_lines_to_allocate
@@ -266,8 +263,7 @@ left join (
 										then alloc.recipient_ben
 								end) as count_ben_wan_fiber_lines,
 				count(distinct 	case
-									when (li.num_open_flags	=	0 or (li.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(li.open_flag_labels) or
-																									'exclude_for_cost_only_restricted'	=	any(li.open_flag_labels))))
+									when (li.num_open_flags	=	0
 										and li.wan_conditions_met = true
 										and li.connect_category ilike '%Fiber%'
 										then alloc.recipient_ben
@@ -286,7 +282,6 @@ left join (
 			select 	*
 			from fy2016.allocations
 			where broadband = true
-			and recipient_type in ('School', 'District')
 		) alloc
 		on ldli.line_item_id = alloc.line_item_id
 		where li.isp_conditions_met = false
@@ -306,7 +301,7 @@ where include_in_universe_of_districts
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 9/28/2016
+Last Modified Date: 10/20/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query
