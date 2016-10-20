@@ -65,8 +65,7 @@ select
 				end
 			end
 	else
-		case 	when 	exclude_from_wan_analysis = false and
-						priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
+		case 	when 	exclude_from_wan_analysis = false then 'Not Target'
 				else 'Potential Target' end
 	end as stage_indicator,
 	lines_w_dirty,
