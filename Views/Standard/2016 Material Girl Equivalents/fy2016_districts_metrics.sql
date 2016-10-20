@@ -50,9 +50,13 @@ select	dd.*,
 					else	upstream_bandwidth_cost
 				end	+	internet_bandwidth_cost	as	ia_bandwidth_for_cost_per_mbps,
 				ia_monthly_cost_direct_to_district	+
-				    			(ia_monthly_cost_per_student_backbone_pieces*num_students) as ia_monthly_cost,
+				    			((ia_monthly_cost_per_student_backbone_pieces +
+									ia_monthly_cost_per_student_shared_ia_pieces)*num_students) as ia_monthly_cost,
+				ia_monthly_cost_direct_to_district	+
+				    			(ia_monthly_cost_per_student_shared_ia_pieces*num_students) as ia_monthly_cost_no_backbone,
 				ia_monthly_cost_direct_to_district,
-				ia_monthly_cost_per_student_backbone_pieces*num_students as ia_monthly_cost_shared,
+				(ia_monthly_cost_per_student_backbone_pieces +
+					ia_monthly_cost_per_student_shared_ia_pieces)*num_students as ia_monthly_cost_shared,
 				case
 				  when (case
 			          	when	com_info_bandwidth_cost	>	0
@@ -66,7 +70,8 @@ select	dd.*,
 			          	else	upstream_bandwidth_cost
 			          end	+	internet_bandwidth_cost) > 0
 				    then  (ia_monthly_cost_direct_to_district	+
-				    			(ia_monthly_cost_per_student_backbone_pieces*num_students))/
+				    			((ia_monthly_cost_per_student_backbone_pieces +
+									ia_monthly_cost_per_student_shared_ia_pieces)*num_students))/
 				    				(case
                     	when	com_info_bandwidth_cost	>	0
                     	then	com_info_bandwidth_cost
@@ -257,7 +262,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 9/28/2016
+Last Modified Date: 10/17/2016
 Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables
