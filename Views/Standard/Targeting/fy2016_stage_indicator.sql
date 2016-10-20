@@ -212,7 +212,7 @@ left join (
 		on c.line_item_id = li.id
 		left join (
 			select 	line_item_id,
-					sum(original_num_lines_to_allocate) as alloc
+					sum(num_lines_to_allocate) as alloc
 			from fy2016.allocations
 			where broadband = true
 			group by line_item_id
@@ -237,24 +237,24 @@ left join (
 		select  d.esh_id,
 				sum(case
 						when not(li.connect_category ilike '%Fiber%')
-							then alloc.original_num_lines_to_allocate
+							then alloc.num_lines_to_allocate
 					end) as sum_alloc_nonfiber_lines,
 				sum(case
 						when li.wan_conditions_met = true
 							and li.connect_category ilike '%Fiber%'
-							then alloc.original_num_lines_to_allocate
+							then alloc.num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines,
 				sum(case
 						when (li.num_open_flags	=	0 or (li.num_open_flags	=	1 and (	'exclude_for_cost_only_free'	=	any(li.open_flag_labels) or
 																						'exclude_for_cost_only_restricted'	=	any(li.open_flag_labels))))
 							and li.wan_conditions_met = true
 							and li.connect_category ilike '%Fiber%'
-							then alloc.original_num_lines_to_allocate
+							then alloc.num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines_clean,
 				sum(case
 						when (li.internet_conditions_met = true or li.upstream_conditions_met = true)
 							and li.connect_category ilike '%Fiber%'
-							then alloc.original_num_lines_to_allocate
+							then alloc.num_lines_to_allocate
 					end) as sum_alloc_ia_fiber_lines,
 				count(distinct 	case
 									when not(li.connect_category ilike '%Fiber%')
