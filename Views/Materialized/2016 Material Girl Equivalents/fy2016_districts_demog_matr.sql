@@ -40,6 +40,11 @@ select  case
                                           then 0
                                         else sc_MT.student_count - sc_MT.student_pk_count
                                       end
+          when d.esh_id = '946654' then case
+                                        when sc_NY.student_count - sc_NY.student_pk_count is null
+                                          then 0
+                                        else sc_NY.student_count - sc_NY.student_pk_count
+                                      end
             else  case
                     when sc.student_count - sc.student_pk_count is null
                       then 0
@@ -56,6 +61,11 @@ select  case
                                         when sc_MT.school_count is null
                                           then 0
                                         else sc_MT.school_count
+                                      end
+          when d.esh_id = '946654' then case
+                                        when sc_NY.school_count is null
+                                          then 0
+                                        else sc_NY.school_count
                                       end
             else  case
                     when sc.school_count is null
@@ -86,6 +96,14 @@ select  case
                                       when sc_MT.school_count>5 and sc_MT.school_count<=15 then 'Medium'
                                       when sc_MT.school_count>15 and sc_MT.school_count<=50 then 'Large'
                                       when sc_MT.school_count>50 then 'Mega'
+                                        else 'Unknown'
+                                    end
+          when d.esh_id = '946654' then case
+                                      when sc_NY.school_count=1 then 'Tiny'
+                                      when sc_NY.school_count>1 and sc_NY.school_count<=5 then 'Small'
+                                      when sc_NY.school_count>5 and sc_NY.school_count<=15 then 'Medium'
+                                      when sc_NY.school_count>15 and sc_NY.school_count<=50 then 'Large'
+                                      when sc_NY.school_count>50 then 'Mega'
                                         else 'Unknown'
                                     end
             else  case
@@ -272,6 +290,59 @@ left join ( select  ag131a."LSTREE",
 on d."LSTREE"=sc_MT."LSTREE"
 and d."LSTATE"=sc_MT."LSTATE"
 
+left join ( select  case
+                      when ag131a."NAME" ilike '%geographic%'
+                        true
+                      else false
+                    end as nyps_indicator,
+                    ag131a."LSTATE",
+                    sum(case
+                            when flaggable_id is null
+                              then 1
+                            else 0
+                          end) as school_count,
+                    sum(case
+                            when flaggable_id is null and sc131a."TYPE" = '1'
+                              then 1
+                            else 0
+                          end) as school_type_1_count,
+                    sum(case
+                          when (flaggable_id is null or include_students > 0)
+                                and sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
+                            else 0
+                        end) as student_count,
+                    sum(case
+                          when  (flaggable_id is null or include_students > 0)
+                                and sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
+                            else 0
+                        end) as student_pk_count,
+                    count(distinct  case
+                                      when flaggable_id is null
+                                        then sc131a."LEAID"
+                                    end) as district_count
+            from public.sc131a
+            left join ag131a
+            on sc131a."LEAID" = ag131a."LEAID"
+            left join ( select distinct entity_id, nces_code
+                        from public.entity_nces_codes) eim
+            on sc131a."NCESSCH" = eim.nces_code
+            left join (
+              select  flaggable_id,
+                      count(case
+                              when label = 'closed_school'
+                                then 1
+                            end) as include_students
+              from fy2016.flags
+              where label in ('closed_school', 'non_school', 'charter_school')
+              and status = 'open'
+              group by flaggable_id
+            ) t
+            on eim.entity_id = t.flaggable_id
+            where sc131a."LSTATE" = 'NY'
+            group by  ag131a."LSTREE",
+                      ag131a."LSTATE" ) sc_NY
+on (d.esh_id = '946654') = sc_ny.nyps_indicator
+
 where case --only include the HS district when smushing MT districts (exclude the ELEM)
         when sc_MT.district_count > 1
           then  right(d."NAME",3) =' HS'
@@ -281,11 +352,12 @@ where case --only include the HS district when smushing MT districts (exclude th
         else true
       end
 and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
+and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'geographic' districts in NYPS
 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/17/2016
+Last Modified Date: 10/21/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
