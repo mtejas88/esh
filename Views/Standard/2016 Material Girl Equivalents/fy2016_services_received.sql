@@ -9,7 +9,29 @@ select base.*,
       when base.line_item_total_num_lines::numeric > 0
         THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_recurring_elig_cost
       ELSE NULL
-    END AS line_item_district_monthly_cost
+    END AS line_item_district_monthly_cost_recurring,
+    CASE
+      WHEN district_info_by_li.num_students_served > 0 and consortium_shared=true OR purpose = 'Backbone'
+            then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_total_monthly_cost
+      WHEN consortium_shared=true OR purpose = 'Backbone'
+        then null
+      WHEN base.line_item_total_num_lines = 'Unknown'
+        THEN null
+      when base.line_item_total_num_lines::numeric > 0
+        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
+      ELSE NULL
+    END AS line_item_district_monthly_cost_total,
+    case
+      when line_item_total_num_lines = 'Unknown'
+        then null
+      else line_item_recurring_elig_cost/line_item_total_num_lines
+    end as monthly_circuit_cost_recurring,
+    case
+      when line_item_total_num_lines = 'Unknown'
+        then null
+      else line_item_total_monthly_cost/line_item_total_num_lines
+    end as monthly_circuit_cost_total
+
 FROM (
           SELECT
             li.id AS line_item_id,
