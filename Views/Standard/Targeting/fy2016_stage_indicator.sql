@@ -168,16 +168,16 @@ left join (
 								end) as specif_recip_fiber_internet_upstream_lines_alloc,
 				count(distinct 	case
 									when 	not(c.connect_category ilike '%Fiber%')
-											and	(c.num_open_flags	=	0
+											and	c.num_open_flags	=	0
 										then ec.circuit_id
 								end) as specif_recip_clean_nonfiber_lines,
 				count(distinct 	case
-									when (c.num_open_flags	=	0
+									when c.num_open_flags	=	0
 									and not(c.connect_category ilike '%Fiber%')
 										then ec.circuit_id
 								end) as clean_specif_recip_nonfiber_lines,
 				count(distinct 	case
-									when (c.num_open_flags	=	0
+									when c.num_open_flags	=	0
 									and c.wan_conditions_met = true
 									and c.connect_category ilike '%Fiber%'
 									and num_lines != 'Unknown'
@@ -242,7 +242,7 @@ left join (
 							then alloc.num_lines_to_allocate
 					end) as sum_alloc_wan_fiber_lines,
 				sum(case
-						when (li.num_open_flags	=	0
+						when li.num_open_flags	=	0
 							and li.wan_conditions_met = true
 							and li.connect_category ilike '%Fiber%'
 							then alloc.num_lines_to_allocate
@@ -262,7 +262,7 @@ left join (
 										then alloc.recipient_ben
 								end) as count_ben_wan_fiber_lines,
 				count(distinct 	case
-									when (li.num_open_flags	=	0
+									when li.num_open_flags	=	0
 										and li.wan_conditions_met = true
 										and li.connect_category ilike '%Fiber%'
 										then alloc.recipient_ben
