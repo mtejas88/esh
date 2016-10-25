@@ -24,12 +24,16 @@ select base.*,
     case
       when line_item_total_num_lines = 'Unknown'
         then null
-      else line_item_recurring_elig_cost/line_item_total_num_lines::numeric
+      when base.line_item_total_num_lines::numeric > 0
+        then line_item_recurring_elig_cost/line_item_total_num_lines::numeric
+      else NULL
     end as monthly_circuit_cost_recurring,
     case
       when line_item_total_num_lines = 'Unknown'
         then null
-      else line_item_total_monthly_cost/line_item_total_num_lines::numeric
+      when base.line_item_total_num_lines::numeric > 0
+        then line_item_total_monthly_cost/line_item_total_num_lines::numeric
+      else NULL
     end as monthly_circuit_cost_total
 
 FROM (
