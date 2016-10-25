@@ -1,6 +1,6 @@
 select base.*,
     CASE
-      WHEN district_info_by_li.num_students_served > 0 and consortium_shared=true OR purpose = 'Backbone'
+      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
             then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_recurring_elig_cost
       WHEN consortium_shared=true OR purpose = 'Backbone'
         then null
@@ -11,7 +11,7 @@ select base.*,
       ELSE NULL
     END AS line_item_district_monthly_cost_recurring,
     CASE
-      WHEN district_info_by_li.num_students_served > 0 and consortium_shared=true OR purpose = 'Backbone'
+      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
             then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_total_monthly_cost
       WHEN consortium_shared=true OR purpose = 'Backbone'
         then null
@@ -72,9 +72,9 @@ FROM (
             li.num_lines AS line_item_total_num_lines,
             li.connect_category AS connect_category,
             CASE
-              WHEN li.months_of_service = 0 OR li.months_of_service IS NULL
-                THEN li.total_cost / 12
-              ELSE li.total_cost / li.months_of_service
+              WHEN li.months_of_service > 0
+                THEN li.total_cost / li.months_of_service
+              ELSE li.total_cost / 12
             END AS line_item_total_monthly_cost,
             li.total_cost AS line_item_total_cost,
             li.rec_elig_cost AS line_item_recurring_elig_cost,
