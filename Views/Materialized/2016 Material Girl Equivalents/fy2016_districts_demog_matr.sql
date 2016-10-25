@@ -292,7 +292,7 @@ and d."LSTATE"=sc_MT."LSTATE"
 
 left join ( select  case
                       when ag131a."NAME" ilike '%geographic%'
-                        true
+                        then true
                       else false
                     end as nyps_indicator,
                     ag131a."LSTATE",
