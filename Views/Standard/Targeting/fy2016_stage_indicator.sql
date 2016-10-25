@@ -65,7 +65,7 @@ select
 				end
 			end
 	else
-		case 	when 	exclude_from_wan_analysis = false then 'Not Target'
+		case 	when 	exclude_from_ia_analysis = false then 'Not Target'
 				else 'Potential Target' end
 	end as stage_indicator,
 	lines_w_dirty,
