@@ -693,7 +693,7 @@ left join (
 						then sum(frl_percentage_numerator)/sum(	 frl_percentage_denomenator)
 				end as frl_percent
 
-		from fy2016_schools_demog
+		from public.fy2016_schools_demog_matr
 
 		group	by	district_esh_id
 ) school_info
