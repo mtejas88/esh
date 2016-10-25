@@ -40,7 +40,7 @@ select  case
                                           then 0
                                         else sc_MT.student_count - sc_MT.student_pk_count
                                       end
-          when d.esh_id = '946654' then case
+          when eim.entity_id = '946654' then case
                                         when sc_NY.student_count - sc_NY.student_pk_count is null
                                           then 0
                                         else sc_NY.student_count - sc_NY.student_pk_count
@@ -62,7 +62,7 @@ select  case
                                           then 0
                                         else sc_MT.school_count
                                       end
-          when d.esh_id = '946654' then case
+          when eim.entity_id = '946654' then case
                                         when sc_NY.school_count is null
                                           then 0
                                         else sc_NY.school_count
@@ -98,7 +98,7 @@ select  case
                                       when sc_MT.school_count>50 then 'Mega'
                                         else 'Unknown'
                                     end
-          when d.esh_id = '946654' then case
+          when eim.entity_id = '946654' then case
                                       when sc_NY.school_count=1 then 'Tiny'
                                       when sc_NY.school_count>1 and sc_NY.school_count<=5 then 'Small'
                                       when sc_NY.school_count>5 and sc_NY.school_count<=15 then 'Medium'
@@ -134,10 +134,12 @@ select  case
           and ( sc.student_count - sc.student_pk_count  >0
                 or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
                 or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
+                or (eim.entity_id = '946654' and sc_NY.student_count - sc_NY.student_pk_count  >0)
                 or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts
           and ( (sc.school_count) > 0
                 or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)
                 or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
+                or (eim.entity_id = '946654' and (sc_NY.school_count)>0)
           and "BOUND" != '2' --closed districts
             then  case
                     when "TYPE" != '7' or d."LSTATE" = 'AZ'
@@ -291,7 +293,7 @@ on d."LSTREE"=sc_MT."LSTREE"
 and d."LSTATE"=sc_MT."LSTATE"
 
 left join ( select  case
-                      when ag131a."NAME" ilike '%geographic%'
+                      when ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
                         then true
                       else false
                     end as nyps_indicator,
@@ -339,9 +341,14 @@ left join ( select  case
             ) t
             on eim.entity_id = t.flaggable_id
             where sc131a."LSTATE" = 'NY'
-            group by  ag131a."LSTREE",
+            group by  case
+                        when ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
+                          then true
+                        else false
+                      end,
                       ag131a."LSTATE" ) sc_NY
-on (d.esh_id = '946654') = sc_ny.nyps_indicator
+on (eim.entity_id = '946654') = sc_NY.nyps_indicator
+and d."LSTATE"=sc_NY."LSTATE"
 
 where case --only include the HS district when smushing MT districts (exclude the ELEM)
         when sc_MT.district_count > 1
