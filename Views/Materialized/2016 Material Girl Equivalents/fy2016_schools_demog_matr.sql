@@ -43,7 +43,7 @@ from public.sc131a
 join (select *
       from public.fy2016_districts_demog_matr
       where postal_cd not in ('MT', 'VT')
-      and esh_id != '946654';) d
+      and esh_id != '946654') d
 on sc131a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
