@@ -128,7 +128,7 @@ Author: Justine Schott
 Created On Date: 10/18/2016
 Last Modified Date:
 Name of QAing Analyst(s):
-Purpose: For comparing cost across years
+Purpose: For comparing across years
 Methodology: Utilizing line items and 2016 districts universe
 */
 
