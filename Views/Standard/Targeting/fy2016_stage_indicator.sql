@@ -35,9 +35,9 @@ select
 							(fiber_wan_lines_w_dirty >= sum_alloc_wan_fiber_lines or
 							fiber_wan_lines_w_dirty >= count_ben_wan_fiber_lines) then						--row 26
 					case when fiber_internet_upstream_lines_w_dirty > 0 then 											--row 27
-						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 or
-										fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or
-										fiber_wan_lines >= count_ben_wan_fiber_lines_clean) and
+						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 and
+										(fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or
+										fiber_wan_lines >= count_ben_wan_fiber_lines_clean)) and
 										priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') and
 										(not(array_to_string(flag_array,',') ilike '%wan%') or array_to_string(flag_array,',') is null) then 'Not Target'
 								else 'Potential Target' end															--rows 29,30
