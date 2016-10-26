@@ -1,48 +1,4 @@
 select  		dd.esh_id as district_esh_id,
---ia cost pieces
-/*				sum(case
-							when	'committed_information_rate'	=	any(open_flags)
-							and	number_of_dirty_line_item_flags	=	0
-							and (not(	'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	com_info_bandwidth_cost,
-				sum(case
-							when	internet_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	internet_bandwidth_cost,
-				sum(case
-							when	upstream_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	upstream_bandwidth_cost,
-				sum(case
-							when	isp_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	isp_bandwidth_cost,*/
 						sum(case
 									when	(isp_conditions_met	=	TRUE
 												or	internet_conditions_met	=	TRUE
@@ -55,11 +11,6 @@ select  		dd.esh_id as district_esh_id,
 									and consortium_shared = false
 									and num_lines::numeric>0
 										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
-																	/*/ case
-																		when months_of_service = 0 or months_of_service is null
-																			then 12
-																		else months_of_service
-																	  end*/
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district,
 						sum(case
@@ -67,7 +18,7 @@ select  		dd.esh_id as district_esh_id,
 									and	number_of_dirty_line_item_flags	=	0
 									and rec_elig_cost != 'No data'
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
@@ -75,11 +26,58 @@ select  		dd.esh_id as district_esh_id,
 									and rec_elig_cost != 'No data'
 									and	number_of_dirty_line_item_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 						d15.num_students,
-						d15.exclude_from_analysis
+						d15.exclude_from_analysis,
+						sum(case
+									when	connect_category ilike '%fiber%'
+									and isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and	number_of_dirty_line_item_flags	=	0
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as fiber_lines,
+						sum(case
+									when	connect_category = 'Fixed Wireless'
+									and connect_type != 'Satellite Service'
+									and isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and	number_of_dirty_line_item_flags	=	0
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as fixed_wireless_lines,
+						sum(case
+									when	connect_type = 'Cable Modem'
+									and isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and	number_of_dirty_line_item_flags	=	0
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as cable_lines,
+						sum(case
+									when	(connect_category = 'Copper'
+											or connect_type = 'Digital Subscriber Line (DSL)')
+									and isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and	number_of_dirty_line_item_flags	=	0
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as copper_dsl_lines,
+						sum(case
+									when	connect_type in ('Satellite Service', 'Data Plan/Air Card Service')
+									and isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and	number_of_dirty_line_item_flags	=	0
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as satellite_lte_lines
 
 
 from	public.fy2016_districts_demog_matr dd
@@ -133,3 +131,48 @@ Name of QAing Analyst(s):
 Purpose: For comparing cost across years
 Methodology: Utilizing line items and 2016 districts universe
 */
+
+--ia cost pieces
+/*				sum(case
+							when	'committed_information_rate'	=	any(open_flags)
+							and	number_of_dirty_line_item_flags	=	0
+							and (not(	'exclude_for_cost_only'	=	any(open_flags))
+										or	open_flags	is	null)
+							and rec_elig_cost != 'No data'
+							and consortium_shared = false
+								then	bandwidth_in_mbps	*	allocation_lines
+							else	0
+						end)	as	com_info_bandwidth_cost,
+				sum(case
+							when	internet_conditions_met	=	TRUE
+							and	(not(	'committed_information_rate'	=	any(open_flags)
+												or 'exclude_for_cost_only'	=	any(open_flags))
+										or	open_flags	is	null)
+							and rec_elig_cost != 'No data'
+							and	number_of_dirty_line_item_flags	=	0
+							and consortium_shared = false
+								then	bandwidth_in_mbps	*	allocation_lines
+							else	0
+						end)	as	internet_bandwidth_cost,
+				sum(case
+							when	upstream_conditions_met	=	TRUE
+							and	(not(	'committed_information_rate'	=	any(open_flags)
+												or 'exclude_for_cost_only'	=	any(open_flags))
+										or	open_flags	is	null)
+							and rec_elig_cost != 'No data'
+							and	number_of_dirty_line_item_flags	=	0
+							and consortium_shared = false
+								then	bandwidth_in_mbps	*	allocation_lines
+							else	0
+						end)	as	upstream_bandwidth_cost,
+				sum(case
+							when	isp_conditions_met	=	TRUE
+							and	(not(	'committed_information_rate'	=	any(open_flags)
+												or 'exclude_for_cost_only'	=	any(open_flags))
+										or	open_flags	is	null)
+							and rec_elig_cost != 'No data'
+							and	number_of_dirty_line_item_flags	=	0
+							and consortium_shared = false
+								then	bandwidth_in_mbps	*	allocation_lines
+							else	0
+						end)	as	isp_bandwidth_cost,*/
