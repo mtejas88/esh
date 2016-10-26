@@ -20,7 +20,7 @@ select
 	city,
 	zip,
 	county,
-	postal_cd,
+	dm.postal_cd,
 	latitude,
 	longitude,
 	case
@@ -181,8 +181,8 @@ select
 		   	END as needs_wifi
 
 from public.fy2016_districts_metrics dm
-left join public.fy2016_wifi_connectivity_informations wci
-on dm.esh_id = wci.parent_entity_id::varchar
+left join public.fy2016_wifi_connectivity_informations wifi
+on dm.esh_id = wifi.parent_entity_id::varchar
 
 /*
 Author: Justine Schott
