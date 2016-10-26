@@ -181,12 +181,12 @@ select	dd.*,
             case
               when campus_count < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
                 then 0
-              else .08* (campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
+              else .92* (campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
             end as current_assumed_scalable_campuses,
             case
               when campus_count < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
                 then 0
-              else .92* (campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
+              else .08* (campus_count - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
             end as current_assumed_unscalable_campuses,
 			fiber_internet_upstream_lines,
 			fixed_wireless_internet_upstream_lines,
