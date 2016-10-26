@@ -31,9 +31,9 @@ select
 							end																							--rows 20,21,22
 						end
 			else
-				case when 	campuses_specif_recip_nonfiber_not_wan_lines_alloc = 0 or
-							fiber_wan_lines_w_dirty >= sum_alloc_wan_fiber_lines or
-							fiber_wan_lines_w_dirty >= count_ben_wan_fiber_lines then						--row 26
+				case when 	campuses_specif_recip_nonfiber_not_wan_lines_alloc = 0 and
+							(fiber_wan_lines_w_dirty >= sum_alloc_wan_fiber_lines or
+							fiber_wan_lines_w_dirty >= count_ben_wan_fiber_lines) then						--row 26
 					case when fiber_internet_upstream_lines_w_dirty > 0 then 											--row 27
 						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 or
 										fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or
@@ -49,9 +49,9 @@ select
 						end
 					end																									--rows 31,32,33
 				else
-					case when 	campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0  or
-								fiber_internet_upstream_lines_w_dirty >= sum_alloc_ia_fiber_lines or
-								fiber_internet_upstream_lines_w_dirty >= count_ben_ia_fiber_lines then								--row 34
+					case when 	campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0  and
+								(fiber_internet_upstream_lines_w_dirty >= sum_alloc_ia_fiber_lines or
+								fiber_internet_upstream_lines_w_dirty >= count_ben_ia_fiber_lines) then								--row 34
 						case 	when 	exclude_from_wan_analysis = false and
 										priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
 								else 'Potential Target' end																--rows 36,37
