@@ -1,4 +1,4 @@
-select			esh_id,
+select			district_esh_id,
 				num_students,
 				exclude_from_analysis,
 				ia_monthly_cost_direct_to_district	+

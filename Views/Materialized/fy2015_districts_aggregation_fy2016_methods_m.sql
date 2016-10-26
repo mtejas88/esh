@@ -77,7 +77,8 @@ select  		dd.esh_id as district_esh_id,
 									and consortium_shared = false
 										then	allocation_lines
 									else	0
-								end) as satellite_lte_lines
+								end) as satellite_lte_lines,
+						d15.num_campuses
 
 
 from	public.fy2016_districts_demog_matr dd
