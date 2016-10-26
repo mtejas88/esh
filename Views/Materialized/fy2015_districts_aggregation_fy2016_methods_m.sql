@@ -121,7 +121,8 @@ and d15.include_in_universe_of_districts
 
 group by	  	dd.esh_id,
 				d15.num_students,
-				d15.exclude_from_analysis
+				d15.exclude_from_analysis,
+				d15.num_campuses
 
 
 /*
