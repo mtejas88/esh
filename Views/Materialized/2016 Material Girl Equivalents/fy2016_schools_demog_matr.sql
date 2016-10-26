@@ -234,11 +234,13 @@ select  d.esh_id as district_esh_id,
         ds.campus_id
 
 from (
-  select *
+  select sc131a.*
   from public.sc131a
-  where "LSTATE" = 'NY'
-  and ( name ilike '%geographic%'
-        or "LEAID" = '3620580')
+  left join public.ag131a
+  on sc131a."LEAID" = ag131a."LEAID"
+  where ag131a."LSTATE" = 'NY'
+  and ( ag131a."NAME" ilike '%geographic%'
+        or ag131a."LEAID" = '3620580')
 ) sc131af
 left join (select *
       from public.fy2016_districts_demog_matr
