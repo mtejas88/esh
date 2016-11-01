@@ -115,6 +115,12 @@ select
     	or broadband_internet_upstream_lines is null
       		then FALSE
 	end as meeting_2018_goal_no_oversub_fcc_25,
+	case
+		when not_broadband_internet_upstream_lines > 0
+			then false
+		when not_broadband_internet_upstream_lines = 0
+			then true
+	end as all_circuits_meeting_broadband_fcc_25_goal,
 	ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
 	ia_monthly_cost as ia_monthly_cost_total,
@@ -187,7 +193,7 @@ on dm.esh_id = wifi.parent_entity_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 10/20/2016
+Last Modified Date: 11/1/2016
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
