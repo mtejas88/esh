@@ -65,9 +65,9 @@ on dd.esh_id = fbts.esh_id
 left join (
   select district_esh_id,
          case
-            when campus_id = 'Unknown'
-                then address
-            else campus_id
+         	when campus_id = 'Unknown'
+         		then address
+         	else campus_id
          end as campus_id,
          array_agg(name) as campus_school_names,
          array_agg(school_nces_code) as campus_school_nces_cds,
@@ -80,6 +80,7 @@ left join (
 -- 11/2 discussion recap; min/max rule for identifying sample value for each campus is somewhat arbitrary
 -- let's either document that it's arbitrary (or it wasn't but unclear of Greg's decisions) or
 -- re-do it by assigning row number
+
   from endpoint.fy2016_schools_demog  sd
   left join public.sc131a sc
   on sd.school_nces_code = sc."NCESSCH"
