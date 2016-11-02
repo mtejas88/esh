@@ -55,11 +55,11 @@ where dd.include_in_universe_of_districts
 --Don't include "No Data"s -- some are behind on refresh, so include if they are clean
 	and (fbts.fiber_target_status != 'No Data' or dd.exclude_from_ia_analysis = false)
 --Don't include Potential Targets if they are dirty or have 0 unscalable campuses
-and not(fbts.fiber_target_status = 'Potential Target'
-		and (	dd.current_known_unscalable_campuses + (.08 * dd.current_assumed_unscalable_campuses) = 0
-				or dd.exclude_from_ia_analysis = true
+	and not(fbts.fiber_target_status = 'Potential Target'
+			and (	dd.current_known_unscalable_campuses + (.08 * dd.current_assumed_unscalable_campuses) = 0
+					or dd.exclude_from_ia_analysis = true
+				)
 			)
-		)
 
 /*
 Author: Justine Schott
