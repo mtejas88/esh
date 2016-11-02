@@ -94,6 +94,7 @@ left join (
            end
 
 ) campus_schools
+
 on dd.esh_id = campus_schools.district_esh_id
 
 left join (
