@@ -13,7 +13,6 @@ select  distinct  dd.esh_id,
                     else dd.discount_rate_c1::numeric
                   end as c1_discount_rate_or_state_avg,
                   case
-                  --Not Target districts don't have any unscalable campuses
                     when  fbts.fiber_target_status in ('Target', 'No Data')
                           or (fbts.fiber_target_status = 'Potential Target'
                             and (   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
