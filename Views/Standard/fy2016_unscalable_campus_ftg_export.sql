@@ -86,12 +86,12 @@ left join (
   on sd.school_nces_code = sc."NCESSCH"
   where district_include_in_universe_of_districts
 
-  group by district_esh_id,
-           case
-              when campus_id = 'Unknown'
-                  then address
-              else campus_id
-           end
+  group by 	district_esh_id,
+         case
+            when campus_id = 'Unknown'
+                then address
+            else campus_id
+         end
 
 ) campus_schools
 
