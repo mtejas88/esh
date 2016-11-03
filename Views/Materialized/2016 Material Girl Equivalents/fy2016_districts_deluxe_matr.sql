@@ -115,6 +115,13 @@ select
     	or broadband_internet_upstream_lines is null
       		then FALSE
 	end as meeting_2018_goal_no_oversub_fcc_25,
+	case
+		when 'bw_upgrade' = any(tag_array)
+			then true
+		when 'bw_not_upgrade' = any(tag_array)
+			then false
+		else null
+	end as bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
 	ia_monthly_cost as ia_monthly_cost_total,
