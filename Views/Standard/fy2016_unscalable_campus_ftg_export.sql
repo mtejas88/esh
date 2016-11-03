@@ -22,14 +22,11 @@ select  dd.esh_id,
                             dd.current_assumed_unscalable_campuses > 0
               then  dd.current_known_unscalable_campuses +
                       dd.current_assumed_unscalable_campuses
-            when    fbts.fiber_target_status = 'Target'
+            when    fbts.fiber_target_status in ('Target', 'No Data')
                     and num_campuses in (1,2)
                 then 1
-            when    fbts.fiber_target_status = 'Target'
+            when    fbts.fiber_target_status in ('Target', 'No Data')
                 then num_campuses::numeric * .34
---note: No Data Assumption needs to be decided upon
-            when fbts.fiber_target_status = 'No Data'
-                then NULL
             else dd.current_known_unscalable_campuses +
                     dd.current_assumed_unscalable_campuses
         end as district_num_campuses_unscalable,
