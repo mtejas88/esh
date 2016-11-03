@@ -178,11 +178,22 @@ select
 	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
    			WHEN wifi.count_wifi_needed = 0 THEN false
         	ELSE null
-		   	END as needs_wifi
+		   	END as needs_wifi,
+	c2_prediscount_budget_15,
+	c2_prediscount_remaining_15,
+	c2_prediscount_remaining_16,
+	c2_postdiscount_remaining_15,
+	c2_postdiscount_remaining_16,
+	received_c2_15,
+	received_c2_16,
+	budget_used_c2_15,
+	budget_used_c2_16
 
 from public.fy2016_districts_metrics_matr dm
 left join public.fy2016_wifi_connectivity_informations_matr wifi
 on dm.esh_id = wifi.parent_entity_id::varchar
+left join public.fy2016_districts_c2_funding_matr c2
+on dm.esh_id = c2.esh_id::varchar
 
 /*
 Author: Justine Schott

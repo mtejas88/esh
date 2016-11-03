@@ -166,8 +166,9 @@ agg_dr_2016 as (
   on d16.district_esh_id = ud.esh_id
   where proportionate_c2_cost > 0
   group by postal_cd
-)
+),
 
+district_cost as (
   select
     d15.esh_id,
     d15.postal_cd,
@@ -201,11 +202,42 @@ agg_dr_2016 as (
   on d15.esh_id = d16.district_esh_id
   left join agg_dr_2016
   on d15.postal_cd = agg_dr_2016.postal_cd
+)
+
+select  esh_id,
+        c2_cost_budget as c2_prediscount_budget_15,
+        c2_cost_remaining_2015 as c2_prediscount_remaining_15,
+        c2_cost_budget - c2_cost_remaining_2015 as c2_pre_discount_spent_15,
+        c2_cost_remaining_2016 as c2_prediscount_remaining_16,
+        c2_cost_remaining_2015 - c2_cost_remaining_2016 as c2_pre_discount_spent_16,
+        c2_cost_remaining_2015*c2_discount_rate_for_remaining_budget as c2_postdiscount_remaining_15,
+        c2_cost_remaining_2016*c2_discount_rate_for_remaining_budget as c2_postdiscount_remaining_16,
+        case
+          when c2_cost_budget > c2_cost_remaining_2015
+            then true
+          else false
+        end as received_c2_15,
+        case
+          when c2_cost_remaining_2015 > c2_cost_remaining_2016
+            then true
+          else false
+        end as received_c2_16,
+        case
+          when c2_cost_remaining_2015 = 0
+            then true
+          else false
+        end as budget_used_c2_15,
+        case
+          when c2_cost_remaining_2016 = 0
+            then true
+          else false
+        end as budget_used_c2_16
+from district_cost
 
 /*
 Author: Justine Schott
 Created On Date: 10/14/2016
-Last Modified Date: 11/1/2016
+Last Modified Date: 11/3/2016
 Name of QAing Analyst(s): Jess Seok
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
 Methodology:
