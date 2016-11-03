@@ -1,4 +1,4 @@
-select
+select distinct
 	esh_id,
 	nces_cd,
 	name,
