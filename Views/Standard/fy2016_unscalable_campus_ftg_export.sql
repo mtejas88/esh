@@ -15,7 +15,13 @@ select  dd.esh_id,
                     and dd.current_known_unscalable_campuses +
                             dd.current_assumed_unscalable_campuses = 0
                     and dd.non_fiber_lines > 0
-                then dd.non_fiber_lines
+              then dd.non_fiber_lines
+            when    dd.exclude_from_ia_analysis = false
+                    and fbts.fiber_target_status = 'Target'
+                    and dd.current_known_unscalable_campuses +
+                            dd.current_assumed_unscalable_campuses > 0
+              then  dd.current_known_unscalable_campuses +
+                      dd.current_assumed_unscalable_campuses
             when    fbts.fiber_target_status = 'Target'
                     and num_campuses in (1,2)
                 then 1
@@ -43,9 +49,9 @@ on dd.esh_id = fbts.esh_id
 left join (
   select district_esh_id,
          case
-         	when campus_id = 'Unknown'
-         		then address
-         	else campus_id
+            when campus_id = 'Unknown'
+                then address
+            else campus_id
          end as campus_id,
          array_agg(name) as campus_school_names,
          array_agg(school_nces_code) as campus_school_nces_cds,
@@ -63,7 +69,7 @@ left join (
   on sd.school_nces_code = sc."NCESSCH"
   where district_include_in_universe_of_districts
 
-  group by 	district_esh_id,
+  group by  district_esh_id,
          case
             when campus_id = 'Unknown'
                 then address
@@ -76,13 +82,13 @@ on dd.esh_id = campus_schools.district_esh_id
 
 where dd.include_in_universe_of_districts
 --Not Target districts don't have any unscalable campuses
-	and fbts.fiber_target_status != 'Not Target'
+    and fbts.fiber_target_status != 'Not Target'
 --Don't include Potential Targets if they are dirty or have 0 unscalable campuses
-	and not(fbts.fiber_target_status = 'Potential Target'
-			and (	dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses = 0
-					or dd.exclude_from_ia_analysis = true
-				)
-			)
+    and not(fbts.fiber_target_status = 'Potential Target'
+            and (   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses = 0
+                    or dd.exclude_from_ia_analysis = true
+                )
+            )
 
 /*
 Author: Justine Schott
