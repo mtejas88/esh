@@ -13,6 +13,7 @@ select	dd.*,
 				da.flag_array,
 				da.tag_array,
 				broadband_internet_upstream_lines,
+				not_broadband_internet_upstream_lines,
 				case
 					when	com_info_bandwidth	>	0
 						then	com_info_bandwidth

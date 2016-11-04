@@ -116,6 +116,11 @@ select distinct
       		then FALSE
 	end as meeting_2018_goal_no_oversub_fcc_25,
 	case
+		when not_broadband_internet_upstream_lines > 0
+			then true
+		else false
+	end as at_least_one_line_not_meeting_broadband_goal,
+	case
 		when 'bw_upgrade' = any(tag_array)
 			then true
 		when 'bw_not_upgrade' = any(tag_array)
