@@ -6,7 +6,7 @@ with universe_districts as (
             then 9200
           else sd.num_students*150
         end) as c2_cost_budget
-  from public.fy2016_districts_deluxe_matr dd
+  from public.fy2016_districts_demog_matr dd
   left join public.fy2016_schools_demog_matr sd
   on dd.esh_id = sd.district_esh_id
   where include_in_universe_of_districts = true
