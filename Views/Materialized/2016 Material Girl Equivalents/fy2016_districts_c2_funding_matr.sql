@@ -6,8 +6,8 @@ with universe_districts as (
             then 9200
           else sd.num_students*150
         end) as c2_cost_budget
-  from endpoint.fy2016_districts_deluxe dd
-  left join endpoint.fy2016_schools_demog sd
+  from public.fy2016_districts_deluxe_matr dd
+  left join public.fy2016_schools_demog_matr sd
   on dd.esh_id = sd.district_esh_id
   where include_in_universe_of_districts = true
   group by  esh_id,
@@ -26,7 +26,7 @@ ad_2015 as (
     dl.district_esh_id,
     a.cat_2_cost
     from public.allocations a
-    left join endpoint.fy2016_district_lookup dl
+    left join public.fy2016_district_lookup_matr dl
     on a.recipient_id::varchar = dl.esh_id
     left join universe_districts dd
     on dl.district_esh_id = dd.esh_id
@@ -104,7 +104,7 @@ ad_2016 as (
     dl.district_esh_id,
     a.cat_2_cost
     from fy2016.allocations a
-    left join endpoint.fy2016_district_lookup dl
+    left join public.fy2016_district_lookup_matr dl
     on a.recipient_id::varchar = dl.esh_id
     left join universe_districts dd
     on dl.district_esh_id = dd.esh_id

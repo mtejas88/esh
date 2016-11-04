@@ -54,7 +54,7 @@ FROM (
             li.open_flag_labels AS open_flags,
             li.erate AS erate,
             li.consortium_shared AS consortium_shared,
-            CASE
+            case
               WHEN li.isp_conditions_met
                 THEN 'ISP'
               WHEN li.internet_conditions_met
