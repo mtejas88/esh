@@ -1,4 +1,4 @@
-select
+select distinct
 	esh_id,
 	nces_cd,
 	name,
@@ -25,8 +25,8 @@ select
 	longitude,
 	case
 		when  	(flag_array is null or
-				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
-            	and ia_bandwidth_per_student_kbps > 0
+				    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
+            and ia_bandwidth_per_student_kbps > 0
 			then false
 		else true
 	end as exclude_from_ia_analysis,
@@ -115,6 +115,18 @@ select
     	or broadband_internet_upstream_lines is null
       		then FALSE
 	end as meeting_2018_goal_no_oversub_fcc_25,
+	case
+		when not_broadband_internet_upstream_lines > 0
+			then true
+		else false
+	end as at_least_one_line_not_meeting_broadband_goal,
+	case
+		when 'bw_upgrade' = any(tag_array)
+			then true
+		when 'bw_not_upgrade' = any(tag_array)
+			then false
+		else null
+	end as bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
 	ia_monthly_cost as ia_monthly_cost_total,
@@ -174,20 +186,31 @@ select
 	lines_w_dirty,
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
-	ia_monthly_cost_no_backbone,
+  	ia_monthly_cost_no_backbone,
 	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
    			WHEN wifi.count_wifi_needed = 0 THEN false
         	ELSE null
-		   	END as needs_wifi
+		   	END as needs_wifi,
+	c2_prediscount_budget_15,
+	c2_prediscount_remaining_15,
+	c2_prediscount_remaining_16,
+	c2_postdiscount_remaining_15,
+	c2_postdiscount_remaining_16,
+	received_c2_15,
+	received_c2_16,
+	budget_used_c2_15,
+	budget_used_c2_16
 
 from public.fy2016_districts_metrics dm
 left join public.fy2016_wifi_connectivity_informations wifi
 on dm.esh_id = wifi.parent_entity_id::varchar
+left join public.fy2016_districts_c2_funding c2
+on dm.esh_id = c2.esh_id::varchar
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 10/20/2016
+Last Modified Date: 11/3/2016
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

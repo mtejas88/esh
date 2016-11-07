@@ -78,7 +78,14 @@ select  		dd.esh_id as district_esh_id,
 										then	allocation_lines
 									else	0
 								end) as satellite_lte_lines,
-						d15.num_campuses
+						d15.num_campuses,
+						sum(case
+									when isp_conditions_met = false
+									and (not('backbone' = any(open_flags)) or open_flags is null)
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as lines_w_dirty
 
 
 from	public.fy2016_districts_demog_matr dd

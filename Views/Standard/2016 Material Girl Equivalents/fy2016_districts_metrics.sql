@@ -13,6 +13,7 @@ select	dd.*,
 				da.flag_array,
 				da.tag_array,
 				broadband_internet_upstream_lines,
+				not_broadband_internet_upstream_lines,
 				case
 					when	com_info_bandwidth	>	0
 						then	com_info_bandwidth
@@ -240,7 +241,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/26/2016
+Last Modified Date: 11/1/2016
 Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables

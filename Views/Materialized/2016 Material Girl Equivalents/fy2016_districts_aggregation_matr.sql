@@ -40,6 +40,15 @@ select  		dd.esh_id as district_esh_id,
 								then	allocation_lines
 							else	0
 						end)	as	broadband_internet_upstream_lines,
+				sum(case
+							when	(upstream_conditions_met	=	TRUE or internet_conditions_met = TRUE)
+							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+							and	num_open_flags	=	0
+							and consortium_shared = false
+							and bandwidth_in_mbps < 25
+								then	allocation_lines
+							else	0
+						end)	as	not_broadband_internet_upstream_lines,
 --ia cost/mbps pieces
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)

@@ -51,7 +51,8 @@ select			district_esh_id,
               when num_campuses < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
                 then 0
               else .08* (num_campuses - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
-            end as current_assumed_unscalable_campuses
+            end as current_assumed_unscalable_campuses,
+            lines_w_dirty
 
 from	fy2015_districts_aggregation_fy2016_methods_m
 

@@ -54,7 +54,7 @@ FROM (
             li.open_flag_labels AS open_flags,
             li.erate AS erate,
             li.consortium_shared AS consortium_shared,
-            CASE
+            case
               WHEN li.isp_conditions_met
                 THEN 'ISP'
               WHEN li.internet_conditions_met
@@ -82,7 +82,11 @@ FROM (
             li.bandwidth_in_mbps AS bandwidth_in_mbps,
             li.months_of_service AS months_of_service,
             li.contract_end_date AS contract_end_date,
-            spc.reporting_name AS reporting_name,
+            case
+              when spc.reporting_name is null
+                then  li.service_provider_name
+              else spc.reporting_name
+            end AS reporting_name,
             li.service_provider_name AS service_provider_name,
             li.applicant_name AS applicant_name,
             li.applicant_id AS applicant_id,
@@ -140,7 +144,7 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       10/20/2016
+Last Modified Date:       11/1/2016
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:
