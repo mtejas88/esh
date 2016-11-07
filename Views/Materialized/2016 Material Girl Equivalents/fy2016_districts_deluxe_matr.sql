@@ -20,7 +20,7 @@ select
 	city,
 	zip,
 	county,
-	postal_cd,
+	dm.postal_cd,
 	latitude,
 	longitude,
 	case
@@ -174,9 +174,15 @@ select
 	lines_w_dirty,
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
-  ia_monthly_cost_no_backbone
+  	ia_monthly_cost_no_backbone,
+	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
+   			WHEN wifi.count_wifi_needed = 0 THEN false
+        	ELSE null
+		   	END as needs_wifi
 
-from public.fy2016_districts_metrics_matr
+from public.fy2016_districts_metrics_matr dm
+left join public.fy2016_wifi_connectivity_informations_matr wifi
+on dm.esh_id = wifi.parent_entity_id::varchar
 
 /*
 Author: Justine Schott
