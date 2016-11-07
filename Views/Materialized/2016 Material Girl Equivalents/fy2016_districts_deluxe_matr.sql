@@ -1,5 +1,5 @@
 select distinct
-	esh_id,
+	dm.esh_id,
 	nces_cd,
 	name,
 	union_code,
