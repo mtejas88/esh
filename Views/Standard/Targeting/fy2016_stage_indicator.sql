@@ -32,8 +32,8 @@ select
 						end
 			else
 				case when 	campuses_specif_recip_nonfiber_not_wan_lines_alloc = 0 and
-							(fiber_wan_lines_w_dirty >= sum_alloc_wan_fiber_lines or
-							fiber_wan_lines_w_dirty >= count_ben_wan_fiber_lines) then						--row 26
+							(fiber_wan_lines_w_dirty_w_nifs >= sum_alloc_wan_fiber_lines or
+							fiber_wan_lines_w_dirty_w_nifs >= count_ben_wan_fiber_lines) then						--row 26
 					case when fiber_internet_upstream_lines_w_dirty > 0 then 											--row 27
 						case 	when 	(campuses_specif_recip_nonfiber_not_wan_lines_alloc_clean = 0 and
 										(fiber_wan_lines >= sum_alloc_wan_fiber_lines_clean or
@@ -50,8 +50,8 @@ select
 					end																									--rows 31,32,33
 				else
 					case when 	campuses_specif_recip_nonfiber_not_ia_lines_alloc = 0  and
-								(fiber_internet_upstream_lines_w_dirty >= sum_alloc_ia_fiber_lines or
-								fiber_internet_upstream_lines_w_dirty >= count_ben_ia_fiber_lines) then								--row 34
+								(fiber_internet_upstream_lines_w_dirty_w_nifs >= sum_alloc_ia_fiber_lines or
+								fiber_internet_upstream_lines_w_dirty_w_nifs >= count_ben_ia_fiber_lines) then								--row 34
 						case 	when 	exclude_from_wan_analysis = false and
 										priority_status__c in ('Priority 5', 'Priority 6', 'Priority 7', 'Priority 10') then 'Not Target'
 								else 'Potential Target' end																--rows 36,37
@@ -73,6 +73,8 @@ select
 	non_fiber_internet_upstream_lines_w_dirty,
 	fiber_wan_lines_w_dirty,
 	fiber_internet_upstream_lines_w_dirty,
+	fiber_wan_lines_w_dirty_w_nifs,
+	fiber_internet_upstream_lines_w_dirty_w_nifs,
 	district_specif_recip_nonfiber_lines,
 	campuses_specif_recip_nonfiber_lines,
 	campuses_specif_recip_fiber_wan_lines,
@@ -280,7 +282,15 @@ left join (
 		left join (
 			select 	*
 			from fy2016.allocations
-			where broadband = true
+			left join (
+			  select distinct flaggable_id
+			  from fy2016.flags
+			  where label in ('closed_school', 'non_school', 'charter_school')
+			  and status = 'open'
+			) t
+			on allocations.recipient_id = t.flaggable_id
+			where flaggable_id is null
+			and broadband = true
 		) alloc
 		on ldli.line_item_id = alloc.line_item_id
 		where li.isp_conditions_met = false
@@ -295,6 +305,47 @@ left join (
 		group by d.esh_id
 ) district_alloc_recips
 on d.esh_id = district_alloc_recips.esh_id
+left join (
+	select 	district_esh_id,
+			count(distinct 	case
+								when 	connect_category ILIKE '%Fiber%'
+										and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+										and wan_conditions_met = true
+										and consortium_shared = false
+									then circuit_id
+							end) as fiber_wan_lines_w_dirty_w_nifs,
+			count(distinct 	case
+								when 	connect_category ILIKE '%Fiber%'
+										and connect_type not in ('DS-1', 'Digital Subscriber Line (DSL)')
+										and (internet_conditions_met = true or upstream_conditions_met = true)
+										and consortium_shared = false
+									then circuit_id
+							end) as fiber_internet_upstream_lines_w_dirty_w_nifs
+	from fy2016.entity_circuits ec
+	left join fy2016.circuits c
+	on ec.circuit_id = c.id
+	left join (
+		select esh_id, district_esh_id
+		from public.fy2016_district_lookup_matr
+		UNION
+		select esh_id::varchar, district_esh_id::varchar
+		from fy2016.other_locations
+	) dl_nifs
+	on ec.entity_id::varchar = dl_nifs.esh_id
+	join (
+		select esh_id
+		from public.fy2016_districts_demog_matr
+		where include_in_universe_of_districts
+	) univ
+	on dl_nifs.district_esh_id = univ.esh_id
+	where (not('canceled' = any(open_flag_labels) or
+	        'video_conferencing' = any(open_flag_labels) or
+	        'exclude' = any(open_flag_labels))
+			or open_flag_labels is null)
+	group by 	district_esh_id
+) all_circuits
+on d.esh_id = all_circuits.district_esh_id
+
 where include_in_universe_of_districts
 
 /*
