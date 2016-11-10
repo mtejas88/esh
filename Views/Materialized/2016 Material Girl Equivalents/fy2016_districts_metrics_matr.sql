@@ -227,6 +227,7 @@ select	dd.*,
 		    fiber_internet_upstream_lines_w_dirty,
 		    fiber_wan_lines_w_dirty,
 		    lines_w_dirty,
+		    line_items_w_dirty,
 		    fiber_wan_lines,
 		    consortium_affiliation,
 		    ia_procurement_type,
@@ -241,7 +242,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/26/2016
+Last Modified Date: 11/10/2016
 Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables

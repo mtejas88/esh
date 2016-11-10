@@ -184,6 +184,7 @@ select distinct
     fiber_internet_upstream_lines_w_dirty,
     fiber_wan_lines_w_dirty,
 	lines_w_dirty,
+	line_items_w_dirty,
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
   	ia_monthly_cost_no_backbone,
@@ -210,7 +211,7 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 11/3/2016
+Last Modified Date: 11/10/2016
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
