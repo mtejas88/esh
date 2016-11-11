@@ -201,6 +201,7 @@ select distinct
   	fbts.bw_target_status
 
 from public.fy2016_districts_deluxe_matr dpd
+left join public.fy2016_fiber_bw_target_status fbts
 on dpd.esh_id = fbts.esh_id
 
 /*
