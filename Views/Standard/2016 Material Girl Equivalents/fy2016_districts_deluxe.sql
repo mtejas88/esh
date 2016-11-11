@@ -1,10 +1,10 @@
 select distinct
-	esh_id,
+	dpd.esh_id,
 	nces_cd,
 	name,
 	union_code,
-	null as state_senate_district,
-	null as state_assembly_district,
+	state_senate_district,
+	state_assembly_district,
 	ulocal,
 	locale,
 	district_size,
@@ -20,132 +20,131 @@ select distinct
 	city,
 	zip,
 	county,
-	dm.postal_cd,
+	dpd.postal_cd,
 	latitude,
 	longitude,
+	dpd.exclude_from_ia_analysis,
+	exclude_from_ia_cost_analysis,
+	dpd.exclude_from_wan_analysis,
+	exclude_from_wan_cost_analysis,
 	case
-		when  	(flag_array is null or
-				    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
-            and ia_bandwidth_per_student_kbps > 0
-			then false
-		else true
-	end as exclude_from_ia_analysis,
-	case
-		when 	(flag_array is null or
-				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
-				and ia_no_cost_lines = 0
-				and ia_monthly_cost > 0
-				and ia_monthly_cost_per_mbps > 0
-			then false
-		else true
-	end as exclude_from_ia_cost_analysis,
-	case
-		when 	flag_array is null
-			then false
-		else true
-	end as exclude_from_wan_analysis,
-	case
-		when 	flag_array is null
-				and wan_no_cost_lines = 0
-				and wan_monthly_cost > 0
-				and wan_monthly_cost_per_line > 0
-			then false
-		else true
-	end as exclude_from_wan_cost_analysis,
+	    when  fbts.fiber_target_status in ('Target', 'No Data', 'Not Target')
+	          or (fbts.fiber_target_status = 'Potential Target'
+	            and dpd.exclude_from_ia_analysis = false)
+	    	then false
+	   	else true
+	end as exclude_from_current_fiber_analysis,
 	include_in_universe_of_districts,
 	flag_array,
 	tag_array,
-	flag_count as num_open_district_flags,
-	case
-		when 	(flag_array is not null or
-				flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%')
-			then 'dirty'
-		when 'outreach_confirmed' = any(tag_array)
-			then  'outreach_confirmed'
-		when 'line_items_outreach_confirmed' = any(tag_array)
-			then 'line_items_outreach_confirmed'
-		when 'outreach_confirmed_auto' = any(tag_array)
-			then 'line_items_verified'
-		when 'dqt_reviewed' = any(tag_array)
-			then 'dqt_reviewed'
-		when machine_cleaned_lines > 0
-			then 'machine_cleaned'
-		else 'natively_clean'
-	end as clean_categorization,
+	num_open_district_flags,
+	clean_categorization,
 	ia_bandwidth_per_student_kbps,
-	case
-		when ia_bandwidth_per_student_kbps >= 100
-			then true
-		when ia_bandwidth_per_student_kbps < 100
-			then false
-	end as meeting_2014_goal_no_oversub,
-	case
-		when ia_bandwidth_per_student_kbps*ia_oversub_ratio >= 100
-			then true
-		when ia_bandwidth_per_student_kbps*ia_oversub_ratio < 100
-			then false
-	end as meeting_2014_goal_oversub,
-	case
-    	when ia_bandwidth_per_student_kbps >= 100
-      	and broadband_internet_upstream_lines > 0
-      		then TRUE
-    	when ia_bandwidth_per_student_kbps < 100
-    	or broadband_internet_upstream_lines = 0
-    	or broadband_internet_upstream_lines is null
-      		then FALSE
-	end as meeting_2014_goal_no_oversub_fcc_25,
-	case
-		when ia_bandwidth_per_student_kbps >= 1000
-			then true
-		when ia_bandwidth_per_student_kbps < 1000
-			then false
-	end as meeting_2018_goal_no_oversub,
-	case
-		when ia_bandwidth_per_student_kbps*ia_oversub_ratio >= 1000
-			then true
-		when ia_bandwidth_per_student_kbps*ia_oversub_ratio < 1000
-			then false
-	end as meeting_2018_goal_oversub,
-	case
-    	when ia_bandwidth_per_student_kbps >= 1000
-      	and broadband_internet_upstream_lines > 0
-      		then TRUE
-    	when ia_bandwidth_per_student_kbps < 1000
-    	or broadband_internet_upstream_lines = 0
-    	or broadband_internet_upstream_lines is null
-      		then FALSE
-	end as meeting_2018_goal_no_oversub_fcc_25,
-	case
-		when not_broadband_internet_upstream_lines > 0
-			then true
-		else false
-	end as at_least_one_line_not_meeting_broadband_goal,
-	case
-		when 'bw_upgrade' = any(tag_array)
-			then true
-		when 'bw_not_upgrade' = any(tag_array)
-			then false
-		else null
-	end as bw_upgrade_indicator,
+	meeting_2014_goal_no_oversub,
+	meeting_2014_goal_oversub,
+	meeting_2014_goal_no_oversub_fcc_25,
+	meeting_2018_goal_no_oversub,
+	meeting_2018_goal_oversub,
+	meeting_2018_goal_no_oversub_fcc_25,
+	at_least_one_line_not_meeting_broadband_goal,
+	bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
-	ia_bandwidth as ia_bw_mbps_total,
-	ia_monthly_cost as ia_monthly_cost_total,
+	ia_bw_mbps_total,
+	ia_monthly_cost_total,
 	ia_monthly_cost_direct_to_district,
 	ia_monthly_cost_shared,
 	wan_monthly_cost_per_line,
-	wan_monthly_cost as wan_monthly_cost_total,
-	case
-		when ia_monthly_cost_per_mbps <= 3
-			then true
-		when ia_monthly_cost_per_mbps > 3
-			then false
-	end as meeting_3_per_mbps_affordability_target,
-	hierarchy_connect_category as hierarchy_ia_connect_category,
+	wan_monthly_cost_total,
+	meeting_3_per_mbps_affordability_target,
+	hierarchy_ia_connect_category,
 	all_ia_connectcat,
-	current_known_scalable_campuses,
-	current_assumed_scalable_campuses,
-	current_known_unscalable_campuses,
-	current_assumed_unscalable_campuses,
+	case
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fbts.fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses = 0
+	          and non_fiber_lines > 0
+	    then 0
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses > 0
+	  	then current_known_scalable_campuses
+	  when fbts.fiber_target_status in ('Target', 'No Data')
+	    then 0
+	  when fbts.fiber_target_status = 'Not Target'
+	    then 0
+	  else current_known_scalable_campuses
+	end as current_known_scalable_campuses,
+	case
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fbts.fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses = 0
+	          and non_fiber_lines > 0
+	    then 	case
+		    		when non_fiber_lines > num_campuses
+		    			then 0
+		    		else num_campuses - non_fiber_lines
+		    	end
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses > 0
+	  	then  current_assumed_scalable_campuses
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and num_campuses = 1
+	    then 0
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and num_campuses = 2
+	    then 1
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	    then num_campuses::numeric * .66
+	  when fbts.fiber_target_status = 'Not Target'
+	    then num_campuses
+	  else current_assumed_scalable_campuses
+	end as current_assumed_scalable_campuses,
+	case
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fbts.fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses = 0
+	          and non_fiber_lines > 0
+	    then 0
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses > 0
+	  	then  current_known_unscalable_campuses
+	  when    fbts.fiber_target_status in ('Target', 'No Data', 'Not Target')
+	    then 0
+	  else current_known_unscalable_campuses
+	end as current_known_unscalable_campuses,
+	case
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fbts.fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses = 0
+	          and non_fiber_lines > 0
+	    then 	case
+		    		when non_fiber_lines > num_campuses
+		    			then num_campuses
+		    		else non_fiber_lines
+		    	end
+	  when    dpd.exclude_from_ia_analysis = false
+	          and fiber_target_status = 'Target'
+	          and current_known_unscalable_campuses +
+	              current_assumed_unscalable_campuses > 0
+	  	then  current_assumed_unscalable_campuses
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and num_campuses in (1,2)
+	    then 1
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	    then num_campuses::numeric * .34
+	  when fbts.fiber_target_status = 'Not Target'
+	    then 0
+	  else current_assumed_unscalable_campuses
+	end as current_assumed_unscalable_campuses,
 	sots_known_scalable_campuses,
 	sots_assumed_scalable_campuses,
 	sots_known_unscalable_campuses,
@@ -188,10 +187,7 @@ select distinct
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
   	ia_monthly_cost_no_backbone,
-	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
-   			WHEN wifi.count_wifi_needed = 0 THEN false
-        	ELSE null
-		   	END as needs_wifi,
+	needs_wifi,
 	c2_prediscount_budget_15,
 	c2_prediscount_remaining_15,
 	c2_prediscount_remaining_16,
@@ -200,19 +196,19 @@ select distinct
 	received_c2_15,
 	received_c2_16,
 	budget_used_c2_15,
-	budget_used_c2_16
+	budget_used_c2_16,
+	fbts.fiber_target_status,
+  	fbts.bw_target_status
 
-from public.fy2016_districts_metrics dm
-left join public.fy2016_wifi_connectivity_informations wifi
-on dm.esh_id = wifi.parent_entity_id::varchar
-left join public.fy2016_districts_c2_funding c2
-on dm.esh_id = c2.esh_id::varchar
+from public.fy2016_districts_deluxe dpd
+left join public.fy2016_fiber_bw_target_status fbts
+on dpd.esh_id = fbts.esh_id
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
 Last Modified Date: 11/10/2016
 Name of QAing Analyst(s):
-Purpose: 2015 and 2016 district data in terms of 2016 methodology for longitudinal analysis
+Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:
 */
