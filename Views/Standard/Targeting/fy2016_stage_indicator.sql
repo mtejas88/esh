@@ -94,7 +94,7 @@ select
 	flag_array,
 	postal_cd,
 	nces_cd
-from public.fy2016_districts_deluxe_matr d
+from public.fy2016_districts_predeluxe_matr d
 left join (
 	select 	esh_id as account__esh_id__c,
 			fiber_priority_status::varchar as priority_status__c
