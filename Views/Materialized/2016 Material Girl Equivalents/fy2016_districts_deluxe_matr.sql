@@ -189,6 +189,7 @@ select distinct
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
   	ia_monthly_cost_no_backbone,
+  	(ia_monthly_cost - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 	needs_wifi,
 	c2_prediscount_budget_15,
 	c2_prediscount_remaining_15,
