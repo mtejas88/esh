@@ -28,7 +28,9 @@ select distinct
 	dpd.exclude_from_wan_analysis,
 	exclude_from_wan_cost_analysis,
 	case
-	    when  fbts.fiber_target_status in ('Target', 'No Data', 'Not Target')
+	    when  fbts.fiber_target_status in ('Target', 'Not Target')
+	    	  or (fbts.fiber_target_status = 'No Data'
+	            and dpd.num_campuses <= 2)
 	          or (fbts.fiber_target_status = 'Potential Target'
 	            and dpd.exclude_from_ia_analysis = false)
 	    	then false
