@@ -28,7 +28,7 @@ select 			si.esh_id,
 				on si.esh_id = ps.esh_id::varchar
 				left join public.fy2016_bw_indicator bi
 				on si.esh_id = bi.esh_id
-				left join public.fy2016_districts_deluxe_matr dd
+				left join public.fy2016_districts_predeluxe_matr dd
 				on si.esh_id = dd.esh_id
 
 /*
