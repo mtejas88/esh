@@ -295,12 +295,12 @@ left join (
 		group by d.esh_id
 ) district_alloc_recips
 on d.esh_id = district_alloc_recips.esh_id
-where include_in_universe_of_districts
+where d.include_in_universe_of_districts or d.district_type = 'Charter'
 
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 10/20/2016
+Last Modified Date: 11/21/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query
