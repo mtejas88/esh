@@ -22,12 +22,12 @@ select
 from fy2016_districts_predeluxe_matr d16
 left join fy2015_districts_deluxe_m d15
 on d16.esh_id = d15.esh_id::varchar
-where include_in_universe_of_districts
+where d16.include_in_universe_of_districts or d16.district_type = 'Charter'
 
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 10/4/2016
+Last Modified Date: 11/21/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts' bandwidth target status
 Methodology: Compare 2015 and 2016 bw/student values, as well as whether they receive services
