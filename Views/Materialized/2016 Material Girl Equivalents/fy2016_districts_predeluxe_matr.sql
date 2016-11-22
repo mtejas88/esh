@@ -34,8 +34,6 @@ select distinct
 		when 	(flag_array is null or
 				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
 				and ia_no_cost_lines = 0
-				and ia_monthly_cost > 0
-				and ia_monthly_cost_per_mbps > 0
 			then false
 		else true
 	end as exclude_from_ia_cost_analysis,
@@ -47,8 +45,7 @@ select distinct
 	case
 		when 	flag_array is null
 				and wan_no_cost_lines = 0
-				and wan_monthly_cost > 0
-				and wan_monthly_cost_per_line > 0
+				and wan_lines_w_dirty > 0
 			then false
 		else true
 	end as exclude_from_wan_cost_analysis,
@@ -210,7 +207,7 @@ on dm.esh_id = c2.esh_id::varchar
 
 /*
 Author: Justine Schott
-Created On Date: 11/10/2016
+Created On Date: 11/22/2016
 Last Modified Date:
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
