@@ -99,7 +99,7 @@ select  		dd.esh_id as district_esh_id,
 												or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
@@ -111,14 +111,14 @@ select  		dd.esh_id as district_esh_id,
 									when	backbone_conditions_met = true
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- wan cost/connection pieces
@@ -130,7 +130,7 @@ select  		dd.esh_id as district_esh_id,
 									and	num_open_flags	=	0
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
@@ -343,7 +343,7 @@ select  		dd.esh_id as district_esh_id,
 					                    	then concat(	allocation_lines, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
@@ -372,7 +372,7 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
@@ -401,7 +401,7 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
@@ -435,7 +435,7 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
@@ -661,7 +661,16 @@ from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
 on 	dd.esh_id = ldli.district_esh_id
 left join	(
-		select *
+		select 	*,
+				case
+					when rec_elig_cost > 0
+						then rec_elig_cost
+					else one_time_elig_cost/  case
+												when months_of_service = 0 or months_of_service is null
+													then 12
+												else months_of_service
+											  end 
+				end as esh_rec_cost
 		from fy2016.line_items
 		where broadband = true
 		and (not('canceled' = any(open_flag_labels) or
