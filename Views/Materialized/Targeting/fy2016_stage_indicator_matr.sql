@@ -300,7 +300,7 @@ where d.include_in_universe_of_districts or d.district_type = 'Charter'
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 11/21/2016
+Last Modified Date: 11/22/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query

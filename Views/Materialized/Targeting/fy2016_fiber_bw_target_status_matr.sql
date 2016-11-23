@@ -16,7 +16,7 @@ select 			si.esh_id,
 						 else bi.bw_indicator
 						 end as bw_target_status
 
-				from public.fy2016_stage_indicator si
+				from public.fy2016_stage_indicator_matr si
 				left join (
 					select esh_id,
 							case
@@ -26,7 +26,7 @@ select 			si.esh_id,
 							end as fiber_priority_status
 					from endpoint.district_priority_status) ps
 				on si.esh_id = ps.esh_id::varchar
-				left join public.fy2016_bw_indicator bi
+				left join public.fy2016_bw_indicator_matr bi
 				on si.esh_id = bi.esh_id
 				left join public.fy2016_districts_predeluxe_matr dd
 				on si.esh_id = dd.esh_id

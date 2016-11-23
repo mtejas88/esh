@@ -53,8 +53,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)
 							and	num_open_flags	=	0
-							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-										or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -63,9 +62,8 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	internet_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -74,9 +72,8 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	upstream_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -85,9 +82,8 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	isp_conditions_met	=	TRUE
 							and (not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -99,12 +95,11 @@ select  		dd.esh_id as district_esh_id,
 												or	upstream_conditions_met	=	TRUE
 												or	'committed_information_rate'	=	any(open_tag_labels))
 									and	num_open_flags	=	0
-									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
@@ -116,27 +111,26 @@ select  		dd.esh_id as district_esh_id,
 									when	backbone_conditions_met = true
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- wan cost/connection pieces
 						sum(case
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
@@ -147,9 +141,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
-										or	open_tag_labels	is	null)
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+												or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 										then allocation_lines
@@ -350,7 +343,7 @@ select  		dd.esh_id as district_esh_id,
 					                    	then concat(	allocation_lines, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
@@ -379,13 +372,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-
 					                end), ', ') as bundled_internet_services,
 	                    array_to_string(
 	                    	array_agg(case
@@ -409,13 +401,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-
 					                end), ', ') as upstream_services,
 	                    array_to_string(
 	                    	array_agg(case
@@ -444,13 +435,12 @@ select  		dd.esh_id as district_esh_id,
 								                        	connect_category, ' line(s) at ',
 								                        	bandwidth_in_mbps, ' Mbps from ',
 								                        	service_provider_name, ' for $',
-								                        	round(rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
+								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 																				/*/ case
 																					when months_of_service = 0 or months_of_service is null
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-
 					                end), ', ') as wan_services,
 					    array_to_string(
 	                    	array_agg(case
@@ -527,6 +517,15 @@ select  		dd.esh_id as district_esh_id,
 										then	allocation_lines
 									else	0
 								end) as lines_w_dirty,
+						sum(case
+									when wan_conditions_met = true
+									and isp_conditions_met = false
+									and backbone_conditions_met = false
+									and consortium_shared = false
+										then	allocation_lines
+									else	0
+								end) as wan_lines_w_dirty,
+						sum(allocation_lines) as line_items_w_dirty,
 						sum(case
 									when num_open_flags	=	0
 									and connect_category ILIKE '%Fiber%'
@@ -636,13 +635,13 @@ select  		dd.esh_id as district_esh_id,
 						end as ia_procurement_type,
 --cleanliness
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and (internet_conditions_met or upstream_conditions_met or isp_conditions_met or backbone_conditions_met)
 										then allocation_lines
 									else	0
 								end) as ia_no_cost_lines,
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and wan_conditions_met
 										then allocation_lines
 									else	0
@@ -662,7 +661,16 @@ from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
 on 	dd.esh_id = ldli.district_esh_id
 left join	(
-		select *
+		select 	*,
+				case
+					when rec_elig_cost > 0
+						then rec_elig_cost
+					else one_time_elig_cost/  case
+												when months_of_service = 0 or months_of_service is null
+													then 12
+												else months_of_service
+											  end 
+				end as esh_rec_cost
 		from fy2016.line_items
 		where broadband = true
 		and (not('canceled' = any(open_flag_labels) or
@@ -758,7 +766,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/17/2016
+Last Modified Date: 11/22/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

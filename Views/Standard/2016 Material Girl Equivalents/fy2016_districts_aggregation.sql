@@ -524,6 +524,7 @@ select  		dd.esh_id as district_esh_id,
 										then	allocation_lines
 									else	0
 								end) as lines_w_dirty,
+						sum(allocation_lines) as line_items_w_dirty,
 						sum(case
 									when num_open_flags	=	0
 									and connect_category ILIKE '%Fiber%'
@@ -755,7 +756,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 11/1/2016
+Last Modified Date: 11/10/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

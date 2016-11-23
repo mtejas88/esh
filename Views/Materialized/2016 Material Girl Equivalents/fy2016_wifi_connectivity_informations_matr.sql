@@ -11,12 +11,12 @@ from fy2016.connectivity_informations ci
 
 left join public.entity_bens eb_parent
 on ci.parent_entity_number = eb_parent.ben
-left join endpoint.fy2016_districts_demog dd
+left join public.fy2016_districts_demog_matr dd
 on eb_parent.entity_id = dd.esh_id::text::int
 
 left join public.entity_bens eb_child
 on ci.child_entity_number = eb_child.ben
-left join endpoint.fy2016_schools_demog sd
+left join public.fy2016_schools_demog_matr sd
 on eb_child.entity_id = sd.school_esh_id::text::int
 
 where dd.esh_id is not null

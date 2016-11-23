@@ -27,7 +27,7 @@ where d16.include_in_universe_of_districts or d16.district_type = 'Charter'
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 11/21/2016
+Last Modified Date: 11/22/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts' bandwidth target status
 Methodology: Compare 2015 and 2016 bw/student values, as well as whether they receive services

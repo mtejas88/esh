@@ -91,7 +91,7 @@ select  		dd.esh_id as district_esh_id,
 from	public.fy2016_districts_demog_matr dd
 left join public.districts d15
 on dd.esh_id = d15.esh_id::varchar
-left join public.lines_to_district_by_line_item_2015	ldli
+left join public.lines_to_district_by_line_item_2015_m	ldli
 on 	dd.esh_id = ldli.district_esh_id::varchar
 left join	(
 		select *
@@ -107,7 +107,7 @@ left join (
 		select	ldli.line_item_id,
 						sum(d.num_students::numeric)	as	num_students_served
 
-		from public.lines_to_district_by_line_item_2015	ldli
+		from public.lines_to_district_by_line_item_2015_m	ldli
 
 		join public.districts	d
 		on ldli.district_esh_id	=	d.esh_id
