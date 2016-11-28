@@ -17,18 +17,18 @@ select
 			then false
 		else true
    end as exclude_from_ia_analysis,
-	ia_bandwidth_per_student_kbps,
+	sm.ia_bandwidth_per_student_kbps,
 	case
-		when ia_bandwidth_per_student_kbps >= 100
+		when sm.ia_bandwidth_per_student_kbps >= 100
 			then true
-		when ia_bandwidth_per_student_kbps < 100
+		when sm.ia_bandwidth_per_student_kbps < 100
 			then false
 	end as meeting_2014_goal_no_oversub,
 	case
-    	when ia_bandwidth_per_student_kbps >= 100
+    	when sm.ia_bandwidth_per_student_kbps >= 100
       	and broadband_internet_upstream_lines > 0
       		then TRUE
-    	when ia_bandwidth_per_student_kbps < 100
+    	when sm.ia_bandwidth_per_student_kbps < 100
     	or broadband_internet_upstream_lines = 0
     	or broadband_internet_upstream_lines is null
       		then FALSE
@@ -38,24 +38,24 @@ select
 			then true
 		else false
 	end as at_least_one_line_not_meeting_broadband_goal,
-	ia_monthly_cost_per_mbps,
+	sm.ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
 	ia_monthly_cost as ia_monthly_cost_total,
-	ia_monthly_cost_direct_to_district,
-	ia_monthly_cost_shared,
+	sm.ia_monthly_cost_direct_to_district,
+	sm.ia_monthly_cost_shared,
 	case
-		when ia_monthly_cost_per_mbps <= 3
+		when sm.ia_monthly_cost_per_mbps <= 3
 			then true
-		when ia_monthly_cost_per_mbps > 3
+		when sm.ia_monthly_cost_per_mbps > 3
 			then false
 	end as meeting_3_per_mbps_affordability_target,
-	current_known_scalable_campuses,
-	current_assumed_scalable_campuses,
-	current_known_unscalable_campuses,
-	current_assumed_unscalable_campuses,
-	wan_lines,
-	non_fiber_lines,
-	ia_monthly_cost_no_backbone
+	sm.current_known_scalable_campuses,
+	sm.current_assumed_scalable_campuses,
+	sm.current_known_unscalable_campuses,
+	sm.current_assumed_unscalable_campuses,
+	sm.wan_lines,
+	sm.non_fiber_lines,
+	sm.ia_monthly_cost_no_backbone
 
 from public.fy2016_schools_metrics_matr sm
 left join public.fy2016_districts_deluxe_matr dd

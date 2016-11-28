@@ -76,6 +76,21 @@ select			sd.*,
                     end	+	internet_bandwidth_cost)
 			  end as	ia_monthly_cost_per_mbps,
 		    case
+		      when num_schools > 5 and wan_lines = 0
+		        then 0
+		        else
+		          case
+		            when campus_count < (fiber_lines + fixed_wireless_lines + satellite_lte_lines + copper_dsl_lines + cable_lines)
+		              then 0
+		              else campus_count - (fiber_lines + fixed_wireless_lines + satellite_lte_lines + copper_dsl_lines + cable_lines)
+		          end
+		    end as sots_assumed_unscalable_campuses,
+		    case
+		      when campus_count < fiber_lines
+		        then campus_count
+		        else fiber_lines
+		    end as current_known_scalable_campuses,
+		    case
 		      when copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines > 0
 		        then
 		          case
