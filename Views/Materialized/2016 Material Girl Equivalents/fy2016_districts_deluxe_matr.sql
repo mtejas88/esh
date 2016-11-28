@@ -188,6 +188,7 @@ select distinct
 	line_items_w_dirty,
 	fiber_wan_lines,
 	most_recent_ia_contract_end_date,
+	wan_lines_w_dirty,
   	ia_monthly_cost_no_backbone,
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 	needs_wifi,
