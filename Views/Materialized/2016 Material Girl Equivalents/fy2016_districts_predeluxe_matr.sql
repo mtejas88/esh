@@ -200,7 +200,8 @@ select distinct
 	received_c2_15,
 	received_c2_16,
 	budget_used_c2_15,
-	budget_used_c2_16
+	budget_used_c2_16,
+	wan_lines_w_dirty
 
 from public.fy2016_districts_metrics_matr dm
 left join public.fy2016_wifi_connectivity_informations_matr wifi

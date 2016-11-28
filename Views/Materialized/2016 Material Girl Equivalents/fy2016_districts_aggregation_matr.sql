@@ -53,8 +53,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)
 							and	num_open_flags	=	0
-							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-										or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -63,8 +62,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	internet_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -74,8 +72,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	upstream_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -85,8 +82,7 @@ select  		dd.esh_id as district_esh_id,
 				sum(case
 							when	isp_conditions_met	=	TRUE
 							and (not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -99,8 +95,7 @@ select  		dd.esh_id as district_esh_id,
 												or	upstream_conditions_met	=	TRUE
 												or	'committed_information_rate'	=	any(open_tag_labels))
 									and	num_open_flags	=	0
-									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
@@ -130,8 +125,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
@@ -147,8 +141,7 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
@@ -634,13 +627,13 @@ select  		dd.esh_id as district_esh_id,
 						end as ia_procurement_type,
 --cleanliness
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and (internet_conditions_met or upstream_conditions_met or isp_conditions_met or backbone_conditions_met)
 										then allocation_lines
 									else	0
 								end) as ia_no_cost_lines,
 						sum(case
-									when ('exclude_for_cost_only_free' = any(open_tag_labels) or 'exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
 									and wan_conditions_met
 										then allocation_lines
 									else	0
@@ -654,7 +647,14 @@ select  		dd.esh_id as district_esh_id,
 									 and backbone_conditions_met = false
 									 and consortium_shared = false
 										 then contract_end_date
-								  end ) as most_recent_ia_contract_end_date
+								  end ) as most_recent_ia_contract_end_date,
+						sum(case
+									when	wan_conditions_met = true
+									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+									and consortium_shared = false
+										then allocation_lines
+									else	0
+								end) as wan_lines_w_dirty
 
 from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
@@ -756,7 +756,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 11/10/2016
+Last Modified Date: 11/16/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
