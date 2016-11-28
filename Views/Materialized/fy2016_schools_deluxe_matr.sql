@@ -54,7 +54,6 @@ select
 	sm.current_known_unscalable_campuses,
 	sm.current_assumed_unscalable_campuses,
 	sm.wan_lines,
-	sm.non_fiber_lines,
 	sm.ia_monthly_cost_no_backbone
 
 from public.fy2016_schools_metrics_matr sm
