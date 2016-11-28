@@ -1,6 +1,6 @@
 select  		sd.campus_id,
 				sd.postal_cd,
-				sd.school_esh_ids, 
+				sd.school_esh_ids,
 				sd.district_esh_id,
 				sd.num_schools,
         		sd.frl_percent,
@@ -203,6 +203,7 @@ from (
 				else campus_id
 			end as campus_id,
 			district_esh_id,
+			district_include_in_universe_of_districts,
 			array_agg(school_esh_id) as school_esh_ids,
 			count(*) as num_schools,
 			case
@@ -210,25 +211,26 @@ from (
 					then sum(frl_percentage_numerator)/sum(	 frl_percentage_denomenator)
 			end as frl_percent
 
-    from public.fy2016_schools_demog_matr 
+    from public.fy2016_schools_demog_matr
     group by 	postal_cd,
 				case
 					when campus_id is null or campus_id = 'Unknown'
 						then address
 					else campus_id
 				end,
-				district_esh_id
+				district_esh_id,
+				district_include_in_universe_of_districts
  ) sd
 left join public.fy2016_lines_to_school_by_line_item_matr as lsli
 on 	sd.campus_id = lsli.campus_id
 
 left join	(
 	select *
-	from fy2016.line_items 
+	from fy2016.line_items
 	where broadband = true
 	and (not('canceled' = any(open_flag_labels) or
 	        'video_conferencing' = any(open_flag_labels) or
-	        'exclude' = any(open_flag_labels)) or 
+	        'exclude' = any(open_flag_labels)) or
 		open_flag_labels is null)
 
 )	li
@@ -253,9 +255,10 @@ left join (
 on	school_info_by_li.line_item_id	=	lsli.line_item_id
 
 where sd.postal_cd in ('DE', 'HI', 'RI')
+and district_include_in_universe_of_districts
 group by	sd.campus_id,
 			sd.postal_cd,
-			sd.school_esh_ids, 
+			sd.school_esh_ids,
 			sd.district_esh_id,
 			sd.num_schools,
     		sd.frl_percent
@@ -263,6 +266,6 @@ group by	sd.campus_id,
 /*
 Author: Jess Seok
 Created On Date: 11/21/2016
-Last Modified Date: 
+Last Modified Date:
 Name of QAing Analyst(s):Justine Schott
 */
