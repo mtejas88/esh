@@ -58,7 +58,7 @@ select
 	ia_monthly_cost_no_backbone
 
 from public.fy2016_schools_metrics_matr sm
-left join public.fy2016_districts_deluxe dd
+left join public.fy2016_districts_deluxe_matr dd
 on sm.district_esh_id = dd.esh_id
 
 order by sm.postal_cd,
@@ -66,7 +66,7 @@ order by sm.postal_cd,
 
 /*
 Author: Jess Seok
-Created On Date: 11/18/2016
+Created On Date: 11/28/2016
 Last Modified Date:
 Name of QAing Analyst(s):Justine Schott
 */

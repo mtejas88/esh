@@ -1,4 +1,6 @@
 select			sd.*,
+				school_esh_ids,
+				num_schools,
 				1 as num_campuses,
 				broadband_internet_upstream_lines,
 				not_broadband_internet_upstream_lines,
