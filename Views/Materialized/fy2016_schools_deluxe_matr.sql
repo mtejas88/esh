@@ -4,6 +4,7 @@ select
    sm.school_esh_ids,
    sm.district_esh_id,
    dd.name as district_name,
+   sm.postal_cd,
    sm.num_students,
    sm.num_schools,
    sm.num_campuses,
@@ -11,7 +12,7 @@ select
    dd.fiber_target_status as district_fiber_target_status,
    dd.bw_target_status as district_bw_target_status,
    case
-   		when dd.exclude_from_ia_analysis = false and ia_bandwidth > 0
+   		when dd.exclude_from_ia_analysis = false and sm.ia_bandwidth_per_student_kbps > 0
 			then false
 		else true
    end as exclude_from_ia_analysis,
