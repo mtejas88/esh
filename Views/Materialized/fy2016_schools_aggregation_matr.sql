@@ -220,14 +220,22 @@ left join public.fy2016_lines_to_school_by_line_item_matr as lsli
 on 	sd.campus_id = lsli.campus_id
 
 left join	(
-	select *
-	from fy2016.line_items
-	where broadband = true
-	and (not('canceled' = any(open_flag_labels) or
-	        'video_conferencing' = any(open_flag_labels) or
-	        'exclude' = any(open_flag_labels)) or
-		open_flag_labels is null)
-
+		select 	*,
+				case
+					when rec_elig_cost > 0
+						then rec_elig_cost
+					else one_time_elig_cost/  case
+												when months_of_service = 0 or months_of_service is null
+													then 12
+												else months_of_service
+											  end
+				end as esh_rec_cost
+		from fy2016.line_items
+		where broadband = true
+		and (not('canceled' = any(open_flag_labels) or
+		        'video_conferencing' = any(open_flag_labels) or
+		        'exclude' = any(open_flag_labels))
+	    		or open_flag_labels is null)
 )	li
 on	lsli.line_item_id	=	li.id
 
