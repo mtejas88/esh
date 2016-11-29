@@ -3,7 +3,7 @@ select
    sm.campus_id,
    sm.school_esh_ids,
    sm.district_esh_id,
-   sm.name,
+   dd.name as district_name,
    sm.school_type,
    sm.address,
    sm.city,
