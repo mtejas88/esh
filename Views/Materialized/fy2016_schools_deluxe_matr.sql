@@ -20,7 +20,7 @@ select
 		else true
    end as exclude_from_ia_analysis,
    case
-   		when dd.exclude_from_current_fiber_analysis = false and ia_bandwidth > 0
+   		when dd.exclude_from_current_fiber_analysis = false
 			then false
 		else true
    end as exclude_from_current_fiber_analysis,
@@ -90,17 +90,17 @@ select
 	          and sm.current_known_unscalable_campuses +
 	              sm.current_assumed_unscalable_campuses > 0
 	  	then  sm.current_assumed_scalable_campuses
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	          and dd.num_campuses = 1
 	    then 0
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	          and dd.num_campuses = 2
 	    then .5
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	    then .66
-	  when fbts.fiber_target_status = 'Not Target'
+	  when dd.fiber_target_status = 'Not Target'
 	    then 1
-	  else current_assumed_scalable_campuses
+	  else sm.current_assumed_scalable_campuses
 	end as current_assumed_scalable_campuses,
 	case
 	  when    dd.exclude_from_ia_analysis = false
@@ -134,15 +134,15 @@ select
 	          and sm.current_known_unscalable_campuses +
 	              sm.current_assumed_unscalable_campuses > 0
 	  	then  sm.current_assumed_unscalable_campuses
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	          and dd.num_campuses = 1
 	    then 1
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	          and dd.num_campuses = 2
 	    then .5
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	  when    dd.fiber_target_status in ('Target', 'No Data')
 	    then dd.num_campuses::numeric * .34
-	  when fbts.fiber_target_status = 'Not Target'
+	  when dd.fiber_target_status = 'Not Target'
 	    then .34
 	  else sm.current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
