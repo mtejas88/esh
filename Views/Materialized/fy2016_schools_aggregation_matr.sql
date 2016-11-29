@@ -115,15 +115,15 @@ select  		sd.campus_id,
 						sum(case
 									when	backbone_conditions_met = true
 									and	num_open_flags	=	0
-									and district_info_by_li.num_students_served::numeric > 0
-										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+									and school_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ school_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	num_open_flags	=	0
-									and district_info_by_li.num_students_served::numeric > 0
-										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+									and school_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ school_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- campus fiber percentage pieces
