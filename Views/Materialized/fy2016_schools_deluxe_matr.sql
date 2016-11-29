@@ -149,9 +149,6 @@ from public.fy2016_schools_metrics_matr sm
 left join public.fy2016_districts_deluxe_matr dd
 on sm.district_esh_id = dd.esh_id
 
-order by sm.postal_cd,
-		 sm.campus_id
-
 /*
 Author: Jess Seok
 Created On Date: 11/29/2016
