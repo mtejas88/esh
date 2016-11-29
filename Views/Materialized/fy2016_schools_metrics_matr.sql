@@ -109,6 +109,7 @@ from public.fy2016_schools_demog_matr as sd
 left join public.fy2016_schools_aggregation_matr as sa
 on	sd.campus_id = sa.campus_id
 where sd.postal_cd in ('DE', 'HI', 'RI')
+and sd.district_include_in_universe_of_districts
 
 /*
 Author: Jess Seok

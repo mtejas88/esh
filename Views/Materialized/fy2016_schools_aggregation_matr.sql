@@ -58,8 +58,7 @@ select  		sd.campus_id,
 				sum(case
 							when	'committed_information_rate'	=	any(open_tag_labels)
 							and	num_open_flags	=	0
-							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-										or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+							and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -68,8 +67,7 @@ select  		sd.campus_id,
 				sum(case
 							when	internet_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -79,8 +77,7 @@ select  		sd.campus_id,
 				sum(case
 							when	upstream_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -90,8 +87,7 @@ select  		sd.campus_id,
 				sum(case
 							when	isp_conditions_met	=	TRUE
 							and (not(	'committed_information_rate'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
@@ -104,12 +100,11 @@ select  		sd.campus_id,
 												or	upstream_conditions_met	=	TRUE
 												or	'committed_information_rate'	=	any(open_tag_labels))
 									and	num_open_flags	=	0
-									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels)
-												or 'exclude_for_cost_only_free'	=	any(open_tag_labels))
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 																	/*/ case
 																		when months_of_service = 0 or months_of_service is null
 																			then 12
@@ -120,15 +115,15 @@ select  		sd.campus_id,
 						sum(case
 									when	backbone_conditions_met = true
 									and	num_open_flags	=	0
-									and school_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ school_info_by_li.num_students_served::numeric /** months_of_service )*/
+									and district_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	num_open_flags	=	0
-									and school_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ school_info_by_li.num_students_served::numeric /** months_of_service )*/
+									and district_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- campus fiber percentage pieces
