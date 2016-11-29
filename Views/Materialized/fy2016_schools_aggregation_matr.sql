@@ -3,6 +3,7 @@ select  		sd.campus_id,
 				sd.school_esh_ids,
 				sd.district_esh_id,
 				sd.num_schools,
+				sd.num_students,
         		sd.frl_percent,
 --ia bw/student pieces
 				sum(case
@@ -201,6 +202,11 @@ from (
 			district_include_in_universe_of_districts,
 			array_agg(school_esh_id) as school_esh_ids,
 			count(*) as num_schools,
+			sum(case
+					when num_students > 0
+						then num_students
+					else 0
+				end) as num_students,
 			case
 				when sum(frl_percentage_denomenator) > 0
 					then sum(frl_percentage_numerator)/sum(	 frl_percentage_denomenator)
@@ -264,6 +270,7 @@ group by	sd.campus_id,
 			sd.school_esh_ids,
 			sd.district_esh_id,
 			sd.num_schools,
+			sd.num_students,
     		sd.frl_percent
 
 /*

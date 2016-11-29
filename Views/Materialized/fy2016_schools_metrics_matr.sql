@@ -1,9 +1,5 @@
-select			sd.*,
-				school_esh_ids,
-				num_schools,
+select			sa.*,
 				1 as num_campuses,
-				broadband_internet_upstream_lines,
-				not_broadband_internet_upstream_lines,
 				case
 					when com_info_bandwidth	>	0
 						then com_info_bandwidth
@@ -101,16 +97,9 @@ select			sd.*,
               when 1 < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
                 then 0
               else .08* (1 - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
-            end as current_assumed_unscalable_campuses,
-            non_fiber_lines,
-			wan_lines,
-			frl_percent
+            end as current_assumed_unscalable_campuses
 
-from public.fy2016_schools_demog_matr as sd
-left join public.fy2016_schools_aggregation_matr as sa
-on	sd.campus_id = sa.campus_id
-where sd.postal_cd in ('DE', 'HI', 'RI')
-and sd.district_include_in_universe_of_districts
+from public.fy2016_schools_aggregation_matr as sa
 
 /*
 Author: Jess Seok
