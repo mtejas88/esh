@@ -141,9 +141,9 @@ select
 	          and dd.num_campuses = 2
 	    then .5
 	  when    dd.fiber_target_status in ('Target', 'No Data')
-	    then dd.num_campuses::numeric * .34
-	  when dd.fiber_target_status = 'Not Target'
 	    then .34
+	  when dd.fiber_target_status = 'Not Target'
+	    then 0
 	  else sm.current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
 	sm.wan_lines,
