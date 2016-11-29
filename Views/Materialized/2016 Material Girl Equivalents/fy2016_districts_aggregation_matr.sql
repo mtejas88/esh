@@ -63,7 +63,7 @@ select  		dd.esh_id as district_esh_id,
 							when	internet_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -73,7 +73,7 @@ select  		dd.esh_id as district_esh_id,
 							when	upstream_conditions_met	=	TRUE
 							and	(not(	'committed_information_rate'	=	any(open_tag_labels)
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -83,7 +83,7 @@ select  		dd.esh_id as district_esh_id,
 							when	isp_conditions_met	=	TRUE
 							and (not(	'committed_information_rate'	=	any(open_tag_labels)
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -96,7 +96,7 @@ select  		dd.esh_id as district_esh_id,
 												or	'committed_information_rate'	=	any(open_tag_labels))
 									and	num_open_flags	=	0
 									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
@@ -126,7 +126,7 @@ select  		dd.esh_id as district_esh_id,
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 									and num_lines::numeric>0
@@ -142,7 +142,7 @@ select  		dd.esh_id as district_esh_id,
 									when	wan_conditions_met = true
 									and	(not(	'committed_information_rate'	=	any(open_tag_labels)
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
-												or	open_tag_labels	is	null)
+										or	open_tag_labels	is	null)
 									and	num_open_flags	=	0
 									and consortium_shared = false
 										then allocation_lines
@@ -655,7 +655,14 @@ select  		dd.esh_id as district_esh_id,
 									 and backbone_conditions_met = false
 									 and consortium_shared = false
 										 then contract_end_date
-								  end ) as most_recent_ia_contract_end_date
+								  end ) as most_recent_ia_contract_end_date,
+						sum(case
+									when	wan_conditions_met = true
+									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+									and consortium_shared = false
+										then allocation_lines
+									else	0
+								end) as wan_lines_w_dirty
 
 from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
@@ -669,7 +676,7 @@ left join	(
 												when months_of_service = 0 or months_of_service is null
 													then 12
 												else months_of_service
-											  end 
+											  end
 				end as esh_rec_cost
 		from fy2016.line_items
 		where broadband = true
