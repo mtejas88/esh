@@ -93,13 +93,22 @@ on 	dd.esh_id = ldli.district_esh_id::varchar
 left join	(
 		select *,
 				case
-					when rec_elig_cost != 'No Data' and rec_elig_cost::numeric > 0
-						then rec_elig_cost::numeric
-					else one_time_eligible_cost/  case
+					when rec_elig_cost != 'No data'
+						then 	case
+									when rec_elig_cost::numeric > 0
+										then rec_elig_cost::numeric
+									else one_time_eligible_cost/  case
+																	when orig_r_months_of_service = 0 or orig_r_months_of_service is null
+																		then 12
+																	else orig_r_months_of_service
+																  end
+								end
+					else one_time_eligible_cost/ case
 													when orig_r_months_of_service = 0 or orig_r_months_of_service is null
 														then 12
 													else orig_r_months_of_service
-												  end
+												 end
+
 				end as esh_rec_cost
 
 		from public.line_items
