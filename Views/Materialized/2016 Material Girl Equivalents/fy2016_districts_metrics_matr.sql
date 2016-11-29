@@ -234,8 +234,7 @@ select	dd.*,
 		    ia_procurement_type,
 		    ia_no_cost_lines,
 		    wan_no_cost_lines,
-			most_recent_ia_contract_end_date,
-			wan_lines_w_dirty
+			most_recent_ia_contract_end_date
 
 from	fy2016_districts_demog_matr		 dd
 left	join	fy2016_districts_aggregation_matr	da
