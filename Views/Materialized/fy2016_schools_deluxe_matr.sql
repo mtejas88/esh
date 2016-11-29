@@ -12,11 +12,18 @@ select
    sm.locale,
    sm.num_students,
    sm.frl_percent,
+   dd.fiber_target_status as district_fiber_target_status,
+   dd.bw_target_status as district_bw_target_status,
    case
    		when dd.exclude_from_ia_analysis = false and ia_bandwidth > 0
 			then false
 		else true
    end as exclude_from_ia_analysis,
+   case
+   		when dd.exclude_from_current_fiber_analysis = false and ia_bandwidth > 0
+			then false
+		else true
+   end as exclude_from_current_fiber_analysis,
 	sm.ia_bandwidth_per_student_kbps,
 	case
 		when sm.ia_bandwidth_per_student_kbps >= 100
@@ -49,10 +56,96 @@ select
 		when sm.ia_monthly_cost_per_mbps > 3
 			then false
 	end as meeting_3_per_mbps_affordability_target,
-	sm.current_known_scalable_campuses,
-	sm.current_assumed_scalable_campuses,
-	sm.current_known_unscalable_campuses,
-	sm.current_assumed_unscalable_campuses,
+	case
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses = 0
+	          and sm.non_fiber_lines > 0
+	    then 0
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses > 0
+	  	then sm.current_known_scalable_campuses
+	  when dd.fiber_target_status in ('Target', 'No Data')
+	    then 0
+	  when dd.fiber_target_status = 'Not Target'
+	    then 0
+	  else sm.current_known_scalable_campuses
+	end as current_known_scalable_campuses,
+	case
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses = 0
+	          and sm.non_fiber_lines > 0
+	    then 	case
+		    		when sm.non_fiber_lines > 1
+		    			then 0
+		    		else 1 - sm.non_fiber_lines
+		    	end
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses > 0
+	  	then  sm.current_assumed_scalable_campuses
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and dd.num_campuses = 1
+	    then 0
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and dd.num_campuses = 2
+	    then .5
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	    then .66
+	  when fbts.fiber_target_status = 'Not Target'
+	    then 1
+	  else current_assumed_scalable_campuses
+	end as current_assumed_scalable_campuses,
+	case
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses = 0
+	          and sm.non_fiber_lines > 0
+	    then 0
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses > 0
+	  	then  sm.current_known_unscalable_campuses
+	  when    dd.fiber_target_status in ('Target', 'No Data', 'Not Target')
+	    then 0
+	  else sm.current_known_unscalable_campuses
+	end as current_known_unscalable_campuses,
+	case
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses = 0
+	          and sm.non_fiber_lines > 0
+	    then 	case
+		    		when sm.non_fiber_lines > 1
+		    			then 1
+		    		else sm.non_fiber_lines
+		    	end
+	  when    dd.exclude_from_ia_analysis = false
+	          and dd.fiber_target_status = 'Target'
+	          and sm.current_known_unscalable_campuses +
+	              sm.current_assumed_unscalable_campuses > 0
+	  	then  sm.current_assumed_unscalable_campuses
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and dd.num_campuses = 1
+	    then 1
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	          and dd.num_campuses = 2
+	    then .5
+	  when    fbts.fiber_target_status in ('Target', 'No Data')
+	    then dd.num_campuses::numeric * .34
+	  when fbts.fiber_target_status = 'Not Target'
+	    then .34
+	  else sm.current_assumed_unscalable_campuses
+	end as current_assumed_unscalable_campuses,
 	sm.wan_lines,
 	sm.ia_monthly_cost_no_backbone
 
@@ -65,7 +158,7 @@ order by sm.postal_cd,
 
 /*
 Author: Jess Seok
-Created On Date: 11/28/2016
+Created On Date: 11/29/2016
 Last Modified Date:
 Name of QAing Analyst(s):Justine Schott
 */

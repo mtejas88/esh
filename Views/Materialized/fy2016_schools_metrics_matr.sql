@@ -102,6 +102,7 @@ select			sd.*,
                 then 0
               else .08* (1 - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
             end as current_assumed_unscalable_campuses,
+            non_fiber_lines,
 			wan_lines,
 			frl_percent
 
