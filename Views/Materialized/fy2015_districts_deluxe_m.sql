@@ -140,7 +140,8 @@ case
     and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps & non-fiber connect type
     then TRUE
     else FALSE
-end as meeting_2018_goal_oversub_fcc_25 -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
+end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
+most_recent_ia_contract_end_date
 
 
   from  public.districts
