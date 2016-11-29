@@ -41,7 +41,6 @@ select			sa.*,
 									ia_monthly_cost_per_student_shared_ia_pieces)*num_students) as ia_monthly_cost,
 				ia_monthly_cost_direct_to_district	+
 				    			(ia_monthly_cost_per_student_shared_ia_pieces*num_students) as ia_monthly_cost_no_backbone,
-				ia_monthly_cost_direct_to_district,
 				(ia_monthly_cost_per_student_backbone_pieces +
 					ia_monthly_cost_per_student_shared_ia_pieces)*num_students as ia_monthly_cost_shared,
 				case
