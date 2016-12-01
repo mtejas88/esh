@@ -13,6 +13,8 @@ select distinct
 	num_schools,
 	num_campuses,
 	num_students,
+	num_teachers,
+	num_other_staff,
 	frl_percent,
 	discount_rate_c1,
 	discount_rate_c2,

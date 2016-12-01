@@ -147,7 +147,35 @@ select  case
                     else false
                   end
           else false
-        end as include_in_universe_of_districts
+        end as include_in_universe_of_districts,
+        case
+          when d."LSTATE" = 'VT' then stf_VT.num_teachers
+          when d."LSTATE" = 'MT' then stf_MT.num_teachers
+          when eim.entity_id = '946654' then stf_NY.num_teachers
+            else  case when "KGTCH" < 0 then 0 else "KGTCH" end
+                + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
+                + case when "SECTCH" < 0 then 0 else "SECTCH" end
+                + case when "UGTCH" < 0 then 0 else "UGTCH" end
+        end as num_teachers,
+        case
+          when d."LSTATE" = 'VT' then stf_VT.num_other_staff
+          when d."LSTATE" = 'MT' then stf_MT.num_other_staff
+          when eim.entity_id = '946654' then stf_NY.num_other_staff
+            else  case when "AIDES" < 0 then 0 else "AIDES" end
+                + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
+                + case when "SECGUI" < 0 then 0 else "SECGUI" end
+                + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
+                + case when "TOTGUI" < 0 then 0 else "TOTGUI" end
+                + case when "LIBSPE" < 0 then 0 else "LIBSPE" end
+                + case when "LIBSUP" < 0 then 0 else "LIBSUP" end
+                + case when "LEAADM" < 0 then 0 else "LEAADM" end
+                + case when "LEASUP" < 0 then 0 else "LEASUP" end
+                + case when "SCHADM" < 0 then 0 else "SCHADM" end
+                + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
+                + case when "STUSUP" < 0 then 0 else "STUSUP" end
+                + case when "OTHSUP" < 0 then 0 else "OTHSUP" end
+        end as num_other_staff
 
 from public.ag131a d
 left join ( select distinct entity_id, nces_code
@@ -341,12 +369,105 @@ left join ( select  case
             ) t
             on eim.entity_id = t.flaggable_id
             where sc131a."LSTATE" = 'NY'
+            and (ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580')
             group by  case
                         when ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
                           then true
                         else false
                       end,
                       ag131a."LSTATE" ) sc_NY
+on (eim.entity_id = '946654') = sc_NY.nyps_indicator
+and d."LSTATE"=sc_NY."LSTATE"
+
+left join ( select  "UNION",
+                    "LSTATE",
+                    sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
+                        + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
+                        + case when "SECTCH" < 0 then 0 else "SECTCH" end
+                        + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
+                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                        + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
+                        + case when "SECGUI" < 0 then 0 else "SECGUI" end
+                        + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
+                        + case when "TOTGUI" < 0 then 0 else "TOTGUI" end
+                        + case when "LIBSPE" < 0 then 0 else "LIBSPE" end
+                        + case when "LIBSUP" < 0 then 0 else "LIBSUP" end
+                        + case when "LEAADM" < 0 then 0 else "LEAADM" end
+                        + case when "LEASUP" < 0 then 0 else "LEASUP" end
+                        + case when "SCHADM" < 0 then 0 else "SCHADM" end
+                        + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
+                        + case when "STUSUP" < 0 then 0 else "STUSUP" end
+                        + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
+
+            from public.ag131a
+            where "LSTATE" = 'VT' --only smushing by UNION for districts in VT
+            group by  "UNION",
+                      "LSTATE" ) stf_VT
+on d."UNION"=stf_VT."UNION"
+and d."LSTATE"=stf_VT."LSTATE"
+
+left join ( select  ag131a."LSTREE",
+                    ag131a."LSTATE",
+                    sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
+                        + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
+                        + case when "SECTCH" < 0 then 0 else "SECTCH" end
+                        + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
+                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                        + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
+                        + case when "SECGUI" < 0 then 0 else "SECGUI" end
+                        + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
+                        + case when "TOTGUI" < 0 then 0 else "TOTGUI" end
+                        + case when "LIBSPE" < 0 then 0 else "LIBSPE" end
+                        + case when "LIBSUP" < 0 then 0 else "LIBSUP" end
+                        + case when "LEAADM" < 0 then 0 else "LEAADM" end
+                        + case when "LEASUP" < 0 then 0 else "LEASUP" end
+                        + case when "SCHADM" < 0 then 0 else "SCHADM" end
+                        + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
+                        + case when "STUSUP" < 0 then 0 else "STUSUP" end
+                        + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
+            from ag131a
+            where "LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
+            group by  "LSTREE",
+                      "LSTATE" ) stf_MT
+on d."LSTREE"=stf_MT."LSTREE"
+and d."LSTATE"=stf_MT."LSTATE"
+
+left join ( select  case
+                      when "NAME" ilike '%geographic%' or "LEAID" = '3620580'
+                        then true
+                      else false
+                    end as nyps_indicator,
+                    "LSTATE",
+
+                    sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
+                        + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
+                        + case when "SECTCH" < 0 then 0 else "SECTCH" end
+                        + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
+                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                        + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
+                        + case when "SECGUI" < 0 then 0 else "SECGUI" end
+                        + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
+                        + case when "TOTGUI" < 0 then 0 else "TOTGUI" end
+                        + case when "LIBSPE" < 0 then 0 else "LIBSPE" end
+                        + case when "LIBSUP" < 0 then 0 else "LIBSUP" end
+                        + case when "LEAADM" < 0 then 0 else "LEAADM" end
+                        + case when "LEASUP" < 0 then 0 else "LEASUP" end
+                        + case when "SCHADM" < 0 then 0 else "SCHADM" end
+                        + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
+                        + case when "STUSUP" < 0 then 0 else "STUSUP" end
+                        + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
+            from ag131a
+            where "LSTATE" = 'NY'
+            and ("NAME" ilike '%geographic%' or "LEAID" = '3620580')
+            group by  case
+                        when "NAME" ilike '%geographic%' or "LEAID" = '3620580'
+                          then true
+                        else false
+                      end,
+                      "LSTATE" ) stf_NY
 on (eim.entity_id = '946654') = sc_NY.nyps_indicator
 and d."LSTATE"=sc_NY."LSTATE"
 
@@ -364,7 +485,7 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/21/2016
+Last Modified Date: 12/1/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
