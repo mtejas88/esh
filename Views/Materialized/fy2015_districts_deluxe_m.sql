@@ -140,7 +140,8 @@ case
     and cdd_calc.Tot_internet_upstream_lines - cdd_calc.NotBB_internet_upstream_lines > 0  -- at least one circuit that is not less than 25 mbps & non-fiber connect type
     then TRUE
     else FALSE
-end as meeting_2018_goal_oversub_fcc_25 -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
+end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
+most_recent_ia_contract_end_date
 
 
   from  public.districts
@@ -545,7 +546,16 @@ left join (
                     end), ', ') as "wan_connections",
 
                     array_to_string(array_agg(case when wan_conditions_met=true and consortium_shared=false
-                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "wan_contract_expiration"
+                    then concat(service_provider_name, ' - ', extract(month from contract_end_date::timestamp), '/', extract(year from contract_end_date::timestamp)) end), ', ') as "wan_contract_expiration",
+    min(case
+           when ( isp_conditions_met = true
+                  or internet_conditions_met = true
+                  or upstream_conditions_met = true )
+           and (  not(open_flags ilike '%backbone%')
+                  or open_flags is null)
+           and consortium_shared = false
+             then contract_end_date
+        end ) as most_recent_ia_contract_end_date
     from fy2015_services_received_m svcs
     GROUP BY recipient_id
 ) pt
@@ -556,7 +566,7 @@ on districts.esh_id=pt.recipient_id
 /*
 Author: Justine Schott
 Created On Date: 2/9/2016
-Last Modified Date: 08/25/2016
+Last Modified Date: 11/29/2016
 Name of QAing Analyst(s): Greg Kurzhals, last modified by Jess Seok
 Purpose: Purpose: Districts table data pull with added columns
 Methodology:

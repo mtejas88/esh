@@ -7,26 +7,23 @@ select  		dd.esh_id as district_esh_id,
 									and	number_of_dirty_line_item_flags	=	0
 							and	(not(	'exclude_for_cost_only'	=	any(open_flags))
 										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
 									and consortium_shared = false
 									and num_lines::numeric>0
-										then	rec_elig_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district,
 						sum(case
 									when	'backbone' = any(open_flags)
 									and	number_of_dirty_line_item_flags	=	0
-									and rec_elig_cost != 'No data'
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
-									and rec_elig_cost != 'No data'
 									and	number_of_dirty_line_item_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-										then	rec_elig_cost::numeric	/ district_info_by_li.num_students_served::numeric
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 						d15.num_students,
@@ -94,7 +91,26 @@ on dd.esh_id = d15.esh_id::varchar
 left join public.lines_to_district_by_line_item_2015_m	ldli
 on 	dd.esh_id = ldli.district_esh_id::varchar
 left join	(
-		select *
+		select *,
+				case
+					when rec_elig_cost != 'No data'
+						then 	case
+									when rec_elig_cost::numeric > 0
+										then rec_elig_cost::numeric
+									else one_time_eligible_cost/  case
+																	when orig_r_months_of_service = 0 or orig_r_months_of_service is null
+																		then 12
+																	else orig_r_months_of_service
+																  end
+								end
+					else one_time_eligible_cost/ case
+													when orig_r_months_of_service = 0 or orig_r_months_of_service is null
+														then 12
+													else orig_r_months_of_service
+												 end
+
+				end as esh_rec_cost
+
 		from public.line_items
 		where broadband = true
 		and (not('canceled' = any(open_flags) or
@@ -140,48 +156,3 @@ Name of QAing Analyst(s):
 Purpose: For comparing across years
 Methodology: Utilizing line items and 2016 districts universe
 */
-
---ia cost pieces
-/*				sum(case
-							when	'committed_information_rate'	=	any(open_flags)
-							and	number_of_dirty_line_item_flags	=	0
-							and (not(	'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	com_info_bandwidth_cost,
-				sum(case
-							when	internet_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	internet_bandwidth_cost,
-				sum(case
-							when	upstream_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	upstream_bandwidth_cost,
-				sum(case
-							when	isp_conditions_met	=	TRUE
-							and	(not(	'committed_information_rate'	=	any(open_flags)
-												or 'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
-							and rec_elig_cost != 'No data'
-							and	number_of_dirty_line_item_flags	=	0
-							and consortium_shared = false
-								then	bandwidth_in_mbps	*	allocation_lines
-							else	0
-						end)	as	isp_bandwidth_cost,*/
