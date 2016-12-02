@@ -655,14 +655,7 @@ select  		dd.esh_id as district_esh_id,
 									 and backbone_conditions_met = false
 									 and consortium_shared = false
 										 then contract_end_date
-								  end ) as most_recent_ia_contract_end_date,
-						sum(case
-									when	wan_conditions_met = true
-									and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
-									and consortium_shared = false
-										then allocation_lines
-									else	0
-								end) as wan_lines_w_dirty
+								  end ) as most_recent_ia_contract_end_date
 
 from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
