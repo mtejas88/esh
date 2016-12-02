@@ -13,6 +13,8 @@ select distinct
 	num_schools,
 	num_campuses,
 	num_students,
+	num_teachers,
+	num_other_staff,
 	frl_percent,
 	discount_rate_c1,
 	discount_rate_c2,
@@ -208,7 +210,7 @@ on dm.esh_id = c2.esh_id::varchar
 
 /*
 Author: Justine Schott
-Created On Date: 11/22/2016
+Created On Date: 12/1/2016
 Last Modified Date:
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
