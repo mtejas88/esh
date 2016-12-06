@@ -68,7 +68,7 @@ select district_esh_id,
           join (
             select dl_ca_1.*
             from (
-                --dl_ca_1: create district_lookup for charters and BIEs. since they are not on the districts table,
+                --dl_ca_1: district_lookup for charters and BIEs. since they are not on the districts table,
                 --they may be categorized as consortia and their schools may be categorized as other_locations
                 select esh_id, district_esh_id, postal_cd
                         from public.schools
