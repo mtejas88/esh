@@ -96,8 +96,8 @@ select
 	nces_cd
 from public.fy2016_districts_predeluxe_matr d
 left join (
-	select 	esh_id as account__esh_id__c,
-			fiber_priority_status::varchar as priority_status__c
+	select 	esh_id__c as account__esh_id__c,
+			priority_status__c_f as priority_status__c
 	from public.priority_status_2015_m
 ) opp
 on d.esh_id = opp.account__esh_id__c::varchar
