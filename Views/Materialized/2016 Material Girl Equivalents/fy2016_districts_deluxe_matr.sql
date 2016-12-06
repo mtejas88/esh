@@ -14,6 +14,7 @@ select distinct
 	num_campuses,
 	num_students,
 	num_teachers,
+	num_aides,
 	num_other_staff,
 	frl_percent,
 	discount_rate_c1,
