@@ -300,7 +300,7 @@ from (
                                   ia_bandwidth_per_student
                           from public.districts
                           left join (
-                              --demographics_updated: need to include charter schools and students for traditional districts; all previous tables merged
+                              --demographics_updated: need to include charter schools and students for traditional districts all previous tables merged
                               select revised_demographics."district_nces",
                               revised_demographics."num_all_schools",
                               revised_demographics."num_charter_schools",
