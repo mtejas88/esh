@@ -38,6 +38,39 @@ select distinct
 	    	then false
 	   	else true
 	end as exclude_from_current_fiber_analysis,
+	case
+	    when  dpd.exclude_from_ia_analysis = false
+	    	then 'metric_extrapolation'
+	   	when  fbts.fiber_target_status in ('Target', 'Not Target')
+	    	  or (fbts.fiber_target_status = 'No Data'
+	            and dpd.num_campuses <= 2)
+	          or (fbts.fiber_target_status = 'Potential Target'
+	            and dpd.exclude_from_ia_analysis = false)
+	    	then 'metric'
+	   	else 'extrapolate_to'
+	end as fiber_metric_calc_group,
+	case
+	    when  dpd.exclude_from_ia_analysis = false and fbts.fiber_target_status = 'Target'
+	    	then 'clean_target'
+	    when  fbts.fiber_target_status = 'Target'
+	    	then 'dirty_target'
+	    when  dpd.exclude_from_ia_analysis = false and fbts.fiber_target_status = 'Not Target'
+	    	then 'clean_not_target'
+	    when  fbts.fiber_target_status = 'Not Target'
+	    	then 'dirty_not_target'
+	    when  current_known_unscalable_campuses + current_assumed_unscalable_campuses = 0
+	    	  and dpd.exclude_from_ia_analysis = false
+	    	  and fbts.fiber_target_status = 'Potential Target'
+	    	then 'clean_no_unscalable_potential_target'
+	    when  dpd.exclude_from_ia_analysis = false
+	    	  and fbts.fiber_target_status = 'Potential Target'
+	    	then 'clean_unscalable_potential_target'
+	    when  fbts.fiber_target_status = 'Potential Target'
+	    	then 'dirty_potential_target'
+	   	when  dpd.num_campuses <= 2
+	    	then 'small_no_data'
+	   	else 'large_no_data'
+	end as fiber_metric_status,
 	include_in_universe_of_districts,
 	flag_array,
 	tag_array,
@@ -213,7 +246,7 @@ on dpd.esh_id = fbts.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 11/10/2016
+Last Modified Date: 12/5/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:

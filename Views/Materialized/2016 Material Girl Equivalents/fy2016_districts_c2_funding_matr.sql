@@ -25,7 +25,8 @@ select  esh_id,
           when c2_cost_remaining_2016 = 0
             then true
           else false
-        end as budget_used_c2_16
+        end as budget_used_c2_16,
+        c2_discount_rate_for_remaining_budget
 from (
   select
     districts_2015.esh_id,
@@ -329,7 +330,7 @@ from (
 /*
 Author: Justine Schott
 Created On Date: 10/14/2016
-Last Modified Date: 11/7/2016 -- for crusher structure
+Last Modified Date: 12/5/2016
 Name of QAing Analyst(s): Jess Seok
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
 Methodology:
