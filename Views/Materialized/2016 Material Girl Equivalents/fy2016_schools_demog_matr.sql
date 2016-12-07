@@ -23,10 +23,6 @@ select d.esh_id as district_esh_id,
             else 0
         end as num_students,
         case
-          when sc131a."FTE"::numeric > 0 then sc131a."FTE"::numeric
-            else 0
-        end as num_fte,
-        case
           when left(sc131a."ULOCAL",1) = '1' then 'Urban'
           when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
           when left(sc131a."ULOCAL",1) = '3' then 'Town'
@@ -90,10 +86,6 @@ select  d.esh_id as district_esh_id,
           when sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."MEMBER"::numeric - sc131a."PK"::numeric
             else 0
         end as num_students,
-        case
-          when sc131a."FTE"::numeric > 0 then sc131a."FTE"::numeric
-            else 0
-        end as num_fte,
         case
           when left(sc131a."ULOCAL",1) = '1' then 'Urban'
           when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
@@ -161,10 +153,6 @@ select  d.esh_id as district_esh_id,
             else 0
         end as num_students,
         case
-          when sc131a."FTE"::numeric > 0 then sc131a."FTE"::numeric
-            else 0
-        end as num_fte,
-        case
           when left(sc131a."ULOCAL",1) = '1' then 'Urban'
           when left(sc131a."ULOCAL",1) = '2' then 'Suburban'
           when left(sc131a."ULOCAL",1) = '3' then 'Town'
@@ -229,10 +217,6 @@ select  d.esh_id as district_esh_id,
             else 0
         end as num_students,
         case
-          when sc131a."FTE"::numeric > 0 then sc131a."FTE"::numeric
-            else 0
-        end as num_fte,
-        case
           when left(sc131af."ULOCAL",1) = '1' then 'Urban'
           when left(sc131af."ULOCAL",1) = '2' then 'Suburban'
           when left(sc131af."ULOCAL",1) = '3' then 'Town'
@@ -280,7 +264,7 @@ where flaggable_id is null
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/6/2016
+Last Modified Date: 10/26/2016
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Schools demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
