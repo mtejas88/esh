@@ -6,7 +6,7 @@ select  		sd.campus_id,
 				sd.num_students,
 --ia bw/student pieces
 				sum(case
-							when	'committed_information_rate'	=	any(open_tag_labels)
+							when	'committed_information_rate'	=	any(open_flags)
 							and	number_of_dirty_line_item_flags	=	0
 							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
@@ -40,7 +40,7 @@ select  		sd.campus_id,
 						end)	as	isp_bandwidth,
 				sum(case
 							when	(upstream_conditions_met	=	TRUE or internet_conditions_met = TRUE)
-							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+							and	(not('committed_information_rate'	=	any(open_flags)) or	open_flags	is	null)
 							and	number_of_dirty_line_item_flags	=	0
 							and consortium_shared = false
 							and bandwidth_in_mbps >= 25
@@ -49,7 +49,7 @@ select  		sd.campus_id,
 						end)	as	broadband_internet_upstream_lines,
 				sum(case
 							when	(upstream_conditions_met	=	TRUE or internet_conditions_met = TRUE)
-							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
+							and	(not('committed_information_rate'	=	any(open_flags)) or	open_flags	is	null)
 							and	number_of_dirty_line_item_flags	=	0
 							and consortium_shared = false
 							and bandwidth_in_mbps < 25
@@ -58,7 +58,7 @@ select  		sd.campus_id,
 						end)	as	not_broadband_internet_upstream_lines,
 --ia cost/mbps pieces
 				sum(case
-							when	'committed_information_rate'	=	any(open_tag_labels)
+							when	'committed_information_rate'	=	any(open_flags)
 							and	number_of_dirty_line_item_flags	=	0
 							and	(not(	'exclude_for_cost_only'	=	any(open_flags))
 										or	open_flags	is	null)
@@ -111,15 +111,15 @@ select  		sd.campus_id,
 						sum(case
 									when	'backbone' = any(open_flags)
 									and	number_of_dirty_line_item_flags	=	0
-									and district_info_by_li.num_students_served::numeric > 0
-										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
+									and school_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ school_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_backbone_pieces,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	number_of_dirty_line_item_flags	=	0
-									and district_info_by_li.num_students_served::numeric > 0
-										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
+									and school_info_by_li.num_students_served::numeric > 0
+										then	esh_rec_cost::numeric	/ school_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_ia_pieces,
 -- campus fiber percentage pieces
@@ -200,8 +200,10 @@ from (
 			array_agg(s.esh_id) as school_esh_ids,
 			count(*) as num_schools,
 			sum(case
-					when s.num_students > 0
-						then s.num_students
+					when s.num_students='No data'
+						then 0
+					when s.num_students::numeric > 0
+						then s.num_students::numeric
 					else 0
 				end) as num_students
 
@@ -253,7 +255,7 @@ left join	(
 on	lsli.line_item_id	=	li.id
 
 left join (
-	select	ldli.line_item_id,
+	select	lsli.line_item_id,
 			sum(s.num_students::numeric)	as	num_students_served
 
 	from public.fy2015_lines_to_school_by_line_item_m	lsli
@@ -265,12 +267,14 @@ left join (
 	on ds.school_id	=	s.esh_id
 
 	join public.line_items	li
-	on ldli.line_item_id	=	li.id
+	on lsli.line_item_id	=	li.id
 
 	where	(li.consortium_shared=true
 	or 'backbone' = any(open_flags))
 	and broadband = true
-	and d.num_students != 'No data'
+	and s.num_students != 'No data'
+
+	group by lsli.line_item_id
 ) school_info_by_li
 on	school_info_by_li.line_item_id	=	lsli.line_item_id
 
@@ -284,8 +288,8 @@ group by	sd.campus_id,
 			sd.num_students
 
 /*
-Author: Jess Seok
-Created On Date: 11/21/2016
+Author: Justine Schott
+Created On Date: 12/8/2016
 Last Modified Date:
-Name of QAing Analyst(s):Justine Schott
+Name of QAing Analyst(s):
 */
