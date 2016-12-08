@@ -46,31 +46,31 @@ select
 			then false
 	end as meeting_3_per_mbps_affordability_target,
     case
-      when num_campuses < fiber_lines
-        then num_campuses
+      when sm.num_campuses < fiber_lines
+        then sm.num_campuses
         else fiber_lines
     end as current_known_scalable_campuses,
     case
       when copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines > 0
         then
           case
-            when num_campuses < (fiber_lines )
+            when sm.num_campuses < (fiber_lines )
               then 0
-            when num_campuses - (fiber_lines ) < copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
-              then num_campuses - (fiber_lines)
+            when sm.num_campuses - (fiber_lines ) < copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
+              then sm.num_campuses - (fiber_lines)
               else copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
           end
         else 0
     end as current_known_unscalable_campuses,
     case
-      when num_campuses < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
+      when sm.num_campuses < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
         then 0
-      else .92* (num_campuses - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
+      else .92* (sm.num_campuses - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
     end as current_assumed_scalable_campuses,
     case
-      when num_campuses < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
+      when sm.num_campuses < fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines
         then 0
-      else .08* (num_campuses - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
+      else .08* (sm.num_campuses - (fiber_lines + copper_dsl_lines + satellite_lte_lines + fixed_wireless_lines + cable_lines))::numeric
     end as current_assumed_unscalable_campuses,
 	sm.wan_lines,
 	sm.ia_monthly_cost_no_backbone
