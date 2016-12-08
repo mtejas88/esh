@@ -35,6 +35,7 @@ select  		sd.campus_id,
 							and	number_of_dirty_line_item_flags	=	0
 							and	(not(	'committed_information_rate'	=	any(open_flags))
 										or	open_flags	is	null)
+							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth,
@@ -92,6 +93,7 @@ select  		sd.campus_id,
 							and	(not(	'exclude_for_cost_only'	=	any(open_flags)
 										or 'committed_information_rate'	=	any(open_flags))
 										or	open_flags	is	null)
+							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth_cost,
