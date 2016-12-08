@@ -189,37 +189,35 @@ select  		sd.campus_id,
 								end) as non_fiber_lines
 
 from (
-	select 	s.postal_cd,
+	select 	postal_cd,
 			case
 				when campus_id is null or campus_id = 'Unknown'
-					then s.address
+					then address
 				else campus_id
 			end as campus_id,
-			s.district_esh_id,
-			d.include_in_universe_of_districts as district_include_in_universe_of_districts,
-			array_agg(s.esh_id) as school_esh_ids,
+			district_esh_id,
+			district_include_in_universe_of_districts,
+			array_agg(school_esh_id) as school_esh_ids,
 			count(*) as num_schools,
 			sum(case
-					when s.num_students='No data'
-						then 0
-					when s.num_students::numeric > 0
-						then s.num_students::numeric
+					when num_students > 0
+						then num_students
 					else 0
-				end) as num_students
+				end) as num_students,
+			case
+				when sum(frl_percentage_denomenator) > 0
+					then sum(frl_percentage_numerator)/sum(	 frl_percentage_denomenator)
+			end as frl_percent
 
-    from public.schools s
-    join public.districts_schools ds
-	on s.esh_id = ds.school_id
-    join public.districts d
-	on s.district_esh_id = d.esh_id
-    group by 	s.postal_cd,
+    from public.fy2016_schools_demog_matr
+    group by 	postal_cd,
 				case
 					when campus_id is null or campus_id = 'Unknown'
-						then s.address
+						then address
 					else campus_id
 				end,
-				s.district_esh_id,
-				d.include_in_universe_of_districts
+				district_esh_id,
+				district_include_in_universe_of_districts
  ) sd
 left join public.fy2015_lines_to_school_by_line_item_m as lsli
 on 	sd.campus_id = lsli.campus_id
@@ -256,15 +254,12 @@ on	lsli.line_item_id	=	li.id
 
 left join (
 	select	lsli.line_item_id,
-			sum(s.num_students::numeric)	as	num_students_served
+			sum(num_students::numeric)	as	num_students_served
 
 	from public.fy2015_lines_to_school_by_line_item_m	lsli
 
-	join public.districts_schools	ds
-	on lsli.campus_id	=	ds.campus_id
-
-	join public.schools	s
-	on ds.school_id	=	s.esh_id
+	join public.fy2016_schools_demog_matr sd
+	on lsli.campus_id	=	sd.campus_id
 
 	join public.line_items	li
 	on lsli.line_item_id	=	li.id
@@ -272,7 +267,6 @@ left join (
 	where	(li.consortium_shared=true
 	or 'backbone' = any(open_flags))
 	and broadband = true
-	and s.num_students != 'No data'
 
 	group by lsli.line_item_id
 ) school_info_by_li
