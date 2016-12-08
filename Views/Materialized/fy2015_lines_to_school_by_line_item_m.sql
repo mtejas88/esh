@@ -12,8 +12,8 @@ join public.districts_schools ds
 on ec.entity_id = ds.school_id
 
 
-where sd.charter = false
-and sd.max_grade_level != 'PK'
+where s.charter = false
+and s.max_grade_level != 'PK'
 
 group by   ds.campus_id,
 		   s.district_esh_id,
