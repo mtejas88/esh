@@ -96,9 +96,9 @@ select
 	nces_cd
 from public.fy2016_districts_predeluxe_matr d
 left join (
-	select 	esh_id as account__esh_id__c,
-			fiber_priority_status::varchar as priority_status__c
-	from endpoint.district_priority_status
+	select 	esh_id__c as account__esh_id__c,
+			priority_status__c_f as priority_status__c
+	from public.priority_status_2015_m
 ) opp
 on d.esh_id = opp.account__esh_id__c::varchar
 left join (
@@ -300,7 +300,7 @@ where d.include_in_universe_of_districts or d.district_type = 'Charter'
 /*
 Author: Justine Schott
 Created On Date: 8/17/2016
-Last Modified Date: 11/22/2016
+Last Modified Date: 12/5/2016
 Name of QAing Analyst(s):
 Purpose: To identify districts that can have their stage modified in Salesforce algorithmically
 Methodology: Utilizes fy2016_districts_deluxe_mat -- the districts deluxe materialized version, because the query

@@ -14,10 +14,12 @@ select distinct
 	num_campuses,
 	num_students,
 	num_teachers,
+	num_aides,
 	num_other_staff,
 	frl_percent,
-	discount_rate_c1,
-	discount_rate_c2,
+	discount_rate_c1::numeric/100 as discount_rate_c1,
+	discount_rate_c2::numeric/100 as discount_rate_c2,
+	c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
 	address,
 	city,
 	zip,
@@ -36,6 +38,7 @@ select distinct
 		when 	(flag_array is null or
 				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
 				and ia_no_cost_lines = 0
+				and ia_bandwidth > 0
 			then false
 		else true
 	end as exclude_from_ia_cost_analysis,
@@ -211,7 +214,7 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date:
+Last Modified Date: 12/8/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

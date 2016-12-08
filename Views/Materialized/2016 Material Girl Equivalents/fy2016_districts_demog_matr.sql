@@ -158,11 +158,16 @@ select  case
                 + case when "UGTCH" < 0 then 0 else "UGTCH" end
         end as num_teachers,
         case
+          when d."LSTATE" = 'VT' then stf_VT.num_aides
+          when d."LSTATE" = 'MT' then stf_MT.num_aides
+          when eim.entity_id = '946654' then stf_NY.num_aides
+            else  case when "AIDES" < 0 then 0 else "AIDES" end
+        end as num_aides,
+        case
           when d."LSTATE" = 'VT' then stf_VT.num_other_staff
           when d."LSTATE" = 'MT' then stf_MT.num_other_staff
           when eim.entity_id = '946654' then stf_NY.num_other_staff
-            else  case when "AIDES" < 0 then 0 else "AIDES" end
-                + case when "CORSUP" < 0 then 0 else "CORSUP" end
+            else  case when "CORSUP" < 0 then 0 else "CORSUP" end
                 + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
                 + case when "SECGUI" < 0 then 0 else "SECGUI" end
                 + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
@@ -385,8 +390,8 @@ left join ( select  "UNION",
                         + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
                         + case when "SECTCH" < 0 then 0 else "SECTCH" end
                         + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
-                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
-                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end) as num_aides,
+                    sum(  case when "CORSUP" < 0 then 0 else "CORSUP" end
                         + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
                         + case when "SECGUI" < 0 then 0 else "SECGUI" end
                         + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
@@ -413,8 +418,8 @@ left join ( select  ag131a."LSTREE",
                         + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
                         + case when "SECTCH" < 0 then 0 else "SECTCH" end
                         + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
-                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
-                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end) as num_aides,
+                    sum(  case when "CORSUP" < 0 then 0 else "CORSUP" end
                         + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
                         + case when "SECGUI" < 0 then 0 else "SECGUI" end
                         + case when "OTHGUI" < 0 then 0 else "OTHGUI" end
@@ -445,8 +450,8 @@ left join ( select  case
                         + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
                         + case when "SECTCH" < 0 then 0 else "SECTCH" end
                         + case when "UGTCH" < 0 then 0 else "UGTCH" end) as num_teachers,
-                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end
-                        + case when "CORSUP" < 0 then 0 else "CORSUP" end
+                    sum(  case when "AIDES" < 0 then 0 else "AIDES" end) as num_aides,
+                    sum(  case when "CORSUP" < 0 then 0 else "CORSUP" end
                         + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
                         + case when "SECGUI" < 0 then 0 else "SECGUI" end
                         + case when "OTHGUI" < 0 then 0 else "OTHGUI" end

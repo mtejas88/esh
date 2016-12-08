@@ -27,7 +27,6 @@ select  		dd.esh_id as district_esh_id,
 							when	isp_conditions_met	=	TRUE
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
-							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth,
@@ -85,7 +84,6 @@ select  		dd.esh_id as district_esh_id,
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
-							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth_cost,
@@ -220,7 +218,7 @@ select  		dd.esh_id as district_esh_id,
 									and consortium_shared = false
 				                then connect_category
 				            end
-				          ), ', ') as all_ia_connectcat,
+				          ), ' | ') as all_ia_connectcat,
 						sum(case
 									when connect_category ILIKE '%Fiber%'
 									and (internet_conditions_met = true or upstream_conditions_met = true)
@@ -335,7 +333,7 @@ select  		dd.esh_id as district_esh_id,
 					    									else ' (unknown purpose)'
 					    								end)
 					    				end)
-					    , ', ') as ia_applicants,
+					    , ' | ') as ia_applicants,
 						--dedicated ISP
 					    array_to_string(
 					    	array_agg(case
@@ -349,21 +347,21 @@ select  		dd.esh_id as district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-					                end), ', ') as dedicated_isp_services,
+					                end), ' | ') as dedicated_isp_services,
 	                    array_to_string(
 	                    	array_agg(case
 	                    				when isp_conditions_met=true and consortium_shared=false
 	                    					then concat(service_provider_name, ' - ',
 	                    								extract(month from contract_end_date::timestamp), '/',
 	                    								extract(year from contract_end_date::timestamp))
-	                    			end), ', ') as dedicated_isp_contract_expiration,
+	                    			end), ' | ') as dedicated_isp_contract_expiration,
 	                    array_to_string(
 				          array_agg( distinct
 				            case
 				              when isp_conditions_met = TRUE and consortium_shared=false
 				                then service_provider_name
 				            end
-				          ), ', ') as dedicated_isp_sp,
+				          ), ' | ') as dedicated_isp_sp,
 					    --bundled IA
 					    array_to_string(
 					    	array_agg(case
@@ -378,21 +376,21 @@ select  		dd.esh_id as district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-					                end), ', ') as bundled_internet_services,
+					                end), ' | ') as bundled_internet_services,
 	                    array_to_string(
 	                    	array_agg(case
 	                    				when internet_conditions_met=true and consortium_shared=false
 	                    					then concat(service_provider_name, ' - ',
 	                    								extract(month from contract_end_date::timestamp), '/',
 	                    								extract(year from contract_end_date::timestamp))
-	                    			end), ', ') as bundled_internet_contract_expiration,
+	                    			end), ' | ') as bundled_internet_contract_expiration,
 	                    array_to_string(
 				          array_agg( distinct
 				            case
 				              when internet_conditions_met = TRUE and consortium_shared=false
 				                then service_provider_name
 				            end
-				          ), ', ') as bundled_internet_sp,
+				          ), ' | ') as bundled_internet_sp,
 	                    --upstream
 					    array_to_string(
 					    	array_agg(case
@@ -407,27 +405,27 @@ select  		dd.esh_id as district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-					                end), ', ') as upstream_services,
+					                end), ' | ') as upstream_services,
 	                    array_to_string(
 	                    	array_agg(case
 	                    				when upstream_conditions_met=true and consortium_shared=false
 	                    					then concat(service_provider_name, ' - ',
 	                    								extract(month from contract_end_date::timestamp), '/',
 	                    								extract(year from contract_end_date::timestamp))
-	                    			end), ', ') as upstream_contract_expiration,
+	                    			end), ' | ') as upstream_contract_expiration,
 	                    array_to_string(
 				          array_agg( distinct
 				            case
 				              when upstream_conditions_met = TRUE and consortium_shared=false
 				                then service_provider_name
 				            end
-				          ), ', ') as upstream_sp,
+				          ), ' | ') as upstream_sp,
 					    --WAN
 					    array_to_string(
 					    	array_agg(distinct case
 					    						when wan_conditions_met=true and consortium_shared=false
 					    							then applicant_name
-					    					end), ', ') as wan_applicants,
+					    					end), ' | ') as wan_applicants,
 					    array_to_string(
 					    	array_agg(case
 					    				when wan_conditions_met=true and consortium_shared=false and num_lines != 'Unknown' and num_lines::numeric > 0
@@ -441,21 +439,21 @@ select  		dd.esh_id as district_esh_id,
 																						then 12
 																					else months_of_service
 																				  end*/, '/mth')
-					                end), ', ') as wan_services,
+					                end), ' | ') as wan_services,
 					    array_to_string(
 	                    	array_agg(case
 	                    				when wan_conditions_met=true and consortium_shared=false
 	                    					then concat(service_provider_name, ' - ',
 	                    								extract(month from contract_end_date::timestamp), '/',
 	                    								extract(year from contract_end_date::timestamp))
-	                    			end), ', ') as wan_contract_expiration,
+	                    			end), ' | ') as wan_contract_expiration,
 	                    array_to_string(
 				          array_agg( distinct
 				            case
 				              when wan_conditions_met = TRUE and consortium_shared=false
 				                then service_provider_name
 				            end
-				          ), ', ') as wan_sp,
+				          ), ' | ') as wan_sp,
 						case
 							when campus_count is null
 								then num_schools
@@ -553,7 +551,7 @@ select  		dd.esh_id as district_esh_id,
 																							8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
 																							10565, 10632)
 																	then service_provider_name
-													end), ', ') as consortium_affiliation,
+													end), ' | ') as consortium_affiliation,
 						case
 							when ( 	sum(case
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
@@ -766,7 +764,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 11/22/2016
+Last Modified Date: 12/8/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
