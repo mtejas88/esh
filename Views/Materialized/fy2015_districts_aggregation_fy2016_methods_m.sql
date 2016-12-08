@@ -5,8 +5,8 @@ select  		dd.esh_id as district_esh_id,
 												or	upstream_conditions_met	=	TRUE
 												or	'committed_information_rate'	=	any(open_flags))
 									and	number_of_dirty_line_item_flags	=	0
-							and	(not(	'exclude_for_cost_only'	=	any(open_flags))
-										or	open_flags	is	null)
+									and	(not(	'exclude_for_cost_only'	=	any(open_flags))
+												or	open_flags	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
@@ -15,6 +15,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	'backbone' = any(open_flags)
 									and	number_of_dirty_line_item_flags	=	0
+									and	(not(	'exclude_for_cost_only'	=	any(open_flags))
+												or	open_flags	is	null)
 									and district_info_by_li.num_students_served::numeric > 0
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
@@ -22,6 +24,8 @@ select  		dd.esh_id as district_esh_id,
 						sum(case
 									when	consortium_shared	=	TRUE	and	(internet_conditions_met	=	TRUE	or	isp_conditions_met	=	true)
 									and	number_of_dirty_line_item_flags	=	0
+									and	(not(	'exclude_for_cost_only'	=	any(open_flags))
+												or	open_flags	is	null)
 									and district_info_by_li.num_students_served::numeric > 0
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
@@ -150,8 +154,8 @@ group by	  	dd.esh_id,
 
 /*
 Author: Justine Schott
-Created On Date: 10/18/2016
-Last Modified Date:
+Created On Date:
+Last Modified Date: 12/8/2016
 Name of QAing Analyst(s):
 Purpose: For comparing across years
 Methodology: Utilizing line items and 2016 districts universe
