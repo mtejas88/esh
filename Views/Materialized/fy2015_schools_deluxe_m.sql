@@ -77,7 +77,7 @@ select
 
 from public.fy2015_schools_metrics_m sm
 left join public.districts dd
-on sm.district_esh_id = dd.esh_id
+on sm.district_esh_id = dd.esh_id::varchar
 
 /*
 Author: Justine Schott
