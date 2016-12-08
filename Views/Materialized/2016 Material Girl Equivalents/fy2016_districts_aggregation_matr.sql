@@ -27,7 +27,6 @@ select  		dd.esh_id as district_esh_id,
 							when	isp_conditions_met	=	TRUE
 							and	(not('committed_information_rate'	=	any(open_tag_labels)) or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
-							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth,
@@ -85,7 +84,6 @@ select  		dd.esh_id as district_esh_id,
 												or 'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
 										or	open_tag_labels	is	null)
 							and	num_open_flags	=	0
-							and consortium_shared = false
 								then	bandwidth_in_mbps	*	allocation_lines
 							else	0
 						end)	as	isp_bandwidth_cost,
@@ -766,7 +764,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/5/2016
+Last Modified Date: 12/8/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
