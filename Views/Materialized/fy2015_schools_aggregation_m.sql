@@ -254,7 +254,7 @@ on	lsli.line_item_id	=	li.id
 
 left join (
 	select	lsli.line_item_id,
-			sum(num_students::numeric)	as	num_students_served
+			sum(sd.num_students::numeric)	as	num_students_served
 
 	from public.fy2015_lines_to_school_by_line_item_m	lsli
 
