@@ -249,7 +249,7 @@ from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
 on dpd.esh_id = fbts.esh_id
 left join public.fy2015_fy2016_districts_upgrades_m du
-on dpd.esh_id = du.esh_id
+on dpd.esh_id = du.esh_id_2016
 
 /*
 Author: Justine Schott
