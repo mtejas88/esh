@@ -13,7 +13,7 @@ select  		sd.campus_id,
 							else	0
 						end)	as	com_info_bandwidth,
 				sum(case
-							when	upstream_conditions_met	=	TRUE
+							when	internet_conditions_met	=	TRUE
 							and	number_of_dirty_line_item_flags	=	0
 							and	(not(	'committed_information_rate'	=	any(open_flags))
 										or	open_flags	is	null)
