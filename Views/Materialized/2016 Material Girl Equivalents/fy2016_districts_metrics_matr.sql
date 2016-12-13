@@ -234,7 +234,11 @@ select	dd.*,
 		    ia_procurement_type,
 		    ia_no_cost_lines,
 		    wan_no_cost_lines,
-			most_recent_ia_contract_end_date
+			most_recent_ia_contract_end_date,
+			ia_monthly_cost_direct_to_district_district_applied +
+				(ia_monthly_cost_per_student_shared_district_applied*num_students) as ia_monthly_cost_district_applied,
+			ia_monthly_cost_direct_to_district_other_applied+
+				(ia_monthly_cost_per_student_shared_other_applied*num_students) as ia_monthly_cost_other_applied
 
 from	fy2016_districts_demog_matr		 dd
 left	join	fy2016_districts_aggregation_matr	da
@@ -243,7 +247,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 11/22/2016
+Last Modified Date: 12/12/2016
 Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables

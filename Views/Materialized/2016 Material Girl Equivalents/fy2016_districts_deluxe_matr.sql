@@ -238,16 +238,25 @@ select distinct
 	budget_used_c2_15,
 	budget_used_c2_16,
 	fbts.fiber_target_status,
-  	fbts.bw_target_status
+  	fbts.bw_target_status,
+  	case
+  		when du.upgrade_indicator
+  			then true
+  		else false
+  	end as upgrade_indicator,
+	ia_monthly_cost_district_applied,
+	ia_monthly_cost_other_applied
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
 on dpd.esh_id = fbts.esh_id
+left join public.fy2015_fy2016_districts_upgrades_m du
+on dpd.esh_id = du.esh_id_2016
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 12/5/2016
+Last Modified Date: 12/12/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:

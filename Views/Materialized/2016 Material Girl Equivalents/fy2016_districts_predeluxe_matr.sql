@@ -203,7 +203,9 @@ select distinct
 	received_c2_16,
 	budget_used_c2_15,
 	budget_used_c2_16,
-	wan_lines_w_dirty
+	wan_lines_w_dirty,
+	ia_monthly_cost_district_applied,
+	ia_monthly_cost_other_applied
 
 from public.fy2016_districts_metrics_matr dm
 left join public.fy2016_wifi_connectivity_informations_matr wifi
@@ -214,7 +216,7 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 12/8/2016
+Last Modified Date: 12/12/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

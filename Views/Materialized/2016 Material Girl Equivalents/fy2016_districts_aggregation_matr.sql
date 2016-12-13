@@ -653,7 +653,65 @@ select  		dd.esh_id as district_esh_id,
 									 and backbone_conditions_met = false
 									 and consortium_shared = false
 										 then contract_end_date
-								  end ) as most_recent_ia_contract_end_date
+								  end ) as most_recent_ia_contract_end_date,
+--progress tracking
+
+						sum(case
+									when	(isp_conditions_met	=	TRUE
+												or	internet_conditions_met	=	TRUE
+												or	upstream_conditions_met	=	TRUE
+												or	'committed_information_rate'	=	any(open_tag_labels))
+									and	num_open_flags	=	0
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
+									and consortium_shared = false
+									and num_lines::numeric>0
+									and applicant_id = dd.esh_id
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+																	/*/ case
+																		when months_of_service = 0 or months_of_service is null
+																			then 12
+																		else months_of_service
+																	  end*/
+									else	0
+								end)	as	ia_monthly_cost_direct_to_district_district_applied,
+						sum(case
+									when	(isp_conditions_met	=	TRUE
+												or	internet_conditions_met	=	TRUE
+												or	upstream_conditions_met	=	TRUE
+												or	'committed_information_rate'	=	any(open_tag_labels))
+									and	num_open_flags	=	0
+									and (not(	'exclude_for_cost_only_restricted'	=	any(open_tag_labels))
+										or	open_tag_labels	is	null)
+									and consortium_shared = false
+									and num_lines::numeric>0
+									and applicant_id != dd.esh_id
+										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
+																	/*/ case
+																		when months_of_service = 0 or months_of_service is null
+																			then 12
+																		else months_of_service
+																	  end*/
+									else	0
+								end)	as	ia_monthly_cost_direct_to_district_other_applied,
+						sum(case
+									when	backbone_conditions_met
+											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)
+									and	num_open_flags	=	0
+									and district_info_by_li.num_students_served::numeric > 0
+									and applicant_id = dd.esh_id
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+									else	0
+								end)	as	ia_monthly_cost_per_student_shared_district_applied,
+						sum(case
+									when	backbone_conditions_met
+											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)
+									and	num_open_flags	=	0
+									and district_info_by_li.num_students_served::numeric > 0
+									and applicant_id != dd.esh_id
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+									else	0
+								end)	as	ia_monthly_cost_per_student_shared_other_applied
 
 from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
@@ -764,7 +822,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/8/2016
+Last Modified Date: 12/12/2016
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
