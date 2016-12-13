@@ -685,8 +685,8 @@ select  		dd.esh_id as district_esh_id,
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district_other_applied,
 						sum(case
-									when	backbone_conditions_met
-											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met))
+									when	(backbone_conditions_met
+											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
 									and applicant_id::varchar = dd.esh_id
@@ -694,8 +694,8 @@ select  		dd.esh_id as district_esh_id,
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_district_applied,
 						sum(case
-									when	backbone_conditions_met
-											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met))
+									when	(backbone_conditions_met
+											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
 									and applicant_id::varchar != dd.esh_id
