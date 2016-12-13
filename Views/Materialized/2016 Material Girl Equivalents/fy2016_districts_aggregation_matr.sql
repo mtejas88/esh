@@ -666,7 +666,7 @@ select  		dd.esh_id as district_esh_id,
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-									and applicant_id = dd.esh_id
+									and applicant_id::varchar = dd.esh_id
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district_district_applied,
@@ -680,7 +680,7 @@ select  		dd.esh_id as district_esh_id,
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-									and applicant_id != dd.esh_id
+									and applicant_id::varchar != dd.esh_id
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district_other_applied,
@@ -689,7 +689,7 @@ select  		dd.esh_id as district_esh_id,
 											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-									and applicant_id = dd.esh_id
+									and applicant_id::varchar = dd.esh_id
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_district_applied,
@@ -698,7 +698,7 @@ select  		dd.esh_id as district_esh_id,
 											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-									and applicant_id != dd.esh_id
+									and applicant_id::varchar != dd.esh_id
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_other_applied
