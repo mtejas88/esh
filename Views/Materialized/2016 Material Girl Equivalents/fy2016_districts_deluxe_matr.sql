@@ -94,6 +94,7 @@ select distinct
 	wan_monthly_cost_per_line,
 	wan_monthly_cost_total,
 	meeting_3_per_mbps_affordability_target,
+	affordability_calculator(ia_monthly_cost_total, ia_bw_mbps_total) as meeting_knapsack_affordability_target,
 	hierarchy_ia_connect_category,
 	all_ia_connectcat,
 	case
@@ -257,7 +258,7 @@ on dpd.esh_id = du.esh_id_2016
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 12/13/2016
+Last Modified Date: 12/29/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:
