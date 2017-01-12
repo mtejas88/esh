@@ -652,6 +652,7 @@ select  		dd.esh_id as district_esh_id,
 												 or upstream_conditions_met = true )
 									 and backbone_conditions_met = false
 									 and consortium_shared = false
+									 and erate
 										 then contract_end_date
 								  end ) as most_recent_ia_contract_end_date,
 --progress tracking
@@ -836,7 +837,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/13/2016
+Last Modified Date: 1/11/2017
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
