@@ -26,7 +26,8 @@ select
 							end																							
 						else
 							case when	d.exclude_from_wan_analysis = false and 
-										d.wan_lines_w_dirty = 0 and 
+										d.wan_lines_w_dirty = 0 and
+										d.num_schools >= 6 and 
 										d.fiber_internet_upstream_lines_w_dirty > 0 then 'Not Target'	--13				--"Is the district fit for WAN, and num_wan_lines = 0, and district has fiber IA/upstream?"
 							     when 	d.non_fiber_lines = 0 then 'Potential Target' --14									--suggested addition for only dirty non-fiber
 							     when 	d.fiber_internet_upstream_lines_w_dirty + d.fiber_wan_lines_w_dirty = 0 then 'Target' --15 --"Does the district have any fiber"
