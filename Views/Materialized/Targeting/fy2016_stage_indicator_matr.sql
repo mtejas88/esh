@@ -58,7 +58,7 @@ select
 				else 'Potential Target' end --2
 	end as fiber_target_status
 
-from public.fy2016_districts_deluxe_matr d
+from public.fy2016_districts_predeluxe_matr d
 
 left join fy2016_campus_w_fiber_nonfiber_matr c
 on d.esh_id = c.district_esh_id
