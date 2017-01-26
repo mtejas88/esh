@@ -121,7 +121,7 @@ Author: Jeremy Holtzman
 Created On Date: 1/20/2017
 Last Modified Date: 1/20/2017
 Name of QAing Analyst(s):
-Purpose: To create a campus table that captures what specific services are allocated to the campus
+Purpose: To make a campus table that captures what specific services are allocated to the campus
 Methodology: Uses the fy2016_schools_demog_matr to identify all campuses in all districts, and then joins
 the relevant line item and allocation tables to determine which services they receive. Good allocations
 are defined by:

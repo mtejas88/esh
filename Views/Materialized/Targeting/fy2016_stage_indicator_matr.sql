@@ -60,7 +60,7 @@ select
 
 from public.fy2016_districts_deluxe_matr d
 
-left join fy2016_campus_w_fiber_nonfiber c
+left join fy2016_campus_w_fiber_nonfiber_matr c
 on d.esh_id = c.district_esh_id
 
 where d.include_in_universe_of_districts or d.district_type = 'Charter'
