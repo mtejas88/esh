@@ -63,7 +63,7 @@ count(distinct 	case
 										then ec.circuit_id
 								end) as campus_fiber_lines_alloc
 
-from public.fy2016_districts_deluxe_matr d 
+from public.fy2016_districts_predeluxe_matr d 
 
 left join public.fy2016_district_lookup_matr dl
 on d.esh_id = dl.district_esh_id
