@@ -11,6 +11,7 @@ select
 	d.fiber_wan_lines_w_dirty,
 	d.include_in_universe_of_districts,
 	d.district_type,
+	d.postal_cd,
 	case when d.lines_w_dirty = 0 then 'No Data' --1																	
 	when d.num_campuses = 1 and d.fiber_internet_upstream_lines > 0 then 'Not Target' --4									-- 1-campus districts with a clean IA or upstream
 	when d.non_fiber_lines_w_dirty > 0 then																					-- "Does the district receive non-fiber?"
@@ -56,7 +57,7 @@ select
 	else
 		case 	when 	d.exclude_from_wan_analysis = false then 'Not Target'	--3											-- "Is the district fit for WAN analysis"
 				else 'Potential Target' end --2
-	end as fiber_target_status
+	end as stage_indicator
 
 from public.fy2016_districts_predeluxe_matr d
 
@@ -75,7 +76,8 @@ group by d.esh_id,
   d.non_fiber_lines,
   d.fiber_wan_lines_w_dirty,
   d.include_in_universe_of_districts,
-  d.district_type
+  d.district_type,
+  d.postal_cd
 
 /*
 Author: Jeremy Holtzman
