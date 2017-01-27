@@ -251,13 +251,16 @@ select distinct
   	end as upgrade_indicator,
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
-	ia_monthly_funding_total
+	ia_monthly_funding_total,
+	dspa.reporting_name as service_provider_assignment
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
 on dpd.esh_id = fbts.esh_id
 left join public.fy2015_fy2016_districts_upgrades_m du
 on dpd.esh_id = du.esh_id_2016
+left join public.fy2016_districts_service_provider_assignments dspa
+on dpd.esh_id = dspa.esh_id
 
 /*
 Author: Justine Schott
