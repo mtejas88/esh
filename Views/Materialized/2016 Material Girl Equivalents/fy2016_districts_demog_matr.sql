@@ -478,10 +478,24 @@ and d."LSTATE"=sc_NY."LSTATE"
 
 where case --only include the HS district when smushing MT districts (exclude the ELEM)
         when sc_MT.district_count > 1
-          then  right(d."NAME",3) =' HS'
-                or right(d."NAME",4) =' H S'
-                or right(d."NAME",12) =' HIGH SCHOOL'
-                or right(d."NAME",13) = ' K-12 SCHOOLS'
+          then --this is the blacklist of NCES IDS for MT districts that were smushed and we dont want to include
+          d."LEAID" not in (  '3001710','3002010','3002220','3002430','3003290','3003420',
+                              '3003820','3003760','3003870','3004440','3004560','3000006',
+                              '3004890','3005010','3005140','3005280','3005880','3025130',
+                              '3006112','3000098','3006260','3006320','3006790','3007050',
+                              '3007110','3007190','3007330','3007830','3000003','3008860',
+                              '3009180','3009670','3010080','3010140','3010210','3011160',
+                              '3011240','3011420','3011550','3011820','3012270','3012510',
+                              '3012960','3013040','3013310','3013395','3013440','3013560',
+                              '3000005','3014340','3015200','3015340','3015360','3015450',
+                              '3015990','3016050','3016200','3016490','3016880','3017010',
+                              '3017610','3018240','3018410','3018570','3018870','3000096',
+                              '3000090','3020040','3020820','3021060','3021240','3021510',
+                              '3021720','3021870','3022080','3022230','3022370','3022750',
+                              '3022790','3023040','3023370','3023520','3023850','3023900',
+                              '3023940','3024150','3000932','3024200','3025020','3024300',
+                              '3026070','3026160','3026550','3026640','3027060','3027740',
+                              '3027810','3028750','3028140','3028590')
         else true
       end
 and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
@@ -490,7 +504,7 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/1/2016
+Last Modified Date: 1/27/2017 -- edit to exclude specific MT districts so we could rename them (JH)
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
