@@ -19,7 +19,8 @@ left join public.fy2016_districts_demog_matr dd
 on eb_parent.entity_id = dd.esh_id::text::int
 left join fy2016.tags t
 on dd.esh_id::text::int = t.taggable_id
-and t.label in ('sufficient_wifi', 'insufficient_wifi') 
+and t.label in ('sufficient_wifi', 'insufficient_wifi')
+and t.deleted_at is null
 
 left join public.entity_bens eb_child
 on ci.child_entity_number = eb_child.ben
