@@ -246,8 +246,7 @@ select distinct
   	end as upgrade_indicator,
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
-	ia_monthly_funding_total,
-	null as test_field
+	ia_monthly_funding_total
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
@@ -258,7 +257,7 @@ on dpd.esh_id = du.esh_id_2016
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 1/20/2017
+Last Modified Date: 12/13/2016
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:
