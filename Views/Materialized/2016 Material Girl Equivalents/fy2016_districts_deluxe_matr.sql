@@ -94,6 +94,11 @@ select distinct
 	wan_monthly_cost_per_line,
 	wan_monthly_cost_total,
 	meeting_3_per_mbps_affordability_target,
+	case
+		when ia_bw_mbps_total::integer > 0
+			then affordability_calculator(ia_monthly_cost_total, ia_bw_mbps_total::integer)
+		else false
+	end as meeting_knapsack_affordability_target,
 	hierarchy_ia_connect_category,
 	all_ia_connectcat,
 	case
@@ -246,18 +251,21 @@ select distinct
   	end as upgrade_indicator,
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
-	ia_monthly_funding_total
+	ia_monthly_funding_total,
+	dspa.reporting_name as service_provider_assignment
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
 on dpd.esh_id = fbts.esh_id
 left join public.fy2015_fy2016_districts_upgrades_m du
 on dpd.esh_id = du.esh_id_2016
+left join public.fy2016_districts_service_provider_assignments dspa
+on dpd.esh_id = dspa.esh_id
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 12/13/2016
+Last Modified Date: 1/26/2017
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
 Methodology:
