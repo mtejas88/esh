@@ -1,4 +1,4 @@
-  select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
+select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
   from (
     select  *,
             row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
