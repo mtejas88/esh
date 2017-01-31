@@ -116,7 +116,7 @@ FROM (
             from fy2016.service_providers
           ) spc
           ON spc.name = li.service_provider_name
-          LEFT OUTER JOIN public.fy2016_districts_deluxe_matr dd
+          LEFT OUTER JOIN public.fy2016_districts_predeluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
           LEFT OUTER JOIN fy2016.districts d
           ON dd.esh_id::numeric = d.esh_id
