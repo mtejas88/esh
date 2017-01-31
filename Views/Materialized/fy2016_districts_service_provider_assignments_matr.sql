@@ -1,4 +1,4 @@
-  select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
+select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
   from (
     select  *,
             row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
@@ -20,7 +20,7 @@
                     else 0
                   end) as upstream_bandwidth
       from public.fy2016_services_received_matr sr
-      left join public.fy2016_districts_deluxe_matr dd
+      left join public.fy2016_districts_predeluxe_matr dd
       on sr.recipient_id = dd.esh_id
       where purpose in ('Upstream', 'Internet')
       and inclusion_status = 'clean_with_cost'
@@ -51,7 +51,7 @@
                     else 0
                   end) as upstream_bandwidth
       from public.fy2016_services_received_matr sr
-      left join public.fy2016_districts_deluxe_matr dd
+      left join public.fy2016_districts_predeluxe_matr dd
       on sr.recipient_id = dd.esh_id
       where purpose in ('Upstream', 'Internet')
       and inclusion_status = 'clean_with_cost'
