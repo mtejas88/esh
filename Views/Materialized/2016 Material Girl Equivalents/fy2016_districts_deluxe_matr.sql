@@ -259,7 +259,7 @@ left join public.fy2016_fiber_bw_target_status_matr fbts
 on dpd.esh_id = fbts.esh_id
 left join public.fy2015_fy2016_districts_upgrades_m du
 on dpd.esh_id = du.esh_id_2016
-left join public.fy2016_districts_service_provider_assignments dspa
+left join public.fy2016_districts_service_provider_assignments_matr dspa
 on dpd.esh_id = dspa.esh_id
 
 /*
