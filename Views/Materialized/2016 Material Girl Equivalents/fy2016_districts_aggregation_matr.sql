@@ -544,7 +544,6 @@ select  		dd.esh_id as district_esh_id,
 																							where include_in_universe_of_districts=true)
 																	then applicant_name
 														when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-																and applicant_id::varchar !=ldli.district_esh_id
 																and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
 																							7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
 																							8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
@@ -837,8 +836,8 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 1/11/2017
-Name of QAing Analyst(s):
+Last Modified Date: 2/6/2017 - JH edited the consortium affiliation field so that the applicant_id can be equal to the recipient id if the line item has one of the identified SPINs
+Name of QAing Analyst(s): 
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
 Methodology: Utilizing other aggregation tables
