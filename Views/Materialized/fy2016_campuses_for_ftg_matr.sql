@@ -23,6 +23,7 @@ select  distinct  dd.esh_id,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
                   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses as district_num_campuses_unscalable,
+                  dd.hierarchy_ia_connect_category as district_hierarchy_ia_connect_category,
                   campus_schools.campus_id,
                   campus_schools.campus_school_names,
                   campus_schools.campus_school_nces_cds,
@@ -105,7 +106,7 @@ where dd.include_in_universe_of_districts
 /*
 Author: Justine Schott
 Created On Date: 11/3/2016
-Last Modified Date: 2/3/2017
+Last Modified Date: 2/6/2017
 Name of QAing Analyst(s):
 Purpose: List potential unscalable campuses in our sample
 Methodology:

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
+#BLUE credentials
 hostname = 'ec2-34-192-206-210.compute-1.amazonaws.com'
-username = 'udf12ao6lnvbn5'
-password = 'p58i2adpeicuhm5a0o2sfntqc8p'
+username = 'ud1bnbevrqe2q'
+password = 'p412da0cf141f10788be82e8a3d0dc8e24698205ec718e9db75cd86aabd6b67c4'
 database = 'dai3g95tesvtj9'
 
 # Simple routine to run a query on a database and print the results:
@@ -79,10 +80,10 @@ def doQuery( conn ) :
 print("Begin refresh...")
 import psycopg2
 myConnection = psycopg2.connect(
-	host=hostname,
-	user=username,
-	password=password,
-	dbname=database
+    host=hostname,
+    user=username,
+    password=password,
+    dbname=database
 )
 doQuery( myConnection )
 print("Refresh complete")
