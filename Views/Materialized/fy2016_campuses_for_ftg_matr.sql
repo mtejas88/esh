@@ -23,6 +23,7 @@ select  distinct  dd.esh_id,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
                   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses as district_num_campuses_unscalable,
+                  dd.hierarchy_ia_connect_category as district_hierarchy_ia_connect_category,
                   campus_schools.campus_id,
                   campus_schools.campus_school_names,
                   campus_schools.campus_school_nces_cds,
@@ -54,7 +55,7 @@ left join (
 -- 11/2 discussion recap min/max rule for identifying sample value for each campus is somewhat arbitrary
 -- let's either document that it's arbitrary (or it wasn't but unclear of Greg's decisions) or
 -- re-do it by assigning row number
-  from public.fy2016_schools_demog_matr  sd
+  from endpoint.fy2016_schools_demog  sd
   left join public.sc131a sc
   on sd.school_nces_code = sc."NCESSCH"
   where district_include_in_universe_of_districts
@@ -83,7 +84,7 @@ left join (
                                                         then 70
                                                       else discount_rate::numeric
                                                     end/100)) as bb_funding
-    from public.fy2016_services_received_matr sr
+    from endpoint.fy2016_services_received sr
     left join fy2016.line_items li
     on sr.line_item_id = li.id
     left join fy2016.frns
@@ -105,7 +106,7 @@ where dd.include_in_universe_of_districts
 /*
 Author: Justine Schott
 Created On Date: 11/3/2016
-Last Modified Date: 2/3/2017
+Last Modified Date: 2/6/2017
 Name of QAing Analyst(s):
 Purpose: List potential unscalable campuses in our sample
 Methodology:
