@@ -55,7 +55,7 @@ left join (
 -- 11/2 discussion recap min/max rule for identifying sample value for each campus is somewhat arbitrary
 -- let's either document that it's arbitrary (or it wasn't but unclear of Greg's decisions) or
 -- re-do it by assigning row number
-  from endpoint.fy2016_schools_demog  sd
+  from public.fy2016_schools_demog_matr  sd
   left join public.sc131a sc
   on sd.school_nces_code = sc."NCESSCH"
   where district_include_in_universe_of_districts
@@ -84,7 +84,7 @@ left join (
                                                         then 70
                                                       else discount_rate::numeric
                                                     end/100)) as bb_funding
-    from endpoint.fy2016_services_received sr
+    from public.fy2016_services_received_matr sr
     left join fy2016.line_items li
     on sr.line_item_id = li.id
     left join fy2016.frns
