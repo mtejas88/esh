@@ -5,6 +5,7 @@ select  distinct  dd.esh_id,
                   dd.latitude as district_latitude,
                   dd.longitude as district_longitude,
                   dd.locale as district_locale,
+                  dd.num_campuses as district_num_campuses,
                   dd.num_schools as district_num_schools,
                   dd.num_students as district_num_students,
                   case
@@ -106,7 +107,7 @@ where dd.include_in_universe_of_districts
 /*
 Author: Justine Schott
 Created On Date: 11/3/2016
-Last Modified Date: 2/6/2017
+Last Modified Date: 2/7/2017
 Name of QAing Analyst(s):
 Purpose: List potential unscalable campuses in our sample
 Methodology:
