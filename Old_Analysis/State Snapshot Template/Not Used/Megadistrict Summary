@@ -1,0 +1,28 @@
+/*
+Author: Greg Kurzhals
+Created On Date: 1/12/2016
+Last Modified Date: 
+Name of QAing Analyst(s): 
+Purpose: Summarizes each state's population of megadistricts (e.g. number, num_students, % of students, 
+districts, and campuses represented, etc.)
+Methodology: Grouping the "districts" table by state allows for the use of aggregate functions to
+quantify the quantity and relative statistical influence of megadistricts within each state.
+*/
+
+
+select districts.postal_cd,
+sum(case when district_size='Mega' then 1 else 0 end) as "num_mega_districts",
+array_agg(distinct case when district_size='Mega' then name else null end) as "district_names",
+sum(case when district_size='Mega' then num_students::bigint else 0 end) as "students_mega_districts",
+sum(case when district_size='Mega' then num_schools::bigint else 0 end) as "schools_mega_districts",
+sum(case when district_size='Mega' then num_campuses::bigint else 0 end) as "campuses_mega_districts",
+sum(case when district_size='Mega' then num_students::bigint else 0 end)/sum(num_students::bigint) as "pct_students_mega_districts",
+sum(case when district_size='Mega' then num_schools::bigint else 0 end)/sum(num_schools::bigint) as "pct_schools_mega_districts",
+sum(case when district_size='Mega' then num_campuses::bigint else 0 end)/sum(num_campuses::bigint) as "pct_campuses_mega_districts"
+
+from districts
+
+where include_in_universe_of_districts=true
+
+GROUP BY districts.postal_cd
+
