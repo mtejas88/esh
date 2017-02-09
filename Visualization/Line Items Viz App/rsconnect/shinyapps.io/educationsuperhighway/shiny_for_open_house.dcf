@@ -1,8 +1,0 @@
-name: shiny_for_open_house
-account: educationsuperhighway
-server: shinyapps.io
-bundleId: 378761
-url: https://educationsuperhighway.shinyapps.io/shiny_for_open_house/
-when: 1456264029.66481
-asMultiple: FALSE
-asStatic: FALSE
