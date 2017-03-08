@@ -104,10 +104,14 @@ left join (
     select
       sr.recipient_id,
       sr.recipient_postal_cd,
-      sum(sr.line_item_district_monthly_cost_total) as bb_cost,
+      sum(case
+            when discount_rate is null
+              then 0
+            else sr.line_item_district_monthly_cost_total
+          end) as bb_cost,
       sum(sr.line_item_district_monthly_cost_total*(case
                                                       when discount_rate is null
-                                                        then 70
+                                                        then 0
                                                       else discount_rate::numeric
                                                     end/100)) as bb_funding
     from public.fy2016_services_received_matr sr
@@ -118,6 +122,8 @@ left join (
 
     where sr.broadband
     and recipient_include_in_universe_of_districts
+    and inclusion_status in ('clean_with_cost', 'dirty')
+    and sr.erate
 
     group by  sr.recipient_id,
               sr.recipient_postal_cd
@@ -132,7 +138,7 @@ where dd.include_in_universe_of_districts
 /*
 Author: Justine Schott
 Created On Date: 11/3/2016
-Last Modified Date: 2/7/2017
+Last Modified Date: 3/8/2017
 Name of QAing Analyst(s):
 Purpose: List potential unscalable campuses in our sample
 Methodology:
