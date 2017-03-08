@@ -10,7 +10,32 @@ select  distinct  dd.esh_id,
                   dd.num_students as district_num_students,
                   case
                     when dd.discount_rate_c1 is null
-                      then round(state_agg_dr::numeric,2)
+                      then
+                        case
+                          when dd.frl_percent is null
+                            then round(state_agg_dr::numeric,2)
+                          else
+                            case when locale in ('Urban', 'Suburban')
+                              then
+                                case
+                                  when frl_percent < .01 then .2
+                                  when frl_percent < .20 then .4
+                                  when frl_percent < .35 then .5
+                                  when frl_percent < .50 then .6
+                                  when frl_percent < .75 then .8
+                                  when frl_percent >= .75 then .9
+                                end
+                              else
+                                case
+                                  when frl_percent < .01 then .25
+                                  when frl_percent < .20 then .50
+                                  when frl_percent < .35 then .60
+                                  when frl_percent < .50 then .70
+                                  when frl_percent < .75 then .80
+                                  when frl_percent >= .75 then .9
+                                end
+                            end
+                        end
                     else dd.discount_rate_c1::numeric
                   end as c1_discount_rate_or_state_avg,
                   case
