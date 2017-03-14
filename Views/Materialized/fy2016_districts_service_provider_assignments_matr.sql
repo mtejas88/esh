@@ -1,4 +1,7 @@
-select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
+select  recipient_sp_bw_rank.recipient_id as esh_id, 
+reporting_name,
+recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
+recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
   from (
     select  *,
             row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
@@ -72,7 +75,7 @@ select  recipient_sp_bw_rank.recipient_id as esh_id, reporting_name
 /*
 Author: Justine Schott
 Created On Date: 1/26/2017
-Last Modified Date:
+Last Modified Date: 3/14/2017 - added primary sp bandwidth and % of districts bw
 Name of QAing Analyst(s):
 Purpose: Service provider assignment as done in 2016 SotS
 Methodology:
