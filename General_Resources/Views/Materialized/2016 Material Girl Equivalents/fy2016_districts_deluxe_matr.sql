@@ -1,5 +1,14 @@
+with state_level_extrap as (
+	select postal_cd,
+	(sum(current_known_unscalable_campuses) + sum(current_assumed_unscalable_campuses))/sum(num_campuses) as extrap_percent
+	from fy2016_districts_fiberpredeluxe_matr
+	where include_in_universe_of_districts
+	and district_type = 'Traditional'
+	and fiber_metric_calc_group = 'metric_extrapolation'
+	group by postal_cd)
+
 select distinct
-	dpd.esh_id,
+	esh_id,
 	nces_cd,
 	name,
 	union_code,
@@ -23,55 +32,16 @@ select distinct
 	city,
 	zip,
 	county,
-	dpd.postal_cd,
+	dfpd.postal_cd,
 	latitude,
 	longitude,
-	dpd.exclude_from_ia_analysis,
+	exclude_from_ia_analysis,
 	exclude_from_ia_cost_analysis,
-	dpd.exclude_from_wan_analysis,
+	exclude_from_wan_analysis,
 	exclude_from_wan_cost_analysis,
-	case
-	    when  fbts.fiber_target_status in ('Target', 'Not Target')
-	    	  or (fbts.fiber_target_status = 'No Data'
-	            and dpd.num_campuses <= 2)
-	          or (fbts.fiber_target_status = 'Potential Target'
-	            and dpd.exclude_from_ia_analysis = false)
-	    	then false
-	   	else true
-	end as exclude_from_current_fiber_analysis,
-	case
-	    when  dpd.exclude_from_ia_analysis = false
-	    	then 'metric_extrapolation'
-	   	when  fbts.fiber_target_status in ('Target', 'Not Target')
-	    	  or (fbts.fiber_target_status = 'No Data'
-	            and dpd.num_campuses <= 2)
-	          or (fbts.fiber_target_status = 'Potential Target'
-	            and dpd.exclude_from_ia_analysis = false)
-	    	then 'metric'
-	   	else 'extrapolate_to'
-	end as fiber_metric_calc_group,
-	case
-	    when  dpd.exclude_from_ia_analysis = false and fbts.fiber_target_status = 'Target'
-	    	then 'clean_target'
-	    when  fbts.fiber_target_status = 'Target'
-	    	then 'dirty_target'
-	    when  dpd.exclude_from_ia_analysis = false and fbts.fiber_target_status = 'Not Target'
-	    	then 'clean_not_target'
-	    when  fbts.fiber_target_status = 'Not Target'
-	    	then 'dirty_not_target'
-	    when  current_known_unscalable_campuses + current_assumed_unscalable_campuses = 0
-	    	  and dpd.exclude_from_ia_analysis = false
-	    	  and fbts.fiber_target_status = 'Potential Target'
-	    	then 'clean_no_unscalable_potential_target'
-	    when  dpd.exclude_from_ia_analysis = false
-	    	  and fbts.fiber_target_status = 'Potential Target'
-	    	then 'clean_unscalable_potential_target'
-	    when  fbts.fiber_target_status = 'Potential Target'
-	    	then 'dirty_potential_target'
-	   	when  dpd.num_campuses <= 2
-	    	then 'small_no_data'
-	   	else 'large_no_data'
-	end as fiber_metric_status,
+	exclude_from_current_fiber_analysis,
+	fiber_metric_calc_group,
+	fiber_metric_status,
 	include_in_universe_of_districts,
 	flag_array,
 	tag_array,
@@ -94,99 +64,28 @@ select distinct
 	wan_monthly_cost_per_line,
 	wan_monthly_cost_total,
 	meeting_3_per_mbps_affordability_target,
-	case
-		when ia_bw_mbps_total::integer > 0
-			then affordability_calculator(ia_monthly_cost_total, ia_bw_mbps_total::integer)
-		else false
-	end as meeting_knapsack_affordability_target,
+	meeting_knapsack_affordability_target,
 	hierarchy_ia_connect_category,
 	all_ia_connectcat,
 	case
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fbts.fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses = 0
-	          and non_fiber_lines > 0
-	    then 0
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses > 0
-	  	then current_known_scalable_campuses
-	  when fbts.fiber_target_status in ('Target', 'No Data')
-	    then 0
-	  when fbts.fiber_target_status = 'Not Target'
-	    then 0
-	  else current_known_scalable_campuses
+		when fiber_metric_calc_group = 'extrapolate_to'
+		then 0
+		else current_known_scalable_campuses
 	end as current_known_scalable_campuses,
 	case
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fbts.fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses = 0
-	          and non_fiber_lines > 0
-	    then 	case
-		    		when non_fiber_lines > num_campuses
-		    			then 0
-		    		else num_campuses - non_fiber_lines
-		    	end
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses > 0
-	  	then  current_assumed_scalable_campuses
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
-	          and num_campuses = 1
-	    then 0
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
-	          and num_campuses = 2
-	    then 1
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
-	    then num_campuses::numeric * .66
-	  when fbts.fiber_target_status = 'Not Target'
-	    then num_campuses
-	  else current_assumed_scalable_campuses
-	end as current_assumed_scalable_campuses,
+		when fiber_metric_calc_group = 'extrapolate_to' 
+		then (num_campuses * (1-extrap_percent)) 
+		else current_assumed_scalable_campuses
+	end as 	current_assumed_scalable_campuses,
 	case
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fbts.fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses = 0
-	          and non_fiber_lines > 0
-	    then 0
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses > 0
-	  	then  current_known_unscalable_campuses
-	  when    fbts.fiber_target_status in ('Target', 'No Data', 'Not Target')
-	    then 0
-	  else current_known_unscalable_campuses
+		when fiber_metric_calc_group = 'extrapolate_to'
+		then 0
+		else current_known_unscalable_campuses
 	end as current_known_unscalable_campuses,
 	case
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fbts.fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses = 0
-	          and non_fiber_lines > 0
-	    then 	case
-		    		when non_fiber_lines > num_campuses
-		    			then num_campuses
-		    		else non_fiber_lines
-		    	end
-	  when    dpd.exclude_from_ia_analysis = false
-	          and fiber_target_status = 'Target'
-	          and current_known_unscalable_campuses +
-	              current_assumed_unscalable_campuses > 0
-	  	then  current_assumed_unscalable_campuses
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
-	          and num_campuses in (1,2)
-	    then 1
-	  when    fbts.fiber_target_status in ('Target', 'No Data')
-	    then num_campuses::numeric * .34
-	  when fbts.fiber_target_status = 'Not Target'
-	    then 0
-	  else current_assumed_unscalable_campuses
+		when fiber_metric_calc_group = 'extrapolate_to' 
+		then (num_campuses * extrap_percent) 
+		else current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
 	sots_known_scalable_campuses,
 	sots_assumed_scalable_campuses,
@@ -231,7 +130,7 @@ select distinct
 	most_recent_ia_contract_end_date,
 	wan_lines_w_dirty,
   	ia_monthly_cost_no_backbone,
-  	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
+  	backbone_monthly_cost,
 	needs_wifi,
 	c2_prediscount_budget_15,
 	c2_prediscount_remaining_15,
@@ -242,31 +141,24 @@ select distinct
 	received_c2_16,
 	budget_used_c2_15,
 	budget_used_c2_16,
-	fbts.fiber_target_status,
-  	fbts.bw_target_status,
-  	case
-  		when du.upgrade_indicator
-  			then true
-  		else false
-  	end as upgrade_indicator,
+	fiber_target_status,
+  	bw_target_status,
+	upgrade_indicator,
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
 	ia_monthly_funding_total,
-	dspa.reporting_name as service_provider_assignment
+	service_provider_assignment
 
-from public.fy2016_districts_predeluxe_matr dpd
-left join public.fy2016_fiber_bw_target_status_matr fbts
-on dpd.esh_id = fbts.esh_id
-left join public.fy2015_fy2016_districts_upgrades_m du
-on dpd.esh_id = du.esh_id_2016
-left join public.fy2016_districts_service_provider_assignments_matr dspa
-on dpd.esh_id = dspa.esh_id
+from fy2016_districts_fiberpredeluxe_matr dfpd
+left join state_level_extrap sle 
+on sle.postal_cd = dfpd.postal_cd
+
 
 /*
-Author: Justine Schott
+Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 1/26/2017
+Last Modified Date: 3/14/2017
 Name of QAing Analyst(s):
-Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in
+Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
 */
