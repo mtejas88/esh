@@ -1,2 +1,13 @@
 
-Shiny/prep_for_Shiny/get_tables.R
+## this file is used by Git to clarify which files should be ignored in the
+commit.
+
+## the first two files are automatically created by Mac OS X operating system
+when a new directory is created
+**/.DS_Store
+**/Icon
+## also ignore all data files
+**/data
+
+
+#Shiny/prep_for_Shiny/get_tables.R
