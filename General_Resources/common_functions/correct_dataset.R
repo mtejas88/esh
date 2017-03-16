@@ -59,8 +59,10 @@ correct.dataset <- function(dataset, sots.flag, services.flag){
   ## create "ia_bandwidth_per_student_kbps" column if it doesn't exist
   ## (can also be "ia_bandwidth_per_student")
   if (services.flag == 0){
-    col <- names(dataset)[grepl("ia_bandwidth_per_student", names(dataset))]
-    dataset$ia_bandwidth_per_student_kbps <- suppressWarnings(as.numeric(dataset[,col]))
+    if ("ia_bandwidth_per_student" %in% names(dataset)){
+      col <- names(dataset)[grepl("ia_bandwidth_per_student", names(dataset))]
+      dataset$ia_bandwidth_per_student_kbps <- suppressWarnings(as.numeric(dataset[,col]))
+    }
   }
   
   
