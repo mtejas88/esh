@@ -19,18 +19,17 @@ dta.470.ia <- read.csv("data/interim/470_ia_status.csv", as.is=T, header=T, stri
 ##**************************************************************************************************************************************************
 ## apply criteria
 
-sub <- dta.470.ia[which(dta.470.ia$service.type == "Internet Access and/or Telecommunications" &
-                          dta.470.ia$function1 == "Lit Fiber Service"),]
+sub <- dta.470[which(dta.470$service.type == "Internet Access and/or Telecommunications" &
+                          dta.470$function1 == "Lit Fiber Service"),]
 
 ## find districts that only have 1 Form 470 that was evaluated as Meeting 2014 IA Goals 
 sub.ia.eval <- dta.470.ia[dta.470.ia$meeting_goals_ia_2014 %in% c(TRUE, FALSE),]
-ids.duplicated <- dta.470.ia$esh_id[which(duplicated(dta.470.ia$esh_id))]
-ids.not.duplicated <- dta.470.ia$esh_id[which(!dta.470.ia$esh_id %in% ids.duplicated)]
+ids.with.470 <- unique(sub.ia.eval$esh_id)
 
-sub <- sub[which(sub$esh_id %in% ids.duplicated),]
+sub <- sub[which(!sub$esh_id %in% ids.with.470),]
 
-sub <- merge(sub, dta.470.ia[c('x470.number', 'meeting_goals_ia_2014')], by='x470.number', all.x=T)
-sub <- sub[which(!is.na(sub$meeting_goals_ia_2014)),]
+#sub <- merge(sub, dta.470.ia[c('x470.number', 'meeting_goals_ia_2014')], by='x470.number', all.x=T)
+#sub <- sub[which(!is.na(sub$meeting_goals_ia_2014)),]
 
 ##**************************************************************************************************************************************************
 ## write out datasets
