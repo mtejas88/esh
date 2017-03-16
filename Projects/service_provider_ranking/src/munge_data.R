@@ -1,0 +1,132 @@
+## =========================================
+##
+## MUNGE DATA: Subset and Clean data
+##
+## =========================================
+
+## Clearing memory
+rm(list=ls())
+
+##**************************************************************************************************************************************************
+## READ IN DATA
+
+dd.2016 <- read.csv("data/raw/deluxe_districts_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+districts.sp.2016 <- read.csv("data/raw/districts_sp_assignments_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+
+##**************************************************************************************************************************************************
+## SUBSET DATA
+
+## first, merge together the datasets
+dd.2016 <- merge(dd.2016, districts.sp.2016, by='esh_id', all.x=T)
+
+## define a dataset where the district was assigned a dominant service provider (i.e. not NA for service_provider_assignment)
+sp.2016 <- dd.2016[which(!is.na(dd.2016$service_provider_assignment)),]
+
+## take out the charter districts
+sp.2016 <- sp.2016[sp.2016$district_type == 'Traditional',]
+
+##**************************************************************************************************************************************************
+## CREATE INDICATORS
+
+## create a binary indicator if a district is meeting and not meeting 2014 connectivity goals
+sp.2016$district_meeting_goals_2014 <- ifelse(sp.2016$meeting_2014_goal_no_oversub == TRUE, 1, 0)
+sp.2016$district_not_meeting_goals_2014 <- ifelse(sp.2016$meeting_2014_goal_no_oversub == FALSE, 1, 0)
+## create a variable for district bw per student
+sp.2016$district_bw_per_student <- (sp.2016$ia_bw_mbps_total * 1000) / sp.2016$num_students
+
+## create a binary indicator if a service provider is solely allowing a district to meet connectivity goals
+sp.2016$sp_bw_per_student <- (sp.2016$primary_sp_bandwidth * 1000) / sp.2016$num_students
+sp.2016$sp_meeting_goals_2014 <- ifelse(sp.2016$sp_bw_per_student >= 100, 1, 0)
+sp.2016$sp_not_meeting_goals_2014 <- ifelse(sp.2016$sp_meeting_goals_2014 == 0, 1, 0)
+
+##------------------------------------------------------------------------------
+## Aggregate by service provider
+
+## TOTAL NUMBER OF DISTRICTS SERVED
+sp.2016$counter <- 1
+sp.agg.districts <- aggregate(sp.2016$counter, by=list(sp.2016$service_provider_assignment), FUN=sum, na.rm=T)
+names(sp.agg.districts) <- c('service_provider', 'num_districts_served')
+
+## subset only to the districts not meeting goals
+sp.2016.not.meeting <- sp.2016[sp.2016$district_meeting_goals_2014 == 0,]
+## take out the 78 districts that say the service provider is meeting even though the district is not
+sp.2016.not.meeting.sp.meeting <- sp.2016.not.meeting[sp.2016.not.meeting$sp_meeting_goals_2014 == 1,]
+sp.2016.not.meeting <- sp.2016.not.meeting[sp.2016.not.meeting$sp_meeting_goals_2014 == 0,]
+
+## NUMBER OF STUDENTS NOT MEETING GOALS
+sp.agg.students.not <- aggregate(sp.2016.not.meeting$district_not_meeting_goals_2014*sp.2016.not.meeting$num_students,
+                                 by=list(sp.2016.not.meeting$service_provider_assignment), FUN=sum, na.rm=T)
+names(sp.agg.students.not) <- c('service_provider', 'num_students_not_meeting_goal')
+sp.agg.students.not.sp.meeting <- aggregate(sp.2016.not.meeting.sp.meeting$district_not_meeting_goals_2014*sp.2016.not.meeting.sp.meeting$num_students,
+                                            by=list(sp.2016.not.meeting.sp.meeting$service_provider_assignment), FUN=sum, na.rm=T)
+names(sp.agg.students.not.sp.meeting) <- c('service_provider', 'num_students_not_meeting_goal_but_sp_meeting_goal')
+
+## NUMBER OF STUDENTS MEETING GOALS
+sp.2016.meeting <- sp.2016[sp.2016$district_meeting_goals_2014 == 1,]
+sp.agg.students <- aggregate(sp.2016.meeting$district_meeting_goals_2014*sp.2016.meeting$num_students,
+                             by=list(sp.2016.meeting$service_provider_assignment), FUN=sum, na.rm=T)
+names(sp.agg.students) <- c('service_provider', 'num_students_meeting_goal')
+
+## NUMBER OF STUDENTS IN DIRTY DISTRICTS
+#dirty.districts <- dd.2016[which(sp.2016.all$exclude_from_ia_analysis.x == TRUE),]
+#sp.agg.students.dirty <- aggregate(dirty.districts$num_students, by=list(dirty.districts$service_provider_2016), FUN=sum, na.rm=T)
+#names(sp.agg.students.dirty) <- c('service_provider', 'num_students_dirty')
+
+## MERGE ALL
+dta.sp <- merge(sp.agg.students.not, sp.agg.students, by='service_provider', all=T)
+dta.sp <- merge(dta.sp, sp.agg.students.not.sp.meeting, by='service_provider', all=T)
+dta.sp <- merge(dta.sp, sp.agg.districts, by='service_provider', all=T)
+#dta.sp <- merge(dta.sp, sp.agg.students.dirty, by='service_provider', all=T)
+## sub NAs for 0 for students not meeting/meeting the goal
+dta.sp$num_students_not_meeting_goal[which(is.na(dta.sp$num_students_not_meeting_goal))] <- 0
+dta.sp$num_students_meeting_goal[which(is.na(dta.sp$num_students_meeting_goal))] <- 0
+dta.sp$num_students_not_meeting_goal_but_sp_meeting_goal[which(is.na(dta.sp$num_students_not_meeting_goal_but_sp_meeting_goal))] <- 0
+#dta.sp$num_students_dirty[which(is.na(dta.sp$num_students_dirty))] <- 0
+
+## add percentage of students not meeting/meeting the goal out of the total number of students in the nation
+dta.sp$percentage_students_not_meeting_goal_nationally <- dta.sp$num_students_not_meeting_goal / sum(dta.sp$num_students_not_meeting_goal, na.rm=T)
+dta.sp$percentage_students_meeting_goal_nationally <- dta.sp$num_students_meeting_goal / sum(dta.sp$num_students_meeting_goal, na.rm=T)
+## add percentage of students not meeting/meeting goal of all students served by the service provider
+dta.sp$percentage_students_not_meeting_goal_of_all_served <- dta.sp$num_students_not_meeting_goal / (dta.sp$num_students_meeting_goal + dta.sp$num_students_not_meeting_goal)
+dta.sp$percentage_students_meeting_goal_of_all_served <- dta.sp$num_students_meeting_goal / (dta.sp$num_students_meeting_goal + dta.sp$num_students_not_meeting_goal)
+
+## order by decreasing number of students not meeting goal
+dta.sp <- dta.sp[order(dta.sp$num_students_not_meeting_goal, decreasing=T),]
+
+
+##**************************************************************************************************************************************************
+## EXTRAPOLATE
+
+## extrapolate by applying the percentage of students not meeting goal to the number of students in the dirty districts
+#dta.sp$extrapolated_additional_students_not_meeting <- round(dta.sp$percentage_students_not_meeting_goal_of_all_served * dta.sp$num_students_dirty, 0)
+#dta.sp$extrapolated_additional_students_not_meeting[which(is.nan(dta.sp$extrapolated_additional_students_not_meeting))] <- 0
+#dta.sp$extrapolated_num_students_not_meeting_goal <- dta.sp$extrapolated_additional_students_not_meeting + dta.sp$num_students_not_meeting_goal
+#sum(dta.sp$extrapolated_num_students_not_meeting_goal) + sum(sub$num_students[sub$district_not_meeting_connectivity == 1], na.rm=T)
+
+## extrapolate by applying the percentage of students meeting goal to the number of students in the dirty districts
+#dta.sp$extrapolated_additional_students_meeting <- round(dta.sp$percentage_students_meeting_goal_of_all_served * dta.sp$num_students_dirty, 0)
+#dta.sp$extrapolated_additional_students_meeting[which(is.nan(dta.sp$extrapolated_additional_students_meeting))] <- 0
+#dta.sp$extrapolated_num_students_meeting_goal <- dta.sp$extrapolated_additional_students_meeting + dta.sp$num_students_meeting_goal
+#sum(dta.sp$extrapolated_num_students_meeting_goal) +  sum(sub$num_students[sub$district_meeting_connectivity == 1], na.rm=T)
+
+## calculate the percentage
+#dta.sp$extrapolated_percentage <- dta.sp$extrapolated_num_students_not_meeting_goal / (dta.sp$extrapolated_num_students_not_meeting_goal + dta.sp$extrapolated_num_students_meeting_goal)
+#dta.sp$extrapolated_percentage <- round(dta.sp$extrapolated_percentage*100, 0)
+
+## reformat the columns
+#dta.sp$percentage_students_not_meeting_goal_nationally <- round(dta.sp$percentage_students_not_meeting_goal_nationally*100, 0)
+#dta.sp$percentage_students_meeting_goal_nationally <- round(dta.sp$percentage_students_meeting_goal_nationally*100, 0)
+#dta.sp$percentage_students_not_meeting_goal_of_all_served <- round(dta.sp$percentage_students_not_meeting_goal_of_all_served*100, 0)
+#dta.sp$percentage_students_meeting_goal_of_all_served <- round(dta.sp$percentage_students_meeting_goal_of_all_served*100, 0)
+
+#dta.sp.publish <- dta.sp[,c('service_provider', 'extrapolated_num_students_not_meeting_goal', 'extrapolated_num_students_meeting_goal', 'extrapolated_percentage')]
+
+
+## take out "NC Office" and "State Replacement"
+not.real.service.providers <- c('NC Office', 'State Replacement ', 'OneNet', 'OneNet ')
+dta.sp <- dta.sp[!dta.sp$service_provider %in% not.real.service.providers,]
+
+##**************************************************************************************************************************************************
+## write out the interim datasets
+
+write.csv(dta.sp, "data/interim/service_provider_aggregated_clean_districts.csv", row.names=F)

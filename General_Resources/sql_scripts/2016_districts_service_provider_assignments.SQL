@@ -1,0 +1,2 @@
+select *
+from public.fy2016_districts_service_provider_assignments_matr
