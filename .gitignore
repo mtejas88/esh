@@ -8,6 +8,8 @@ when a new directory is created
 **/Icon
 ## also ignore all data files
 **/data
+**/.RData
+**/.Rhistory
 
 
 #Shiny/prep_for_Shiny/get_tables.R
