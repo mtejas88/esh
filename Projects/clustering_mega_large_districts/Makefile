@@ -42,11 +42,10 @@ $(CODE_DIR)/figures.R $(CODE_DIR)/out_files/figures.Rout $(FIG_DIR)/visualize_cl
 
 
 ## clean up all generated files
-clean:
+clean_up:
 	@echo "Cleaning up project files and data"	
 	@rm -rf $(CODE_DIR)/out_files/*
 	@rm -rf $(DATA_DIR)/raw/*
 	@rm -rf $(DATA_DIR)/interim/*
 	@rm -rf $(DATA_DIR)/processed/*
 	@rm -rf $(FIG_DIR)/*
-
