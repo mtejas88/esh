@@ -17,35 +17,42 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 ## define variables without any commands
 .PHONY: data sample cluster figures all
 
-data: $(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout $(DATA_DIR)/raw/deluxe_districts_2016.csv $(DATA_DIR)/raw/form_470.csv $(DATA_DIR)/raw/bens.csv
-sample: $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout $(DATA_DIR)/interim/all_districts.csv $(DATA_DIR)/interim/mega_large_districts.csv $(FIG_DIR)/visualize_raw.pdf
-cluster: $(CODE_DIR)/cluster_data.R $(CODE_DIR)/out_files/cluster_data.Rout $(DATA_DIR)/interim/clustered_all_districts.csv $(DATA_DIR)/processed/final_clustered_districts.csv $(DATA_DIR)/processed/aggregated_means_clusters_all_districts.csv $(DATA_DIR)/processed/aggregated_means_clusters_mega_and_large_districts.csv
-figures:$(CODE_DIR)/figures.R $(CODE_DIR)/out_files/figures.Rout $(FIG_DIR)/visualize_clusters.pdf $(FIG_DIR)/visualize_clusters_mega_large.pdf $(FIG_DIR)/distribution_of_cluster_id.pdf $(FIG_DIR)/distribution_of_cluster_id_mega_large.pdf
+data: $(CODE_DIR)/out_files/query_data.Rout
+sample: data $(CODE_DIR)/out_files/munge_data.Rout
+cluster: sample $(CODE_DIR)/out_files/cluster_data.Rout
+figures: cluster $(CODE_DIR)/out_files/figures.Rout
 ## run entire project
 all: data sample cluster figures
 
-$(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout $(DATA_DIR)/raw/deluxe_districts_2016.csv $(DATA_DIR)/raw/form_470.csv $(DATA_DIR)/raw/bens.csv:
+$(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 	@echo "querying data"
 	@R CMD BATCH --no-restore '--args $(GITHUB)' $(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout
 
-$(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout $(DATA_DIR)/interim/all_districts.csv $(DATA_DIR)/interim/mega_large_districts.csv $(FIG_DIR)/visualize_raw.pdf:
+$(CODE_DIR)/out_files/munge_data.Rout: $(CODE_DIR)/munge_data.R
 	@echo "munging data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout
 
-$(CODE_DIR)/cluster_data.R $(CODE_DIR)/out_files/cluster_data.Rout $(DATA_DIR)/interim/clustered_all_districts.csv $(DATA_DIR)/processed/final_clustered_districts.csv $(DATA_DIR)/processed/aggregated_means_clusters_all_districts.csv $(DATA_DIR)/processed/aggregated_means_clusters_mega_and_large_districts.csv:
+$(CODE_DIR)/out_files/cluster_data.Rout: $(CODE_DIR)/cluster_data.R
 	@echo "clustering data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/cluster_data.R $(CODE_DIR)/out_files/cluster_data.Rout
 
-$(CODE_DIR)/figures.R $(CODE_DIR)/out_files/figures.Rout $(FIG_DIR)/visualize_clusters.pdf $(FIG_DIR)/visualize_clusters_mega_large.pdf $(FIG_DIR)/distribution_of_cluster_id.pdf $(FIG_DIR)/distribution_of_cluster_id_mega_large.pdf:
+$(CODE_DIR)/out_files/figures.Rout: $(CODE_DIR)/figures.R
 	@echo "creating figures"
 	@R CMD BATCH --no-restore $(CODE_DIR)/figures.R $(CODE_DIR)/out_files/figures.Rout
 
 
 ## clean up all generated files
-clean_up:
+clean:
 	@echo "Cleaning up project files and data"	
 	@rm -rf $(CODE_DIR)/out_files/*
+	@touch $(CODE_DIR)/out_files/.gitkeep
+	@touch $(DATA_DIR)/.gitkeep
 	@rm -rf $(DATA_DIR)/raw/*
+	@touch $(DATA_DIR)/raw/.gitkeep
 	@rm -rf $(DATA_DIR)/interim/*
+	@touch $(DATA_DIR)/interim/.gitkeep
 	@rm -rf $(DATA_DIR)/processed/*
+	@touch $(DATA_DIR)/processed/.gitkeep
 	@rm -rf $(FIG_DIR)/*
+	@touch $(FIG_DIR)/.gitkeep
+
