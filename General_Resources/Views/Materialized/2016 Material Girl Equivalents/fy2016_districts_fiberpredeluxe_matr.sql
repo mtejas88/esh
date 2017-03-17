@@ -73,6 +73,7 @@ select distinct
 	   	else 'large_no_data'
 	end as fiber_metric_status,
 	include_in_universe_of_districts,
+	include_in_universe_of_districts_all_charters,
 	flag_array,
 	tag_array,
 	num_open_district_flags,
@@ -85,7 +86,6 @@ select distinct
 	meeting_2018_goal_oversub,
 	meeting_2018_goal_no_oversub_fcc_25,
 	at_least_one_line_not_meeting_broadband_goal,
-	bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
 	ia_bw_mbps_total,
 	ia_monthly_cost_total,
@@ -265,7 +265,7 @@ on dpd.esh_id = dspa.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 1/26/2017
+Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

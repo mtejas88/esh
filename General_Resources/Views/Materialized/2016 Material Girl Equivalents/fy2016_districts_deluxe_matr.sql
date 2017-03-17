@@ -43,6 +43,7 @@ select distinct
 	fiber_metric_calc_group,
 	fiber_metric_status,
 	include_in_universe_of_districts,
+	include_in_universe_of_districts_all_charters,
 	flag_array,
 	tag_array,
 	num_open_district_flags,
@@ -55,7 +56,6 @@ select distinct
 	meeting_2018_goal_oversub,
 	meeting_2018_goal_no_oversub_fcc_25,
 	at_least_one_line_not_meeting_broadband_goal,
-	bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
 	ia_bw_mbps_total,
 	ia_monthly_cost_total,
@@ -73,8 +73,8 @@ select distinct
 		else current_known_scalable_campuses
 	end as current_known_scalable_campuses,
 	case
-		when fiber_metric_calc_group = 'extrapolate_to' 
-		then (num_campuses * (1-extrap_percent)) 
+		when fiber_metric_calc_group = 'extrapolate_to'
+		then (num_campuses * (1-extrap_percent))
 		else current_assumed_scalable_campuses
 	end as 	current_assumed_scalable_campuses,
 	case
@@ -83,8 +83,8 @@ select distinct
 		else current_known_unscalable_campuses
 	end as current_known_unscalable_campuses,
 	case
-		when fiber_metric_calc_group = 'extrapolate_to' 
-		then (num_campuses * extrap_percent) 
+		when fiber_metric_calc_group = 'extrapolate_to'
+		then (num_campuses * extrap_percent)
 		else current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
 	sots_known_scalable_campuses,
@@ -150,14 +150,14 @@ select distinct
 	service_provider_assignment
 
 from fy2016_districts_fiberpredeluxe_matr dfpd
-left join state_level_extrap sle 
+left join state_level_extrap sle
 on sle.postal_cd = dfpd.postal_cd
 
 
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 3/14/2017
+Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:

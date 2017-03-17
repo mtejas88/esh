@@ -149,6 +149,34 @@ select  case
           else false
         end as include_in_universe_of_districts,
         case
+          when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
+                  (case
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
+                      else false
+                    end )
+                  --in RI and MA we also include 4's with majority type 1 schools.
+                  or (d."LSTATE" in ('RI', 'MA')
+                      and "TYPE" = '4'
+                      and sc.school_type_1_count/sc.school_count::numeric >= .75 )
+                  --in NY we also include 3's, in VT we only include 3's
+                  or (d."LSTATE" in ('VT', 'NY')
+                      and "TYPE" = '3') )
+          and d."LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
+          and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
+          and ( sc.student_count - sc.student_pk_count  >0
+                or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
+                or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
+                or (eim.entity_id = '946654' and sc_NY.student_count - sc_NY.student_pk_count  >0)
+                or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts
+          and ( (sc.school_count) > 0
+                or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)
+                or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
+                or (eim.entity_id = '946654' and (sc_NY.school_count)>0)
+          and "BOUND" != '2' --closed districts
+            then  true
+          else false
+        end as include_in_universe_of_districts_all_charters,
+        case
           when d."LSTATE" = 'VT' then stf_VT.num_teachers
           when d."LSTATE" = 'MT' then stf_MT.num_teachers
           when eim.entity_id = '946654' then stf_NY.num_teachers
@@ -504,7 +532,7 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 1/27/2017 -- edit to exclude specific MT districts so we could rename them (JH)
+Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
