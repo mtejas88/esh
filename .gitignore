@@ -8,6 +8,7 @@
 Icon
 ## also ignore all data files
 **/data
+!**/data/.gitkeep
 ## and ignore all data and history created by running R in batch
 **/.RData
 **/.Rhistory
