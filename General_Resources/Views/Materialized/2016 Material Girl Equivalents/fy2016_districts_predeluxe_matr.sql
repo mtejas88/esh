@@ -55,6 +55,7 @@ select distinct
 		else true
 	end as exclude_from_wan_cost_analysis,
 	include_in_universe_of_districts,
+	include_in_universe_of_districts_all_charters,
 	flag_array,
 	tag_array,
 	flag_count as num_open_district_flags,
@@ -122,13 +123,6 @@ select distinct
 			then true
 		else false
 	end as at_least_one_line_not_meeting_broadband_goal,
-	case
-		when 'bw_upgrade' = any(tag_array)
-			then true
-		when 'bw_not_upgrade' = any(tag_array)
-			then false
-		else null
-	end as bw_upgrade_indicator,
 	ia_monthly_cost_per_mbps,
 	ia_bandwidth as ia_bw_mbps_total,
 	ia_monthly_cost as ia_monthly_cost_total,
@@ -217,7 +211,7 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 12/13/2016
+Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
