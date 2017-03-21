@@ -304,6 +304,7 @@ on d."UNION"=sc_VT."UNION"
 and d."LSTATE"=sc_VT."LSTATE"
 
 left join ( select  ag131a."LSTREE",
+                    ag131a."LCITY",
                     ag131a."LSTATE",
                     sum(case
                             when flaggable_id is null
@@ -349,8 +350,10 @@ left join ( select  ag131a."LSTREE",
             on eim.entity_id = t.flaggable_id
             where sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
             group by  ag131a."LSTREE",
+                      ag131a."LCITY",
                       ag131a."LSTATE" ) sc_MT
 on d."LSTREE"=sc_MT."LSTREE"
+and d."LCITY"=sc_MT."LCITY"
 and d."LSTATE"=sc_MT."LSTATE"
 
 left join ( select  case
@@ -532,7 +535,7 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters
+Last Modified Date: 3/21/2017 -- update MT smush to smush by both address AND city, not just address
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
