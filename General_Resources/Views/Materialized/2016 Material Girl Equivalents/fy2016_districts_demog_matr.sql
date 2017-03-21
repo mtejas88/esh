@@ -444,6 +444,7 @@ on d."UNION"=stf_VT."UNION"
 and d."LSTATE"=stf_VT."LSTATE"
 
 left join ( select  ag131a."LSTREE",
+                    ag131a."LCITY",
                     ag131a."LSTATE",
                     sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
                         + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
@@ -466,8 +467,10 @@ left join ( select  ag131a."LSTREE",
             from ag131a
             where "LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
             group by  "LSTREE",
+                      "LCITY",
                       "LSTATE" ) stf_MT
 on d."LSTREE"=stf_MT."LSTREE"
+and d."LCITY"=stf_MT."LCITY"
 and d."LSTATE"=stf_MT."LSTATE"
 
 left join ( select  case
@@ -523,7 +526,7 @@ where case --only include the HS district when smushing MT districts (exclude th
                               '3017610','3018240','3018410','3018570','3018870','3000096',
                               '3000090','3020040','3020820','3021060','3021240','3021510',
                               '3021720','3021870','3022080','3022230','3022370','3022750',
-                              '3022790','3023040','3023370','3023520','3023850','3023900',
+                              '3022790','3023040','3023370','3023520','3023900',
                               '3023940','3024150','3000932','3024200','3025020','3024300',
                               '3026070','3026160','3026550','3026640','3027060','3027740',
                               '3027810','3028750','3028140','3028590')
