@@ -7,8 +7,7 @@ frn_data = pd.DataFrame()
 recip_data = pd.DataFrame()
 #outputFile =open#"/Users/jeremyholtzman/Documents/Analysis/Current 2016 471s/combined_test.csv","w")
 
-files = glob.glob("*Current_*.xlsx")
-
+files = glob.glob("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/downloads/*Current_AL*.xlsx")
 
 for f in files:
 	print f
@@ -17,5 +16,5 @@ for f in files:
 	frn_data = frn_data.append(df,ignore_index=True)
 	recip_data = recip_data.append(df2,ignore_index=True)
 	
-frn_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/Current 2016 471s/all_frn.csv", encoding='utf-8')
-recip_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/Current 2016 471s/all_recip.csv", encoding='utf-8')
+frn_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_frn.csv", encoding='utf-8')
+recip_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_recip.csv", encoding='utf-8')
