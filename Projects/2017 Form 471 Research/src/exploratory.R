@@ -6,6 +6,15 @@
 
 rm(list=ls())
 
+packages.to.install <- c("gridExtra")
+for (i in 1:length(packages.to.install)){
+  if (!packages.to.install[i] %in% rownames(installed.packages())){
+    install.packages(packages.to.install[i])
+  }
+}
+
+library(gridExtra)
+
 ##**************************************************************************************************************************************************
 ## read in data
 
@@ -35,10 +44,10 @@ print(paste(num_states_and_dc_applied,'states (including DC) have applied for a 
 print(paste(num_frns,'distinct FRNS across', num_frn_line_items, 'frn line items'))
 
 
-barplot(table(frn_line_items$postal_cd, useNA = 'ifany'))
-barplot(table(frn_line_items$function., useNA = 'ifany'))
-barplot(table(frn_line_items$type_of_product, useNA = 'ifany'))
-barplot(table(frn_line_items$purpose, useNA = 'ifany'))
+#barplot(table(frn_line_items$postal_cd, useNA = 'ifany'))
+#barplot(table(frn_line_items$function., useNA = 'ifany'))
+#barplot(table(frn_line_items$type_of_product, useNA = 'ifany'))
+#barplot(table(frn_line_items$purpose, useNA = 'ifany'))
 
 connect_types <- unique(frn_line_items$type_of_product)
 connect_types_max <- aggregate(frn_line_items$bandwidth_in_mbps, by=list(frn_line_items$type_of_product), FUN = max, na.rm=T)
@@ -55,10 +64,10 @@ pdf("figures/connect_type_bandwidths.pdf",width = 12,height = 12)
 grid.table(connect_types_df)
 dev.off()
 
-barplot(connect_types_max$x, names = c(connect_types_max$Group.1))
-boxplot(frn_line_items$bandwidth_in_mbps ~ frn_line_items$type_of_product, data=frn_line_items)
 
-hist(frn_line_items$monthly_quantity, xlim=c(0,10), breaks = c(0,1,2,3,4,5,6,7,8,9,10,7000))
+#boxplot(frn_line_items$bandwidth_in_mbps ~ frn_line_items$type_of_product, data=frn_line_items)
+
+#hist(frn_line_items$monthly_quantity, xlim=c(0,10), breaks = c(0,1,2,3,4,5,6,7,8,9,10,7000))
 
 ## Count Monthly Quantity and monthly cost when = 0
 zero_quantity <- nrow(frn_line_items[frn_line_items$monthly_quantity==0,])
@@ -66,25 +75,25 @@ zero_recurring_cost <- nrow(frn_line_items[frn_line_items$monthly_recurring_unit
 
 #counting applicants of broadband by applicant type
 num_applications <- table(basic_informations$applicant_type)
-barplot(num_applications)
+#barplot(num_applications)
 
 #summing funding requests of broadband by applicant type
 applicant_funding <- aggregate(basic_informations$total_funding_year_commitment_amount_request, by = list(basic_informations$applicant_type), FUN = sum, na.rm=T)
-barplot(applicant_funding$x, names = c(applicant_funding$Group.1))
+#barplot(applicant_funding$x, names = c(applicant_funding$Group.1))
 broadband_funding <- sum(applicant_funding$x)
 
 #counting applicants of broadband by day
 num_applications_day <- table(basic_informations$certified_timestamp)
-barplot(num_applications_day)
+#barplot(num_applications_day)
 
 #summing funding requests of broadband by day
 applicant_funding_day <- aggregate(basic_informations$total_funding_year_commitment_amount_request, by = list(basic_informations$certified_timestamp), FUN = sum, na.rm=T)
 applicant_funding_day$cumulative_funding <- cumsum(applicant_funding_day$x)
-plot(applicant_funding_day$Group.1, applicant_funding_day$cumulative_funding, type = 'l', xlab = 'date', ylab = 'funding requests', main = 'cumulative sum of broadband funding requests by date')
+#plot(applicant_funding_day$Group.1, applicant_funding_day$cumulative_funding, type = 'l', xlab = 'date', ylab = 'funding requests', main = 'cumulative sum of broadband funding requests by date')
 
 #counting applicants of all services by applicant type
 num_applications_all_services <- table(all_basic_informations$applicant_type)
-barplot(num_applications_all_services)
+#barplot(num_applications_all_services)
 
 #summing funding requests of all services by applicant type
 all_applicant_funding <- aggregate(all_basic_informations$total_funding_year_commitment_amount_request, by=list(all_basic_informations$applicant_type), FUN = sum, na.rm=T)
@@ -95,12 +104,12 @@ all_funding <- sum(all_applicant_funding$x)
 
 #counting applicants of all services by day
 num_applications_all_services_day <- table(all_basic_informations$certified_timestamp)
-plot(num_applications_all_services_day, xlab = 'date', ylab = 'num applications', main = 'number of all applicants by date')
+#plot(num_applications_all_services_day, xlab = 'date', ylab = 'num applications', main = 'number of all applicants by date')
 
 #summing funding requests of all services by day
 all_applicant_funding_day <- aggregate(all_basic_informations$total_funding_year_commitment_amount_request, by=list(all_basic_informations$certified_timestamp), FUN = sum, na.rm=T)
 all_applicant_funding_day$cumulative_funding <- cumsum(all_applicant_funding_day$x)
-plot(all_applicant_funding_day$Group.1, all_applicant_funding_day$cumulative_funding, type = 'l', xlab = 'date', ylab = 'funding requests', main = 'cumulative sum of all funding requests by date')
+#plot(all_applicant_funding_day$Group.1, all_applicant_funding_day$cumulative_funding, type = 'l', xlab = 'date', ylab = 'funding requests', main = 'cumulative sum of all funding requests by date')
 
 #plotting broadband and all funding requests by day
 pdf("figures/broadband_and_all_funding.pdf",width = 8,height = 8)

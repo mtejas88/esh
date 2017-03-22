@@ -8,6 +8,7 @@ export
 PROJ_DIR = .
 DATA_DIR = $(PROJ_DIR)/data
 CODE_DIR = $(PROJ_DIR)/src
+FIGURES_DIR = $(PROJ_DIR)/figures
 
 ## list R files
 RFILES := $(wildcard $(CODE_DIR)/*.R)
@@ -18,8 +19,8 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 
 data: $(CODE_DIR)/out_files/query_data.Rout
 sample: data $(CODE_DIR)/out_files/munge_data.Rout
-## run entire project
-all: data sample
+explore: sample $(CODE_DIR)/out_files/exploratory.Rout
+all: data sample explore
 
 $(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 	@echo "querying data"
@@ -28,6 +29,10 @@ $(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 $(CODE_DIR)/out_files/munge_data.Rout: $(CODE_DIR)/munge_data.R
 	@echo "munging data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout
+
+$(CODE_DIR)/out_files/exploratory.Rout: $(CODE_DIR)/exploratory.R
+	@echo "exploring data"
+	@R CMD BATCH --no-restore $(CODE_DIR)/exploratory.R $(CODE_DIR)/out_files/exploratory.Rout
 
 ## clean up all generated files
 clean:
@@ -39,19 +44,8 @@ clean:
 	@touch $(DATA_DIR)/raw/.gitkeep
 	@rm -rf $(DATA_DIR)/interim/*
 	@touch $(DATA_DIR)/interim/.gitkeep
-	@rm -rf $(DATA_DIR)/processed/*
-	@touch $(DATA_DIR)/processed/.gitkeep
+	@rm -rf $(FIGURES_DIR)/*
+	@touch $(FIGURES_DIR)/.gitkeep
 
 
-## --------------- OLD CODE -------------------
-#data: $(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout $(DATA_DIR)/raw/deluxe_districts_2016.csv $(DATA_DIR)/raw/form_470.csv $(DATA_DIR)/raw/bens.csv
-#sample: $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout $(DATA_DIR)/processed/470_status.csv $(DATA_DIR)/interim/470_ia_status.csv $(DATA_DIR)/interim/470_all.csv
-
-#$(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout $(DATA_DIR)/raw/deluxe_districts_2016.csv $(DATA_DIR)/raw/form_470.csv $(DATA_DIR)/raw/bens.csv:
-#	@echo "querying data"
-#	@R CMD BATCH --no-restore '--args $(GITHUB)' $(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout
-
-#$(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout $(DATA_DIR)/processed/470_status.csv $(DATA_DIR)/interim/470_ia_status.csv $(DATA_DIR)/interim/470_all.csv:
-#	@echo "munging data"
-#	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout
 
