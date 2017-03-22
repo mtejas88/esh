@@ -1,0 +1,8 @@
+pip install os
+pip install dotenv
+pip install pandas
+pip install numpy
+pip install psycopg2
+pip install requests
+pip install collections
+pip install math
