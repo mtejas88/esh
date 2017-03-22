@@ -1,0 +1,55 @@
+
+R version 3.3.0 (2016-05-03) -- "Supposedly Educational"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## =========================================
+> ##
+> ## MUNGE DATA: Subset and Clean data
+> ##
+> ## =========================================
+> 
+> ## Clearing memory
+> rm(list=ls())
+> 
+> ##**************************************************************************************************************************************************
+> ## READ IN DATA
+> 
+> frn.2016 <- read.csv("data/raw/frn_line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+> line.items.2016 <- read.csv("data/raw/line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+> 
+> ##**************************************************************************************************************************************************
+> ## FORMAT DATA
+> 
+> ## append "clean" to each variable name in line.items
+> names(line.items.2016)[names(line.items.2016) != 'id'] <- paste(names(line.items.2016)[names(line.items.2016) != 'id'], "clean", sep='.')
+> 
+> ## first, merge together the datasets
+> dta <- merge(frn.2016, line.items.2016, by='id', all.x=T)
+> 
+> ## for the first attempt at ML, subset the dataset to the dirty columns plus the clean version of connect_type
+> dta.connect.type <- dta[,c("connect_type.clean", names(dta)[!names(dta) %in% names(dta)[grepl(".clean", names(dta))]])]
+> 
+> ##**************************************************************************************************************************************************
+> ## write out the interim datasets
+> 
+> write.csv(dta, "data/interim/combined_raw_and_clean_line_items_2016.csv", row.names=F)
+> write.csv(dta.connect.type, "data/interim/ml_connect_type_2016.csv", row.names=F)
+> 
+> proc.time()
+   user  system elapsed 
+ 47.660   1.763  50.345 
