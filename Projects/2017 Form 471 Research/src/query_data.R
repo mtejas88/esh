@@ -20,7 +20,7 @@ library(dotenv)
 library(gridExtra)
 
 #this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/Analysis/ficher/'
+#github_path <- '~/Documents/Analysis/ficher/'
 setwd(paste(github_path, 'Projects/2017 Form 471 Research', sep=''))
 
 
