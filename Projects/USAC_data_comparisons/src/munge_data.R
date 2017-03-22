@@ -143,6 +143,8 @@ combined$all_match <- ifelse((combined$connect_type_match_override == TRUE | is.
 combined$cost_differences <- (combined$line_item_recurring_elig_cost.y - combined$line_item_recurring_elig_cost.x) / combined$line_item_recurring_elig_cost.x
 combined$cost_differences[combined$cost_differences == 'Inf'] <- NA
 
+combined$bandwidth_differences <- (combined$bandwidth_in_mbps.y - combined$bandwidth_in_mbps.x) / combined$bandwidth_in_mbps.x
+
 ##**************************************************************************************************************************************************
 ## formatting and subsetting current allocations
 current_alloc_mod <- current_allocations[,c("BEN","Line.Item","Quantity")]

@@ -55,7 +55,7 @@ dev.off()
 
 barplot(changes_to_plot, names.arg = c("connect type","connect category","purpose","bandwidth","num lines","cost"), main = "Number of Changes by Field", cex.names=1, col='blue')
 
-#NEED TO FIX
+#bandwidth differences
 hist(combined$bandwidth_differences, xlim=c(-1,2), breaks = c(-1,-.8,-.6,-.4,-.2,0,.2,.4,.6,.8,1,7000), freq = TRUE)
 
 #which purpose fields were most accurate?
