@@ -15,7 +15,7 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 
 
 ## define variables without any commands
-.PHONY: data sample all
+.PHONY: data sample explore all
 
 data: $(CODE_DIR)/out_files/query_data.Rout
 sample: data $(CODE_DIR)/out_files/munge_data.Rout

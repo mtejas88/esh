@@ -44,10 +44,10 @@ print(paste(num_states_and_dc_applied,'states (including DC) have applied for a 
 print(paste(num_frns,'distinct FRNS across', num_frn_line_items, 'frn line items'))
 
 
-#barplot(table(frn_line_items$postal_cd, useNA = 'ifany'))
-#barplot(table(frn_line_items$function., useNA = 'ifany'))
-#barplot(table(frn_line_items$type_of_product, useNA = 'ifany'))
-#barplot(table(frn_line_items$purpose, useNA = 'ifany'))
+table(frn_line_items$postal_cd, useNA = 'ifany')
+table(frn_line_items$function., useNA = 'ifany')
+table(frn_line_items$type_of_product, useNA = 'ifany')
+table(frn_line_items$purpose, useNA = 'ifany')
 
 connect_types <- unique(frn_line_items$type_of_product)
 connect_types_max <- aggregate(frn_line_items$bandwidth_in_mbps, by=list(frn_line_items$type_of_product), FUN = max, na.rm=T)
@@ -62,6 +62,17 @@ connect_types_df <- merge(x = connect_types_df, y = connect_types_max, by='Conne
 #create a table of the connect types min, med, max instead of plots
 pdf("figures/connect_type_bandwidths.pdf",width = 12,height = 12)
 grid.table(connect_types_df)
+dev.off()
+
+#Want to look at distinct function and type of product combinations
+connect_cat_and_types <- frn_line_items[,c('function.','type_of_product')]
+connect_cat_and_types <- data.frame(table(connect_cat_and_types))
+connect_cat_and_types <- connect_cat_and_types[connect_cat_and_types$Freq > 0,]
+connect_cat_and_types <- connect_cat_and_types[order(connect_cat_and_types$function.,connect_cat_and_types$type_of_product),]
+
+#create a table of broadband functions and connect types
+pdf("figures/functions_and_connect_types.pdf",width = 12,height = 12)
+grid.table(connect_cat_and_types)
 dev.off()
 
 
