@@ -10,7 +10,7 @@ os.chdir('/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_com
 frn_data = pd.DataFrame()
 recip_data = pd.DataFrame()
 
-files = glob.glob("*downloads/*Current_*.xlsx")
+files = glob.glob("*downloads/*Current_AL*.xlsx")
 
 
 for f in files:

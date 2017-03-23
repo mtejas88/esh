@@ -29,15 +29,15 @@ $(CODE_DIR)/combining_current.py:
 	@echo "combining USAC files"
 	@python combining_current.py
 
-$(CODE_DIR)/out_files/query_data.Rout:
+$(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 	@echo "querying data"
 	@R CMD BATCH --no-restore '--args $(GITHUB)' $(CODE_DIR)/query_data.R $(CODE_DIR)/out_files/query_data.Rout
 
-$(CODE_DIR)/out_files/munge_data.Rout:
+$(CODE_DIR)/out_files/munge_data.Rout: $(CODE_DIR)/munge_data.R
 	@echo "munging data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout
 
-$(CODE_DIR)/out_files/exploratory.Rout:
+$(CODE_DIR)/out_files/exploratory.Rout: $(CODE_DIR)/exploratory.R
 	@echo "exploring data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/out_files/exploratory.Rout
 
