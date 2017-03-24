@@ -5,12 +5,15 @@ import csv
 import os
 
 #set working directory
-os.chdir('/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons')
+print os.getcwd()
+#os.chdir('../')
+print os.getcwd()
+#os.chdir('/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons')
 
 frn_data = pd.DataFrame()
 recip_data = pd.DataFrame()
 
-files = glob.glob("*downloads/*Current_AL*.xlsx")
+files = glob.glob("*downloads/*Current_*.xlsx")
 
 
 for f in files:
@@ -22,5 +25,5 @@ for f in files:
 	
 print os.getcwd()
 print 'bye'
-#frn_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_frn.csv", encoding='utf-8')
-#recip_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_recip.csv", encoding='utf-8')
+frn_data.to_csv("data/interim/all_frn.csv", encoding='utf-8')
+recip_data.to_csv("data/interim/all_recip.csv", encoding='utf-8')

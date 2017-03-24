@@ -18,9 +18,9 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 ## define variables without any commands
 .PHONY: test data sample explore all
 
-test:$(CODE_DIR)/out_files/combining_current.txt
+usac:$(CODE_DIR)/out_files/combining_current.txt
 data: $(CODE_DIR)/out_files/query_data.Rout
-sample: data $(CODE_DIR)/out_files/munge_data.Rout
+sample: usac data $(CODE_DIR)/out_files/munge_data.Rout
 explore: sample $(CODE_DIR)/out_files/exploratory.Rout
 ## run entire project
 all: data sample
