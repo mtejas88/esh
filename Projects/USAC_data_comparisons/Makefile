@@ -18,16 +18,16 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 ## define variables without any commands
 .PHONY: test data sample explore all
 
-test: $(CODE_DIR)/combining_current.py
+test:$(CODE_DIR)/out_files/combining_current.txt
 data: $(CODE_DIR)/out_files/query_data.Rout
 sample: data $(CODE_DIR)/out_files/munge_data.Rout
 explore: sample $(CODE_DIR)/out_files/exploratory.Rout
 ## run entire project
 all: data sample
 
-$(CODE_DIR)/combining_current.py:
+$(CODE_DIR)/out_files/combining_current.txt: $(CODE_DIR)/combining_current.py
 	@echo "combining USAC files"
-	@python combining_current.py
+	@python $(CODE_DIR)/combining_current.py > $(CODE_DIR)/out_files/combining_current.txt
 
 $(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 	@echo "querying data"

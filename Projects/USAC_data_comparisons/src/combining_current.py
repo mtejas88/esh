@@ -21,5 +21,6 @@ for f in files:
 	recip_data = recip_data.append(df2,ignore_index=True)
 	
 print os.getcwd()
+print 'bye'
 #frn_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_frn.csv", encoding='utf-8')
 #recip_data.to_csv("/Users/jeremyholtzman/Documents/Analysis/ficher/Projects/USAC_data_comparisons/data/interim/all_recip.csv", encoding='utf-8')
