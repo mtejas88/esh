@@ -1,4 +1,4 @@
-source("04_identify_outliers.R")
+source("scripts/04_identify_outliers.R")
 
 ###
 # use case #1 
