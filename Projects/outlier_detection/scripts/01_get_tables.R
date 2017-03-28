@@ -21,7 +21,7 @@ library(dotenv)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/Analysis/ficher/'
+#github_path <- '~/Documents/Analysis/ficher/'
 setwd(paste(github_path, 'Projects/outlier_detection', sep=''))
 
 
