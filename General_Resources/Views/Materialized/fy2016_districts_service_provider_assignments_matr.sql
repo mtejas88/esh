@@ -1,7 +1,8 @@
 select  recipient_sp_bw_rank.recipient_id as esh_id, 
-reporting_name,
+reporting_name, 
 recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
 recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
+
   from (
     select  *,
             row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
@@ -26,7 +27,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       left join public.fy2016_districts_predeluxe_matr dd
       on sr.recipient_id = dd.esh_id
       where purpose in ('Upstream', 'Internet')
-      and inclusion_status = 'clean_with_cost'
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
       and recipient_include_in_universe_of_districts
       and district_type = 'Traditional'
       and recipient_exclude_from_ia_analysis = false
@@ -57,7 +58,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       left join public.fy2016_districts_predeluxe_matr dd
       on sr.recipient_id = dd.esh_id
       where purpose in ('Upstream', 'Internet')
-      and inclusion_status = 'clean_with_cost'
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
       and recipient_include_in_universe_of_districts
       and district_type = 'Traditional'
       and recipient_exclude_from_ia_analysis = false
@@ -69,13 +70,13 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
   on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
   where bw_rank = 1
   and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
-  --remove districts where their service providers bandwidth isn't fully upstream or internet
-  and (bandwidth = upstream_bandwidth or upstream_bandwidth = 0)
+
 
 /*
 Author: Justine Schott
 Created On Date: 1/26/2017
-Last Modified Date: 3/14/2017 - added primary sp bandwidth and % of districts bw
+Last Modified Date: 3/30/2017 - - included clean_no_cost line items. Included districts whose primary
+      service provider gives them IA and upstream
 Name of QAing Analyst(s):
 Purpose: Service provider assignment as done in 2016 SotS
 Methodology:
