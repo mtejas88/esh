@@ -47,6 +47,8 @@ querydb <- function(query_name){
 }
 
 districts_deluxe <- querydb('src/districts_deluxe.sql')
+total_funding_by_district <- querydb('src/total_funding_by_district.sql')
+service_providers <- querydb('src/service_providers.sql')
 
 ## disconnect from database
 dbDisconnect(con)
@@ -54,3 +56,5 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 
 write.csv(districts_deluxe, 'data/raw/2016_districts.csv', row.names = FALSE)
+write.csv(total_funding_by_district, 'data/raw/2016_total_funding_by_district.csv', row.names = FALSE)
+write.csv(service_providers, 'data/raw/service_providers.csv', row.names = FALSE)
