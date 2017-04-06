@@ -218,257 +218,273 @@ bids_connect_copper_summ <- summarise(bids_connect_copper_summ,
                                       pctile_50 = quantile(num_bids_received, probs=0.5),
                                       pctile_75 = quantile(num_bids_received, probs=0.75),
                                       avg = mean(num_bids_received))
+##chart theme
+theme_esh <- function(){
+  theme(
+    text = element_text(color="#666666", size=18),
+    plot.title = element_text(lineheight=.8, size=12,color="#666666"),
+    axis.title.x = element_text(color="#666666", size=15),
+    panel.grid.major = element_line(color = "light grey"),
+    panel.grid.major.x = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+}
 
 ##fiber charts
-fiber_target_0_bids <- ggplot(data=bids_fiber_summ, aes(x=fiber_target_status, y=pct_0_bids)) + 
+fiber_target_0_bids <- ggplot(data=bids_fiber_summ, aes(x=fiber_target_status, y=pct_0_bids)) +
+  geom_text(data=bids_fiber_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1) +
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_fiber_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .15, label = paste0(round(bids_fiber_summ$pct_0_bids[2]/bids_fiber_summ$pct_0_bids[1],0), "x"),
            colour = "red", size = 8)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(text = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 0 Bids") +
+  theme_esh() 
+
 fiber_target_1_bid <- ggplot(data=bids_fiber_summ, aes(x=fiber_target_status, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_fiber_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_fiber_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .4, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bid") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(text = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 1 Bid")  +
+  theme_esh() 
 ##locale charts
 locale_0_bids <- ggplot(data=bids_locale_summ, aes(x=locale_cat, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_locale_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_locale_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(text = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 0 Bids") +
+  theme_esh() 
 locale_1_bid <- ggplot(data=bids_locale_summ, aes(x=locale_cat, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_locale_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_locale_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .45, label = paste0(round(bids_locale_summ$pct_1_bid[1]/bids_locale_summ$pct_1_bid[2],1), "x"),
            colour = "red", size = 8)+
-  ggtitle("Frequency of\n1 Bid") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(text = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 1 Bid") +
+  theme_esh()  
 ##bw goal meeting charts
 bw_goal_0_bids <- ggplot(data=bids_bw_goal_summ, aes(x=meeting_2014_goal_no_oversub, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_bw_goal_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_bw_goal_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="Meeting Bandwidth Goals", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 0 Bids") +
+  theme_esh()  
 bw_goal_1_bid <- ggplot(data=bids_bw_goal_summ, aes(x=meeting_2014_goal_no_oversub, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_bw_goal_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_bw_goal_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="Meeting Bandwidth Goals", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .4, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=18)) 
+  ggtitle("Frequency of 1 Bid") +
+  theme_esh() 
 ##afford goal charts
 afford_goal_0_bids <- ggplot(data=bids_afford_goal_summ, aes(x=meeting_knapsack_affordability_target, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_afford_goal_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_afford_goal_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="Meeting Afford Goals", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=18))
+  ggtitle("Frequency of 0 Bids") +
+  theme_esh() 
 afford_goal_1_bid <- ggplot(data=bids_afford_goal_summ, aes(x=meeting_knapsack_affordability_target, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_afford_goal_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_afford_goal_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="Meeting Afford Goals", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .4, label = "insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=20,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=18))
-
+  ggtitle("Frequency of 1 Bid") +
+  theme_esh() 
 ##purpose charts
 internet_0_bids <- ggplot(data=bids_purpose_internet_summ, aes(x=internet_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_internet_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_internet_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Internet", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_internet_summ$pct_0_bids[2]/bids_purpose_internet_summ$pct_0_bids[1],1), "x"),
            colour = "red", size = 6)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 internet_1_bid <- ggplot(data=bids_purpose_internet_summ, aes(x=internet_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_internet_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_internet_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Internet", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .4,  label="insignificant",
+  annotate("text", x = 1.5, y = .45,  label="insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 1 Bid")  + 
+  theme_esh()
 upstream_0_bids <- ggplot(data=bids_purpose_upstream_summ, aes(x=upstream_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_upstream_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_upstream_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Upstream", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_upstream_summ$pct_0_bids[1]/bids_purpose_upstream_summ$pct_0_bids[2],1), "x"),
            colour = "red", size = 6)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 0 Bids")  + 
+  theme_esh()
 upstream_1_bid <- ggplot(data=bids_purpose_upstream_summ, aes(x=upstream_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_upstream_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_upstream_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Upstream", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .4,  label="insignificant",
+  annotate("text", x = 1.5, y = .45,  label="insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
 wan_0_bids <- ggplot(data=bids_purpose_wan_summ, aes(x=wan_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_wan_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_wan_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has WAN", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_wan_summ$pct_0_bids[1]/bids_purpose_wan_summ$pct_0_bids[2],1), "x"),
            colour = "red", size = 6)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 wan_1_bid <- ggplot(data=bids_purpose_wan_summ, aes(x=wan_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_wan_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_wan_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has WAN", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .4,  label="insignificant",
+  annotate("text", x = 1.5, y = .45,  label="insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
 backbone_0_bids <- ggplot(data=bids_purpose_backbone_summ, aes(x=backbone_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Backbone", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_backbone_summ$pct_0_bids[1]/bids_purpose_backbone_summ$pct_0_bids[2],1), "x"),
            colour = "red", size = 6)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 backbone_1_bid <- ggplot(data=bids_purpose_backbone_summ, aes(x=backbone_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has Backbone", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .4,  label=paste0(round(bids_purpose_backbone_summ$pct_1_bid[1]/bids_purpose_backbone_summ$pct_1_bid[2],1), "x"),
            colour = "red", size = 6)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
 isp_0_bids <- ggplot(data=bids_purpose_isp_summ, aes(x=isp_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_isp_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_isp_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has ISP", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .43,  label="insignificant",
+  annotate("text", x = 1.5, y = .15,  label="insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n0 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 isp_1_bid <- ggplot(data=bids_purpose_isp_summ, aes(x=isp_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_isp_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_purpose_isp_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
   labs(x="FRN has ISP", y="") +
   geom_hline(yintercept=0, size=0.4, color="black")+
   annotate("text", x = 1.5, y = .43,  label="insignificant",
            colour = "#009296", size = 4)+
-  ggtitle("Frequency of\n1 Bids") + 
-  theme(plot.title = element_text(lineheight=.8, size=12,color="#666666")) +
-  theme(axis.title.x = element_text(color="#666666", size=10))
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
 ##connect charts
 fiber_0_bids <- ggplot(data=bids_connect_fiber_summ, aes(x=fiber_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_fiber_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
-  scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
-  labs(title="0 Bids", x="fiber in FRN", y="Probability") +
-  geom_hline(yintercept=0, size=0.4, color="black")
+  geom_text(data=bids_connect_fiber_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
+  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+  labs(x="Fiber in FRN", y="") +
+  geom_hline(yintercept=0, size=0.4, color="black")+
+  annotate("text", x = 1.5, y = .15,  label="insignificant",
+           colour = "#009296", size = 4)+
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 fiber_1_bid <- ggplot(data=bids_connect_fiber_summ, aes(x=fiber_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_fiber_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
-  scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
-  labs(title="1 Bid", x="fiber in FRN", y="Probability") +
-  geom_hline(yintercept=0, size=0.4, color="black")
+  geom_text(data=bids_connect_fiber_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
+  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+  labs(x="Fiber in FRN", y="") +
+  geom_hline(yintercept=0, size=0.4, color="black")+
+  annotate("text", x = 1.5, y = .45,  label="insignificant",
+           colour = "#009296", size = 4)+
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
+
+paste0(round(bids_connect_cable_summ$pct_1_bid[2]/bids_connect_cable_summ$pct_1_bid[1],1), "x")
+paste0(round(bids_connect_cable_summ$pct_0_bids[2]/bids_connect_cable_summ$pct_0_bids[1],1), "x")
+
+
 cable_0_bids <- ggplot(data=bids_connect_cable_summ, aes(x=cable_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_cable_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
-  scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
-  labs(title="0 Bids", x="cable in FRN", y="Probability") +
-  geom_hline(yintercept=0, size=0.4, color="black")
+  geom_text(data=bids_connect_cable_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
+  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+  labs(x="Cable in FRN", y="") +
+  geom_hline(yintercept=0, size=0.4, color="black")+
+  annotate("text", x = 1.5, y = .2,  label=paste0(round(bids_connect_cable_summ$pct_0_bids[2]/bids_connect_cable_summ$pct_0_bids[1],1), "x"),
+           colour = "red", size = 6)+
+  ggtitle("Frequency of 0 Bids") + 
+  theme_esh()
 cable_1_bid <- ggplot(data=bids_connect_cable_summ, aes(x=cable_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_cable_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
-  scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
-  labs(title="1 Bid", x="cable in FRN", y="Probability") +
-  geom_hline(yintercept=0, size=0.4, color="black")
+  geom_text(data=bids_connect_cable_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
+  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+  labs(x="Cable in FRN", y="") +
+  geom_hline(yintercept=0, size=0.4, color="black")+
+  annotate("text", x = 1.5, y = .4,  label="insignificant",
+           colour = "#009296", size = 4)+
+  ggtitle("Frequency of 1 Bid") + 
+  theme_esh()
+
+##WIP!!!!
 copper_0_bids <- ggplot(data=bids_connect_copper_summ, aes(x=copper_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
   labs(title="0 Bids", x="copper in FRN", y="Probability") +
   geom_hline(yintercept=0, size=0.4, color="black")
 copper_1_bid <- ggplot(data=bids_connect_copper_summ, aes(x=copper_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
   labs(title="1 Bid", x="copper in FRN", y="Probability") +
   geom_hline(yintercept=0, size=0.4, color="black")
 fixedwireless_0_bids <- ggplot(data=bids_connect_fixedwireless_summ, aes(x=fixed_wireless_indicator, y=pct_0_bids)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_fixedwireless_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_connect_fixedwireless_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
   labs(title="0 Bids", x="fixedwireless in FRN", y="Probability") +
   geom_hline(yintercept=0, size=0.4, color="black")
 fixedwireless_1_bid <- ggplot(data=bids_connect_fixedwireless_summ, aes(x=fixed_wireless_indicator, y=pct_1_bid)) + 
   geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_fixedwireless_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=1)+ 
+  geom_text(data=bids_connect_fixedwireless_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+ 
   scale_y_continuous(labels = percent_format(), limits = c(0, 1))+
   labs(title="1 Bid", x="fixedwireless in FRN", y="Probability") +
   geom_hline(yintercept=0, size=0.4, color="black")
@@ -496,12 +512,18 @@ png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2
 grid.arrange(bw_goal_0_bids, bw_goal_1_bid, afford_goal_0_bids, afford_goal_1_bid, ncol=2, nrow=2)
 dev.off()
 
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/purposeplot.png",
+png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/purposeplotsig.png",
     width=1000,
     height=796,
     res=120)
-grid.arrange(internet_0_bids, upstream_0_bids, wan_0_bids, isp_0_bids, backbone_0_bids, 
-             internet_1_bid, upstream_1_bid, wan_1_bid, isp_1_bid, backbone_1_bid, ncol=5, nrow=2)
+grid.arrange(internet_0_bids, upstream_0_bids, wan_0_bids, backbone_0_bids, backbone_1_bid, ncol=3, nrow=2)
+dev.off()
+
+png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/purposeplotinsig.png",
+    width=1000,
+    height=796,
+    res=120)
+grid.arrange(internet_1_bid, upstream_1_bid, wan_1_bid, isp_1_bid, isp_0_bids, ncol=3, nrow=2)
 dev.off()
 
 png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/connectplot.png",
