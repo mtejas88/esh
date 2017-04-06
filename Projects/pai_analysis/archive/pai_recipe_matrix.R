@@ -247,7 +247,7 @@ districts_display$district_budget_pai <- as.numeric(districts_display$district_b
 districts_display$ia_current_oop <- (1-districts_display$adj_c1_discount_rate)*(districts_display$ia_monthly_cost_total*12)
 
 ##**************************************************************************************************************************************************
-#Merging tables, and craeting TODAY model
+#Merging tables, and creating TODAY model
 
 #updating ia_monthly_cost total and wan_monthly_cost_total based on total funding by district (clean and dirty)
 districts_display <- merge(x = districts_display, y = total_funding_by_district, by='esh_id')
