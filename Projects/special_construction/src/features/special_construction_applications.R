@@ -29,6 +29,9 @@ speKC.frns$comment <- ifelse(is.na(speKC.frns$Fiber.Type), '', 'include - from J
 
 ##assume cancelled line items were not always on Joe's radar
 ##assume line items not in DRT are cancelled per DRT instructions
+##https://data.usac.org/publicreports/FRN/Status/FundYear
+## The database used by this tool contains only non-canceled applications that meet the window filing
+## requirements for that funding year.
 speKC.frns$comment <- ifelse(!(speKC.frns$comment == ''), 
                              speKC.frns$comment,
                         ifelse(speKC.frns$frn_status == 'Cancelled' | speKC.frns$frn_status == '', 
