@@ -9,7 +9,6 @@ rm(list=ls())
 
 args = commandArgs(trailingOnly=TRUE)
 github_path <- args[1]
-github_path <- "~/Documents/ESH-Code/ficher/"
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -25,11 +24,8 @@ library(dotenv)
 options(java.parameters = "-Xmx4g" )
 
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
-
-## source function to correct dataset
-source(paste(github_path, "General_Resources/common_functions/correct_dataset.R", sep=""))
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
@@ -46,14 +42,8 @@ querydb <- function(query_name){
   data <- dbGetQuery(con, query)
   return(data)
 }
-## raw line item data (as it comes in from USAC)
-frn.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
-frn.line.items.2016 <- correct.dataset(frn.line.items.2016, sots.flag=0, services.flag=0)
-frn.meta.data.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frns.SQL", sep=""))
-frn.meta.data.2016 <- correct.dataset(frn.meta.data.2016, sots.flag=0, services.flag=0)
-## corrected line item data
-line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
-line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
+
+dta <- querydb("src/data_creation/frns_with_district_info.sql")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -61,6 +51,4 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(frn.line.items.2016, "data/raw/frn_line_items_2016.csv", row.names=F)
-write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
-write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
+write.csv(dta, "data/raw/frns_with_district_info.csv", row.names=F)
