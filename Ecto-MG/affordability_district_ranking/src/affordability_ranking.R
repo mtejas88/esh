@@ -4,7 +4,7 @@
 ##
 ## =========================================
 
-affordability_ranking <- function(dta){
+affordability_ranking <- function(dta, cost){
   
   ## subset to clean districts
   dta <- dta[dta$exclude_from_ia_analysis == FALSE,]
@@ -62,23 +62,45 @@ affordability_ranking <- function(dta){
   }
   
   dta <- three_datasets_for_real(dta)
-  
-  ## examine the rest of the districts
-  dta.afford <- dta[which(dta$ia_monthly_cost_total >= 700),]
-  dta.afford <- dta.afford[,c('esh_id', 'target_bandwidth', 'ia_bw_mbps_total', 'ia_monthly_cost_total')]
-  ## add in free internet
-  dta.afford <- rbind(dta.afford, free.internet)
-  
+  ## subset the dataset
+  dta <- dta[,c('esh_id', 'target_bandwidth', 'ia_bw_mbps_total', 'ia_monthly_cost_total', 'ia_monthly_cost_per_mbps')]
   ## calculate difference between target bw and total bw the district is currently receiving
-  dta.afford$diff.bw <- dta.afford$target_bandwidth - dta.afford$ia_bw_mbps_total
-  dta.afford$diff.bw.perc <- round(dta.afford$diff.bw / dta.afford$target_bandwidth, 2)
+  dta$diff.bw <- dta$target_bandwidth - dta$ia_bw_mbps_total
+  dta$diff.bw.perc <- dta$diff.bw / dta$target_bandwidth
+  ## calculate the same for cost_per_mbps
+  dta$cost.per.mbps.normalized <- dta$ia_monthly_cost_per_mbps / 14
   
-  ## we could assign groupings based on breaking the distribution into 5 groups
-  ## <-1, -1 to -.5, -.5 to 0, 0 to .5, .5 to 1
-  dta.afford$group <- ifelse(dta.afford$diff.bw.perc < -1 | dta.afford$ia_monthly_cost_total == 0, 5,
-                             ifelse(dta.afford$diff.bw.perc < -0.5, 4,
-                                    ifelse(dta.afford$diff.bw.perc < 0, 3,
-                                           ifelse(dta.afford$diff.bw.perc < 0.5, 2, 1))))
-  return(dta.afford)
+  ## credit $0 budget (free internet) with 5 stars
+  sub.0 <- dta[which(dta$ia_monthly_cost_total == 0),]
+  sub.0$group <- 5
+  
+  ## apply logic based on knapsack BW to districts with >= $700 budget
+  ## we can assign groupings based on breaking the distribution into 5 groups
+  ## < -1, *****
+  ## -1 to -0.4999999, ****
+  ## -0.5 to -0.0000001, ***
+  ## 0 to .4999999, **
+  ## 0.5 to 1, *
+  sub.g.700 <- dta[which(dta$ia_monthly_cost_total >= 700),]
+  sub.g.700$group <- ifelse(sub.g.700$diff.bw.perc < -1, 5,
+                      ifelse(sub.g.700$diff.bw.perc < -0.5, 4,
+                             ifelse(sub.g.700$diff.bw.perc < 0, 3,
+                                    ifelse(sub.g.700$diff.bw.perc < 0.5, 2, 1))))
+  
+  ## for the districts spending less than $700 total, look at their cost_per_mbps
+  ## if the cost_per_mbps is strictly greater than $14, then they're *
+  ## otherwise dimension out buckets by dividing out cost_per_mbps by $14
+  ## cost.per.mbps.normalized <= 0.25, *****
+  ## cost.per.mbps.normalized <= 0.50, ****
+  ## cost.per.mbps.normalized <= 0.75, ***
+  ## cost.per.mbps.normalized <= 1.00, **
+  sub.l.700 <- dta[which(dta$ia_monthly_cost_total < 700 & dta$ia_monthly_cost_total != 0),]
+  sub.l.700$group <- ifelse(sub.l.700$ia_monthly_cost_per_mbps > 14, 1,
+                            ifelse(sub.l.700$cost.per.mbps.normalized <= 0.25, 5,
+                                   ifelse(sub.l.700$cost.per.mbps.normalized <= 0.50, 4,
+                                          ifelse(sub.l.700$cost.per.mbps.normalized <= 0.75, 3, 2))))
+  ## combine all three datasets 
+  dta <- rbind(sub.0, sub.g.700, sub.l.700)
+  
+  return(dta)
 }
-

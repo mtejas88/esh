@@ -49,8 +49,8 @@ querydb <- function(query_name){
 
 dd.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL", sep=""))
 dd.2016 <- correct.dataset(dd.2016, sots.flag=F, services.flag=F)
-dta.1 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2016_cck12_district_summary_v.sql", sep=""))
-dta.2 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2016_compare_districts_info_v.sql", sep=""))
+cck12.ds <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2016_cck12_district_summary_v.sql", sep=""))
+compare.di <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2016_compare_districts_info_v.sql", sep=""))
 
 ## disconnect from database
 dbDisconnect(con)
@@ -59,5 +59,5 @@ dbDisconnect(con)
 ## write out the datasets
 
 write.csv(dd.2016, "data/raw/deluxe_districts_2016.csv", row.names=F)
-write.csv(dta.1, "data/raw/fy2016_cck12_district_summary.csv", row.names=F)
-write.csv(dta.2, "data/raw/fy2016_compare_districts_info.csv", row.names=F)
+write.csv(cck12.ds, "data/raw/fy2016_cck12_district_summary.csv", row.names=F)
+write.csv(compare.di, "data/raw/fy2016_compare_districts_info.csv", row.names=F)
