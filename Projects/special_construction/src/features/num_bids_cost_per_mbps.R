@@ -35,14 +35,36 @@ bids$suburban_indicator <- ifelse(bids$locale == 'Suburban', 'true', 'false')
 bids$town_indicator <- ifelse(bids$locale == 'Town', 'true', 'false')
 bids$rural_indicator <- ifelse(bids$locale == 'Rural', 'true', 'false')
 
+##agg summary
 bids_clean <- filter(bids, bids$exclude_from_ia_cost_analysis == 'false')
 bids_clean <- filter(bids_clean, bids_clean$exclude_from_ia_analysis == 'false')
+bids_clean <- filter(bids_clean, bids_clean$fiber_target_status != 'Potential Target')
 
 groups_bids_clean <- group_by(bids_clean, fiber_target_status, locale, num_bids_category)
-summary <- summarize(groups_bids_clean, 
-                    count = n(), 
-                    median_ia_monthly_cost_per_mbps = median(ia_monthly_cost_per_mbps, na.rm = T), 
-                    median_ia_bandwidth_per_student_kbps = median(ia_bandwidth_per_student_kbps, na.rm = T))
+summary <- summarize(groups_bids_clean,
+                     count = n(),
+                     median_ia_monthly_cost_per_mbps = median(ia_monthly_cost_per_mbps, na.rm = T),
+                     median_ia_bandwidth_per_student_kbps = median(ia_bandwidth_per_student_kbps, na.rm = T))
+summary <-  summary %>% 
+            arrange(fiber_target_status, locale, num_bids_category,median_ia_monthly_cost_per_mbps) %>% 
+            mutate(rank_ia_monthly_cost_per_mbps = rank(median_ia_monthly_cost_per_mbps, ties.method = 'first'))
+summary <-  summary %>% 
+            arrange(fiber_target_status, locale, num_bids_category,median_ia_bandwidth_per_student_kbps) %>% 
+            mutate(rank_ia_bandwidth_per_student_kbps = rank(median_ia_bandwidth_per_student_kbps, ties.method = 'first'))
 
 write.csv(summary, file = "data/interim/summary.csv")
 
+##fiber target summary
+fiber_target_groups_bids_clean <- group_by(bids_clean, fiber_target_status, num_bids_category)
+fiber_target_summary <- summarize(fiber_target_groups_bids_clean,
+                                  count = n(),
+                                  median_ia_monthly_cost_per_mbps = median(ia_monthly_cost_per_mbps, na.rm = T),
+                                  median_ia_bandwidth_per_student_kbps = median(ia_bandwidth_per_student_kbps, na.rm = T))
+fiber_target_summary <- fiber_target_summary %>% 
+                        arrange(fiber_target_status, num_bids_category,median_ia_monthly_cost_per_mbps) %>% 
+                        mutate(rank_ia_monthly_cost_per_mbps = rank(median_ia_monthly_cost_per_mbps, ties.method = 'first'))
+fiber_target_summary <- fiber_target_summary %>% 
+                        arrange(fiber_target_status, num_bids_category,median_ia_bandwidth_per_student_kbps) %>% 
+                        mutate(rank_ia_bandwidth_per_student_kbps = rank(median_ia_bandwidth_per_student_kbps, ties.method = 'first'))
+
+write.csv(fiber_target_summary, file = "data/interim/fiber_target_summary.csv")
