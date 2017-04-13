@@ -21,7 +21,149 @@ for (i in 1:length(packages.to.install)){
 library(data.table)
 library(plyr)
 
+##**************************************************************************************************************v
+#creating a Totals DF
+#totals budget
+num_students <- sum(districts_display$num_students, na.rm = TRUE)
 
+current_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                     districts_display$include_in_universe_of_districts == TRUE &
+                                                                     districts_display$ia_bandwidth_per_student_kbps >= 100], na.rm = TRUE)
+current_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                    districts_display$include_in_universe_of_districts == TRUE], na.rm = TRUE)
+
+current_num_students_meeting_extrap_perc <- current_num_students_meeting / current_num_students_sample
+
+current_num_students_meeting_extrap <- current_num_students_meeting_extrap_perc * num_students
+
+
+##max cost extraps
+max_cost_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                      districts_display$include_in_universe_of_districts == TRUE &
+                                                                      districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                      districts_display$exclude_from_ia_cost_analysis == FALSE &
+                                                                      districts_display$max_cost_bandwidth_per_student >= 100], na.rm = TRUE)
+
+max_cost_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                     districts_display$include_in_universe_of_districts == TRUE &
+                                                                     districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                     districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
+
+max_cost_num_students_meeting_extrap_perc <- max_cost_num_students_meeting / max_cost_num_students_sample
+
+##cost constant extraps
+cost_constant_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                           districts_display$include_in_universe_of_districts == TRUE &
+                                                                           districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                           districts_display$exclude_from_ia_cost_analysis == FALSE &
+                                                                           districts_display$cost_constant_bandwidth_per_student >= 100], na.rm = TRUE)
+
+cost_constant_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                          districts_display$include_in_universe_of_districts == TRUE &
+                                                                          districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                          districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
+
+cost_constant_num_students_meeting_extrap_perc <- cost_constant_num_students_meeting / cost_constant_num_students_sample
+
+##bw constant extraps
+bw_constant_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                         districts_display$include_in_universe_of_districts == TRUE &
+                                                                         districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                         districts_display$exclude_from_ia_cost_analysis == FALSE &
+                                                                         districts_display$bw_constant_bandwidth_per_student >= 100], na.rm = TRUE)
+
+bw_constant_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                        districts_display$include_in_universe_of_districts == TRUE &
+                                                                        districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                        districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
+
+bw_constant_num_students_meeting_extrap_perc <- bw_constant_num_students_meeting / bw_constant_num_students_sample
+
+
+
+#
+
+cost_constant_total_pai_budg <- sum(districts_display$cost_constant_total_pai_budj, na.rm = TRUE)
+bw_constant_total_pai_budg <- sum(districts_display$bw_constant_total_pai_budg, na.rm = TRUE)
+max_cost_total_pai_budg <- sum(districts_display$max_cost_total_pai_budg, na.rm = TRUE)
+district_cost_total <- sum(districts_display$district_cost_total, na.rm = TRUE)
+current_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0 &
+    districts_display$ia_bandwidth_per_student_kbps >= 100])
+current_districts_meeting_perc <- current_districts_meeting / length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0])
+cost_constant_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0 &
+    districts_display$cost_constant_bandwidth_per_student >= 100])
+cost_constant_districts_meeting_perc <- cost_constant_districts_meeting / length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0])
+bw_constant_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0 &
+    districts_display$bw_constant_bandwidth_per_student >= 100])
+bw_constant_districts_meeting_perc <- bw_constant_districts_meeting / length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0])
+max_cost_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0 &
+    districts_display$max_cost_bandwidth_per_student >= 100])
+max_cost_districts_meeting_perc <- max_cost_districts_meeting / length(districts_display$exclude_from_ia_analysis[
+  districts_display$exclude_from_ia_analysis == FALSE & 
+    districts_display$exclude_from_ia_cost_analysis == FALSE &
+    districts_display$include_in_universe_of_districts == TRUE &
+    districts_display$ia_monthly_cost_per_mbps > 0])
+
+
+#totals oop
+cost_constant_total_pai_oop <- sum(districts_display$cost_constant_total_pai_oop, na.rm = TRUE)
+bw_constant_total_pai_oop <- sum(districts_display$bw_constant_total_pai_oop, na.rm = TRUE)
+max_cost_total_oop <- sum(districts_display$max_cost_total_oop, na.rm = TRUE)
+total_current_oop <- sum(districts_display$total_current_oop, na.rm = TRUE)
+
+
+#joining tables
+totals_df <- data.frame(num_students, cost_constant_total_pai_budg,bw_constant_total_pai_budg,max_cost_total_pai_budg,district_cost_total,
+                        cost_constant_total_pai_oop,bw_constant_total_pai_oop,max_cost_total_oop,total_current_oop)
+totals_df$cost_constant_total_erate_share <- totals_df$cost_constant_total_pai_budg - totals_df$cost_constant_total_pai_oop
+totals_df$bw_constant_total_erate_share_category <- totals_df$bw_constant_total_pai_budg - totals_df$bw_constant_total_pai_oop
+totals_df$max_cost_total_erate_share_category <- totals_df$max_cost_total_pai_budg - totals_df$max_cost_total_oop
+totals_df$total_erate_share_category <- totals_df$district_cost_total - totals_df$total_current_oop
+
+
+
+#creating a per student totals df
+totals_df_per_student <- totals_df
+totals_df_per_student$cost_constant_total_per_student <- totals_df_per_student$cost_constant_total_pai_budg / totals_df_per_student$num_students
+totals_df_per_student$bw_constant_total_per_student <- totals_df_per_student$bw_constant_total_pai_budg / totals_df_per_student$num_students
+totals_df_per_student$max_cost_total_per_student <- totals_df_per_student$max_cost_total_pai_budg / totals_df_per_student$num_students
+totals_df_per_student$current_total_per_student <- totals_df_per_student$district_cost_total / totals_df_per_student$num_students
+totals_df_per_student$cost_constant_erate_per_student <- totals_df_per_student$cost_constant_total_erate_share / totals_df_per_student$num_students
+totals_df_per_student$bw_constant_erate_per_student <- totals_df_per_student$bw_constant_total_erate_share / totals_df_per_student$num_students
+totals_df_per_student$max_cost_erate_per_student <- totals_df_per_student$max_cost_total_erate_share / totals_df_per_student$num_students
+totals_df_per_student$current_erate_per_student <- totals_df_per_student$total_erate_share / totals_df_per_student$num_students
+totals_df_per_student$cost_constant_dist_per_student <- totals_df_per_student$cost_constant_total_pai_oop / totals_df_per_student$num_students
+totals_df_per_student$bw_constant_dist_per_student <- totals_df_per_student$bw_constant_total_pai_oop / totals_df_per_student$num_students
+totals_df_per_student$max_cost_dist_per_student <- totals_df_per_student$max_cost_total_oop / totals_df_per_student$num_students
+totals_df_per_student$current_dist_per_student <- totals_df_per_student$total_current_oop / totals_df_per_student$num_students
 
 ##**************************************************************************************************************************************************
 #CREATING A CATEGORY DF
@@ -276,150 +418,6 @@ rich_summary_df$current_erate_share <- (1-rich_summary_df$`Adj C1 Discount Rate`
 
 
 rich_c2_df <- aggregate(rich_df$num_students, by=list(rich_df$adjusted_c2), FUN = sum)
-
-##**************************************************************************************************************v
-#creating a Totals DF
-#totals budget
-num_students <- sum(districts_display$num_students, na.rm = TRUE)
-
-current_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                     districts_display$include_in_universe_of_districts == TRUE &
-                                                                     districts_display$ia_bandwidth_per_student_kbps >= 100], na.rm = TRUE)
-current_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                    districts_display$include_in_universe_of_districts == TRUE], na.rm = TRUE)
-
-current_num_students_meeting_extrap_perc <- current_num_students_meeting / current_num_students_sample
-
-current_num_students_meeting_extrap <- current_num_students_meeting_extrap_perc * num_students
-
-
-##max cost extraps
-max_cost_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                      districts_display$include_in_universe_of_districts == TRUE &
-                                                                      districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                      districts_display$exclude_from_ia_cost_analysis == FALSE &
-                                                                      districts_display$max_cost_bandwidth_per_student >= 100], na.rm = TRUE)
-
-max_cost_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                     districts_display$include_in_universe_of_districts == TRUE &
-                                                                     districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                     districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
-
-max_cost_num_students_meeting_extrap_perc <- max_cost_num_students_meeting / max_cost_num_students_sample
-
-##cost constant extraps
-cost_constant_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                           districts_display$include_in_universe_of_districts == TRUE &
-                                                                           districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                           districts_display$exclude_from_ia_cost_analysis == FALSE &
-                                                                           districts_display$cost_constant_bandwidth_per_student >= 100], na.rm = TRUE)
-
-cost_constant_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                          districts_display$include_in_universe_of_districts == TRUE &
-                                                                          districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                          districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
-
-cost_constant_num_students_meeting_extrap_perc <- cost_constant_num_students_meeting / cost_constant_num_students_sample
-
-##bw constant extraps
-bw_constant_num_students_meeting <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                         districts_display$include_in_universe_of_districts == TRUE &
-                                                                         districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                         districts_display$exclude_from_ia_cost_analysis == FALSE &
-                                                                         districts_display$bw_constant_bandwidth_per_student >= 100], na.rm = TRUE)
-
-bw_constant_num_students_sample <- sum(districts_display$num_students[districts_display$exclude_from_ia_analysis == FALSE & 
-                                                                        districts_display$include_in_universe_of_districts == TRUE &
-                                                                        districts_display$ia_monthly_cost_per_mbps > 0 &
-                                                                        districts_display$exclude_from_ia_cost_analysis == FALSE], na.rm = TRUE)
-
-bw_constant_num_students_meeting_extrap_perc <- bw_constant_num_students_meeting / bw_constant_num_students_sample
-
-
-
-#
-
-cost_constant_total_pai_budg <- sum(districts_display$cost_constant_total_pai_budj, na.rm = TRUE)
-bw_constant_total_pai_budg <- sum(districts_display$bw_constant_total_pai_budg, na.rm = TRUE)
-max_cost_total_pai_budg <- sum(districts_display$max_cost_total_pai_budg, na.rm = TRUE)
-district_cost_total <- sum(districts_display$district_cost_total, na.rm = TRUE)
-current_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0 &
-    districts_display$ia_bandwidth_per_student_kbps >= 100])
-current_districts_meeting_perc <- current_districts_meeting / length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0])
-cost_constant_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0 &
-    districts_display$cost_constant_bandwidth_per_student >= 100])
-cost_constant_districts_meeting_perc <- cost_constant_districts_meeting / length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0])
-bw_constant_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0 &
-    districts_display$bw_constant_bandwidth_per_student >= 100])
-bw_constant_districts_meeting_perc <- bw_constant_districts_meeting / length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0])
-max_cost_districts_meeting <- length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0 &
-    districts_display$max_cost_bandwidth_per_student >= 100])
-max_cost_districts_meeting_perc <- max_cost_districts_meeting / length(districts_display$exclude_from_ia_analysis[
-  districts_display$exclude_from_ia_analysis == FALSE & 
-    districts_display$exclude_from_ia_cost_analysis == FALSE &
-    districts_display$include_in_universe_of_districts == TRUE &
-    districts_display$ia_monthly_cost_per_mbps > 0])
-
-
-#totals oop
-cost_constant_total_pai_oop <- sum(districts_display$cost_constant_total_pai_oop, na.rm = TRUE)
-bw_constant_total_pai_oop <- sum(districts_display$bw_constant_total_pai_oop, na.rm = TRUE)
-max_cost_total_oop <- sum(districts_display$max_cost_total_oop, na.rm = TRUE)
-total_current_oop <- sum(districts_display$total_current_oop, na.rm = TRUE)
-
-
-#joining tables
-totals_df <- data.frame(num_students, cost_constant_total_pai_budg,bw_constant_total_pai_budg,max_cost_total_pai_budg,district_cost_total,
-                        cost_constant_total_pai_oop,bw_constant_total_pai_oop,max_cost_total_oop,total_current_oop)
-totals_df$cost_constant_total_erate_share <- totals_df$cost_constant_total_pai_budg - totals_df$cost_constant_total_pai_oop
-totals_df$bw_constant_total_erate_share_category <- totals_df$bw_constant_total_pai_budg - totals_df$bw_constant_total_pai_oop
-totals_df$max_cost_total_erate_share_category <- totals_df$max_cost_total_pai_budg - totals_df$max_cost_total_oop
-totals_df$total_erate_share_category <- totals_df$district_cost_total - totals_df$total_current_oop
-
-
-
-#creating a per student totals df
-totals_df_per_student <- totals_df
-totals_df_per_student$cost_constant_total_per_student <- totals_df_per_student$cost_constant_total_pai_budg / totals_df_per_student$num_students
-totals_df_per_student$bw_constant_total_per_student <- totals_df_per_student$bw_constant_total_pai_budg / totals_df_per_student$num_students
-totals_df_per_student$max_cost_total_per_student <- totals_df_per_student$max_cost_total_pai_budg / totals_df_per_student$num_students
-totals_df_per_student$current_total_per_student <- totals_df_per_student$district_cost_total / totals_df_per_student$num_students
-totals_df_per_student$cost_constant_erate_per_student <- totals_df_per_student$cost_constant_total_erate_share / totals_df_per_student$num_students
-totals_df_per_student$bw_constant_erate_per_student <- totals_df_per_student$bw_constant_total_erate_share / totals_df_per_student$num_students
-totals_df_per_student$max_cost_erate_per_student <- totals_df_per_student$max_cost_total_erate_share / totals_df_per_student$num_students
-totals_df_per_student$current_erate_per_student <- totals_df_per_student$total_erate_share / totals_df_per_student$num_students
-totals_df_per_student$cost_constant_dist_per_student <- totals_df_per_student$cost_constant_total_pai_oop / totals_df_per_student$num_students
-totals_df_per_student$bw_constant_dist_per_student <- totals_df_per_student$bw_constant_total_pai_oop / totals_df_per_student$num_students
-totals_df_per_student$max_cost_dist_per_student <- totals_df_per_student$max_cost_total_oop / totals_df_per_student$num_students
-totals_df_per_student$current_dist_per_student <- totals_df_per_student$total_current_oop / totals_df_per_student$num_students
 
 ##************************************************************************************************************************
 #Creating the summary tables by model and locale

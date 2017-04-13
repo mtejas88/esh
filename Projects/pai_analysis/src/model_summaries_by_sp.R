@@ -98,7 +98,7 @@ service_providers$connect_category_summary <- ifelse(service_providers$connect_c
                                                      'Fiber',
                                                      ifelse(service_providers$connect_category == 'ISP Only',
                                                             'ISP',
-                                                            'Non-Fiber')
+                                                            service_providers$connect_category)
 )
 
 service_providers_fiber <- service_providers[service_providers$connect_category_summary == 'Fiber',]
@@ -109,31 +109,66 @@ service_providers_isp <- service_providers[service_providers$connect_category_su
 service_providers_clean_isp <- aggregate(service_providers_isp$total_clean_spend, by=list(service_providers_isp$reporting_name), FUN = sum, na.rm = TRUE)
 names(service_providers_clean_isp) <- c('reporting_name','total_clean_isp_spend')
 
-service_providers_nonfiber <- service_providers[service_providers$connect_category_summary == 'Non-Fiber',]
-service_providers_clean_nonfiber <- aggregate(service_providers_nonfiber$total_clean_spend, by=list(service_providers_nonfiber$reporting_name), FUN = sum, na.rm = TRUE)
-names(service_providers_clean_nonfiber) <- c('reporting_name','total_clean_nonfiber_spend')
+service_providers_t1 <- service_providers[service_providers$connect_category_summary == 'T-1',]
+service_providers_clean_t1 <- aggregate(service_providers_t1$total_clean_spend, by=list(service_providers_t1$reporting_name), FUN = sum, na.rm = TRUE)
+names(service_providers_clean_t1) <- c('reporting_name','total_clean_t1_spend')
+
+service_providers_dsl <- service_providers[service_providers$connect_category_summary == 'DSL',]
+service_providers_clean_dsl <- aggregate(service_providers_dsl$total_clean_spend, by=list(service_providers_dsl$reporting_name), FUN = sum, na.rm = TRUE)
+names(service_providers_clean_dsl) <- c('reporting_name','total_clean_dsl_spend')
+
+service_providers_fixed_wireless <- service_providers[service_providers$connect_category_summary == 'Fixed Wireless',]
+service_providers_clean_fixed_wireless <- aggregate(service_providers_fixed_wireless$total_clean_spend, by=list(service_providers_fixed_wireless$reporting_name), FUN = sum, na.rm = TRUE)
+names(service_providers_clean_fixed_wireless) <- c('reporting_name','total_clean_fixed_wireless_spend')
+
+service_providers_cable <- service_providers[service_providers$connect_category_summary == 'Cable',]
+service_providers_clean_cable <- aggregate(service_providers_cable$total_clean_spend, by=list(service_providers_cable$reporting_name), FUN = sum, na.rm = TRUE)
+names(service_providers_clean_cable) <- c('reporting_name','total_clean_cable_spend')
+
+service_providers_other <- service_providers[service_providers$connect_category_summary %in% c('Other Copper','Uncategorized','Satellite/LTE'),]
+service_providers_clean_other <- aggregate(service_providers_other$total_clean_spend, by=list(service_providers_other$reporting_name), FUN = sum, na.rm = TRUE)
+names(service_providers_clean_other) <- c('reporting_name','total_clean_other_spend')
 
 service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_fiber, by = 'reporting_name', all = TRUE)
 service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_isp, by = 'reporting_name', all = TRUE)
-service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_nonfiber, by = 'reporting_name', all = TRUE)
+service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_t1, by = 'reporting_name', all = TRUE)
+service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_dsl, by = 'reporting_name', all = TRUE)
+service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_fixed_wireless, by = 'reporting_name', all = TRUE)
+service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_cable, by = 'reporting_name', all = TRUE)
+service_providers_extrap <- merge(x = service_providers_extrap, y = service_providers_clean_other, by = 'reporting_name', all = TRUE)
 service_providers_extrap[is.na(service_providers_extrap)] <- 0
 
-service_providers_extrap$total_clean__spend <- service_providers_extrap$total_clean_fiber_spend + service_providers_extrap$total_clean_isp_spend + service_providers_extrap$total_clean_nonfiber_spend
+service_providers_extrap$total_clean__spend <- service_providers_extrap$total_clean_fiber_spend + service_providers_extrap$total_clean_isp_spend + 
+    service_providers_extrap$total_clean_t1_spend + service_providers_extrap$total_clean_dsl_spend + service_providers_extrap$total_clean_fixed_wireless_spend + 
+    service_providers_extrap$total_clean_cable_spend + service_providers_extrap$total_clean_other_spend
 service_providers_extrap$clean_fiber_perc <- service_providers_extrap$total_clean_fiber_spend / service_providers_extrap$total_clean__spend
 service_providers_extrap$clean_isp_perc <- service_providers_extrap$total_clean_isp_spend / service_providers_extrap$total_clean__spend
-service_providers_extrap$clean_nonfiber_perc <- service_providers_extrap$total_clean_nonfiber_spend / service_providers_extrap$total_clean__spend
+service_providers_extrap$clean_t1_perc <- service_providers_extrap$total_clean_t1_spend / service_providers_extrap$total_clean__spend
+service_providers_extrap$clean_dsl_perc <- service_providers_extrap$total_clean_dsl_spend / service_providers_extrap$total_clean__spend
+service_providers_extrap$clean_fixed_wireless_perc <- service_providers_extrap$total_clean_fixed_wireless_spend / service_providers_extrap$total_clean__spend
+service_providers_extrap$clean_cable_perc <- service_providers_extrap$total_clean_cable_spend / service_providers_extrap$total_clean__spend
+service_providers_extrap$clean_other_perc <- service_providers_extrap$total_clean_other_spend / service_providers_extrap$total_clean__spend
 
 #creating national averages to replace NaN
 national_average_fiber_perc <- sum(service_providers_extrap$total_clean_fiber_spend) / sum(service_providers_extrap$total_clean__spend)
 national_average_isp_perc <- sum(service_providers_extrap$total_clean_isp_spend) / sum(service_providers_extrap$total_clean__spend)
-national_average_nonfiber_perc <- sum(service_providers_extrap$total_clean_nonfiber_spend) / sum(service_providers_extrap$total_clean__spend)
+national_average_t1_perc <- sum(service_providers_extrap$total_clean_t1_spend) / sum(service_providers_extrap$total_clean__spend)
+national_average_dsl_perc <- sum(service_providers_extrap$total_clean_dsl_spend) / sum(service_providers_extrap$total_clean__spend)
+national_average_fixed_wireless_perc <- sum(service_providers_extrap$total_clean_fixed_wireless_spend) / sum(service_providers_extrap$total_clean__spend)
+national_average_cable_perc <- sum(service_providers_extrap$total_clean_cable_spend) / sum(service_providers_extrap$total_clean__spend)
+national_average_other_perc <- sum(service_providers_extrap$total_clean_other_spend) / sum(service_providers_extrap$total_clean__spend)
 
 #replacing NaNs with national averages
 service_providers_extrap[is.nan(service_providers_extrap$clean_fiber_perc),c('clean_fiber_perc')] <- national_average_fiber_perc
 service_providers_extrap[is.nan(service_providers_extrap$clean_isp_perc),c('clean_isp_perc')] <- national_average_isp_perc
-service_providers_extrap[is.nan(service_providers_extrap$clean_nonfiber_perc),c('clean_nonfiber_perc')] <- national_average_nonfiber_perc
+service_providers_extrap[is.nan(service_providers_extrap$clean_t1_perc),c('clean_t1_perc')] <- national_average_t1_perc
+service_providers_extrap[is.nan(service_providers_extrap$clean_dsl_perc),c('clean_dsl_perc')] <- national_average_dsl_perc
+service_providers_extrap[is.nan(service_providers_extrap$clean_fixed_wireless_perc),c('clean_fixed_wireless_perc')] <- national_average_fixed_wireless_perc
+service_providers_extrap[is.nan(service_providers_extrap$clean_cable_perc),c('clean_cable_perc')] <- national_average_cable_perc
+service_providers_extrap[is.nan(service_providers_extrap$clean_other_perc),c('clean_other_perc')] <- national_average_other_perc
 
-service_providers_extrap <- service_providers_extrap[,c('reporting_name','clean_ia_perc','clean_wan_perc','clean_fiber_perc','clean_isp_perc','clean_nonfiber_perc')]
+service_providers_extrap <- service_providers_extrap[,c('reporting_name','clean_ia_perc','clean_wan_perc','clean_fiber_perc','clean_isp_perc',
+                                                        'clean_t1_perc','clean_dsl_perc','clean_fixed_wireless_perc','clean_cable_perc','clean_other_perc')]
 
 #************************************************************************************************
 #joining clean ia and wan percent into sum_display
@@ -144,10 +179,18 @@ service_providers_sum_display$extrap_ia_change <- service_providers_sum_display$
 service_providers_sum_display$extrap_wan_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_wan_perc
 service_providers_sum_display$extrap_fiber_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_fiber_perc
 service_providers_sum_display$extrap_isp_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_isp_perc
-service_providers_sum_display$extrap_nonfiber_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_nonfiber_perc
+service_providers_sum_display$extrap_t1_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_t1_perc
+service_providers_sum_display$extrap_dsl_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_dsl_perc
+service_providers_sum_display$extrap_fixed_wireless_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_fixed_wireless_perc
+service_providers_sum_display$extrap_cable_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_cable_perc
+service_providers_sum_display$extrap_other_spend <- service_providers_sum_display$total_spend * service_providers_sum_display$clean_other_perc
 service_providers_sum_display$extrap_fiber_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_fiber_perc
 service_providers_sum_display$extrap_isp_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_isp_perc
-service_providers_sum_display$extrap_nonfiber_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_nonfiber_perc
+service_providers_sum_display$extrap_t1_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_t1_perc
+service_providers_sum_display$extrap_dsl_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_dsl_perc
+service_providers_sum_display$extrap_fixed_wireless_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_fixed_wireless_perc
+service_providers_sum_display$extrap_cable_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_cable_perc
+service_providers_sum_display$extrap_other_change <- service_providers_sum_display$total_funding_change * service_providers_sum_display$clean_other_perc
 
 service_providers_sum_display$extrap_cost_per_mbps <- service_providers_sum_display$extrap_ia_spend / service_providers_sum_display$dedicated_bandwidth_mbps
 service_providers_sum_display$extrap_bandwidth_change_gbps <- service_providers_sum_display$extrap_ia_change / service_providers_sum_display$extrap_cost_per_mbps / 1000

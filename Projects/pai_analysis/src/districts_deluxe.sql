@@ -54,3 +54,4 @@ end as adj_c1_discount_rate
 from public.fy2016_districts_deluxe_matr 
 where include_in_universe_of_districts = True
 and district_type = 'Traditional'
+and postal_cd != 'AK'

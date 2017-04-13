@@ -45,4 +45,6 @@ select    sr.reporting_name,
   and dd.district_type = 'Traditional'
   and not('special_construction' = any(open_flags))
   and sr.purpose != 'Not broadband'
+  and dd.postal_cd != 'AK'
+  and sr.inclusion_status != 'dqs_excluded'
   group by 1,2,3,4,5

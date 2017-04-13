@@ -19,7 +19,7 @@ library(RJDBC)
 library(dotenv)
 
 #this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/Analysis/ficher/'
+#github_path <- '~/Documents/Analysis/ficher/'
 setwd(paste(github_path, 'Projects/pai_analysis', sep=''))
 
 
