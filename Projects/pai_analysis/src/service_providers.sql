@@ -1,4 +1,7 @@
-select    sr.reporting_name,
+select    case when sr.reporting_name in ('Time Warner Cable', 'Time Warner Cable Business LLC')
+                then 'Time Warner Cable'
+                else sr.reporting_name
+          end as reporting_name,
           dd.esh_id,
           dd.postal_cd,
           case

@@ -195,6 +195,7 @@ service_providers_sum_display$extrap_other_change <- service_providers_sum_displ
 service_providers_sum_display$extrap_cost_per_mbps <- service_providers_sum_display$extrap_ia_spend / service_providers_sum_display$dedicated_bandwidth_mbps
 service_providers_sum_display$extrap_bandwidth_change_gbps <- service_providers_sum_display$extrap_ia_change / service_providers_sum_display$extrap_cost_per_mbps / 1000
 
+
 #ordering by funding change
 service_providers_sum_display <- service_providers_sum_display[with(service_providers_sum_display, order(total_funding_change))]
 top_15 <- as.vector(service_providers_sum_display[1:15,c('reporting_name')])
