@@ -19,8 +19,8 @@ library(RJDBC)
 library(dotenv)
 
 #this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/USAC_data_comparisons', sep=''))
+#github_path <- '~/Documents/Analysis/ficher/'
+setwd(paste(github_path, 'Projects/pai_analysis', sep=''))
 
 
 options(java.parameters = "-Xmx4g" )
@@ -46,15 +46,15 @@ querydb <- function(query_name){
   return(data)
 }
 
-esh_li <- querydb('src/esh_li.sql')
-original_frns <- querydb('src/original_frns.sql')
-esh_allocations <- querydb('src/esh_allocations.sql')
+districts_deluxe <- querydb('src/districts_deluxe.sql')
+total_funding_by_district <- querydb('src/total_funding_by_district.sql')
+service_providers <- querydb('src/service_providers.sql')
 
 ## disconnect from database
 dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
 
-write.csv(esh_li, 'data/raw/fy2016_line_items.csv', row.names = FALSE)
-write.csv(original_frns, 'data/raw/original_frns.csv', row.names = FALSE)
-write.csv(esh_allocations, 'data/raw/fy2016_allocations.csv', row.names = FALSE)
+write.csv(districts_deluxe, 'data/raw/2016_districts.csv', row.names = FALSE)
+write.csv(total_funding_by_district, 'data/raw/2016_total_funding_by_district.csv', row.names = FALSE)
+write.csv(service_providers, 'data/raw/service_providers.csv', row.names = FALSE)
