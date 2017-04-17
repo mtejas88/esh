@@ -89,7 +89,7 @@ FROM (
             end AS reporting_name,
             li.service_provider_name AS service_provider_name,
             li.applicant_name AS applicant_name,
-            li.applicant_id AS applicant_id,
+            eb.entity_id AS applicant_id,
             dd.esh_id AS recipient_id,
             dd.name AS recipient_name,
             dd.postal_cd AS recipient_postal_cd,
@@ -111,6 +111,8 @@ FROM (
           FROM public.fy2016_lines_to_district_by_line_item_matr lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
+          LEFT OUTER JOIN public.entity_bens eb
+          ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
             select distinct name, reporting_name
             from fy2016.service_providers
@@ -144,7 +146,7 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       11/1/2016
+Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:
