@@ -64,7 +64,10 @@ from (
       esh_id,
       postal_cd,
       c2_cost_budget,
-      round(proportionate_c2_funding/proportionate_c2_cost,2) as weighted_avg_dr,
+      case
+        when proportionate_c2_cost > 0
+          then round(proportionate_c2_funding/proportionate_c2_cost,2)
+      end as weighted_avg_dr,
       proportionate_c2_cost,
       proportionate_c2_funding,
       case
