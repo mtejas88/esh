@@ -54,6 +54,24 @@ summary <-  summary %>%
 
 write.csv(summary, file = "data/interim/summary.csv")
 
+#agg state summary
+bids_state <- filter(bids, bids$exclude_from_ia_cost_analysis == 'false')
+bids_state <- filter(bids_state, bids_state$exclude_from_ia_analysis == 'false')
+groups_bids_state <- group_by(bids_state, postal_cd, num_bids_category)
+summary_state <- summarize(groups_bids_state,
+                     count = n(),
+                     median_ia_monthly_cost_per_mbps = median(ia_monthly_cost_per_mbps, na.rm = T),
+                     median_ia_bandwidth_per_student_kbps = median(ia_bandwidth_per_student_kbps, na.rm = T))
+summary_state <-  summary_state %>% 
+  arrange(postal_cd, num_bids_category,median_ia_monthly_cost_per_mbps) %>% 
+  mutate(rank_ia_monthly_cost_per_mbps = rank(median_ia_monthly_cost_per_mbps, ties.method = 'first'))
+summary_state <-  summary_state %>% 
+  arrange(postal_cd, num_bids_category,median_ia_bandwidth_per_student_kbps) %>% 
+  mutate(rank_ia_bandwidth_per_student_kbps = rank(median_ia_bandwidth_per_student_kbps, ties.method = 'first'))
+
+write.csv(summary_state, file = "data/interim/summary_state.csv")
+
+
 ##fiber target summary
 fiber_target_groups_bids_clean <- group_by(bids_clean, fiber_target_status, num_bids_category)
 fiber_target_summary <- summarize(fiber_target_groups_bids_clean,

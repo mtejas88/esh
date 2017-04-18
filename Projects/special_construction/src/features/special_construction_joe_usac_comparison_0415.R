@@ -57,3 +57,22 @@ decisions.merged$question <- ifelse(decisions.merged$Decision == 'Funded',
 decisions.merged.question <- filter(decisions.merged, question == TRUE)
 decisions.merged.question <- decisions.merged.question[1:25]
 write.csv(decisions.merged.question, "data/interim/joe_applications_drt_decisions.csv", row.names=FALSE)
+
+table(ifelse(decisions.merged$question == FALSE,
+             'No question',
+             ifelse(decisions.merged$Decision == '',
+                    'Joe Pending',
+                    'USAC Multiple Decisions')),
+      ifelse(decisions.merged$Fiber.Sub.Type == 'Special Construction',
+             decisions.merged$Fiber.Sub.Type,
+             'Otherwise') 
+      )
+table(ifelse(decisions.merged$Fiber.Sub.Type == 'Special Construction',
+             decisions.merged$Fiber.Sub.Type,
+             'Otherwise') )
+table(ifelse(decisions.merged$question == FALSE,
+             'No question',
+             ifelse(decisions.merged$Decision == '',
+                    'Joe Pending',
+                    'USAC Multiple Decisions')))
+nrow(decisions.merged)
