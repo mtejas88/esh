@@ -1,6 +1,10 @@
-# clear the console
-cat("\014")
+## =========================================
+##
+## QUERY DATA FROM THE DB
+##
+## =========================================
 
+## Clearing memory
 rm(list=ls())
 
 args = commandArgs(trailingOnly=TRUE)
@@ -17,21 +21,17 @@ library(DBI)
 library(rJava)
 library(RJDBC)
 library(dotenv)
-
-#this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/USAC_data_comparisons', sep=''))
-
-
 options(java.parameters = "-Xmx4g" )
 
 ## source environment variables
 source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
 source_env("~/.env")
 
+## source function to correct dataset
+source(paste(github_path, "General_Resources/common_functions/correct_dataset.R", sep=""))
+
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
-
 
 ## load PostgreSQL Driver
 pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
@@ -46,15 +46,14 @@ querydb <- function(query_name){
   return(data)
 }
 
-esh_li <- querydb('src/esh_li.sql')
-original_frns <- querydb('src/original_frns.sql')
-esh_allocations <- querydb('src/esh_allocations.sql')
+nces.14.15 <- querydb(paste(github_path, "General_Resources/sql_scripts/nces_2014_2015.SQL", sep=""))
+
 
 ## disconnect from database
 dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
+## write out the datasets
 
-write.csv(esh_li, 'data/raw/fy2016_line_items.csv', row.names = FALSE)
-write.csv(original_frns, 'data/raw/original_frns.csv', row.names = FALSE)
-write.csv(esh_allocations, 'data/raw/fy2016_allocations.csv', row.names = FALSE)
+write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
+write.csv(line.items.2015, "data/raw/line_items_2015.csv", row.names=F)

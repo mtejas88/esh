@@ -10,10 +10,6 @@ DATA_DIR = $(PROJ_DIR)/data
 CODE_DIR = $(PROJ_DIR)/src
 FIGS_DIR = $(PROJ_DIR)/figures
 
-## list R files
-RFILES := $(wildcard $(CODE_DIR)/*.R)
-
-
 ## define variables without any commands
 .PHONY: data sample forest all
 
@@ -34,9 +30,10 @@ $(CODE_DIR)/out_files/munge_data.Rout: $(CODE_DIR)/munge_data.R
 $(CODE_DIR)/out_files/random_forest.Rout: $(CODE_DIR)/random_forest.R
 	@echo "running random forest model"
 	@R CMD BATCH --no-restore $(CODE_DIR)/random_forest.R $(CODE_DIR)/out_files/random_forest.Rout
+
 ## clean up all generated files
 clean:
-	@echo "Cleaning up project files and data"
+	@echo "Cleaning up project files and data"	
 	@rm -rf $(CODE_DIR)/out_files/*
 	@touch $(CODE_DIR)/out_files/.gitkeep
 	@touch $(DATA_DIR)/.gitkeep
@@ -44,7 +41,5 @@ clean:
 	@touch $(DATA_DIR)/raw/.gitkeep
 	@rm -rf $(DATA_DIR)/interim/*
 	@touch $(DATA_DIR)/interim/.gitkeep
-	@rm -rf $(DATA_DIR)/processed/*
-	@touch $(DATA_DIR)/processed/.gitkeep
 	@rm -rf $(FIGS_DIR)/*
 	@touch $(FIGS_DIR)/.gitkeep

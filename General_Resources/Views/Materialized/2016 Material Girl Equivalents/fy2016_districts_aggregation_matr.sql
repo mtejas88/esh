@@ -537,9 +537,9 @@ select  		dd.esh_id as district_esh_id,
 						array_to_string(array_agg(distinct
 													case
 														when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-																and applicant_id::varchar!=ldli.district_esh_id
-																and applicant_type!='School'
-																and applicant_id::varchar not in (	select esh_id
+																and real_applicant_id::varchar!=ldli.district_esh_id
+																and real_applicant_type!='School'
+																and real_applicant_id::varchar not in (	select esh_id
 																							from public.fy2016_districts_demog_matr
 																							where include_in_universe_of_districts=true)
 																	then applicant_name
@@ -554,9 +554,9 @@ select  		dd.esh_id as district_esh_id,
 						case
 							when ( 	sum(case
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-													and applicant_type!='School'
-													and applicant_id::varchar!=ldli.district_esh_id
-													and applicant_id::varchar not in (	select esh_id
+													and real_applicant_type!='School'
+													and real_applicant_id::varchar!=ldli.district_esh_id
+													and real_applicant_id::varchar not in (	select esh_id
 																				from public.fy2016_districts_demog_matr
 																				where include_in_universe_of_districts=true)
 														then 1
@@ -576,7 +576,7 @@ select  		dd.esh_id as district_esh_id,
 										end)>0)
 								and sum(case
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-													and applicant_id::varchar=ldli.district_esh_id
+													and real_applicant_id::varchar=ldli.district_esh_id
 													and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
 																					7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
 																					8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
@@ -588,9 +588,9 @@ select  		dd.esh_id as district_esh_id,
 									then 'Consortium-provided'
 							when (sum(	case
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-													and applicant_type!='School'
-													and applicant_id::varchar!=ldli.district_esh_id
-													and applicant_id::varchar not in (	select esh_id
+													and real_applicant_type!='School'
+													and real_applicant_id::varchar!=ldli.district_esh_id
+													and real_applicant_id::varchar not in (	select esh_id
 																				from public.fy2016_districts_demog_matr
 																				where include_in_universe_of_districts=true)
 														then 1
@@ -610,7 +610,7 @@ select  		dd.esh_id as district_esh_id,
 									end)>0)
 								and sum(case
 											when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-											and applicant_id::varchar=ldli.district_esh_id
+											and real_applicant_id::varchar=ldli.district_esh_id
 											and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
 																	7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
 																	8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
@@ -665,7 +665,7 @@ select  		dd.esh_id as district_esh_id,
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-									and applicant_id::varchar = dd.esh_id
+									and real_applicant_id::varchar = dd.esh_id
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district_district_applied,
@@ -679,7 +679,7 @@ select  		dd.esh_id as district_esh_id,
 										or	open_tag_labels	is	null)
 									and consortium_shared = false
 									and num_lines::numeric>0
-									and applicant_id::varchar != dd.esh_id
+									and real_applicant_id::varchar != dd.esh_id
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 									else	0
 								end)	as	ia_monthly_cost_direct_to_district_other_applied,
@@ -688,7 +688,7 @@ select  		dd.esh_id as district_esh_id,
 											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-									and applicant_id::varchar = dd.esh_id
+									and real_applicant_id::varchar = dd.esh_id
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_district_applied,
@@ -697,7 +697,7 @@ select  		dd.esh_id as district_esh_id,
 											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-									and applicant_id::varchar != dd.esh_id
+									and real_applicant_id::varchar != dd.esh_id
 										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric
 									else	0
 								end)	as	ia_monthly_cost_per_student_shared_other_applied,
@@ -719,7 +719,7 @@ select  		dd.esh_id as district_esh_id,
 											or (consortium_shared	and	(internet_conditions_met or	isp_conditions_met)))
 									and	num_open_flags	=	0
 									and district_info_by_li.num_students_served::numeric > 0
-									and applicant_id::varchar != dd.esh_id
+									and real_applicant_id::varchar != dd.esh_id
 										then	(esh_rec_cost::numeric/district_info_by_li.num_students_served::numeric)*discount_rate
 									else	0
 								end)	as	ia_monthly_funding_per_student_shared
@@ -727,27 +727,36 @@ select  		dd.esh_id as district_esh_id,
 from	public.fy2016_districts_demog_matr dd
 left join public.fy2016_lines_to_district_by_line_item_matr	ldli
 on 	dd.esh_id = ldli.district_esh_id
-left join	(
-		select 	line_items.*,
-				case
-					when rec_elig_cost > 0
-						then rec_elig_cost
-					else one_time_elig_cost/  case
-												when months_of_service = 0 or months_of_service is null
-													then 12
-												else months_of_service
-											  end
-				end as esh_rec_cost,
-				frns.discount_rate::numeric/100 as discount_rate
-		from fy2016.line_items
-		left join fy2016.frns
-		on line_items.frn = frns.frn
-		where broadband = true
-		and (not('canceled' = any(open_flag_labels) or
-		        'video_conferencing' = any(open_flag_labels) or
-		        'exclude' = any(open_flag_labels))
-	    		or open_flag_labels is null)
-)	li
+left join
+  ( SELECT
+fy2016.line_items.id,fy2016.line_items.frn_complete,fy2016.line_items.frn,fy2016.line_items.application_number,fy2016.line_items.application_type,fy2016.line_items.applicant_ben,fy2016.line_items.applicant_name,fy2016.line_items.applicant_postal_cd,fy2016.line_items.service_provider_id,fy2016.line_items.service_provider_name,fy2016.line_items.service_type,fy2016.line_items.service_category,fy2016.line_items.connect_type,fy2016.line_items.connect_category,fy2016.line_items.purpose,fy2016.line_items.bandwidth_in_mbps,fy2016.line_items.bandwidth_in_original_units,fy2016.line_items.num_lines,fy2016.line_items.total_cost,fy2016.line_items.one_time_elig_cost,fy2016.line_items.rec_elig_cost,fy2016.line_items.months_of_service,fy2016.line_items.contract_end_date,fy2016.line_items.num_open_flags,fy2016.line_items.open_flag_labels,fy2016.line_items.open_tag_labels,fy2016.line_items.num_recipients,fy2016.line_items.erate,fy2016.line_items.broadband,fy2016.line_items.consortium_shared,fy2016.line_items.isp_conditions_met,fy2016.line_items.upstream_conditions_met,fy2016.line_items.internet_conditions_met,fy2016.line_items.wan_conditions_met,fy2016.line_items.exclude,fy2016.line_items.upload_bandwidth_in_mbps,fy2016.line_items.backbone_conditions_met,fy2016.line_items.function,
+           eb.entity_id as real_applicant_id,
+           eb.entity_type as real_applicant_type,
+           CASE
+               WHEN rec_elig_cost > 0 then rec_elig_cost
+               ELSE one_time_elig_cost/ CASE
+                                            WHEN months_of_service = 0
+                                                 OR months_of_service is null then 12
+                                            ELSE months_of_service
+                                        END
+           END AS esh_rec_cost,
+           reporting_name,
+           frns.discount_rate::numeric/100 as discount_rate
+   FROM fy2016.line_items
+   left join public.entity_bens eb
+   on eb.ben = fy2016.line_items.applicant_ben
+   left join fy2016.frns
+   on line_items.frn = frns.frn
+   left join(
+    select distinct name, reporting_name
+    from service_provider_categories
+    ) spc
+   on fy2016.line_items.service_provider_name = spc.name
+   WHERE broadband = true
+     AND (not('canceled' = any(open_flag_labels)
+              OR 'video_conferencing' = any(open_flag_labels)
+              OR 'exclude' = any(open_flag_labels))
+          OR open_flag_labels is null) ) li
 on	ldli.line_item_id	=	li.id
 left join (
 		select	ldli.line_item_id,
@@ -836,8 +845,8 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 2/6/2017 - JH edited the consortium affiliation field so that the applicant_id can be equal to the recipient id if the line item has one of the identified SPINs
-Name of QAing Analyst(s): 
+Last Modified Date: 4/13/2017 - js remove references to applicant_id and applicant_type from li
+Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
 Methodology: Utilizing other aggregation tables
