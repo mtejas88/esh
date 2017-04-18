@@ -14,10 +14,10 @@ bids <- filter(bids, bids$num_bids_received < 26)
 bids$indic_0_bids <- ifelse(bids$num_bids_received == 0,1,0)
 bids$indic_1_bids <- ifelse(bids$num_bids_received == 1,1,0)
 bids$indic_2p_bids <- ifelse(bids$num_bids_received > 1,1,0)
-bids$urban_indicator <- ifelse(bids$locale == 'Urban', 'true', 'false')
-bids$suburban_indicator <- ifelse(bids$locale == 'Suburban', 'true', 'false')
-bids$town_indicator <- ifelse(bids$locale == 'Town', 'true', 'false')
-bids$rural_indicator <- ifelse(bids$locale == 'Rural', 'true', 'false')
+bids$urban_indicator <- ifelse(bids$locale == 'Urban', TRUE, FALSE)
+bids$suburban_indicator <- ifelse(bids$locale == 'Suburban', TRUE, FALSE)
+bids$town_indicator <- ifelse(bids$locale == 'Town', TRUE, FALSE)
+bids$rural_indicator <- ifelse(bids$locale == 'Rural', TRUE, FALSE)
 
 ##fiber prepping
 bids_fiber <- bids %>% distinct(frn, num_bids_received, indic_0_bids, indic_1_bids, indic_2p_bids, fiber_target_status)
@@ -93,10 +93,10 @@ bids_rural_summ <- summarise(bids_rural_summ,
                              pctile_75 = quantile(num_bids_received, probs=0.75),
                              avg = mean(num_bids_received))
 ##bw goal meeting prepping 
-bids_bw_goal <- filter(bids, bids$exclude_from_ia_analysis == 'false')
+bids_bw_goal <- filter(bids, bids$exclude_from_ia_analysis == FALSE)
 bids_bw_goal <- bids_bw_goal %>% distinct(frn, num_bids_received, indic_0_bids, indic_1_bids, indic_2p_bids, meeting_2014_goal_no_oversub)
-bids_bw_goal_true <- filter(bids_bw_goal, bids_bw_goal$meeting_2014_goal_no_oversub == 'true')
-bids_bw_goal_false <- filter(bids_bw_goal, bids_bw_goal$meeting_2014_goal_no_oversub == 'false')
+bids_bw_goal_true <- filter(bids_bw_goal, bids_bw_goal$meeting_2014_goal_no_oversub == TRUE)
+bids_bw_goal_false <- filter(bids_bw_goal, bids_bw_goal$meeting_2014_goal_no_oversub == FALSE)
 bids_bw_goal_summ <- group_by(bids_bw_goal, meeting_2014_goal_no_oversub)
 bids_bw_goal_summ <- summarise(bids_bw_goal_summ,
                                count_0_bids = sum(indic_0_bids),
@@ -110,10 +110,10 @@ bids_bw_goal_summ <- summarise(bids_bw_goal_summ,
                                pctile_75 = quantile(num_bids_received, probs=0.75),
                                avg = mean(num_bids_received))
 ##afford goal prepping 
-bids_afford_goal <- filter(bids, bids$exclude_from_ia_cost_analysis == 'false')
+bids_afford_goal <- filter(bids, bids$exclude_from_ia_cost_analysis == FALSE)
 bids_afford_goal <- bids_afford_goal %>% distinct(frn, num_bids_received, indic_0_bids, indic_1_bids, indic_2p_bids, meeting_knapsack_affordability_target)
-bids_afford_goal_true <- filter(bids_afford_goal, bids_afford_goal$meeting_knapsack_affordability_target == 'true')
-bids_afford_goal_false <- filter(bids_afford_goal, bids_afford_goal$meeting_knapsack_affordability_target == 'false')
+bids_afford_goal_true <- filter(bids_afford_goal, bids_afford_goal$meeting_knapsack_affordability_target == TRUE)
+bids_afford_goal_false <- filter(bids_afford_goal, bids_afford_goal$meeting_knapsack_affordability_target == FALSE)
 bids_afford_goal_summ <- group_by(bids_afford_goal, meeting_knapsack_affordability_target)
 bids_afford_goal_summ <- summarise(bids_afford_goal_summ,
                                    count_0_bids = sum(indic_0_bids),
@@ -127,7 +127,7 @@ bids_afford_goal_summ <- summarise(bids_afford_goal_summ,
                                    pctile_75 = quantile(num_bids_received, probs=0.75),
                                    avg = mean(num_bids_received))
 ##purpose prepping 
-bids_purpose <- filter(bids, bids$exclude_from_ia_analysis == 'false')
+bids_purpose <- filter(bids, bids$exclude_from_ia_analysis == FALSE)
 bids_purpose <- bids_purpose %>% distinct(frn, num_bids_received, indic_0_bids, indic_1_bids, indic_2p_bids,
                                           internet_indicator, wan_indicator, upstream_indicator, backbone_indicator, isp_indicator)
 bids_purpose_internet_summ <- group_by(bids_purpose, internet_indicator)
@@ -191,7 +191,7 @@ bids_purpose_wan_summ <- summarise(bids_purpose_wan_summ,
                                    pctile_75 = quantile(num_bids_received, probs=0.75),
                                    avg = mean(num_bids_received))
 ##connect prepping 
-bids_connect <- filter(bids, bids$exclude_from_ia_analysis == 'false')
+bids_connect <- filter(bids, bids$exclude_from_ia_analysis == FALSE)
 bids_connect <- bids_connect %>% distinct(frn, num_bids_received, indic_0_bids, indic_1_bids, indic_2p_bids,
                                           fiber_indicator, copper_indicator, cable_indicator, fixed_wireless_indicator)
 bids_connect_fiber_summ <- group_by(bids_connect, fiber_indicator)
@@ -281,50 +281,50 @@ bids_connect_copper_summ$value <- bids_connect_copper_summ$copper_indicator
 target <- merge(filter(select(bids_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'Target'),
                 filter(select(bids_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'Not Target'),
                 by='category')
-urban <- merge(filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+urban <- merge(filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                 by='category')
-suburban <- merge(filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-               filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+suburban <- merge(filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+               filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                by='category')
-town <- merge(filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-               filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+town <- merge(filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+               filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                by='category')
-rural <- merge(filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-               filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+rural <- merge(filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+               filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                by='category')
-bw_goal <- merge(filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                 filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+bw_goal <- merge(filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                 filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                  by='category')
-afford_goal <- merge(filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                     filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+afford_goal <- merge(filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                     filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                      by='category')
-internet <- merge(filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                  filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+internet <- merge(filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                  filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                   by='category')
-upstream <- merge(filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                  filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+upstream <- merge(filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                  filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                   by='category')
-backbone <- merge(filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                  filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+backbone <- merge(filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                  filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                   by='category')
-isp <- merge(filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-             filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+isp <- merge(filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+             filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
              by='category')
-wan <- merge(filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-             filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+wan <- merge(filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+             filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
              by='category')
-fiber <- merge(filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-               filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+fiber <- merge(filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+               filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                by='category')
-cable <- merge(filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-               filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+cable <- merge(filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+               filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                by='category')
-fixed_wireless <- merge(filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                        filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+fixed_wireless <- merge(filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                        filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                         by='category')
-copper <- merge(filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-                filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
+copper <- merge(filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == TRUE),
+                filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == FALSE),
                 by='category')
 
 multiples1 <- union(target, wan)
@@ -544,12 +544,12 @@ cable_0_bids
 dev.off()
 
 ##agg cost/mbps prepping
-bids_ia_cost <- filter(bids, bids$exclude_from_ia_cost_analysis == 'false')
+bids_ia_cost <- filter(bids, bids$exclude_from_ia_cost_analysis == FALSE)
 bids_ia_cost <- filter(bids_ia_cost, 
-                       bids_ia_cost$internet_indicator == 'true' | 
-                         bids_ia_cost$upstream_indicator == 'true' | 
-                         bids_ia_cost$isp_indicator == 'true' | 
-                         bids_ia_cost$backbone_indicator == 'true')
+                       bids_ia_cost$internet_indicator == TRUE |
+                         bids_ia_cost$upstream_indicator == TRUE |
+                         bids_ia_cost$isp_indicator == TRUE |
+                         bids_ia_cost$backbone_indicator == TRUE)
 bids_ia_cost$num_bids_category <- ifelse(bids_ia_cost$num_bids_received > 1, 2, bids_ia_cost$num_bids_received)
 bids_ia_cost <- bids_ia_cost %>% distinct(frn, num_bids_category, ia_monthly_cost_per_mbps)
 bids_ia_cost_summ <- group_by(bids_ia_cost, num_bids_category)
@@ -560,12 +560,12 @@ bids_ia_cost_summ <- summarise(bids_ia_cost_summ,
 View(bids_ia_cost_summ)
 
 ##agg bw/student prepping
-bids_ia_bw <- filter(bids, bids$exclude_from_ia_analysis == 'false')
+bids_ia_bw <- filter(bids, bids$exclude_from_ia_analysis == FALSE)
 bids_ia_bw <- filter(bids_ia_bw, 
-                     bids_ia_bw$internet_indicator == 'true' | 
-                       bids_ia_bw$upstream_indicator == 'true' | 
-                       bids_ia_bw$isp_indicator == 'true' | 
-                       bids_ia_bw$backbone_indicator == 'true')
+                     bids_ia_bw$internet_indicator == TRUE |
+                       bids_ia_bw$upstream_indicator == TRUE |
+                       bids_ia_bw$isp_indicator == TRUE |
+                       bids_ia_bw$backbone_indicator == TRUE)
 bids_ia_bw$num_bids_category <- ifelse(bids_ia_bw$num_bids_received > 1, 2, bids_ia_bw$num_bids_received)
 bids_ia_bw <- bids_ia_bw %>% distinct(frn, num_bids_category, ia_bandwidth_per_student_kbps)
 bids_ia_bw_summ <- group_by(bids_ia_bw, num_bids_category)

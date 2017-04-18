@@ -68,9 +68,9 @@ for (i in 1:length(locales)){
 }
 
 ## fiber indicators
-bids$fiber_target_status_indicator <- (bids$fiber_target_status == 'Target' | bids$fiber_target_status == 'Not Target')
-#bids_fiber_target <- filter(bids_fiber, bids_fiber$fiber_target_status == 'Target')
-#bids_fiber_not_target <- filter(bids_fiber, bids_fiber$fiber_target_status == 'Not Target')
+bids$fiber_target_indicator <- (bids$fiber_target_status == 'Target' | bids$fiber_target_status == 'Not Target')
+bids$fiber_target_indicator <- ifelse(bids$fiber_target_status == 'Target' & bids$fiber_target_indicator == TRUE, TRUE,
+                                      ifelse(bids$fiber_target_status == 'Not Target' & bids$fiber_target_indicator == TRUE, FALSE, NA))
 
 ## list indicators that require cleanliness
 bids$meeting_knapsack_affordability_indicator <- bids$meeting_knapsack_affordability_target
@@ -118,7 +118,7 @@ create_datasets <- function(bids, indicator_selected){
 }
 
 ## combine all indicators
-all.indicators <- c(locales, "fiber_target_status_indicator", goal.indicators, purpose.indicators, connect.indicators)
+all.indicators <- c(locales, "fiber_target_indicator", goal.indicators, purpose.indicators, connect.indicators)
 ## fix names
 all.indicators <- tolower(all.indicators)
 all.indicators <- gsub("_indicator", "", all.indicators)
@@ -127,92 +127,12 @@ for (i in 1:length(all.indicators)){
   create_datasets(bids, all.indicators[i])
 }
 
-## NOTE: I don't understand what this section is doing, it appears to be merging from the same dataset.
-#target <- merge(filter(select(bids_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'Target'),
-#                filter(select(bids_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'Not Target'),
-#                by='category')
-#urban <- merge(filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#               filter(select(bids_urban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#               by='category')
-#suburban <- merge(filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                  filter(select(bids_suburban_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                  by='category')
-#town <- merge(filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#              filter(select(bids_town_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#              by='category')
-#rural <- merge(filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#               filter(select(bids_rural_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#               by='category')
-#bw_goal <- merge(filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                 filter(select(bids_bw_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                 by='category')
-#afford_goal <- merge(filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                     filter(select(bids_afford_goal_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                     by='category')
-#internet <- merge(filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                  filter(select(bids_purpose_internet_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                  by='category')
-#upstream <- merge(filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                  filter(select(bids_purpose_upstream_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                  by='category')
-#backbone <- merge(filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                  filter(select(bids_purpose_backbone_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                  by='category')
-#isp <- merge(filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#             filter(select(bids_purpose_isp_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#             by='category')
-#wan <- merge(filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#             filter(select(bids_purpose_wan_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#             by='category')
-#fiber <- merge(filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#               filter(select(bids_connect_fiber_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#               by='category')
-#cable <- merge(filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#               filter(select(bids_connect_cable_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#               by='category')
-#fixed_wireless <- merge(filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                        filter(select(bids_connect_fixedwireless_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                        by='category')
-#copper <- merge(filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'true'),
-#                filter(select(bids_connect_copper_summ, category, value, pct_0_bids, pct_1_bid, pct_2p_bids), value == 'false'),
-#                by='category')
-
-multiples1 <- union(target, wan)
-multiples2 <- union(bw_goal, afford_goal)
-multiples3 <- union(internet, upstream)
-multiples4 <- union(isp, backbone)
-multiples5 <- union(copper, fiber)
-multiples6 <- union(fixed_wireless, cable)
-multiples7 <- union(urban, suburban)
-multiples8 <- union(town, rural)
-
-multiples12 <- union(multiples1,multiples2)
-multiples34 <- union(multiples3,multiples4)
-multiples56 <- union(multiples5,multiples6)
-mutliples78 <- union(multiples7,multiples8)
-multiples1234 <- union(multiples12, multiples34)
-multiples5678 <- union(multiples56,mutliples78)
-multiples <- union(multiples1234,multiples5678)
-
-multiples <- mutate(multiples,
-                    pct_0_1_bids.x = pct_0_bids.x + pct_1_bid.x,
-                    pct_0_1_bids.y = pct_0_bids.y + pct_1_bid.y,
-                    multiple_0.v1 = pct_0_bids.x/pct_0_bids.y,
-                    multiple_0.v2 = pct_0_bids.y/pct_0_bids.x,
-                    multiple_1.v1 = pct_1_bid.x/pct_1_bid.y,
-                    multiple_1.v2 = pct_1_bid.y/pct_1_bid.x,
-                    multiple_0_1.v1 = pct_0_1_bids.x/pct_0_1_bids.y,
-                    multiple_0_1.v2 = pct_0_1_bids.y/pct_0_1_bids.x,
-                    multiple_2p.v1 = pct_2p_bids.x/pct_2p_bids.y,
-                    multiple_2p.v2 = pct_2p_bids.y/pct_2p_bids.x)
-write.csv(multiples, file = "data/interim/multiples.csv")
-
 ##**************************************************************************************************************************************************
 ## NOTE: I would say you could break out this section into another script
 ## since all of the above code is about data munging/prepping
 ## and thus should only have be done once since you already write out to data/interim.
 
-## chart theme
+## chart theme settings
 theme_esh <- function(){
   theme(
     text = element_text(color="#666666", size=18),
@@ -224,179 +144,53 @@ theme_esh <- function(){
   )
 }
 
-## fiber charts
-fiber_target_0_bids <- ggplot(data=bids_fiber_summ, aes(x=fiber_target_status, y=pct_0_bids)) +
-  geom_text(data=bids_fiber_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .15, label = paste0(round(bids_fiber_summ$pct_0_bids[2]/bids_fiber_summ$pct_0_bids[1],1), "x"),
-           colour = "red", size = 8)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-## urban charts
-urban_0_bids <- ggplot(data=bids_urban_summ, aes(x=urban_indicator, y=pct_0_bids)) +
-  geom_text(data=bids_urban_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="Urban", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .15, label = paste0(round(bids_urban_summ$pct_0_bids[1]/bids_urban_summ$pct_0_bids[2],1), "x"),
-           colour = "red", size = 8)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-urban_1_bid <- ggplot(data=bids_urban_summ, aes(x=urban_indicator, y=pct_1_bid)) +
-  geom_text(data=bids_urban_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="Urban", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .4, label = paste0(round(bids_urban_summ$pct_1_bid[1]/bids_urban_summ$pct_1_bid[2],1), "x"),
-           colour = "red", size = 8)+
-  ggtitle("Frequency of 1 Bid") +
-  theme_esh()
-## purpose charts
-internet_0_bids <- ggplot(data=bids_purpose_internet_summ, aes(x=internet_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_internet_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="FRN has Internet", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_internet_summ$pct_0_bids[2]/bids_purpose_internet_summ$pct_0_bids[1],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-upstream_0_bids <- ggplot(data=bids_purpose_upstream_summ, aes(x=upstream_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_upstream_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="FRN has Upstream", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_upstream_summ$pct_0_bids[1]/bids_purpose_upstream_summ$pct_0_bids[2],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids")  +
-  theme_esh()
-wan_0_bids <- ggplot(data=bids_purpose_wan_summ, aes(x=wan_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_wan_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="FRN has WAN", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_wan_summ$pct_0_bids[1]/bids_purpose_wan_summ$pct_0_bids[2],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-backbone_0_bids <- ggplot(data=bids_purpose_backbone_summ, aes(x=backbone_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="FRN has Backbone", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .1,  label=paste0(round(bids_purpose_backbone_summ$pct_0_bids[1]/bids_purpose_backbone_summ$pct_0_bids[2],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-backbone_1_bid <- ggplot(data=bids_purpose_backbone_summ, aes(x=backbone_indicator, y=pct_1_bid)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_purpose_backbone_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="FRN has Backbone", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .4,  label=paste0(round(bids_purpose_backbone_summ$pct_1_bid[1]/bids_purpose_backbone_summ$pct_1_bid[2],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 1 Bid") +
-  theme_esh()
-## connect charts
-cable_0_bids <- ggplot(data=bids_connect_cable_summ, aes(x=cable_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_cable_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
-  labs(x="Cable in FRN", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .2,  label=paste0(round(bids_connect_cable_summ$pct_0_bids[2]/bids_connect_cable_summ$pct_0_bids[1],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-copper_0_bids <- ggplot(data=bids_connect_copper_summ, aes(x=copper_indicator, y=pct_0_bids)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_0_bids*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .6))+
-  labs(x="Copper in FRN", y="") +
-  geom_hline(yintercept=0, size=0.4, color="black")+
-  annotate("text", x = 1.5, y = .2,  label=paste0(round(bids_connect_copper_summ$pct_0_bids[2]/bids_connect_copper_summ$pct_0_bids[1],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 0 Bids") +
-  theme_esh()
-copper_1_bid <- ggplot(data=bids_connect_copper_summ, aes(x=copper_indicator, y=pct_1_bid)) +
-  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
-  geom_text(data=bids_connect_copper_summ,aes(label=paste0(round(pct_1_bid*100,1),"%")),vjust=-1)+
-  scale_y_continuous(labels = percent_format(), limits = c(0, .6))+
-  labs(x="Copper in FRN", y="") +
-  geom_hline(yintercept=0, size=0.44, color="black")+
-  annotate("text", x = 1.5, y = .55,  label=paste0(round(bids_connect_copper_summ$pct_1_bid[2]/bids_connect_copper_summ$pct_1_bid[1],1), "x"),
-           colour = "red", size = 6)+
-  ggtitle("Frequency of 1 Bid") +
-  theme_esh()
-
-## charts
+## define function for all plots
 require(gridExtra)
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/targetplot.png",
-    width=1000,
-    height=796,
-    res=120)
-fiber_target_0_bids
-dev.off()
+plot_bids <- function(dta){
+  title <- gsub("_", " ", dta$category[1])
+  plot.object <- ggplot(data=dta, aes(x=indicator, y=pct_0_bids)) +
+                  geom_text(data=dta, aes(label=paste0(round(pct_0_bids*100,1),"%")), vjust=-1) +
+                  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
+                  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+                  labs(x=title, y="") +
+                  geom_hline(yintercept=0, size=0.4, color="black")+
+                  annotate("text", x = 1.5, y = .15, label = paste0(round(dta$pct_0_bids[2]/dta$pct_0_bids[1],1), "x"),
+                  colour = "red", size = 8)+
+                  ggtitle("Frequency of 0 Bids") +
+                  theme_esh()
+  ## write out plot
+  png(file=paste("figures/", dta$category[1], ".png", sep=""), width=1000, height=796, res=120)
+  print(plot.object)
+  dev.off()
 
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/urbanplot.png",
-    width=1000,
-    height=796,
-    res=120)
-grid.arrange(urban_0_bids, urban_1_bid, ncol=2)
-dev.off()
+  if (title %in% c("urban", "backbone", "copper")){
+    plot.object2 <- ggplot(data=dta, aes(x=indicator, y=pct_1_bid)) +
+      geom_text(data=dta, aes(label=paste0(round(pct_1_bid*100,1),"%")), vjust=-1) +
+      geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
+      scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+      labs(x="", y="") +
+      geom_hline(yintercept=0, size=0.4, color="black")+
+      annotate("text", x = 1.5, y = .4, label = paste0(round(dta$pct_1_bid[1]/dta$pct_1_bid[2],1), "x"),
+               colour = "red", size = 8)+
+      ggtitle("Frequency of 1 Bid") +
+      theme_esh()
 
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/internetplot.png",
-    width=1000,
-    height=796,
-    res=120)
-internet_0_bids
-dev.off()
+    png(file=paste("figures/", dta$category[1], "_compare_0_1_bids.png", sep=""), width=1000, height=796, res=120)
+    grid.arrange(plot.object, plot.object2, ncol=2)
+    dev.off()
+  }
+}
 
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/upstreamplot.png",
-    width=1000,
-    height=796,
-    res=120)
-upstream_0_bids
-dev.off()
+## collect datasets to plot for bids
+plot_bids(bids_fiber_summ)
+plot_bids(bids_urban_summ)
+plot_bids(bids_internet_summ)
+plot_bids(bids_upstream_summ)
+plot_bids(bids_wan_summ)
+plot_bids(bids_backbone_summ)
+plot_bids(bids_cable_summ)
+plot_bids(bids_copper_summ)
 
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/wanplot.png",
-    width=1000,
-    height=796,
-    res=120)
-wan_0_bids
-dev.off()
-
-
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/backboneplot.png",
-    width=1000,
-    height=796,
-    res=120)
-grid.arrange(backbone_0_bids, backbone_1_bid, ncol=2)
-dev.off()
-
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/copperplot.png",
-    width=1000,
-    height=796,
-    res=120)
-grid.arrange(copper_0_bids, copper_1_bid, ncol=2)
-dev.off()
-
-png(file="C:/Users/Justine/Google Drive/ESH Main Share/Strategic Analysis Team/2017/Org-Wide Projects/special_construction/images/cableplot.png",
-    width=1000,
-    height=796,
-    res=120)
-cable_0_bids
-dev.off()
 
 ##agg cost/mbps prepping
 bids_ia_cost <- filter(bids, bids$exclude_from_ia_cost_analysis == 'false')
