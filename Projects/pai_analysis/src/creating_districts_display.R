@@ -41,8 +41,11 @@ districts_display$meeting_knapsack_affordability_target <- ifelse(districts_disp
 #e-rate funding for C1 (does not include voice). Clean and dirty broadband erate line items
 #c1 <- 1364343502
 
-#without AK:
+#without AK and excluded line items:
 c1 <- 1125134004
+
+#without AK:
+#c1 <- 1255107617
 
 #e-rate funding for C2
 districts_display$adjusted_c2 <- ifelse(is.na(districts_display$discount_rate_c2), mean(districts_display$discount_rate_c2, na.rm=T), districts_display$discount_rate_c2)
@@ -54,8 +57,11 @@ total_funds <- c1+c2
 #e-rate funding for IA
 #ia_total_funds <-  583053227
 
-#without AK:
+#without AK and excluded line items:
 ia_total_funds <- 451975094
+
+#without AK:
+#ia_total_funds <- 500005536
 
 #e-rate funding for WAN
 wan_total_funds <- c1 - ia_total_funds
