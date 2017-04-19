@@ -330,7 +330,7 @@ state_metrics['advice_skew'] = where(	logical_or(	(state_metrics['total_cost_az_
 															'high - skew towards minimum',
 															'no insight')
 
-state_metrics.to_csv('../../data/external/state_metrics.csv')
+state_metrics.to_csv('../../data/processed/state_metrics.csv')
 print("File saved")
 
 
