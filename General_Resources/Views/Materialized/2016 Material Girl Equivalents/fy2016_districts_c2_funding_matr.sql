@@ -64,7 +64,10 @@ from (
       esh_id,
       postal_cd,
       c2_cost_budget,
-      round(proportionate_c2_funding/proportionate_c2_cost,2) as weighted_avg_dr,
+      case
+        when proportionate_c2_cost > 0
+          then round(proportionate_c2_funding/proportionate_c2_cost,2)
+      end as weighted_avg_dr,
       proportionate_c2_cost,
       proportionate_c2_funding,
       case
@@ -113,8 +116,10 @@ from (
           dl.district_esh_id,
           a.cat_2_cost
           from public.allocations a
+          left join public.entity_bens eb
+          on eb.ben = a.recipient_ben
           left join public.fy2016_district_lookup_matr dl
-          on a.recipient_id::varchar = dl.esh_id
+          on eb.entity_id::varchar = dl.esh_id
           left join (
             select esh_id,
                   dd.postal_cd,
@@ -187,8 +192,10 @@ from (
         dl.district_esh_id,
         a.cat_2_cost
         from fy2016.allocations a
+        left join public.entity_bens eb
+        on eb.ben = a.recipient_ben
         left join public.fy2016_district_lookup_matr dl
-        on a.recipient_id::varchar = dl.esh_id
+        on eb.entity_id::varchar = dl.esh_id
         left join (
           select esh_id,
                 dd.postal_cd,
@@ -264,8 +271,10 @@ from (
           dl.district_esh_id,
           a.cat_2_cost
           from fy2016.allocations a
+          left join public.entity_bens eb
+          on eb.ben = a.recipient_ben
           left join public.fy2016_district_lookup_matr dl
-          on a.recipient_id::varchar = dl.esh_id
+          on eb.entity_id::varchar = dl.esh_id
           left join (
             select esh_id,
                   dd.postal_cd,
@@ -330,7 +339,7 @@ from (
 /*
 Author: Justine Schott
 Created On Date: 10/14/2016
-Last Modified Date: 12/5/2016
+Last Modified Date: 4/13/2017 -- JS remove references to esh_id's in allocation tables
 Name of QAing Analyst(s): Jess Seok
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
 Methodology:
