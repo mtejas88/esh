@@ -8,9 +8,10 @@ export
 PROJ_DIR = .
 DATA_DIR = $(PROJ_DIR)/data
 CODE_DIR = $(PROJ_DIR)/src
+FIGS_DIR = $(PROJ_DIR)/figures
 
 ## define variables without any commands
-.PHONY: data sample all
+.PHONY: data sample forest all
 
 data: $(CODE_DIR)/out_files/query_data.Rout
 sample: data $(CODE_DIR)/out_files/munge_data.Rout
