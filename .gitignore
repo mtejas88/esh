@@ -5,6 +5,9 @@
 Icon
 **/desktop.ini
 
+## and ignore any API credentials stored in python
+./**/credentials.py
+
 ## also ignore all data files
 **/data/*
 !**/data/.gitkeep
