@@ -1,16 +1,33 @@
-## This file is used by Git to clarify which files should be ignored in the commit.
+## this file is used by Git to clarify which files should be ignored in the commit.
 
-
-## the first two files are automatically created by Mac OS X or Windows operating system
 ## when a new directory is created
 **/.DS_Store
-Icon
+Icon
 **/desktop.ini
+
+## and ignore any API credentials stored in python
+./**/credentials.py
 
 ## also ignore all data files
 **/data/*
-## but don't ignore the actual directory
 !**/data/.gitkeep
+
+**/data/raw/*
+!**/data/raw/.gitkeep
+
+**/data/interim/*
+!**/data/interim/.gitkeep
+
+**/data/processed/*
+!**/data/processed/.gitkeep
+
+## and figures files
+**/figures/*
+!**/figures/.gitkeep
+
+## and out files
+**/src/out_files/*
+!**/src/out_files/.gitkeep
 
 ## and ignore all data and history created by running R in batch
 **/.RData
@@ -18,14 +35,3 @@ Icon
 
 ## and ignore any API credentials stored in python
 ./**/credentials.py
-
-## ignore any files in /src/out_files/
-**/out_files/*
-## but don't ignore the actual directory
-!**/out_files/.gitkeep
-
-## ignore any files in figures/
-**/figures/*
-## but don't ignore the actual directory
-!**/figures/.gitkeep
-
