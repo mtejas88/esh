@@ -55,8 +55,8 @@ for z in range(0,len(state_metrics)):
 		value.append('builds')
 		district_postal_cd.append(state_metrics['district_postal_cd'][z])
 
-	methodology = append(methodology, ['overall', 'wan', 'ia', 'overall', 'wan', 'ia', 'wan', 'wan'])
-	cut = append(cut, ['min', 'min', 'min', 'max', 'max', 'max', 'az', 'az_pop'])
+	methodology = append(methodology, ['min', 'min', 'min', 'max', 'max', 'max', 'az', 'az_pop'])
+	cut = append(cut, ['overall', 'wan', 'ia', 'overall', 'wan', 'ia', 'wan', 'wan'])
 
 	numbers = append(numbers,
 		[state_metrics['min_builds'][z],
