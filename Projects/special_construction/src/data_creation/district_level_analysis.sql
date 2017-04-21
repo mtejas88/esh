@@ -43,7 +43,6 @@ with state_bids as (
              select
                 frns.frn,
                 frns.num_bids_received::numeric,
-                frns.total_pre_discount_charges::numeric,
                 del.esh_id,
                 del.postal_cd,
                 del.fiber_target_status,
@@ -66,7 +65,16 @@ with state_bids as (
                   or 'DSL' = any(array_agg(sr.purpose)) as copper_indicator,
                 'Cable' = any(array_agg(sr.purpose)) as cable_indicator,
                 'Fixed Wireless' = any(array_agg(sr.purpose)) as fixed_wireless_indicator,
-                sum(sr.bandwidth_in_mbps * sr.quantity_of_line_items_received_by_district) as sum_bandwidth
+                sum(case
+                        when sr.bandwidth_in_mbps < 100
+                            then 1
+                        else 0
+                    end) as low_bw_indicator,
+                sum(case
+                        when sr.bandwidth_in_mbps < 100
+                            then 1
+                        else 0
+                    end) as low_bw_indicator
             from public.fy2016_services_received_matr sr
             left join public.fy2016_districts_deluxe_matr del
             on sr.recipient_id = del.esh_id
@@ -78,7 +86,7 @@ with state_bids as (
             and sr.broadband
             and sr.inclusion_status != 'dqs_excluded'
             and del.include_in_universe_of_districts_all_charters
-            group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+            group by 1,2,3,4,5,6,7,8,9,10,11,12
         ) frns_districts
         where   not(internet_indicator and
                     wan_indicator = false
@@ -86,7 +94,7 @@ with state_bids as (
                     and backbone_indicator = false
                     and isp_indicator = false
                     and total_pre_discount_charges < 3600
-                    and sum_bandwidth >= 100
+                    and low_bw_indicator = 0
                 )
         group by 1,2,3,4,5,6,7,8,9,10
     ) districts
