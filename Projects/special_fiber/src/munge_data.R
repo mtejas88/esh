@@ -40,6 +40,8 @@ joe_f.2017$Estimated.Special.construction <- gsub(",","",joe_f.2017$Estimated.Sp
 joe_f.2017$Estimated.Special.construction <- substring(joe_f.2017$Estimated.Special.construction,2)
 joe_f.2017$Estimated.Special.construction <- as.numeric(joe_f.2017$Estimated.Special.construction)
 
+write.csv(joe_f.2017, "data/interim/joe_f.2017.csv", row.names=F)
+
 #joining applicant BENs to joe f's spreadsheet. losing some rows because they don't go to districts / schools
 new_joe_f.2017 <- merge(x = joe_f.2017, y = applicant_470s.2017, by = 'form_470')
 
