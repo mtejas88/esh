@@ -81,3 +81,4 @@ district_summary <- merge(x = district_summary, y = district_costs, by = 'esh_id
 district_summary <- district_summary[district_summary$include_in_universe_of_districts == TRUE,]
 
 write.csv(district_summary, "data/interim/district_summary.csv", row.names=F)
+write.csv(applicant_requests.2017, "data/interim/applicant_summary.csv", row.names=F)

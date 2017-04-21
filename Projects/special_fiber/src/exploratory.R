@@ -11,6 +11,7 @@ rm(list=ls())
 ## READ IN DATA
 
 district_summary <- read.csv("data/interim/district_summary.csv", as.is=T, header=T, stringsAsFactors=F)
+applicant_summary <- read.csv("data/interim/applicant_summary.csv", as.is=T, header=T, stringsAsFactors=F)
 
 funding_lost <- sum(district_summary$estimated_special_construction)
 schools_impacted <- sum(district_summary$num_schools)
@@ -30,4 +31,9 @@ barplot(by_locale$estimated_special_construction, names.arg = by_locale$locale, 
 barplot(by_locale$num_students, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
 barplot(by_locale$num_schools, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
 
+applicant_summary <- applicant_summary[order(applicant_summary$estimated_special_construction, decreasing = TRUE),]
+
+top_5_applicants <- applicant_summary[1:5,]
+
+barplot(top_5_applicants$estimated_special_construction, names.arg = top_5_applicants$adj_applicant_ben, main = 'Top Applicants', col = 'blue')
 
