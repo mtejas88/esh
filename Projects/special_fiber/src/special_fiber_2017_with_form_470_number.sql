@@ -866,8 +866,10 @@ and case when (f."Applicant Type" != 'Consortium' or applicant_ben in ('17012451
 
 )
 
-select *
+select distinct "470 Number"
 from recipient_lookup rl
 
 left join public.fy2016_districts_deluxe_matr d
 on rl.recipient_id = d.esh_id
+
+where include_in_universe_of_districts
