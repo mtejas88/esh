@@ -20,6 +20,9 @@ joe_f.2017 <- read.csv("joe_f/joe_f_form470.csv", as.is=T, header=T, stringsAsFa
 source('../../General_Resources/common_functions/correct_dataset.R')
 sf.2017 <- correct.dataset(sf.2017, 0 , 0)
 
+#subsetting to districts in our universe
+sf.2017 <- sf.2017[sf.2017$include_in_universe_of_districts == TRUE,]
+
 #adjusting name of 470 column
 colnames(joe_f.2017)[6] <- 'form_470'
 
@@ -81,6 +84,6 @@ district_summary <- sf.2017[,columns_to_keep]
 district_summary <- district_summary[!duplicated(district_summary),]
 district_summary <- merge(x = district_summary, y = district_costs, by = 'esh_id')
 district_summary <- district_summary[district_summary$include_in_universe_of_districts == TRUE,]
-
+sum(district_summary$estimated_special_construction)
 write.csv(district_summary, "data/interim/district_summary.csv", row.names=F)
 write.csv(applicant_requests.2017, "data/interim/applicant_summary.csv", row.names=F)
