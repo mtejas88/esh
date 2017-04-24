@@ -12,24 +12,24 @@
                         when num_bids_received = 0
                             then 1
                         else 0
-                    end) as frns_0_bid,
+                    end) > 0 as frns_0_bid_indicator,
                 sum(case
                         when num_bids_received = 1
                             then 1
                         else 0
-                    end) as frns_1_bid,
+                    end) > 0 as frns_1_bid_indicator,
                 sum(case
                         when num_bids_received = 2
                             then 1
                         else 0
-                    end) as frns_2_bid,
+                    end) > 0 as frns_2_bid_indicator,
                 sum(case
                         when num_bids_received = 2
                             then 1
                         else 0
-                    end) as frns_3p_bid
+                    end) > 0 as frns_3p_bid_indicator
         from(
-             select
+            select
                 frns.frn,
                 frns.num_bids_received::numeric,
                 del.esh_id,
@@ -53,17 +53,7 @@
                   or 'T-1' = any(array_agg(sr.purpose))
                   or 'DSL' = any(array_agg(sr.purpose)) as copper_indicator,
                 'Cable' = any(array_agg(sr.purpose)) as cable_indicator,
-                'Fixed Wireless' = any(array_agg(sr.purpose)) as fixed_wireless_indicator,
-                sum(case
-                        when sr.bandwidth_in_mbps < 100
-                            then 1
-                        else 0
-                    end) as low_bw_indicator,
-                sum(case
-                        when sr.bandwidth_in_mbps < 100
-                            then 1
-                        else 0
-                    end) as low_bw_indicator
+                'Fixed Wireless' = any(array_agg(sr.purpose)) as fixed_wireless_indicator
             from public.fy2016_districts_deluxe_matr del
             left join (
                 select *
@@ -79,4 +69,4 @@
             where del.include_in_universe_of_districts_all_charters
             group by 1,2,3,4,5,6,7,8,9,10,11,12
         ) frns_districts
-        group by 1,2,3,4,5,6,7,8,9,10;
+        group by 1,2,3,4,5,6,7,8,9,10
