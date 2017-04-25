@@ -515,7 +515,10 @@ districts_display$current_num_students_meeting_extrap_perc <- ifelse(districts_d
                                                                      ifelse(districts_display$locale == 'Suburban', locale_df[2,'current_num_students_meeting_extrap_perc'], 
                                                                             ifelse(districts_display$locale == 'Town', locale_df[3,'current_num_students_meeting_extrap_perc'],
                                                                                    locale_df[4,'current_num_students_meeting_extrap_perc'])))
-districts_display$current_num_students_meeting_extrap <- districts_display$current_num_students_meeting_extrap_perc * districts_display$num_students
+
+districts_display$current_num_students_meeting_extrap <- ifelse(districts_display$exclude_from_ia_analysis == FALSE & districts_display$include_in_universe_of_districts == TRUE,
+                                                                districts_display$current_num_students_meeting,
+                                                                districts_display$current_num_students_meeting_extrap_perc * districts_display$num_students)
 
 
 #max cost
@@ -526,7 +529,13 @@ districts_display$max_cost_num_students_meeting_extrap_perc <- ifelse(districts_
                                                                              ifelse(districts_display$locale == 'Town', locale_df[3,'max_cost_num_students_meeting_extrap_perc'],
                                                                                     locale_df[4,'max_cost_num_students_meeting_extrap_perc'])))
 
-districts_display$max_cost_num_students_meeting_extrap <- districts_display$max_cost_num_students_meeting_extrap_perc * districts_display$num_students
+#districts_display$max_cost_num_students_meeting_extrap <- districts_display$max_cost_num_students_meeting_extrap_perc * districts_display$num_students
+districts_display$max_cost_num_students_meeting_extrap <- ifelse(districts_display$exclude_from_ia_analysis == FALSE & 
+                                                                   districts_display$include_in_universe_of_districts == TRUE &
+                                                                   districts_display$ia_monthly_cost_per_mbps > 0 &
+                                                                   districts_display$exclude_from_ia_cost_analysis == FALSE,
+                                                                districts_display$max_cost_num_students_meeting,
+                                                                districts_display$max_cost_num_students_meeting_extrap_perc * districts_display$num_students)
 
 districts_display$total_current_erate_share <-districts_display$district_cost_total - districts_display$total_current_oop
 
