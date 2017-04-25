@@ -2,6 +2,8 @@
                 postal_cd,
                 fiber_target_status,
                 locale,
+                num_schools,
+                num_campuses,
                 ia_monthly_cost_per_mbps,
                 meeting_knapsack_affordability_target,
                 ia_bandwidth_per_student_kbps,
@@ -42,6 +44,8 @@
                 del.meeting_2014_goal_no_oversub,
                 del.exclude_from_ia_analysis,
                 del.exclude_from_ia_cost_analysis,
+                del.num_schools,
+                del.num_campuses,
                 'Internet' = any(array_agg(sr.purpose)) as internet_indicator,
                 'WAN' = any(array_agg(sr.purpose)) as wan_indicator,
                 'Upstream' = any(array_agg(sr.purpose)) as upstream_indicator,
@@ -67,6 +71,6 @@
             left join fy2016.frns
             on li.frn = frns.frn
             where del.include_in_universe_of_districts_all_charters
-            group by 1,2,3,4,5,6,7,8,9,10,11,12
+            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
         ) frns_districts
-        group by 1,2,3,4,5,6,7,8,9,10
+        group by 1,2,3,4,5,6,7,8,9,10,11,12
