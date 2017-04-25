@@ -9,6 +9,7 @@ rm(list=ls())
 
 args = commandArgs(trailingOnly=TRUE)
 github_path <- args[1]
+github_path <- "~/Documents/ESH-Code/ficher/"
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -46,8 +47,10 @@ querydb <- function(query_name){
   return(data)
 }
 ## raw line item data (as it comes in from USAC)
-frn.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
-frn.2016 <- correct.dataset(frn.2016, sots.flag=0, services.flag=0)
+frn.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
+frn.line.items.2016 <- correct.dataset(frn.line.items.2016, sots.flag=0, services.flag=0)
+frn.meta.data.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frns.SQL", sep=""))
+frn.meta.data.2016 <- correct.dataset(frn.meta.data.2016, sots.flag=0, services.flag=0)
 ## corrected line item data
 line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
 line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
@@ -58,5 +61,6 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(frn.2016, "data/raw/frn_line_items_2016.csv", row.names=F)
+write.csv(frn.line.items.2016, "data/raw/frn_line_items_2016.csv", row.names=F)
+write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
 write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)

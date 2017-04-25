@@ -63,6 +63,7 @@ original_frn_not_current <- original_frn_mod[which(!original_frn_mod$line_item %
 names(original_frn_not_current) <- names(esh_frn_file)
 names(current_frn_mod) <- names(esh_frn_file)
 
+
 #combined the current frns with the original frns
 all_usac_frns <- rbind(current_frn_mod, original_frn_not_current)
 
@@ -78,6 +79,9 @@ esh_frn_file <- esh_frn_file[which(esh_frn_file$frn_complete %in% commonId),]
 
 #commonPurpose <- intersect(current_frn_mod_2$connect_type, esh_frn_file_2$connect_type)
 combined <- merge(x = all_usac_frns, y = esh_frn_file, by = 'frn_complete') #inner join
+
+current_num <- nrow(combined[which(combined$frn_complete %in% current_frn_mod$frn_complete),])
+original_frn_not_current_num <- nrow(combined[which(combined$frn_complete %in% original_frn_not_current$frn_complete),])
 
 ##**************************************************************************************************************************************************
 ## formatting combined dataframe
