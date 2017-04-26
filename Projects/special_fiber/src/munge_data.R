@@ -67,12 +67,27 @@ missing <- applicant_requests.2017[!applicant_requests.2017$adj_applicant_ben %i
 applicant_requests.2017 <- merge(x = recipient_count, y = applicant_requests.2017, by = 'adj_applicant_ben')
 applicant_requests.2017$recip_cost <- applicant_requests.2017$recip_perc * applicant_requests.2017$estimated_special_construction
 
+
 #merging together recipient cost with sf.2017
 sf.2017 <- merge(x = sf.2017, y = applicant_requests.2017, by = 'adj_applicant_ben')
+sf.2017$non_consortia_applicant <- ifelse(sf.2017$Applicant.Type %in% c('School','School District'), 1, 0)
+
+#df of num schools and students served by applicant (note, some students and schools are double counted)
+applicant_schools <- aggregate(sf.2017$num_schools, by = list(sf.2017$adj_applicant_ben), FUN = sum)
+names(applicant_schools) <- c('adj_applicant_ben','num_schools')
+applicant_students <- aggregate(sf.2017$num_students, by = list(sf.2017$adj_applicant_ben), FUN = sum)
+names(applicant_students) <- c('adj_applicant_ben','num_students')
+
+applicant_requests.2017 <- merge(x = applicant_requests.2017, y = applicant_schools, by = 'adj_applicant_ben')
+applicant_requests.2017 <- merge(x = applicant_requests.2017, y = applicant_students, by = 'adj_applicant_ben')
 
 #unique recipient district costs
 district_costs <- aggregate(sf.2017$recip_cost, by = list(sf.2017$recipient_id), FUN = sum, na.rm = T)
 names(district_costs) <- c('esh_id','estimated_special_construction')
+
+#determining if the district receives from consortia
+consortia_summary <- aggregate(sf.2017$non_consortia_applicant, by = list(sf.2017$recipient_id), FUN = sum, na.rm = T)
+names(consortia_summary) <- c('esh_id','non_consortia_applicant')
 
 #final district summary df
 columns_to_keep <- c('esh_id','nces_cd','district_size', 'district_type','num_schools','num_campuses','num_students', 'locale',
@@ -84,6 +99,9 @@ district_summary <- sf.2017[,columns_to_keep]
 district_summary <- district_summary[!duplicated(district_summary),]
 district_summary <- merge(x = district_summary, y = district_costs, by = 'esh_id')
 district_summary <- district_summary[district_summary$include_in_universe_of_districts == TRUE,]
+district_summary <- merge(x = district_summary, y = consortia_summary, by = 'esh_id')
 sum(district_summary$estimated_special_construction)
+district_summary$non_consortia_applicant <- ifelse(district_summary$non_consortia_applicant == 0, 'Consortia Applicant', 'Non Consortia Applicant')
+
 write.csv(district_summary, "data/interim/district_summary.csv", row.names=F)
 write.csv(applicant_requests.2017, "data/interim/applicant_summary.csv", row.names=F)
