@@ -8,11 +8,13 @@ import pylab
 import pandas as pd
 import numpy as np
 import statsmodels.formula.api as smf
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
 
 ## data prep
 #import
 districts_for_sc_reg = pd.read_csv('data/interim/reg/districts_for_sc_reg.csv')
+#clean for cost only
+districts_for_sc_reg = districts_for_sc_reg.loc[districts_for_sc_reg['exclude_from_ia_cost_analysis'] == False]
 #target, not target only for regression
 districts_for_sc_reg =  districts_for_sc_reg.loc[districts_for_sc_reg['fiber_target_status'].isin(['Target', 'Not Target'])]
 #aggregate 2+,3+
@@ -22,8 +24,8 @@ state_procures_independently = ['AK', 'AZ', 'CT', 'CO', 'FL', 'ID', 'IL', 'IN', 
 districts_for_sc_reg['state_procures_independently'] = districts_for_sc_reg['postal_cd'].isin(state_procures_independently)
 
 ## model prep
-lm_incl = LogisticRegression()
-lm_excl = LogisticRegression()
+lm_incl = LinearRegression()
+lm_excl = LinearRegression()
 
 status_dummies = pd.get_dummies(districts_for_sc_reg.fiber_target_status, prefix='status').iloc[:, 1:]
 districts_for_sc_reg  = pd.concat([districts_for_sc_reg, status_dummies], axis=1)
@@ -31,9 +33,9 @@ districts_for_sc_reg  = pd.concat([districts_for_sc_reg, status_dummies], axis=1
 locale_dummies = pd.get_dummies(districts_for_sc_reg.locale, prefix='locale').iloc[:, 1:]
 districts_for_sc_reg = pd.concat([districts_for_sc_reg, locale_dummies], axis=1)
 
-feature_cols_incl_bids = ['frns_0_bid_indicator', 'frns_1_bid_indicator', 'frns_2p_bid_indicator', 'locale_Town', 'locale_Suburban', 'locale_Urban', 'state_procures_independently']
+feature_cols_incl_bids = ['frns_0_bid_indicator', 'frns_1_bid_indicator', 'frns_2p_bid_indicator', 'locale_Town', 'locale_Suburban', 'locale_Urban', 'state_procures_independently', 'ia_monthly_cost_per_mbps', 'num_schools']
 
-feature_cols_excl_bids = ['locale_Town', 'locale_Suburban', 'locale_Urban', 'state_procures_independently']
+feature_cols_excl_bids = ['locale_Town', 'locale_Suburban', 'locale_Urban', 'state_procures_independently', 'ia_monthly_cost_per_mbps', 'num_schools']
 
 X_incl = districts_for_sc_reg[feature_cols_incl_bids]
 X_excl = districts_for_sc_reg[feature_cols_excl_bids]
@@ -44,6 +46,8 @@ lm_incl.fit(X_incl, y)
 lm_excl.fit(X_excl, y)
 print(lm_incl.score(X_incl,y))
 print(lm_excl.score(X_excl,y))
+print(lm_incl.coef_)
+print(lm_excl.coef_)
 
 #regression does this about statistical significance, these are not
 #how many records is statistical significance here and did we reach it
