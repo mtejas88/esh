@@ -115,7 +115,41 @@ for (i in 1:length(all.indicators)){
 }
 
 ##====================================
-## STEP #3: WRITE AND EXPORT PLOTS
+## STEP #3: WRITE AND EXPORT SUMM
+##====================================
+
+#convert rows to columns and write
+write.table(cbind(filter(bids_rural_summ, values == TRUE), 
+                  filter(bids_rural_summ, values == FALSE)), 
+            "data/interim/multiples.csv", 
+            col.names=TRUE, row.names = FALSE,
+            sep=",")
+
+#append all tables' with rows as columns
+for (i in 2:length(all.indicators)){
+  write.table(cbind(filter(eval(as.name(paste("bids", tolower(all.indicators[i]), "summ", sep="_"))), values == TRUE), 
+                    filter(eval(as.name(paste("bids", tolower(all.indicators[i]), "summ", sep="_"))), values == FALSE)), 
+              file = "data/interim/multiples.csv", 
+              col.names=FALSE, row.names = FALSE
+              , sep=",", append=TRUE)
+}
+
+#reimport munged table with columns needed
+multiples <- read.csv("data/interim/multiples.csv", as.is=TRUE)
+multiples <- select(multiples, 
+                    count_0_bids, count_1_bid, count_2p_bids, category, 
+                    values, pct_0_bids, pct_2p_bids,
+                    values.1, pct_0_bids.1, pct_2p_bids.1)
+multiples$pct_0_bids_multiple <- ifelse( multiples$pct_0_bids < multiples$pct_0_bids.1,
+                                         multiples$pct_0_bids.1 /multiples$pct_0_bids,
+                                         multiples$pct_0_bids / multiples$pct_0_bids.1)
+multiples$pct_2p_bids_multiple <- ifelse( multiples$pct_2p_bids < multiples$pct_2p_bids.1,
+                                          multiples$pct_2p_bids.1 /multiples$pct_2p_bids,
+                                          multiples$pct_2p_bids / multiples$pct_2p_bids.1)
+
+
+##====================================
+## STEP #4: WRITE AND EXPORT SIG PLOTS
 ##====================================
 
 
@@ -141,7 +175,10 @@ plot_bids <- function(dta){
                   scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
                   labs(x=title, y="") +
                   geom_hline(yintercept=0, size=0.4, color="black")+
-                  annotate("text", x = 1.5, y = .15, label = paste0(round(dta$pct_0_bids[2]/dta$pct_0_bids[1],1), "x"),
+                  annotate("text", x = 1.5, y = .15, 
+                           label = paste0(round(select(filter(multiples, 
+                                                              category == bids_fiber_summ$category[1]), 
+                                                       pct_0_bids_multiple),1), "x"),
                   colour = "red", size = 8)+
                   ggtitle("Frequency of 0 Bids") +
                   theme_esh()
@@ -151,9 +188,7 @@ plot_bids <- function(dta){
   dev.off()
 }
 
-
 ## collect datasets to plot for bids
-plot_bids(bids_fiber_summ)
 plot_bids(bids_urban_summ)
 plot_bids(bids_internet_summ)
 plot_bids(bids_upstream_summ)
@@ -161,6 +196,5 @@ plot_bids(bids_wan_summ)
 plot_bids(bids_backbone_summ)
 plot_bids(bids_cable_summ)
 plot_bids(bids_copper_summ)
-
-
+plot_bids(filter(bids_fiber_target_summ, !is.na(indicator)))
 

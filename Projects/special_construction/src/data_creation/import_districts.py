@@ -23,7 +23,3 @@ conn.close()
 
 districts_for_sc_reg.round(2)
 districts_for_sc_reg.to_csv('../../../data/interim/reg/districts_for_sc_reg.csv')
-
-districts_for_sc_reg_clean = districts_for_sc_reg.loc[districts_for_sc_reg['exclude_from_ia_analysis'] == False]
-districts_for_sc_reg_clean = districts_for_sc_reg_clean.loc[districts_for_sc_reg_clean['exclude_from_ia_cost_analysis'] == False]
-districts_for_sc_reg_clean.to_csv('../../../data/interim/reg/districts_for_sc_reg_clean.csv')
