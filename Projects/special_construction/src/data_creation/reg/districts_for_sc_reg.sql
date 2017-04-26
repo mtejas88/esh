@@ -77,6 +77,7 @@
                 del.locale,
                 del.ia_monthly_cost_per_mbps,
                 del.meeting_knapsack_affordability_target,
+                del.ia_bw_mbps_total,
                 del.ia_bandwidth_per_student_kbps,
                 del.meeting_2014_goal_no_oversub,
                 del.exclude_from_ia_analysis,
@@ -108,6 +109,6 @@
             left join fy2016.frns
             on li.frn = frns.frn
             where del.include_in_universe_of_districts_all_charters
-            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
         ) frns_districts
         group by 1,2,3,4,5,6,7,8,9,10,11,12, 13
