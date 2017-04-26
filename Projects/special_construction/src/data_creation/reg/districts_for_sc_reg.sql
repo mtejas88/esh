@@ -6,6 +6,7 @@
                 num_campuses,
                 ia_monthly_cost_per_mbps,
                 meeting_knapsack_affordability_target,
+                ia_bw_mbps_total,
                 ia_bandwidth_per_student_kbps,
                 meeting_2014_goal_no_oversub,
                 exclude_from_ia_analysis,
@@ -29,7 +30,43 @@
                         when num_bids_received = 2
                             then 1
                         else 0
-                    end) > 0 as frns_3p_bid_indicator
+                    end) > 0 as frns_3p_bid_indicator,
+                sum(case
+                        when    num_bids_received = 0
+                                and (   internet_indicator
+                                        or upstream_indicator
+                                        or backbone_indicator
+                                        or isp_indicator)
+                            then 1
+                        else 0
+                    end) > 0 as frns_0_bid_ia_indicator,
+                sum(case
+                        when    num_bids_received = 1
+                                and (   internet_indicator
+                                        or upstream_indicator
+                                        or backbone_indicator
+                                        or isp_indicator)
+                            then 1
+                        else 0
+                    end) > 0 as frns_1_bid_ia_indicator,
+                sum(case
+                        when    num_bids_received = 2
+                                and (   internet_indicator
+                                        or upstream_indicator
+                                        or backbone_indicator
+                                        or isp_indicator)
+                            then 1
+                        else 0
+                    end) > 0 as frns_2_bid_ia_indicator,
+                sum(case
+                        when    num_bids_received = 2
+                                and (   internet_indicator
+                                        or upstream_indicator
+                                        or backbone_indicator
+                                        or isp_indicator)
+                            then 1
+                        else 0
+                    end) > 0 as frns_3p_bid_ia_indicator
         from(
             select
                 frns.frn,
@@ -73,4 +110,4 @@
             where del.include_in_universe_of_districts_all_charters
             group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
         ) frns_districts
-        group by 1,2,3,4,5,6,7,8,9,10,11,12
+        group by 1,2,3,4,5,6,7,8,9,10,11,12, 13
