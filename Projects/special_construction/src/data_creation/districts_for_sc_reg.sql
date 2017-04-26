@@ -93,13 +93,13 @@
                 'Upstream' = any(array_agg(sr.purpose)) as upstream_indicator,
                 'Backbone' = any(array_agg(sr.purpose)) as backbone_indicator,
                 'ISP' = any(array_agg(sr.purpose)) as isp_indicator,
-                'Lit Fiber' = any(array_agg(sr.purpose))
-                  or 'Dark Fiber' = any(array_agg(sr.purpose)) as fiber_indicator,
-                'Other Copper' = any(array_agg(sr.purpose))
-                  or 'T-1' = any(array_agg(sr.purpose))
-                  or 'DSL' = any(array_agg(sr.purpose)) as copper_indicator,
-                'Cable' = any(array_agg(sr.purpose)) as cable_indicator,
-                'Fixed Wireless' = any(array_agg(sr.purpose)) as fixed_wireless_indicator
+                'Lit Fiber' = any(array_agg(sr.connect_category))
+                  or 'Dark Fiber' = any(array_agg(sr.connect_category)) as fiber_indicator,
+                'Other Copper' = any(array_agg(sr.connect_category))
+                  or 'T-1' = any(array_agg(sr.connect_category))
+                  or 'DSL' = any(array_agg(sr.connect_category)) as copper_indicator,
+                'Cable' = any(array_agg(sr.connect_category)) as cable_indicator,
+                'Fixed Wireless' = any(array_agg(sr.connect_category)) as fixed_wireless_indicator
             from public.fy2016_districts_deluxe_matr del
             left join (
                 select *
