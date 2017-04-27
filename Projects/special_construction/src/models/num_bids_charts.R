@@ -146,7 +146,10 @@ multiples$pct_0_bids_multiple <- ifelse( multiples$pct_0_bids < multiples$pct_0_
 multiples$pct_2p_bids_multiple <- ifelse( multiples$pct_2p_bids < multiples$pct_2p_bids.1,
                                           multiples$pct_2p_bids.1 /multiples$pct_2p_bids,
                                           multiples$pct_2p_bids / multiples$pct_2p_bids.1)
-
+write.table(multiples, 
+            "data/processed/multiples.csv", 
+            col.names=TRUE, row.names = FALSE,
+            sep=",")
 
 ##====================================
 ## STEP #4: WRITE AND EXPORT SIG PLOTS
@@ -190,7 +193,7 @@ plot_bids <- function(dta){
 
 ## collect datasets to plot for bids
 plot_bids(bids_urban_summ)
-plot_bids(bids_internet_summ)
+plot_bids(bids_fiber_summ)
 plot_bids(bids_upstream_summ)
 plot_bids(bids_wan_summ)
 plot_bids(bids_backbone_summ)

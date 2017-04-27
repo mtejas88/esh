@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 import pylab
 import pandas as pd
 import numpy as np
+import scipy
 import statsmodels.api as sm
 
 ## data prep
 #import
-districts_for_ia_bw_reg = pd.read_csv('data/interim/reg/districts_for_sc_reg.csv')
+districts_for_ia_bw_reg = pd.read_csv('data/interim/districts_for_sc_reg.csv')
 #clean for cost only for regression
 districts_for_ia_bw_reg = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['exclude_from_ia_analysis'] == False]
 #aggregate 2+,3+
@@ -35,7 +36,31 @@ feature_cols_ia_bw = ['frns_0_bid_ia_indicator', 'frns_1_bid_ia_indicator', 'frn
 X_ia_bw = districts_for_ia_bw_reg[feature_cols_ia_bw ]
 y_ia_bw = districts_for_ia_bw_reg.ia_bandwidth_per_student_kbps
 
+data_true_bw = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['frns_2p_bid_ia_indicator'] == True]
+data_true_bw = data_true_bw.ia_bandwidth_per_student_kbps
+
+data_false_bw = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['frns_2p_bid_ia_indicator'] == False]
+data_false_bw = data_false_bw.ia_bandwidth_per_student_kbps
+
+data_true_bw_0 = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['frns_0_bid_ia_indicator'] == True]
+data_true_bw_0 = data_true_bw_0.ia_bandwidth_per_student_kbps
+
+data_false_bw_0 = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['frns_0_bid_ia_indicator'] == False]
+data_false_bw_0 = data_false_bw_0.ia_bandwidth_per_student_kbps
+
 ## statsmodels model
 X_ia_bw = sm.add_constant(X_ia_bw)
 est_ia_bw = sm.OLS(y_ia_bw, X_ia_bw.astype(float)).fit()
 print(est_ia_bw.summary())
+
+## t test
+ttest_ia_bw  = scipy.stats.ttest_ind(data_true_bw, data_false_bw, equal_var=False)
+print("Fail to reject null hypothesis; districts that receive 2+ bids on one of their internet access services have similar bw/student as districts with only 0, 1 bid internet access services. P-value: {}".format(round(ttest_ia_bw.pvalue,2)))
+print("Mean bw/student for districts that receive 2+ bids on one of their internet access services: {}".format(round(np.mean(data_true_bw),2)))
+print("Mean bw/student for districts that receive 0, 1 bids on all of their internet access services: {}".format(round(np.mean(data_false_bw),2)))
+
+ttest_ia_bw_0  = scipy.stats.ttest_ind(data_true_bw_0, data_false_bw_0, equal_var=False)
+#p-value divided by 2 for a one-tailed test (since we want to see if 0 bids are significantly GREATER THAN non-0 bids
+print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have more bw/student than districts with only 1+ bid internet access services. P-value: {}".format(round(ttest_ia_bw_0.pvalue/2,2)))
+print("Mean bw/student for districts that receive 0 bids on one of their internet access services: {}".format(round(np.mean(data_true_bw_0),2)))
+print("Mean bw/student for districts that receive 1+ bids on all of their internet access services: {}".format(round(np.mean(data_false_bw_0),2)))

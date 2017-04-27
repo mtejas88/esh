@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 import pylab
 import pandas as pd
 import numpy as np
+import scipy
 import statsmodels.api as sm
 
 ## data prep
 #import
-districts_for_ia_cost_reg = pd.read_csv('data/interim/reg/districts_for_sc_reg.csv')
+districts_for_ia_cost_reg = pd.read_csv('data/interim/districts_for_sc_reg.csv')
 #clean for cost only for regression
 districts_for_ia_cost_reg = districts_for_ia_cost_reg.loc[districts_for_ia_cost_reg['exclude_from_ia_cost_analysis'] == False]
 districts_for_ia_cost_reg = districts_for_ia_cost_reg.loc[districts_for_ia_cost_reg['postal_cd'] != 'AK']
@@ -36,7 +37,34 @@ feature_cols_ia_cost = ['frns_0_bid_ia_indicator', 'frns_1_bid_ia_indicator', 'f
 X_ia_cost = districts_for_ia_cost_reg[feature_cols_ia_cost ]
 y_ia_cost = districts_for_ia_cost_reg.ia_monthly_cost_per_mbps
 
+data_true = districts_for_ia_cost_reg.loc[districts_for_ia_cost_reg['frns_0_bid_ia_indicator'] == True]
+data_true = data_true.ia_monthly_cost_per_mbps
+
+data_false = districts_for_ia_cost_reg.loc[districts_for_ia_cost_reg['frns_0_bid_ia_indicator'] == False]
+data_false = data_false.ia_monthly_cost_per_mbps
+
 ## statsmodels model
 X_ia_cost = sm.add_constant(X_ia_cost)
 est_ia_cost = sm.OLS(y_ia_cost, X_ia_cost.astype(float)).fit()
 print(est_ia_cost.summary())
+
+## t test
+ttest_ia_cost  = scipy.stats.ttest_ind(data_true, data_false, equal_var=False)
+#p-value divided by 2 for a one-tailed test (since we want to see if 0 bids are significantly GREATER THAN non-0 bids
+print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have higher cost/mbps than districts with only 1+ bid internet access services. P-value: {}".format(round(ttest_ia_cost.pvalue/2,2)))
+print("Mean cost/mbps for districts that receive 0 bids on one of their internet access services: ${}".format(round(np.mean(data_true),2)))
+print("Mean cost/mbps for districts that receive 1+ bids on all of their internet access services: ${}".format(round(np.mean(data_false),2)))
+print("Districts that receive 0 bids on one of their internet access services pay {}x as much as districts that only receive 1 or more bids".format(round(np.mean(data_true)/np.mean(data_false),1)))
+
+
+##plot cost/mbps
+y = [np.mean(data_true), np.mean(data_false)]
+x = [1, 2]
+width = 1/1.5
+
+fig = plt.figure()
+plt.bar(x, y, width, color=["#FDB913","#F09221"])
+plt.xticks([])
+plt.yticks([])
+#plt.xlabel('0 Bid Frns')
+plt.savefig("figures/figure.pdf")
