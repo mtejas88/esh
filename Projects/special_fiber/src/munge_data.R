@@ -15,6 +15,7 @@ applicant_470s.2017 <- read.csv("data/raw/applicant_470s_2017.csv", as.is=T, hea
 joe_f.2017 <- read.csv("joe_f/joe_f_form470.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
+##2017 FORM 470 MUNGING
 
 #correcting columns
 source('../../General_Resources/common_functions/correct_dataset.R')
@@ -105,3 +106,51 @@ district_summary$non_consortia_applicant <- ifelse(district_summary$non_consorti
 
 write.csv(district_summary, "data/interim/district_summary.csv", row.names=F)
 write.csv(applicant_requests.2017, "data/interim/applicant_summary.csv", row.names=F)
+
+##**************************************************************************************************************************************************
+##2016 FORM 470 MUNGING
+
+sf.2016 <- read.csv("data/raw/special_fiber_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+dd.2016 <- read.csv("data/raw/dd_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+
+#correcting columns
+source('../../General_Resources/common_functions/correct_dataset.R')
+sf.2016 <- correct.dataset(sf.2016, 0 , 0)
+dd.2016 <- correct.dataset(dd.2016, 0 , 0)
+
+#creating  dataframe of the unique special fiber line items applied for
+applicant_summary_16 <- sf.2016[,c('line_item_id','inclusion_status','purpose','line_item_total_num_lines','connect_category','line_item_total_cost',
+                                   'bandwidth_in_mbps','reporting_name')]
+applicant_summary_16 <- applicant_summary_16[!duplicated(applicant_summary_16),]
+
+#creating a df of just the costs for the districts (line_item_district_monthly_total * months). NEED TO REMOVE DUPs FROM DISTRICT COSTS. FIXXXXXX
+
+district_costs_16 <- sf.2016[,c('line_item_id','line_item_district_monthly_cost_total','months_of_service','recipient_id')]
+district_costs_16 <- district_costs_16[!duplicated(district_costs_16),]
+district_costs_16 <- aggregate(district_costs_16$line_item_district_monthly_cost_total * district_costs_16$months_of_service, by = list(district_costs_16$recipient_id), FUN = sum)
+names(district_costs_16) <- c('esh_id','district_cost_no_extrap')
+
+#calculating total cost (not just received by districts, since some goes to NIFs). this will be used to extrapolate the district costs 
+total_district_costs_16 <- sum(applicant_summary_16$line_item_total_cost)
+extrap_percent <- (total_district_costs_16 / sum(district_costs_16$district_cost_no_extrap))
+
+#extrapolated district costs (to spread out the costs that just go to NIFs from those line items and the missing one time costs)
+district_costs_16$district_cost_extrap <- district_costs_16$district_cost_no_extrap * (extrap_percent)
+
+
+#only keeping districts that receive special fiber services
+district_summary_16 <- dd.2016[dd.2016$esh_id %in% sf.2016$recipient_id,]
+
+#merging in district costs
+district_summary_16 <- merge(x= district_summary_16, y = district_costs_16, by = 'esh_id')
+
+#dirty line items
+
+table(unique(sf.2016[,c('line_item_id','inclusion_status')])$inclusion_status)
+
+
+sum(unique(sf.2016[,c('line_item_id','line_item_total_cost')])$line_item_total_cost)
+sum(applicant_summary_16$line_item_total_cost)
+
+write.csv(district_summary_16, "data/interim/district_summary_16.csv", row.names=F)
+write.csv(applicant_summary_16, "data/interim/applicant_summary_16.csv", row.names=F)

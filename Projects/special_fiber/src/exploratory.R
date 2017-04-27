@@ -11,6 +11,8 @@ rm(list=ls())
 library(data.table)
 
 ##**************************************************************************************************************************************************
+## 2017 FORM 470s
+
 ## READ IN DATA
 
 district_summary <- read.csv("data/interim/district_summary.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -45,3 +47,21 @@ top_5_applicants <- applicant_summary[1:5,]
 
 barplot(top_5_applicants$estimated_special_construction, names.arg = top_5_applicants$adj_applicant_ben, main = 'Top Applicants', col = 'blue')
 
+##**************************************************************************************************************************************************
+## 2016 LINE ITEM DATA
+
+district_summary_16 <- read.csv("data/interim/district_summary_16.csv", as.is=T, header=T, stringsAsFactors=F)
+applicant_summary_16 <- read.csv("data/interim/applicant_summary_16.csv", as.is=T, header=T, stringsAsFactors=F)
+
+funding_lost_16 <- sum(applicant_summary_16$line_item_total_cost)
+districts_impacted_16 <- length(district_summary_16$esh_id)
+schools_impacted_16 <- sum(district_summary_16$num_schools)
+students_impacted_16 <- sum(district_summary_16$num_students)
+campuses_impacted_16 <- sum(district_summary_16$num_campuses)
+
+district_summary_sub_16 <- data.table(district_summary_16[,c('postal_cd','locale','fiber_target_status','num_students','num_schools','num_campuses','district_cost_no_extrap','district_cost_extrap')])
+by_locale_16 <- district_summary_sub_16[,lapply(.SD,sum), by=c('locale'), .SDcols =! c("postal_cd","fiber_target_status")]
+by_state_16 <- district_summary_sub_16[,lapply(.SD,sum), by=c('postal_cd'), .SDcols =! c("locale","fiber_target_status")]
+
+by_locale_districts_16 <- aggregate(district_summary_16$esh_id, by = list(district_summary_16$locale), FUN = length)
+names(by_locale_districts_16) <- c('locale','num_districts')
