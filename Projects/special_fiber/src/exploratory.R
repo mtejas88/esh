@@ -37,15 +37,15 @@ names(by_locale_districts) <- c('locale','num_districts')
 by_locale_districts_and_applicant <- aggregate(district_summary$esh_id, by = list(district_summary$locale, district_summary$non_consortia_applicant), FUN = length)
 names(by_locale_districts_and_applicant) <- c('locale','non_consortia_applicant','num_districts')
 
-barplot(by_locale$estimated_special_construction, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
-barplot(by_locale$num_students, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
-barplot(by_locale$num_schools, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
+#barplot(by_locale$estimated_special_construction, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
+#barplot(by_locale$num_students, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
+#barplot(by_locale$num_schools, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
 
 applicant_summary <- applicant_summary[order(applicant_summary$estimated_special_construction, decreasing = TRUE),]
 
 top_5_applicants <- applicant_summary[1:5,]
 
-barplot(top_5_applicants$estimated_special_construction, names.arg = top_5_applicants$adj_applicant_ben, main = 'Top Applicants', col = 'blue')
+#barplot(top_5_applicants$estimated_special_construction, names.arg = top_5_applicants$adj_applicant_ben, main = 'Top Applicants', col = 'blue')
 
 ##**************************************************************************************************************************************************
 ## 2016 LINE ITEM DATA
@@ -65,3 +65,7 @@ by_state_16 <- district_summary_sub_16[,lapply(.SD,sum), by=c('postal_cd'), .SDc
 
 by_locale_districts_16 <- aggregate(district_summary_16$esh_id, by = list(district_summary_16$locale), FUN = length)
 names(by_locale_districts_16) <- c('locale','num_districts')
+
+coloardo_summary <- district_summary_16[district_summary_16$postal_cd == 'CO',]
+
+write.csv(coloardo_summary, "data/interim/coloardo_summary_16.csv", row.names=F)
