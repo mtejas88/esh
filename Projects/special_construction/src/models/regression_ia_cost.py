@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import scipy
 import statsmodels.api as sm
+import seaborn
 
 ## data prep
 #import
@@ -51,20 +52,31 @@ print(est_ia_cost.summary())
 ## t test
 ttest_ia_cost  = scipy.stats.ttest_ind(data_true, data_false, equal_var=False)
 #p-value divided by 2 for a one-tailed test (since we want to see if 0 bids are significantly GREATER THAN non-0 bids
-print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have higher cost/mbps than districts with only 1+ bid internet access services. P-value: {}".format(round(ttest_ia_cost.pvalue/2,2)))
-print("Mean cost/mbps for districts that receive 0 bids on one of their internet access services: ${}".format(round(np.mean(data_true),2)))
-print("Mean cost/mbps for districts that receive 1+ bids on all of their internet access services: ${}".format(round(np.mean(data_false),2)))
-print("Districts that receive 0 bids on one of their internet access services pay {}x as much as districts that only receive 1 or more bids".format(round(np.mean(data_true)/np.mean(data_false),1)))
+pvalue = round(ttest_ia_cost.pvalue/2,2)
+mu_true = round(np.mean(data_true),2)
+mu_false = round(np.mean(data_false),2)
+mu_multiple = round(np.mean(data_true)/np.mean(data_false),1)
+
+print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have higher cost/mbps than districts with only 1+ bid internet access services. P-value: {}".format(pvalue))
+print("Mean cost/mbps for districts that receive 0 bids on one of their internet access services: ${}".format(mu_true))
+print("Mean cost/mbps for districts that receive 1+ bids on all of their internet access services: ${}".format(mu_false))
+print("Districts that receive 0 bids on one of their internet access services pay {}x as much as districts that only receive 1 or more bids".format(mu_multiple))
 
 
 ##plot cost/mbps
-y = [np.mean(data_true), np.mean(data_false)]
+y = [mu_true, mu_false]
 x = [1, 2]
+axis_label = ['0 Bid FRNs', '1+ Bid FRNs']
 width = 1/1.5
 
-fig = plt.figure()
-plt.bar(x, y, width, color=["#FDB913","#F09221"])
-plt.xticks([])
-plt.yticks([])
-#plt.xlabel('0 Bid Frns')
-plt.savefig("figures/figure.pdf")
+plt.bar(x, y, width, color=["#FDB913","#F09221"], align = 'center')
+plt.suptitle('Difference in Average     Internet Access Cost/Mbps', fontsize = 20)
+plt.xticks(x, axis_label)
+plt.ylabel('Internet Access cost/mbps')
+plt.annotate("$"+str(mu_true), xy=(.9, mu_true + .9), xytext=(.9, mu_true + .9), color = "grey")
+plt.annotate("$"+str(mu_false), xy=(1.9, mu_false + .9), xytext=(1.9, mu_false + .9), color = "grey")
+plt.annotate(str(mu_multiple)+"x", xy=(1.5, (mu_true - mu_false)/2 + mu_false), xytext=(1.5, (mu_true - mu_false)/2 + mu_false), color = 'red', size = 20)
+seaborn.despine(left=True, right=True)
+seaborn.set_style("whitegrid", {'axes.grid' : False})
+plt.show()
+plt.savefig("figures/ia_cost_by_frn_bids.png")

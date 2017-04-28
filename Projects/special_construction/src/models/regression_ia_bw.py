@@ -55,12 +55,36 @@ print(est_ia_bw.summary())
 
 ## t test
 ttest_ia_bw  = scipy.stats.ttest_ind(data_true_bw, data_false_bw, equal_var=False)
+
 print("Fail to reject null hypothesis; districts that receive 2+ bids on one of their internet access services have similar bw/student as districts with only 0, 1 bid internet access services. P-value: {}".format(round(ttest_ia_bw.pvalue,2)))
 print("Mean bw/student for districts that receive 2+ bids on one of their internet access services: {}".format(round(np.mean(data_true_bw),2)))
 print("Mean bw/student for districts that receive 0, 1 bids on all of their internet access services: {}".format(round(np.mean(data_false_bw),2)))
 
 ttest_ia_bw_0  = scipy.stats.ttest_ind(data_true_bw_0, data_false_bw_0, equal_var=False)
 #p-value divided by 2 for a one-tailed test (since we want to see if 0 bids are significantly GREATER THAN non-0 bids
-print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have more bw/student than districts with only 1+ bid internet access services. P-value: {}".format(round(ttest_ia_bw_0.pvalue/2,2)))
-print("Mean bw/student for districts that receive 0 bids on one of their internet access services: {}".format(round(np.mean(data_true_bw_0),2)))
-print("Mean bw/student for districts that receive 1+ bids on all of their internet access services: {}".format(round(np.mean(data_false_bw_0),2)))
+pvalue = round(ttest_ia_bw.pvalue/2,2)
+mu_true = round(np.mean(data_true_bw_0),2)
+mu_false = round(np.mean(data_false_bw_0),2)
+mu_multiple = round(np.mean(data_true_bw_0)/np.mean(data_false_bw_0),1)
+
+print("Reject null hypothesis; districts that receive 0 bids on one of their internet access services have more bw/student than districts with only 1+ bid internet access services. P-value: {}".format(pvalue))
+print("Mean bw/student for districts that receive 0 bids on one of their internet access services: {}".format(mu_true))
+print("Mean bw/student for districts that receive 1+ bids on all of their internet access services: {}".format(mu_false))
+
+##plot cost/mbps
+y = [mu_true, mu_false]
+x = [1, 2]
+axis_label = ['0 Bid FRNs', '1+ Bid FRNs']
+width = 1/1.5
+
+plt.bar(x, y, width, color=["#FDB913","#F09221"], align = 'center')
+plt.suptitle('Difference in Average Internet Access BW/Student', fontsize = 20)
+plt.xticks(x, axis_label)
+plt.ylabel('Internet Access bw/student')
+plt.annotate("$"+str(mu_true), xy=(.9, mu_true + 2.3), xytext=(.9, mu_true + 2.3), color = "grey")
+plt.annotate("$"+str(mu_false), xy=(1.9, mu_false + 2.3), xytext=(1.9, mu_false + 2.3), color = "grey")
+plt.annotate(str(mu_multiple)+"x", xy=(1.5, (mu_true - mu_false)/2 + mu_false), xytext=(1.5, (mu_true - mu_false)/2 + mu_false), color = 'red', size = 20)
+seaborn.despine(left=True, right=True)
+seaborn.set_style("whitegrid", {'axes.grid' : False})
+plt.show()
+plt.savefig("figures/ia_bw_by_frn_bids.png")
