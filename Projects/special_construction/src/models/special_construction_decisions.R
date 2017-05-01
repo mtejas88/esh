@@ -20,8 +20,22 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 decisions.joe <- read.csv("data/external/special_construction_funding_decisions_joeF_04152017.csv", as.is=T, header=T)
 decisions.drt <- read.csv("data/raw/fiber_applications_with_results.csv", as.is=T, header=T)
 districts <- read.csv("data/interim/districts_for_sc_reg.csv", as.is=T, header=T)
-districts <- filter(districts, esh_id, fiber_target_status, 
+for (i in 1:ncol(districts)){
+  values <- unique(districts[,i])
+  if ("True" %in% values | "False" %in% values){
+    districts[,i] <- as.logical(districts[,i])
+  }
+  if ("t" %in% values | "f" %in% values){
+    districts[,i] <- gsub("t", "True", districts[,i])
+    districts[,i] <- gsub("f", "False", districts[,i])
+    districts[,i] <- as.logical(districts[,i])
+  }
+}
+districts <- select(districts, esh_id, fiber_target_status, 
                     frns_0_bid_indicator, frns_1_bid_indicator, frns_2_bid_indicator, frns_3p_bid_indicator)
+districts$frns_2p_bid_indicator <- ifelse(districts$frns_2_bid_indicator == TRUE | districts$frns_3p_bid_indicator == TRUE,
+                                          TRUE,
+                                          FALSE)
 
 #summarize application data
 decisions.joe %>%
@@ -63,6 +77,9 @@ prop.table(table(specK.decisions.apps$frns_0_bid_indicator))
 
 prop.table(table(districts.bids$frns_1_bid_indicator))
 prop.table(table(specK.decisions.apps$frns_1_bid_indicator))
+
+prop.table(table(districts.bids$frns_2p_bid_indicator))
+prop.table(table(specK.decisions.apps$frns_2p_bid_indicator))
 
 
 #check FRN.COUNT field
