@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 
 ## data prep
 #import
-districts_for_status_reg = pd.read_csv('data/interim/reg/districts_for_sc_reg.csv')
+districts_for_status_reg = pd.read_csv('data/interim/districts_for_sc_reg.csv')
 #target, not target only for regression
 districts_for_status_reg =  districts_for_status_reg.loc[districts_for_status_reg['fiber_target_status'].isin(['Target', 'Not Target'])]
 #aggregate 2+,3+
