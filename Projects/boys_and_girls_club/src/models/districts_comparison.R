@@ -3,6 +3,7 @@
 ## Boys and Girls Club Analysis
 ## 
 ## OBJECTIVES:
+##    -- Compare BandG with fiber and bw targets
 ##
 ## ==============================================
 
