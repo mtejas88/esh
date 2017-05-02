@@ -68,4 +68,14 @@ names(by_locale_districts_16) <- c('locale','num_districts')
 
 coloardo_summary <- district_summary_16[district_summary_16$postal_cd == 'CO',]
 
+#creating a by locale summary that removes the recipients of free services
+
+by_locale_16_no_free <- district_summary_sub_16[district_summary_sub_16$district_cost_extrap > 0,lapply(.SD,sum), by=c('locale'), .SDcols =! c("postal_cd","fiber_target_status")]
+by_state_16_no_free <- district_summary_sub_16[district_summary_sub_16$district_cost_extrap > 0,lapply(.SD,sum), by=c('postal_cd'), .SDcols =! c("locale","fiber_target_status")]
+
+by_locale_districts_16_no_free <- data.table(district_summary_16[district_summary_16$district_cost_extrap > 0,])
+by_locale_districts_16_no_free <- aggregate(by_locale_districts_16_no_free$esh_id, by = list(by_locale_districts_16_no_free$locale), FUN = length)
+names(by_locale_districts_16_no_free) <- c('locale','num_districts')
+
+
 write.csv(coloardo_summary, "data/interim/coloardo_summary_16.csv", row.names=F)
