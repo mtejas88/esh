@@ -373,7 +373,7 @@ select
 	999.9::numeric as "LONCOD",
 	'x'::varchar as "CONAME",
 	'x'::varchar as "ULOCAL"
-	"LSTREE",
+	/*"LSTREE",
 	--kept current name and renamed as prior year field name
 	"LATCODE", "LATCODE" as "LATCOD",
 	--kept current name and renamed as prior year field name
