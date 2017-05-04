@@ -21,7 +21,9 @@ districts <- read.csv("data/interim/districts.csv", as.is=T, header=T)
 schools_bgca <- read.csv("data/external/BGCA_School_Sites_NCES_Identified.csv", as.is=T, header=T)
 
 #join datasets
-districts_filt <- select(districts, nces_cd, fiber_target_status, bw_target_status)
+districts_filt <- select(districts, nces_cd, fiber_target_status, bw_target_status, ia_bandwidth_per_student_kbps, 
+                         ia_monthly_cost_per_mbps, meeting_knapsack_affordability_target, ia_bw_mbps_total,
+                         upgrade_indicator, needs_wifi)
 schools_upd <- left_join(schools_bgca, districts_filt, 
                         by = c("NCES.District.ID" = "nces_cd"))
 schools_upd$bw_target_status <- ifelse(schools_upd$bw_target_status == 'No Data' | 
@@ -35,6 +37,7 @@ schools_upd$fiber_target_status <- ifelse(schools_upd$fiber_target_status == 'No
                                        'No Data',
                                        schools_upd$fiber_target_status)
 ##write joined dataset for bgca
+schools_upd[is.na(schools_upd)] <- ""
 write.table(schools_upd, 
             "data/processed/schools_bgca.csv", 
             col.names=TRUE, row.names = FALSE,
