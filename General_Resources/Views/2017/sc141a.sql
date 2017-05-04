@@ -43,7 +43,13 @@ select
 	"UPDATED_STATUS_TEXT",
 	"UPDATED_STATUS",
 	"EFFECTIVE_DATE",
-	"CHARTER_TEXT",
+	"CHARTER_TEXT", case
+						when "CHARTER_TEXT" = 'Yes'
+							then '1'
+						when "CHARTER_TEXT" = 'No'
+							then '2'
+						else 'N'
+					end as "CHARTR",
 	"PKOFFERED",
 	"KGOFFERED",
 	"G1OFFERED",
