@@ -14,6 +14,8 @@ nces <- read.csv("data/raw/nces_2014-15.csv", as.is=T, header=T, stringsAsFactor
 usac <- read.csv("data/raw/usac_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 schools <- read.csv("data/raw/schools.csv", as.is=T, header=T, stringsAsFactors=F)
 bens <- read.csv("data/raw/bens.csv", as.is=T, header=T, stringsAsFactors=F)
+salesforce_account <- read.csv("data/raw/salesforce_account.csv", as.is=T, header=T, stringsAsFactors=F)
+salesforce_facilities <- read.csv("data/raw/salesforce_facilities.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## SUBSET AND FORMAT DATA
@@ -107,24 +109,38 @@ combined$state.match <- ifelse(combined$physical_state == combined$stabr, TRUE, 
 table(combined$state.match)
 combined <- combined[combined$state.match == TRUE,]
 ## calculate difference in districts
-combined$diff <- combined$total_num_students_usac - combined$total_num_students_nces
+combined$diff <- abs(combined$total_num_students_usac - combined$total_num_students_nces)
+
+## take out FL outlier
+#combined <- combined[combined$nces_cd != 1201290,]
+#combined <- combined[combined$diff <= 100000,]
 
 ##**************************************************************************************************************************************************
 ## TEST
 
-## use t-test to see if there is a statistically significant difference between verified districts and none verified districts
-t.test(diff~verified, data=combined)
+## initialize list
+store.t <- NULL
+mean.true <- NULL
+mean.false <- NULL
+iters <- 5000
+set.seed(533)
 
-## results:
-## Welch Two Sample t-test
-## data:  diff by verified
-## t = -0.91072, df = 4907.6, p-value = 0.3625
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-## -13719.619   5016.052
-## sample estimates:
-## mean in group FALSE  mean in group TRUE 
-## 413.7446           4765.5281 
+## use t-test to see if there is a statistically significant difference between verified districts and none verified districts
+for (i in 1:iters){
+  sub <- combined[sample(1:nrow(combined), 2000, replace=F),]
+  store.t <- append(store.t, t.test(diff~verified, data=sub)$p.value)
+  mean.true <- append(mean.true, mean(sub$diff[sub$verified == TRUE], na.rm=T))
+  mean.false <- append(mean.false, mean(sub$diff[sub$verified == FALSE], na.rm=T))
+}
+
+hist(store.t)
+mean(store.t)
+
+mean(mean.true)
+median(mean.true)
+
+mean(mean.false)
+median(mean.false)
 
 ##**************************************************************************************************************************************************
 ## write out the interim datasets

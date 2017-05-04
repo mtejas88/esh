@@ -51,6 +51,8 @@ usac <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_entity_re
 schools <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_schools_demog.SQL", sep=""))
 schools <- correct.dataset(schools, 0, 0)
 bens <- querydb(paste(github_path, "General_Resources/sql_scripts/Entity_Bens.SQL", sep=""))
+salesforce_account <- querydb(paste(github_path, "General_Resources/sql_scripts/salesforce_account.SQL", sep=""))
+salesforce_facilities <- querydb(paste(github_path, "General_Resources/sql_scripts/salesforce_facilities.SQL", sep=""))
 
 ## disconnect from database
 dbDisconnect(con)
@@ -62,3 +64,5 @@ write.csv(nces, "data/raw/nces_2014-15.csv", row.names=F)
 write.csv(usac, "data/raw/usac_2016.csv", row.names=F)
 write.csv(schools, "data/raw/schools.csv", row.names=F)
 write.csv(bens, "data/raw/bens.csv", row.names=F)
+write.csv(salesforce_account, "data/raw/salesforce_account.csv", row.names=F)
+write.csv(salesforce_facilities, "data/raw/salesforce_facilities.csv", row.names=F)
