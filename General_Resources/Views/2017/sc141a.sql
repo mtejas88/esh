@@ -357,11 +357,11 @@ select
 	"REDLCH",
 	"ISFL",
 	--remove once geographic data is added
-	null as "LSTREE",
-	null as "LATCOD",
-	null as "LONCOD",
-	null as "CONAME",
-	null as "ULOCAL"
+	'x' as "LSTREE",
+	-999.9 as "LATCOD",
+	999.9 as "LONCOD",
+	'x' as "CONAME",
+	'x' as "ULOCAL"
 	/*"LSTREE",
 	--kept current name and renamed as prior year field name
 	"LATCODE", "LATCODE" as "LATCOD",
