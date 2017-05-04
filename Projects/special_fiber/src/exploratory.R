@@ -77,5 +77,10 @@ by_locale_districts_16_no_free <- data.table(district_summary_16[district_summar
 by_locale_districts_16_no_free <- aggregate(by_locale_districts_16_no_free$esh_id, by = list(by_locale_districts_16_no_free$locale), FUN = length)
 names(by_locale_districts_16_no_free) <- c('locale','num_districts')
 
+#editing the applicant summary to remove all free lines
+
+applicant_summary_16 <- applicant_summary_16[applicant_summary_16$line_item_total_cost > 0,]
+special_connections_16 <- sum(applicant_summary_16$line_item_total_num_lines)
+by_purpose_clean_16 <- aggregate(applicant_summary_16[!applicant_summary_16$inclusion_status == 'dirty',]$line_item_total_num_lines, by = list(applicant_summary_16$purpose), FUN = sum, na.rm = T) #SHOULD I REMOVE DIRTY AND EXTRAP?
 
 write.csv(coloardo_summary, "data/interim/coloardo_summary_16.csv", row.names=F)
