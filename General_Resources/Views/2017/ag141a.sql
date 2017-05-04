@@ -368,11 +368,11 @@ select
 	"IASCHADM",
 	"IASUPST",
 	--remove once geographic data is added
-	'x' as "LSTREE",
-	-999.9 as "LATCOD",
-	999.9 as "LONCOD",
-	'x' as "CONAME",
-	'x' as "ULOCAL"/*,
+	'x'::varchar as "LSTREE",
+	-999.9::numeric as "LATCOD",
+	999.9::numeric as "LONCOD",
+	'x'::varchar as "CONAME",
+	'x'::varchar as "ULOCAL"
 	"LSTREE",
 	--kept current name and renamed as prior year field name
 	"LATCODE", "LATCODE" as "LATCOD",
