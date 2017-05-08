@@ -24,7 +24,6 @@ r as (select line_item_id,
 	where funding_year = 2017
 	)
 
-
 select 
 eli.id,
 eli.frn_complete,
@@ -33,12 +32,12 @@ eli.frn_complete,
 
 eli.application_number,
 	
-	bi.applicant_type as application_type, /*2016 line items table calls this field application_type */
+	bi.applicant_type as application_type, /*USAC identifcation */
 
 eli.applicant_ben,
 	
 	bi.billed_entity_name as applicant_name,
-	bi.applicant_type, /*2016 line items table does not have this field*/
+	eb.entity_type as applicant_type, /*ESH identification*/
 	bi.applicant_postal_cd,
 
 eli.service_provider_id,
@@ -57,7 +56,12 @@ eli.upload_bandwidth_in_mbps,
 
 	concat(fli.download_speed,' ',fli.download_speed_units) as bandwidth_in_original_units,
 
-eli.num_lines,
+case
+	when eli.num_lines = -1
+	then 'Unknown'
+	else eli.num_lines
+end as num_lines,
+
 eli.one_item_elig_cost,
 eli.rec_elig_cost,
 eli.months_of_service,
@@ -106,6 +110,9 @@ on t.taggable_type = eli.id
 
 left join r
 on r.line_item_id = eli.id
+
+left join public.entity_bens eb
+on eb.ben = eli.applicant_ben
 
 where eli.funding_year = 2017
 /*not sure if service provider will be funding year specific*/
