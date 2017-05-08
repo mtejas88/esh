@@ -30,12 +30,17 @@ by_state <- district_summary_sub[,lapply(.SD,sum), by=c('postal_cd'), .SDcols =!
 by_fiber_target_status <- district_summary_sub[,lapply(.SD,sum), by=c('fiber_target_status'), .SDcols =! c("locale","postal_cd",'non_consortia_applicant')]
 
 by_locale_and_applicant <- district_summary_sub[,lapply(.SD,sum), by=c('locale','non_consortia_applicant'), .SDcols =! c("postal_cd","fiber_target_status")]
+by_state_and_applicant <- district_summary_sub[,lapply(.SD,sum), by=c('postal_cd','non_consortia_applicant'), .SDcols =! c("locale","fiber_target_status")]
+by_state_no_consortia <- by_state_and_applicant[!by_state_and_applicant$non_consortia_applicant == 'Consortia Applicant',]
 
 by_locale_districts <- aggregate(district_summary$esh_id, by = list(district_summary$locale), FUN = length)
 names(by_locale_districts) <- c('locale','num_districts')
 
 by_locale_districts_and_applicant <- aggregate(district_summary$esh_id, by = list(district_summary$locale, district_summary$non_consortia_applicant), FUN = length)
 names(by_locale_districts_and_applicant) <- c('locale','non_consortia_applicant','num_districts')
+
+by_state_districts_and_applicant <- aggregate(district_summary$esh_id, by = list(district_summary$postal_cd, district_summary$non_consortia_applicant), FUN = length)
+names(by_state_districts_and_applicant) <- c('state','non_consortia_applicant','num_districts')
 
 #barplot(by_locale$estimated_special_construction, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
 #barplot(by_locale$num_students, names.arg = by_locale$locale, main = 'Funding Lost by Locale', col = 'blue')
@@ -84,3 +89,17 @@ special_connections_16 <- sum(applicant_summary_16$line_item_total_num_lines)
 by_purpose_clean_16 <- aggregate(applicant_summary_16[!applicant_summary_16$inclusion_status == 'dirty',]$line_item_total_num_lines, by = list(applicant_summary_16$purpose), FUN = sum, na.rm = T) #SHOULD I REMOVE DIRTY AND EXTRAP?
 
 write.csv(coloardo_summary, "data/interim/coloardo_summary_16.csv", row.names=F)
+
+##**************************************************************************************************************************************************
+## 2016 DISTRICTS CONGRESS
+
+district_congress_summary_16 <- read.csv("data/interim/district_congress_summary_16.csv", as.is=T, header=T, stringsAsFactors=F)
+district_congress_sub_16 <- data.table(district_congress_sub_16[,c('state_and_district','postal_cd.x','locale','fiber_target_status','num_students','num_schools','num_campuses','district_cost_no_extrap','district_cost_extrap')])
+#removing recipients of free services
+district_congress_sub_16 <- district_congress_sub_16[district_congress_sub_16$district_cost_extrap > 0]
+
+by_congress_16 <- district_congress_sub_16[,lapply(.SD,sum), by=c('state_and_district'), .SDcols =! c("postal_cd.x","locale","fiber_target_status")]
+
+##**************************************************************************************************************************************************
+## 2016 DISTRICTS CONGRESS
+

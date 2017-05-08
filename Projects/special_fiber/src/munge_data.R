@@ -154,3 +154,21 @@ sum(applicant_summary_16$line_item_total_cost)
 
 write.csv(district_summary_16, "data/interim/district_summary_16.csv", row.names=F)
 write.csv(applicant_summary_16, "data/interim/applicant_summary_16.csv", row.names=F)
+
+##**************************************************************************************************************************************************
+##CONGRESS MUNGING 
+
+congress <- read.csv("congress/districts_to_congress_shp.csv", as.is=T, header=T, stringsAsFactors=F)
+congress <- congress[congress$KEEP. == 'yes',c('esh_id','name','postal_cd','CD115FP','State.and.Rep.District')]
+
+#only keeping districts that receive special fiber services
+district_congress_summary_16 <- congress[congress$esh_id %in% sf.2016$recipient_id,]
+
+#merging in district costs
+district_congress_summary_16 <- merge(x= district_congress_summary_16, y = district_costs_16, by = 'esh_id')
+names(district_congress_summary_16) <- c('esh_id','name','postal_cd','district','state_and_district','district_cost_no_extrap','district_cost_extrap')
+
+#merging in other districts deluxe fields
+district_congress_summary_16 <- merge(x = district_congress_summary_16, y = dd.2016, by = 'esh_id')
+
+write.csv(district_congress_summary_16, "data/interim/district_congress_summary_16.csv", row.names=F)
