@@ -1,14 +1,17 @@
-with f as (
+with f as (select
 	flaggable_id,
-	count(id) as num_open_flags
+	count(id) as num_open_flags,
 	array_agg(label) as open_flag_labels
 
 	from public.flags 
 	where status = 'open'
 	and flaggable_type = 'LineItem'
 	and funding_year = 2017
+
+	group by flaggable_id
 	),
-t as (taggable_id,
+t as (select
+	taggable_id,
 	count(id) as num_open_tags,
 	array_agg(label) as open_tag_labels
 
@@ -16,12 +19,16 @@ t as (taggable_id,
 	where deleted_at is null
 	and taggable_type = 'LineItem'
 	and funding_year = 2017
+
+	group by taggable_id
 	),
 r as (select line_item_id,
 	count(recipient_ben) as num_recipients
 	
 	from public.esh_allocations
 	where funding_year = 2017
+
+	group by line_item_id
 	)
 
 select 
@@ -37,7 +44,6 @@ ec.connect_category,
 
 	eli.connect_type,
 	eli.function,
-	eli.purpose,
 	eli.bandwidth_in_mbps,
 	eli.upload_bandwidth_in_mbps,
 	eli.months_of_service,
@@ -74,7 +80,7 @@ left join f
 on f.flaggable_id = eli.id
 
 left join t
-on t.taggable_type = eli.id
+on t.taggable_id = eli.id
 
 left join r
 on r.line_item_id = eli.id

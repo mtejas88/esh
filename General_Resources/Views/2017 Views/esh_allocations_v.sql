@@ -12,10 +12,10 @@ ea.base_allocation_id,
 
 ea.recipient_ben,
 
-	eb.entity_id as recipient_id,
-	eb.entity_type as recipient_type,
+	rb.entity_id as recipient_id,
+	rb.entity_type as recipient_type,
 	e.name as recipient_name,
-	e.postal_cd as recipient_postal_cd
+	e.postal_cd as recipient_postal_cd,
 
 ea.cat_2_cost,
 ea.num_lines_to_allocate,
@@ -35,7 +35,7 @@ left join public.entity_bens rb
 on rb.ben = ea.recipient_ben
 
 left join public.entities e 
-on e.entity_id = ea.recipient_ben
+on e.entity_id = rb.entity_id
 
 where ea.funding_year = 2017
 and eli.funding_year = 2017

@@ -1,14 +1,17 @@
-with f as (
+with f as (select
 	flaggable_id,
-	count(id) as num_open_flags
+	count(id) as num_open_flags,
 	array_agg(label) as open_flag_labels
 
 	from public.flags 
 	where status = 'open'
 	and flaggable_type = 'LineItem'
 	and funding_year = 2017
+
+	group by flaggable_id
 	),
-t as (taggable_id,
+t as (select
+	taggable_id,
 	count(id) as num_open_tags,
 	array_agg(label) as open_tag_labels
 
@@ -16,12 +19,16 @@ t as (taggable_id,
 	where deleted_at is null
 	and taggable_type = 'LineItem'
 	and funding_year = 2017
+
+	group by taggable_id
 	),
 r as (select line_item_id,
 	count(recipient_ben) as num_recipients
 	
 	from public.esh_allocations
 	where funding_year = 2017
+
+	group by line_item_id
 	)
 
 select 
@@ -38,7 +45,7 @@ eli.applicant_ben,
 	
 	bi.billed_entity_name as applicant_name,
 	eb.entity_type as applicant_type, /*ESH identification*/
-	bi.applicant_postal_cd,
+	bi.postal_cd as applicant_postal_cd,
 
 eli.service_provider_id,
 
@@ -59,10 +66,10 @@ eli.upload_bandwidth_in_mbps,
 case
 	when eli.num_lines = -1
 	then 'Unknown'
-	else eli.num_lines
+	else eli.num_lines::char
 end as num_lines,
 
-eli.one_item_elig_cost,
+eli.one_time_elig_cost,
 eli.rec_elig_cost,
 eli.months_of_service,
 eli.contract_end_date,
@@ -92,9 +99,6 @@ from public.esh_line_items eli
 left join fy2017.frn_line_items fli 
 on fli.line_item = eli.frn_complete
 
-left join fy2017.frns f 
-on f.frn = fli.frn 
-
 left join fy2017.basic_informations bi 
 on bi.application_number =  eli.application_number
 
@@ -106,7 +110,7 @@ left join f
 on f.flaggable_id = eli.id
 
 left join t
-on t.taggable_type = eli.id
+on t.taggable_id = eli.id
 
 left join r
 on r.line_item_id = eli.id
