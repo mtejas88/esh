@@ -15,10 +15,13 @@ usac <- read.csv("data/raw/usac_2016.csv", as.is=T, header=T, stringsAsFactors=F
 schools <- read.csv("data/raw/schools.csv", as.is=T, header=T, stringsAsFactors=F)
 bens <- read.csv("data/raw/bens.csv", as.is=T, header=T, stringsAsFactors=F)
 salesforce_account <- read.csv("data/raw/salesforce_account.csv", as.is=T, header=T, stringsAsFactors=F)
-salesforce_facilities <- read.csv("data/raw/salesforce_facilities.csv", as.is=T, header=T, stringsAsFactors=F)
+#salesforce_facilities <- read.csv("data/raw/salesforce_facilities.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## SUBSET AND FORMAT DATA
+
+## subset salesforce to the number of students field
+salesforce_account <- salesforce_account[,c('esh_id__c', 'district_num_students__c')]
 
 ## format the column names (take out capitalization)
 names(nces) <- tolower(names(nces))
@@ -114,6 +117,13 @@ combined$diff <- abs(combined$total_num_students_usac - combined$total_num_stude
 ## take out FL outlier
 #combined <- combined[combined$nces_cd != 1201290,]
 #combined <- combined[combined$diff <= 100000,]
+
+
+
+## combine NCES and SF
+
+
+
 
 ##**************************************************************************************************************************************************
 ## TEST
