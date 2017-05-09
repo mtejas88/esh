@@ -102,10 +102,8 @@ left join (
 	left join public.fy2017_esh_line_items_v li
   on a.line_item_id = li.id
 
-  left join public.entity_bens eb --FIX TABLE
-  on eb.ben = a.recipient_ben
   left join fy2017.districts_schools c --FIX TABLE
-  on eb.entity_id = c.school_id
+  on a.recipient_id = c.school_id
 
 	where li.broadband = true
 	group by line_item_id
