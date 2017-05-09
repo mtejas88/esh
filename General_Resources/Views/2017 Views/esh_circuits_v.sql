@@ -1,3 +1,14 @@
+/*
+Author: Jamie Barnes
+Created On Date: 5/8/2017
+Last Modified Date: 
+Name of QAing Analyst(s): 
+Purpose: View to mimic 2016 version of circuits table for 2017 by adding back in columns we dropped from public.esh_circuits
+Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one.
+Dependencies: public.esh_circuits, public.esh_line_items, public.esh_service_providers, public.flags, public.tags, public.esh_allocations
+*/
+
+
 with f as (select
 	flaggable_id,
 	count(id) as num_open_flags,
