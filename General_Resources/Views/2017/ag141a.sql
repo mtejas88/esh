@@ -367,13 +367,7 @@ select
 	"IALIBSTF",
 	"IASCHADM",
 	"IASUPST",
-	--remove once geographic data is added
-	'x'::varchar as "LSTREE",
-	-999.9::numeric as "LATCOD",
-	999.9::numeric as "LONCOD",
-	'x'::varchar as "CONAME",
-	'x'::varchar as "ULOCAL"
-	/*"LSTREE",
+	"LSTREE",
 	--kept current name and renamed as prior year field name
 	"LATCODE", "LATCODE" as "LATCOD",
 	--kept current name and renamed as prior year field name
@@ -385,13 +379,13 @@ select
 	"LOCALE",	"LOCALE" as "ULOCAL",
 	"CSA",
 	"CBSA",
-	"NECTA",
-	"METMIC"*/
+	"METMIC",
+	"NECTA"
 
 from public.fy2014_fy2015_districts_directories dd
 full outer join public.fy2014_fy2015_districts_membership dm
 on dd."LEAID" = dm."LEAID"
 full outer join public.fy2014_fy2015_districts_staff ds
-on dd."LEAID" = ds."LEAID"/*
-full outer join public.fy2014_fy2015_districts_geographic dg
-on dd."LEAID" = dg."LEAID"*/
+on dd."LEAID" = ds."LEAID"
+full outer join public.fy2014_fy2015_districts_geo_data dg
+on dd."LEAID" = dg."LEAID"

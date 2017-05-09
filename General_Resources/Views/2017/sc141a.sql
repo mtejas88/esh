@@ -362,13 +362,7 @@ select
 	"FRELCH",
 	"REDLCH",
 	"ISFL",
-	--remove once geographic data is added
-	'x'::varchar as "LSTREE",
-	-999.9::numeric as "LATCOD",
-	999.9::numeric as "LONCOD",
-	'x'::varchar as "CONAME",
-	'x'::varchar as "ULOCAL"
-	/*"LSTREE",
+	"LSTREE",
 	--kept current name and renamed as prior year field name
 	"LATCODE", "LATCODE" as "LATCOD",
 	--kept current name and renamed as prior year field name
@@ -381,7 +375,7 @@ select
 	"CSA",
 	"CBSA",
 	"NECTA",
-	"METMIC"*/
+	"METMIC"
 
 from public.fy2014_fy2015_schools_directory sd
 full outer join public.fy2014_fy2015_schools_membership sm
@@ -389,6 +383,6 @@ on sd."NCESSCH" = sm."NCESSCH"
 full outer join public.fy2014_fy2015_schools_staff ss
 on sd."NCESSCH" = ss."NCESSCH"
 full outer join public.fy2014_fy2015_schools_lunch_program_eligibility slpe
-on sd."NCESSCH" = slpe."NCESSCH"/*
-full outer join public.fy2014_fy2015_schools_geographic sg
-on sd."NCESSCH" = sg."NCESSCH"*/
+on sd."NCESSCH" = slpe."NCESSCH"
+full outer join public.fy2014_fy2015_schools_geo_data sg
+on sd."NCESSCH" = sg."NCESSCH"
