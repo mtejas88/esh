@@ -69,7 +69,7 @@ on d.esh_id = c.district_esh_id
 left join public.fy2016_fiber_bw_target_status_matr d16
 on d.esh_id = d16.esh_id
 
-where d.include_in_universe_of_districts or d.district_type = 'Charter'
+where d.include_in_universe_of_districts_all_charters
 group by d.esh_id,
   d.lines_w_dirty,
   d.num_campuses,

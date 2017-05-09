@@ -69,29 +69,27 @@ left join public.fy2017_district_lookup_matr dl
 on d.esh_id = dl.district_esh_id
 
 join public.fy2017_schools_demog_matr ds -- used join so wouldn't have district BENs
-on dl.esh_id = ds.school_esh_id::varchar
+on dl.esh_id::varchar = ds.school_esh_id::varchar
 
 left join public.esh_entity_circuits ec
-on ec.entity_id::varchar = dl.esh_id
+on ec.entity_id::varchar = dl.esh_id::varchar
 and ec.funding_year = 2017
 
-left join (
+left join ( 
   select *
-  from public.esh_circuits c
+  from public.fy2017_esh_circuits_v c
   where c.isp_conditions_met = false
   and c.backbone_conditions_met = false
   and c.consortium_shared = false
   and not('canceled' = any(c.open_flag_labels) or
 		     'video_conferencing' = any(c.open_flag_labels) or
 		     'exclude' = any(c.open_flag_labels))
-  and c.funding_year = 2017
 ) c
 on ec.circuit_id = c.id
 
-left join public.esh_line_items li
+left join public.fy2017_esh_line_items_v li 
 on c.line_item_id = li.id
 and li.broadband = true
-and li.funding_year = 2017
 
 left join (
 	select 	line_item_id,
@@ -99,25 +97,22 @@ left join (
 		count(distinct a.recipient_ben) as recipients,
 		count(distinct c.campus_id) + sum(case when c.campus_id is null then 1
                                       else 0 end) as num_campuses_and_others
-	from public.esh_allocations a
+	from public.fy2017_esh_allocations_v a
 
-	left join public.esh_line_items li
+	left join public.fy2017_esh_line_items_v li
   on a.line_item_id = li.id
-  and li.funding_year = 2017
 
-
-  left join public.entity_bens eb
+  left join public.entity_bens eb --FIX TABLE
   on eb.ben = a.recipient_ben
-  left join fy2017.districts_schools c
+  left join fy2017.districts_schools c --FIX TABLE
   on eb.entity_id = c.school_id
 
 	where li.broadband = true
-  and a.funding_year = 2017
 	group by line_item_id
 ) alloc
 on c.line_item_id = alloc.line_item_id
 
-where (include_in_universe_of_districts or district_type = 'Charter')
+where include_in_universe_of_districts_all_charters
 
 
 group by 1,2

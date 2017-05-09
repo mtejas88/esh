@@ -29,13 +29,12 @@ select
 from fy2017_districts_predeluxe_matr d17
 
 left join fy2016_districts_deluxe_matr d16
-on d17.esh_id = d16.esh_id
+on d17.esh_id::varchar = d16.esh_id
 
 left join fy2015_districts_deluxe_m d15
 on d16.esh_id = d15.esh_id::varchar
 
-where d17.include_in_universe_of_districts or d17.district_type = 'Charter'
-and d17.num_students != 0
+where d17.include_in_universe_of_districts_all_charters
 
 /*
 Author: Jeremy Holtzman
