@@ -51,6 +51,7 @@ dd_2016 <- querydb("src/dd_2016.SQL")
 dd_2015 <- querydb("src/dd_2015.SQL")
 new_students_meeting <- querydb("src/new_students_meeting.SQL")
 wifi_schools <- querydb("src/wifi_by_schools_disagg.SQL")
+wifi_schools_2 <- querydb("src/wifi_by_schools_disagg_perf.SQL")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -65,3 +66,4 @@ write.csv(dd_2016, "data/raw/dd_2016.csv", row.names=F)
 write.csv(dd_2015, "data/raw/dd_2015.csv", row.names=F)
 write.csv(new_students_meeting, "data/raw/new_students_meeting.csv", row.names=F)
 write.csv(wifi_schools, "data/raw/wifi_schools.csv", row.names=F)
+write.csv(wifi_schools_2, "data/raw/wifi_schools_2.csv", row.names=F)

@@ -184,3 +184,15 @@ names(by_congress_wifi) <- c('state_and_district','has_wifi_schools')
 by_congress_wifi$has_wifi_schools <- round(by_congress_wifi$has_wifi_schools,0)
 by_congress_wifi <- merge(x= by_congress_wifi, y = by_congress_schools, on = 'state_and_district')
 by_congress_wifi$has_wifi_perc <- by_congress_wifi$has_wifi_schools / by_congress_wifi$num_schools
+
+# not meeting WIFI PERFECT
+wifi_schools_2 <- read.csv("data/raw/wifi_schools_2.csv", as.is=T, header=T, stringsAsFactors=F)
+district_congress_sub_16_3 <- data.table(district_congress_summary_16[,c('esh_id','state_and_district','postal_cd.x','exclude_from_ia_analysis','meeting_2014_goal_no_oversub','num_students','num_schools')])
+wifi_schools_2 <- merge(x = district_congress_sub_16_3, y = wifi_schools_2, by = 'esh_id')
+wifi_schools_2$need_wifi_schools <- wifi_schools_2$not_meeting * wifi_schools_2$num_schools
+wifi_schools_2$has_wifi_schools <- wifi_schools_2$num_schools - wifi_schools_2$need_wifi_schools
+by_congress_wifi_2 <- aggregate(wifi_schools_2$has_wifi_schools, by = list(wifi_schools_2$state_and_district), FUN = sum)
+names(by_congress_wifi_2) <- c('state_and_district','has_wifi_schools')
+by_congress_wifi_2$has_wifi_schools <- round(by_congress_wifi_2$has_wifi_schools,0)
+by_congress_wifi_2 <- merge(x= by_congress_wifi_2, y = by_congress_schools, on = 'state_and_district')
+by_congress_wifi_2$has_wifi_perc <- by_congress_wifi_2$has_wifi_schools / by_congress_wifi_2$num_schools
