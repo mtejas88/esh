@@ -25,7 +25,7 @@ library(dotenv)
 options(java.parameters = "-Xmx4g" )
 
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## source function to correct dataset
@@ -54,6 +54,11 @@ frn.meta.data.2016 <- correct.dataset(frn.meta.data.2016, sots.flag=0, services.
 ## corrected line item data
 line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
 line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
+## service provider data (for reporting name)
+sp.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_service_providers.SQL", sep=""))
+sp.2016 <- unique(sp.2016[,c('name', 'reporting_name')])
+names(sp.2016)[names(sp.2016) == 'name'] <- 'service_provider_name'
+sp.2016 <- sp.2016[!is.na(sp.2016$reporting_name),]
 
 ## disconnect from database
 dbDisconnect(con)
@@ -64,3 +69,4 @@ dbDisconnect(con)
 write.csv(frn.line.items.2016, "data/raw/frn_line_items_2016.csv", row.names=F)
 write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
 write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
+write.csv(sp.2016, "data/raw/service_providers_2016.csv", row.names=F)
