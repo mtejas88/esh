@@ -38,7 +38,6 @@ r as (select line_item_id,
 	count(distinct recipient_ben) as num_recipients
 	
 	from public.esh_allocations
-	where funding_year = 2017
 
 	group by line_item_id
 	)
