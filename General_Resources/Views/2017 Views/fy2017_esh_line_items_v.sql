@@ -12,7 +12,7 @@ Dependencies: public.esh_line_items, fy2017.frn_line_items, fy2017.basic_informa
 
 with f as (select
 	flaggable_id,
-	count(id) as num_open_flags,
+	count(distinct label) as num_open_flags,
 	array_agg(label) as open_flag_labels
 
 	from public.flags 
@@ -24,7 +24,7 @@ with f as (select
 	),
 t as (select
 	taggable_id,
-	count(id) as num_open_tags,
+	count(distinct label) as num_open_tags,
 	array_agg(label) as open_tag_labels
 
 	from public.tags
@@ -35,7 +35,7 @@ t as (select
 	group by taggable_id
 	),
 r as (select line_item_id,
-	count(recipient_ben) as num_recipients
+	count(distinct recipient_ben) as num_recipients
 	
 	from public.esh_allocations
 	where funding_year = 2017
