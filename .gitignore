@@ -9,7 +9,7 @@ Icon
 ./**/credentials.py
 
 ## ignore ipynb files
-**/.ipynb*
+**/*.ipynb*
 
 ## also ignore all data files
 **/data/*
