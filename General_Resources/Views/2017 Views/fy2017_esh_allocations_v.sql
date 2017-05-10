@@ -48,5 +48,4 @@ on rb.ben = ea.recipient_ben
 left join public.entities e 
 on e.entity_id = rb.entity_id
 
-where ea.funding_year = 2017
-and eli.funding_year = 2017
+where eli.funding_year = 2017
