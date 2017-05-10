@@ -294,7 +294,16 @@ sum(case
       when usac_remaining_balance > 0 and abs(remaining_diff)/usac_remaining_balance > .1
         then 1
       else 0
-    end)/count(*)::numeric as pct_schools_gt10pct_remaining_diff
+    end)/count(*)::numeric as pct_schools_gt10pct_remaining_diff,
+median(case
+          when remaining_diff < 0 and usac_remaining_balance > 0
+            then remaining_diff/usac_remaining_balance
+        end) as median_pct_remaining_diff_lt0,
+sum(case
+      when usac_remaining_balance > 0 and remaining_diff/usac_remaining_balance < -.1
+        then 1
+      else 0
+    end)/count(*)::numeric as pct_schools_lt10pct_remaining_diff
 from comparison
 
 UNION
@@ -333,6 +342,15 @@ sum(case
       when usac_remaining_balance > 0 and abs(remaining_diff)/usac_remaining_balance > .1
         then 1
       else 0
-    end)/count(*)::numeric as pct_schools_gt10pct_remaining_diff
+    end)/count(*)::numeric as pct_schools_gt10pct_remaining_diff,
+median(case
+          when remaining_diff < 0 and usac_remaining_balance > 0
+            then remaining_diff/usac_remaining_balance
+        end) as median_pct_remaining_diff_lt0,
+sum(case
+      when usac_remaining_balance > 0 and remaining_diff/usac_remaining_balance < -.1
+        then 1
+      else 0
+    end)/count(*)::numeric as pct_schools_lt10pct_remaining_diff
 from comparison
 group by 1
