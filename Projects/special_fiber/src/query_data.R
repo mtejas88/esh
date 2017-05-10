@@ -48,7 +48,9 @@ special_fiber_2017 <- querydb("src/special_fiber_2017.SQL")
 applicant_470s <- querydb("src/applicant_470s.SQL")
 special_fiber_2016 <- querydb("src/special_fiber_2016.SQL")
 dd_2016 <- querydb("src/dd_2016.SQL")
-
+dd_2015 <- querydb("src/dd_2015.SQL")
+new_students_meeting <- querydb("src/new_students_meeting.SQL")
+wifi_schools <- querydb("src/wifi_by_schools_disagg.SQL")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -60,3 +62,6 @@ write.csv(special_fiber_2017, "data/raw/special_fiber_2017.csv", row.names=F)
 write.csv(applicant_470s, "data/raw/applicant_470s_2017.csv", row.names=F)
 write.csv(special_fiber_2016, "data/raw/special_fiber_2016.csv", row.names=F)
 write.csv(dd_2016, "data/raw/dd_2016.csv", row.names=F)
+write.csv(dd_2015, "data/raw/dd_2015.csv", row.names=F)
+write.csv(new_students_meeting, "data/raw/new_students_meeting.csv", row.names=F)
+write.csv(wifi_schools, "data/raw/wifi_schools.csv", row.names=F)

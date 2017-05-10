@@ -154,6 +154,7 @@ sum(applicant_summary_16$line_item_total_cost)
 
 write.csv(district_summary_16, "data/interim/district_summary_16.csv", row.names=F)
 write.csv(applicant_summary_16, "data/interim/applicant_summary_16.csv", row.names=F)
+write.csv(dd.2016, "data/interim/dd_16.csv",row.names=F)
 
 ##**************************************************************************************************************************************************
 ##CONGRESS MUNGING 

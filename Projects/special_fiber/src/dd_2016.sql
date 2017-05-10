@@ -23,7 +23,10 @@ meeting_2018_goal_oversub,
 ia_monthly_cost_per_mbps,
 meeting_knapsack_affordability_target,
 fiber_target_status,
-bw_target_status
+bw_target_status,
+current_assumed_unscalable_campuses,
+current_known_unscalable_campuses,
+c2_postdiscount_remaining_16
 
 from public.fy2016_districts_deluxe_matr
 where include_in_universe_of_districts
