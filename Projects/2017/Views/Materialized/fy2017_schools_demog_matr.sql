@@ -18,7 +18,7 @@ select d.esh_id as district_esh_id,
 
         case
 
-          when sc141a."CHARTR" = '1' then 'Charter'
+          when sc141a."CHARTER_TEXT" = 'Yes' then 'Charter'
 
           when d.district_type = 'Other Agency'
 
@@ -103,7 +103,7 @@ left join ( select distinct esh_id__c, esh_id__c as campus_id
 
             from salesforce.facilities__c ) ds --per Meghan, campus id will be added to this table
 
-on eim.entity_id = ds.esh_id__c
+on eim.entity_id::varchar = ds.esh_id__c
 
 left join (
 
@@ -134,7 +134,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when eim.entity_id is null then ‘Unknown’
+          when eim.entity_id is null then 'Unknown'
 
             else eim.entity_id::varchar
 
@@ -150,7 +150,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when sc141a."CHARTR" = '1' then 'Charter'
+          when sc141a."CHARTER_TEXT" = 'Yes' then 'Charter'
 
           when d.district_type = 'Other Agency'
 
@@ -238,7 +238,7 @@ on sc141a."NCESSCH" = eim.nces_code
 left join ( select distinct esh_id__c, esh_id__c as campus_id
 
             from salesforce.facilities__c) ds --assuming the campus ids will be added to this table, per discussion with Meghan at 4:30 pm on May 9, 2017
-on eim.entity_id = ds.esh_id__c
+on eim.entity_id::varchar = ds.esh_id__c
 
 left join (
 
@@ -269,7 +269,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when eim.entity_id is null then 'Unknown '
+          when eim.entity_id is null then 'Unknown'
 
             else eim.entity_id::varchar
 
@@ -285,7 +285,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when sc141a."CHARTR" = '1' then 'Charter'
+          when sc141a."CHARTER_TEXT" = 'Yes' then 'Charter'
 
           when d.district_type = 'Other Agency'
 
@@ -372,7 +372,7 @@ left join ( select distinct esh_id__c, esh_id__c as campus_id
 --per discussion with Meghan at 4:30 pm on May 9, 2017, the campus id field will be added to salesforce.facilities__c table
 
 
-on eim.entity_id = ds.esh_id__c
+on eim.entity_id::varchar = ds.esh_id__c
 
 left join (
 
@@ -419,7 +419,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when sc141af."CHARTR" = '1' then 'Charter'
+          when sc141af."CHARTER_TEXT" = 'Yes' then 'Charter'
 
           when d.district_type = 'Other Agency'
 
@@ -518,7 +518,7 @@ left join ( select distinct esh_id__c, esh_id__c as campus_id
 
             from salesforce.facilities__c) ds --per Meghan, campus id will be added to this table
 
-on eim.entity_id = ds.esh_id__c
+on eim.entity_id::varchar = ds.esh_id__c
 
 left join (
 
