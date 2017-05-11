@@ -47,7 +47,7 @@ ec.line_item_id,
 ec.funding_year,
 
 	eli.service_provider_id,
-	esp.service_provider_name,
+	esp.name as service_provider_name,
 
 ec.circuit_cost,
 ec.connect_category,
@@ -73,7 +73,11 @@ ec.backbone_conditions_met,
 	r.num_recipients,
 /* intentionally putting open flag and tag arrays at the end 
 since presence of nulls in these will offset column values in spreadsheets */
-	f.num_open_flags,
+	case
+		when f.num_open_flags is null 
+		then 0
+		else f.num_open_flags
+	end as num_open_flags,
 	f.open_flag_labels,
 	t.open_tag_labels
 
@@ -82,9 +86,9 @@ from public.esh_circuits ec
 left join public.esh_line_items eli 
 on eli.id = ec.line_item_id
 
-/*not sure if this is the table and what the column names will be*/
-left join public.esh_service_providers esp 
-on esp.service_provider_id = eli.service_provider_id
+/*using 2016 service provider table until 2017 is ready*/
+left join fy2016.service_providers esp 
+on esp.id::varchar = eli.service_provider_id::varchar
 
 left join f
 on f.flaggable_id = eli.id
