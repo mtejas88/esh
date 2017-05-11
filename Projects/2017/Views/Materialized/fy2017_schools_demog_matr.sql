@@ -1,10 +1,8 @@
-
-
 select d.esh_id as district_esh_id,
 
         case
 
-          when eim.entity_id is null then ‘Unknown’
+          when eim.entity_id is null then 'Unknown'
 
             else eim.entity_id::varchar
 
@@ -30,7 +28,7 @@ select d.esh_id as district_esh_id,
 
         end as school_type,
 
-        sc141a."LSTREE" as address,
+        sc141a."LSTREET1" as address,
 
         sc141a."LCITY" as city,
 
@@ -103,7 +101,7 @@ on sc141a."NCESSCH" = eim.nces_code
 
 left join ( select distinct school_id, campus_id
 
-            from fy2017.districts_schools ) ds --assuming there will be fy2017.district_schools
+            from salesforce.facilities__c ) ds --per Meghan, campus id will be added to this table
 
 on eim.entity_id = ds.school_id
 
@@ -116,7 +114,7 @@ left join (
   where label in ('closed_school', 'non_school', 'charter_school')
 
   and status = 'open'
-  and funding_year = 2017
+  and funding_year = 2017 --per engineering, funding year is integer data type in all tables
 
 ) t
 
@@ -162,7 +160,7 @@ select  d.esh_id as district_esh_id,
 
         end as school_type,
 
-        sc141a."LSTREE" as address,
+        sc141a."LSTREET1" as address,
 
         sc141a."LCITY" as city,
 
@@ -204,9 +202,9 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0
+          when "TOTFRL"::numeric>0 and sc141a."MEMBER"::numeric > 0
 
-            then sc131a."MEMBER"::numeric
+            then sc141a."MEMBER"::numeric
 
         end as frl_percentage_denomenator,
 
@@ -227,7 +225,7 @@ join (select *
 
       where postal_cd = 'MT') d
 
-on ag141a."LSTREE" = d.address
+on ag141a."LSTREET1" = d.address
 
 and sc141a."LSTATE" = d.postal_cd
 
@@ -239,7 +237,7 @@ on sc141a."NCESSCH" = eim.nces_code
 
 left join ( select distinct school_id, campus_id
 
-            from fy2017.districts_schools ) ds --assuming there will be fy2017.district_schools
+            from salesforce.facilities__c) ds --assuming the campus ids will be added to this table, per discussion with Meghan at 4:30 pm on May 9, 2017
 on eim.entity_id = ds.school_id
 
 left join (
@@ -271,7 +269,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when eim.entity_id is null then 'Unknown for 2015'
+          when eim.entity_id is null then 'Unknown '
 
             else eim.entity_id::varchar
 
@@ -297,7 +295,7 @@ select  d.esh_id as district_esh_id,
 
         end as school_type,
 
-        sc141a."LSTREE" as address,
+        sc141a."LSTREET1" as address,
 
         sc141a."LCITY" as city,
 
@@ -339,7 +337,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when "TOTFRL"::numeric>0 and sc131a."MEMBER"::numeric > 0
+          when "TOTFRL"::numeric>0 and sc141a."MEMBER"::numeric > 0
 
             then sc141a."MEMBER"::numeric
 
@@ -370,7 +368,9 @@ on sc141a."NCESSCH" = eim.nces_code
 
 left join ( select distinct school_id, campus_id
 
-            from fy2017.districts_schools ) ds --assuming there will be fy2017.district_schools
+            from salesforce.facilities__c ) ds
+--per discussion with Meghan at 4:30 pm on May 9, 2017, the campus id field will be added to salesforce.facilities__c table
+
 
 on eim.entity_id = ds.school_id
 
@@ -403,7 +403,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when eim.entity_id is null then 'Unknown’
+          when eim.entity_id is null then 'Unknown'
 
             else eim.entity_id::varchar
 
@@ -429,7 +429,7 @@ select  d.esh_id as district_esh_id,
 
         end as school_type,
 
-         sc141af."LSTREE" as address,
+         sc141af."LSTREET1" as address,
 
          sc141af."LCITY" as city,
 
@@ -439,7 +439,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when sc141af.”MEMBER"::numeric > 0 and sc141af."PK"::numeric <= 0 then sc141af."MEMBER"::numeric
+          when sc141af."MEMBER"::numeric > 0 and sc141af."PK"::numeric <= 0 then sc141af."MEMBER"::numeric
 
           when sc141af."MEMBER"::numeric > 0 and sc141af."PK"::numeric > 0 then sc141af."MEMBER"::numeric - sc141af."PK"::numeric
 
@@ -471,7 +471,7 @@ select  d.esh_id as district_esh_id,
 
         case
 
-          when "TOTFRL"::numeric>0 and sc131af."MEMBER"::numeric > 0
+          when "TOTFRL"::numeric>0 and sc141af."MEMBER"::numeric > 0
 
             then sc141af."MEMBER"::numeric
 
@@ -516,7 +516,7 @@ on sc141af."NCESSCH" = eim.nces_code
 
 left join ( select distinct school_id, campus_id
 
-            from fy2017.districts_schools ) ds --assuming there will be fy2017.district_schools
+            from salesforce.facilities__c) ds --per Meghan, campus id will be added to this table
 
 on eim.entity_id = ds.school_id
 
@@ -552,7 +552,7 @@ Name of QAing Analyst(s): Greg Kurzhals
 
 Purpose: Schools demographics of those in the universe
 
-Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
+Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before
 
 metrics aggregation so school-district association can be created.
 
