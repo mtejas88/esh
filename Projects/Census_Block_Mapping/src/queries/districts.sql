@@ -1,0 +1,1 @@
+select esh_id, latitude, longitude from public.fy2016_districts_deluxe_matr
