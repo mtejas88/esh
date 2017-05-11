@@ -1,7 +1,5 @@
-
-
 select  case
-          when eim.entity_id is null then ‘Unknown’
+          when eim.entity_id is null then 'Unknown'
             else eim.entity_id::varchar
         end as esh_id,
         d."LEAID" as nces_cd,
@@ -24,7 +22,7 @@ select  case
             then 'Traditional'
           else 'Other Agency'
         end as district_type,
-        d."LSTREE" as address,
+        d."LSTREET1" as address,
         d."LCITY" as city,
         d."LZIP" as zip,
         d."CONAME" as county,
@@ -241,7 +239,7 @@ left join ( select  "LEAID",
             from public.sc141a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc131a."NCESSCH" = eim.nces_code
+            on sc141a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
@@ -252,7 +250,7 @@ left join ( select  "LEAID",
               from public.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-	and funding_year = ‘2017’ --adding funding year filter for public flags
+  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
@@ -282,12 +280,12 @@ left join ( select  "UNION",
                         end) as student_pk_count,
                     count(distinct  case
                                       when flaggable_id is null
-                                        then sc131a."LEAID"
+                                        then sc141a."LEAID"
                                     end) as district_count
             from public.sc141a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc131a."NCESSCH" = eim.nces_code
+            on sc141a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
@@ -297,7 +295,7 @@ left join ( select  "UNION",
               from public.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-	and funding_year = ‘2017’ --adding funding year filter for public flags
+  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
@@ -307,7 +305,7 @@ left join ( select  "UNION",
 on d."UNION"=sc_VT."UNION"
 and d."LSTATE"=sc_VT."LSTATE"
 
-left join ( select  ag141a."LSTREE",
+left join ( select  ag141a."LSTREET1",
                     ag141a."LCITY",
                     ag141a."LSTATE",
                     sum(case
@@ -349,15 +347,15 @@ left join ( select  ag141a."LSTREE",
               from public.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-	and funding_year = ‘2017’ --adding funding year filter for public flags
+  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where sc141a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
-            group by  ag141a."LSTREE",
+            where sc141a."LSTATE" = 'MT' --only smushing by district LSTREET1 for districts in MT
+            group by  ag141a."LSTREET1",
                       ag141a."LCITY",
                       ag141a."LSTATE" ) sc_MT
-on d."LSTREE"=sc_MT."LSTREE"
+on d."LSTREET1"=sc_MT."LSTREET1"
 and d."LCITY"=sc_MT."LCITY"
 and d."LSTATE"=sc_MT."LSTATE"
 
@@ -406,14 +404,14 @@ left join ( select  case
               from public.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-	and funding_year = ‘2017’ --adding funding year filter for public flags
+  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
             where sc141a."LSTATE" = 'NY'
             and (ag141a."NAME" ilike '%geographic%' or ag141a."LEAID" = '3620580')
             group by  case
-                        when ag141a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
+                        when ag141a."NAME" ilike '%geographic%' or ag141a."LEAID" = '3620580'
                           then true
                         else false
                       end,
@@ -449,7 +447,7 @@ left join ( select  "UNION",
 on d."UNION"=stf_VT."UNION"
 and d."LSTATE"=stf_VT."LSTATE"
 
-left join ( select  ag141a."LSTREE",
+left join ( select  ag141a."LSTREET1",
                     ag141a."LCITY",
                     ag141a."LSTATE",
                     sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
@@ -471,11 +469,11 @@ left join ( select  ag141a."LSTREE",
                         + case when "STUSUP" < 0 then 0 else "STUSUP" end
                         + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
             from ag141a
-            where "LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
-            group by  "LSTREE",
+            where "LSTATE" = 'MT' --only smushing by district LSTREET1 for districts in MT
+            group by  "LSTREET1",
                       "LCITY",
                       "LSTATE" ) stf_MT
-on d."LSTREE"=stf_MT."LSTREE"
+on d."LSTREET1"=stf_MT."LSTREET1"
 and d."LCITY"=stf_MT."LCITY"
 and d."LSTATE"=stf_MT."LSTATE"
 
@@ -519,7 +517,7 @@ and d."LSTATE"=sc_NY."LSTATE"
 where case --only include the HS district when smushing MT districts (exclude the ELEM)
         when sc_MT.district_count > 1
           then --this is the blacklist of NCES IDS for MT districts that were smushed and we dont want to include
-          d."LEAID" not in s(  '3001710','3002010','3002220','3002430','3003290','3003420',
+          d."LEAID" not in (  '3001710','3002010','3002220','3002430','3003290','3003420',
                               '3003820','3003760','3003870','3004440','3004560','3000006',
                               '3004890','3005010','3005140','3005280','3005880','3025130',
                               '3006112','3000098','3006260','3006320','3006790','3007050',
@@ -543,17 +541,16 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 
 /*
 Author: Justine Schott
-Created On Date: 6/20/2016
-Last Modified Date: 3/21/2017 -- update MT smush to smush by both address AND city, not just address
+Date: 6/20/2016
+Last Modified Date: 3/21/2017 --  MT smush to smush by both address AND city, not just address
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
-Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
-metrics aggregation so school-district association can be created. Excluded schools have flags to be removed from the population.
-
+Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before
+metrics aggregation so school-district association can be applied. Excluded schools have flags to be removed from the population.
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
+Methodology: Using new tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
 Usage of public.flags & funding_year clause
 */
