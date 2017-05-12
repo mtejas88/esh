@@ -82,7 +82,8 @@ group by d.esh_id,
   d.fiber_wan_lines_w_dirty,
   d.include_in_universe_of_districts,
   d.district_type,
-  d.postal_cd
+  d.postal_cd,
+  d16.fiber_target_no_override
 
 /*
 Author: Jeremy Holtzman
