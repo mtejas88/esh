@@ -60,7 +60,6 @@ ec.connect_category,
 
 ec.broadband,
 	
-	eli.exclude,
 	eli.erate,
 
 ec.consortium_shared,
@@ -90,8 +89,8 @@ on eli.id = ec.line_item_id
 left join fy2016.service_providers esp 
 on esp.id::varchar = eli.service_provider_id::varchar
 
-left join f
 on f.flaggable_id = eli.id
+left join f
 
 left join t
 on t.taggable_id = eli.id
