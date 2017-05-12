@@ -8,6 +8,9 @@ Icon
 ## and ignore any API credentials stored in python
 ./**/credentials.py
 
+## ignore ipynb files
+**/*.ipynb*
+
 ## also ignore all data files
 **/data/*
 !**/data/.gitkeep
