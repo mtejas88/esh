@@ -39,6 +39,11 @@ nces <- read.csv("data/interim/nces_schools_subset.csv", as.is=T, header=T, stri
 nces$leaid <- correct_ids(nces$leaid, district=1)
 nces$ncessch <- correct_ids(nces$ncessch, district=0)
 
+## round 2017 lat/long coordinates to 4 decimal places to match last year's calcalation
+## (since some campuses didn't stick due to the slight difference in calculation)
+nces$latcode <- round(nces$latcode, digits=4)
+nces$longcode <- round(nces$longcode, digits=4)
+
 ### FIND ALL POSSIBLE COMBINATIONS OF SCHOOLS WITHIN EACH DISTRICT
 ## subset to districts with more than 1 school
 districts.dta <- data.frame(table(nces$leaid))

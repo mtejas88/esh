@@ -18,7 +18,7 @@ data: external_data $(CODE_DIR)/out_files/query_data.Rout
 sample: data $(CODE_DIR)/out_files/munge_data.Rout
 distances: sample $(CODE_DIR)/out_files/calculate_school_distances.Rout
 campuses: distances $(CODE_DIR)/out_files/create_campuses.Rout
-checks: campuses $(CODE_DIR)/out_files/checks.Rout
+checks: campuses $(CODE_DIR)/out_files/checks_and_final_formatting.Rout
 ## run entire project
 all: external_data data sample distances campuses checks
 
@@ -47,11 +47,9 @@ $(CODE_DIR)/out_files/create_campuses.Rout: $(CODE_DIR)/create_campuses.R
 	@echo "creating campuses (will take ~10 min to run)"
 	@R CMD BATCH --no-restore $(CODE_DIR)/create_campuses.R $(CODE_DIR)/out_files/create_campuses.Rout
 
-$(CODE_DIR)/out_files/checks.Rout: $(CODE_DIR)/checks.R
+$(CODE_DIR)/out_files/checks_and_final_formatting.Rout: $(CODE_DIR)/checks_and_final_formatting.R
 	@echo "checking campuses"
-	@R CMD BATCH --no-restore $(CODE_DIR)/checks.R $(CODE_DIR)/out_files/checks.Rout
-
-## clean up all generated files
+	@R CMD BATCH --no-restore $(CODE_DIR)/checks_and_final_formatting.R $(CODE_DIR)/out_files/checks_and_final_formatting.Rout
 clean:
 	@echo "Cleaning up project files and data"	
 	@rm -rf $(CODE_DIR)/out_files/*

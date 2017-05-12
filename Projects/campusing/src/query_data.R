@@ -44,8 +44,10 @@ querydb <- function(query_name){
 }
 
 nces <- querydb(paste(github_path, "General_Resources/sql_scripts/fy2014_fy2015_schools_membership.SQL", sep=""))
+nces.districts <- querydb(paste(github_path, "General_Resources/sql_scripts/fy2014_fy2015_districts_directories.SQL", sep=""))
 schools.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_schools_demog.SQL", sep=""))
 deluxe.schools.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_schools.SQL", sep=""))
+nces.to.entities.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_nces_entities.SQL", sep=""))
 
 ## disconnect from database
 dbDisconnect(con)
@@ -54,5 +56,7 @@ dbDisconnect(con)
 ## write out the datasets
 
 write.csv(nces, "data/raw/nces_schools_2014-15.csv", row.names=F)
+write.csv(nces.districts, "data/raw/nces_districts_2014-15.csv", row.names=F)
 write.csv(schools.2016, "data/raw/2016_schools.csv", row.names=F)
 write.csv(deluxe.schools.2016, "data/raw/2016_deluxe_schools.csv", row.names=F)
+write.csv(nces.to.entities.2017, "data/raw/2017_nces_to_entities.csv", row.names=F)
