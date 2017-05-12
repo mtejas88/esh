@@ -68,12 +68,14 @@ from public.fy2017_districts_predeluxe_matr d
 left join public.fy2017_district_lookup_matr dl
 on d.esh_id = dl.district_esh_id
 
+left join public.entity_bens eb
+on dl.esh_id = eb.entity_id::varchar
+
 join public.fy2017_schools_demog_matr ds -- used join so wouldn't have district BENs
 on dl.esh_id::varchar = ds.school_esh_id::varchar
 
-left join public.esh_entity_circuits ec
-on ec.entity_id::varchar = dl.esh_id::varchar
-and ec.funding_year = 2017
+left join public.entity_ben_circuits  ec
+on ec.ben = eb.ben
 
 left join ( 
   select *
