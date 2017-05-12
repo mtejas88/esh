@@ -297,7 +297,7 @@ from (
       left join (
         select *
         from fy2016.line_items
-        where service_category::numeric = 2.
+        where service_category::numeric = 2
       ) c2_li_2016
       on c2_li_2016.id = ad_2016.line_item_id
       left join (
