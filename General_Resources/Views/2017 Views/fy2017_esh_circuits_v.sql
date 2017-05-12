@@ -89,8 +89,8 @@ on eli.id = ec.line_item_id
 left join fy2016.service_providers esp 
 on esp.id::varchar = eli.service_provider_id::varchar
 
-on f.flaggable_id = eli.id
 left join f
+on f.flaggable_id = eli.id
 
 left join t
 on t.taggable_id = eli.id
