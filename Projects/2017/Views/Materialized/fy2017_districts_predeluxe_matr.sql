@@ -61,7 +61,8 @@ select distinct
 	when
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') and and array_to_string(flag_array,',') ilike '%dirty_wan%'))
+	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
+	and (array_to_string(flag_array,',') ilike '%dirty_wan%')
 
 		/*when  	(flag_array is null or
 
@@ -81,7 +82,8 @@ select distinct
 
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') and and array_to_string(flag_array,',') ilike '%dirty_wan%'))
+	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
+	and (array_to_string(flag_array,',') ilike '%dirty_wan%')
 
 
 		/*when 	(flag_array is null or
@@ -134,13 +136,15 @@ select distinct
 
 	case
 
-		when 	(flag_array is not null or
-
+when
 			(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
 			(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-			(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') and and array_to_string(flag_array,',') ilike '%dirty_wan%'))
+			(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
+			and (array_to_string(flag_array,',') ilike '%dirty_wan%')
 
-				/*flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%')*/ -- commenting out due to new flag logic (see above)
+				/*flag_count = 1 and array_to_string(flag_array,',') 
+				ilike '%missing_wan%')-- commenting out due to new flag logic (see above)*/
+				
 			then 'dirty'
 
 		when 'outreach_confirmed' = any(tag_array)
@@ -385,13 +389,13 @@ select distinct
 
   	ia_monthly_cost_no_backbone,
 
-	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
+	/*CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
 
    			WHEN wifi.count_wifi_needed = 0 THEN false
 
         	ELSE null
 
-		   	END as needs_wifi,
+		   	END as needs_wifi,*/
 
 	/*c2_prediscount_budget_15,
 

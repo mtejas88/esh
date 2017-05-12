@@ -1,7 +1,3 @@
-/*funding year filter is pending to be confirmed
-ALSO >>> public tags vs public.esh_tags
-ALSO >>> discount calculations tables is not ready  */
-
 select  		dd.esh_id as district_esh_id,
 
 --ia bw/student pieces
@@ -202,7 +198,7 @@ select  		dd.esh_id as district_esh_id,
 
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 
-																	/*/ case
+																	/* case
 
 																		when months_of_service = 0 or months_of_service is null
 
@@ -224,7 +220,7 @@ select  		dd.esh_id as district_esh_id,
 
 									and district_info_by_li.num_students_served::numeric > 0
 
-										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /** months_of_service )*/
+										then	esh_rec_cost::numeric	/ district_info_by_li.num_students_served::numeric /* months_of_service )*/
 
 									else	0
 
@@ -264,7 +260,7 @@ select  		dd.esh_id as district_esh_id,
 
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 
-																	/*/ case
+																	/* case
 
 																		when months_of_service = 0 or months_of_service is null
 
@@ -690,7 +686,7 @@ select  		dd.esh_id as district_esh_id,
 
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
-																				/*/ case
+																				/* case
 
 																					when months_of_service = 0 or months_of_service is null
 
@@ -748,7 +744,7 @@ select  		dd.esh_id as district_esh_id,
 
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
-																				/*/ case
+																				/* case
 
 																					when months_of_service = 0 or months_of_service is null
 
@@ -806,7 +802,7 @@ select  		dd.esh_id as district_esh_id,
 
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
-																				/*/ case
+																				/* case
 
 																					when months_of_service = 0 or months_of_service is null
 
@@ -1471,21 +1467,21 @@ left join
 
   ( SELECT
 
-public.esh_line_items_v.id,public.esh_line_items_v.frn_complete,public.esh_line_items_v.frn,public.esh_line_items_v.application_number,public.esh_line_items_v.application_type,
-public.esh_line_items_v.applicant_ben,public.esh_line_items_v.applicant_name,public.esh_line_items_v.applicant_postal_cd,public.esh_line_items_v.service_provider_id,
-public.esh_line_items_v.service_provider_name,public.esh_line_items_v.service_type,public.esh_line_items_v.service_category,public.esh_line_items_v.connect_type,
-public.esh_line_items_v.connect_category,public.esh_line_items_v.purpose,public.esh_line_items_v.bandwidth_in_mbps,public.esh_line_items_v.bandwidth_in_original_units,
-public.esh_line_items_v.num_lines,public.esh_line_items_v.total_cost,public.esh_line_items_v.one_time_elig_cost,public.esh_line_items_v.rec_elig_cost,
-public.esh_line_items_v.months_of_service,public.esh_line_items_v.contract_end_date,public.esh_line_items_v.num_open_flags,public.esh_line_items_v.open_flag_labels,
-public.esh_line_items_v.open_tag_labels,public.esh_line_items_v.num_recipients,public.esh_line_items_v.erate,public.esh_line_items_v.broadband,
-public.esh_line_items_v.consortium_shared,public.esh_line_items_v.isp_conditions_met,public.esh_line_items_v.upstream_conditions_met,
-public.esh_line_items_v.internet_conditions_met,public.esh_line_items_v.wan_conditions_met,public.esh_line_items_v.exclude,public.esh_line_items_v.upload_bandwidth_in_mbps,
-public.esh_line_items_v.backbone_conditions_met,public.esh_line_items_v.function,
+public.fy2017_esh_line_items_v.id,public.fy2017_esh_line_items_v.frn_complete,public.fy2017_esh_line_items_v.frn,public.fy2017_esh_line_items_v.application_number,public.fy2017_esh_line_items_v.application_type,
+public.fy2017_esh_line_items_v.applicant_ben,public.fy2017_esh_line_items_v.applicant_name,public.fy2017_esh_line_items_v.applicant_postal_cd,public.fy2017_esh_line_items_v.service_provider_id,
+public.fy2017_esh_line_items_v.name,public.fy2017_esh_line_items_v.service_type,public.fy2017_esh_line_items_v.service_category,public.fy2017_esh_line_items_v.connect_type,
+public.fy2017_esh_line_items_v.connect_category,public.fy2017_esh_line_items_v.purpose,public.fy2017_esh_line_items_v.bandwidth_in_mbps,public.fy2017_esh_line_items_v.bandwidth_in_original_units,
+public.fy2017_esh_line_items_v.num_lines,public.fy2017_esh_line_items_v.total_cost,public.fy2017_esh_line_items_v.one_time_elig_cost,public.fy2017_esh_line_items_v.rec_elig_cost,
+public.fy2017_esh_line_items_v.months_of_service,public.fy2017_esh_line_items_v.contract_end_date,public.fy2017_esh_line_items_v.num_open_flags,public.fy2017_esh_line_items_v.open_flag_labels,
+public.fy2017_esh_line_items_v.open_tag_labels,public.fy2017_esh_line_items_v.num_recipients,public.fy2017_esh_line_items_v.erate,public.fy2017_esh_line_items_v.broadband,
+public.fy2017_esh_line_items_v.consortium_shared,public.fy2017_esh_line_items_v.isp_conditions_met,public.fy2017_esh_line_items_v.upstream_conditions_met,
+public.fy2017_esh_line_items_v.internet_conditions_met,public.fy2017_esh_line_items_v.wan_conditions_met,public.fy2017_esh_line_items_v.exclude,public.fy2017_esh_line_items_v.upload_bandwidth_in_mbps,
+public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_items_v.function,
 
 
-           eb.entity_id as real_applicant_id,
+           eb.id as real_applicant_id,
 
-           eb.entity_type as real_applicant_type,
+           eb.type as real_applicant_type,
 
            CASE
 
@@ -1504,6 +1500,7 @@ public.esh_line_items_v.backbone_conditions_met,public.esh_line_items_v.function
            END AS esh_rec_cost,
 
            reporting_name,
+           spc.name as service_provider_name,
 
            frns.discount_rate::numeric/100 as discount_rate
 
@@ -1522,13 +1519,13 @@ public.esh_line_items_v.backbone_conditions_met,public.esh_line_items_v.function
 
    left join(
 
-    select distinct name, reporting_name
+    select distinct id, reporting_name, name
 
     from public.service_provider_categories --using the same public table that we used in 2016
 
     ) spc
 
-   on fy2017_esh_line_items_v.service_provider_name = spc.name --adding the view name
+   on fy2017_esh_line_items_v.service_provider_id::varchar = spc.id::varchar --adding the view name*/
 
    WHERE broadband = true
 
@@ -1556,7 +1553,7 @@ left join (
 
 
 
-		join fy2017_districts_demog_mat d
+		join fy2017_districts_demog_matr d
 
 		on ldli.district_esh_id::varchar	=	d.esh_id::varchar
 
@@ -1688,15 +1685,21 @@ left join (
 
 
 
-		from fy2017.discount_calculations dc
+		from fy2017.discount_calculations dc --commenting as c2 funding is not ready
 
-		join ( select distinct id, ben__c
+		join ( select distinct entity_id, ben
 
-            from salesforce.facilities__c) eim
+            from public.entity_bens) eim
 
-		on dc.parent_entity_ben = eim.ben__c
+		on dc.parent_entity_ben = eim.ben
+/*join ( select distinct id, ben__c
 
-		group by entity_id
+            from salesforce.facilities__c
+
+		--on tag_info.parent_entity_ben = salesforce.facilities__c.ben__c
+
+		group by entity_ben*/
+		group by 1
 
 ) dr_info
 
