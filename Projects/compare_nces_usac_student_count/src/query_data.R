@@ -9,7 +9,6 @@ rm(list=ls())
 
 args = commandArgs(trailingOnly=TRUE)
 github_path <- args[1]
-github_path <- "~/Documents/ESH-Code/ficher/"
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -46,19 +45,14 @@ querydb <- function(query_name){
   data <- dbGetQuery(con, query)
   return(data)
 }
-## raw line item data (as it comes in from USAC)
-frn.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
-frn.line.items.2016 <- correct.dataset(frn.line.items.2016, sots.flag=0, services.flag=0)
-frn.meta.data.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frns.SQL", sep=""))
-frn.meta.data.2016 <- correct.dataset(frn.meta.data.2016, sots.flag=0, services.flag=0)
-## corrected line item data
-line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
-line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
-## service provider data (for reporting name)
-sp.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_service_providers.SQL", sep=""))
-sp.2016 <- unique(sp.2016[,c('name', 'reporting_name')])
-names(sp.2016)[names(sp.2016) == 'name'] <- 'service_provider_name'
-sp.2016 <- sp.2016[!is.na(sp.2016$reporting_name),]
+
+nces <- querydb(paste(github_path, "General_Resources/sql_scripts/fy2014_fy2015_schools_membership.SQL", sep=""))
+usac <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_entity_reports.SQL", sep=""))
+schools <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_schools_demog.SQL", sep=""))
+schools <- correct.dataset(schools, 0, 0)
+bens <- querydb(paste(github_path, "General_Resources/sql_scripts/Entity_Bens.SQL", sep=""))
+salesforce_account <- querydb(paste(github_path, "General_Resources/sql_scripts/salesforce_account.SQL", sep=""))
+salesforce_facilities <- querydb(paste(github_path, "General_Resources/sql_scripts/salesforce_facilities.SQL", sep=""))
 
 ## disconnect from database
 dbDisconnect(con)
@@ -66,7 +60,9 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(frn.line.items.2016, "data/raw/frn_line_items_2016.csv", row.names=F)
-write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
-write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
-write.csv(sp.2016, "data/raw/service_providers_2016.csv", row.names=F)
+write.csv(nces, "data/raw/nces_2014-15.csv", row.names=F)
+write.csv(usac, "data/raw/usac_2016.csv", row.names=F)
+write.csv(schools, "data/raw/schools.csv", row.names=F)
+write.csv(bens, "data/raw/bens.csv", row.names=F)
+write.csv(salesforce_account, "data/raw/salesforce_account.csv", row.names=F)
+write.csv(salesforce_facilities, "data/raw/salesforce_facilities.csv", row.names=F)

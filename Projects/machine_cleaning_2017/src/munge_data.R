@@ -16,6 +16,7 @@ source("src/define_broadband.R")
 frn.line.items.2016 <- read.csv("data/raw/frn_line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 frn.meta.data.2016 <- read.csv("data/raw/frn_meta_data_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 line.items.2016 <- read.csv("data/raw/line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.2016 <- read.csv("data/raw/service_providers_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## CLEAN DATA
@@ -35,6 +36,10 @@ names(line.items.2016)[names(line.items.2016) != 'id'] <- paste(names(line.items
 
 ## merge in cleaned data
 dta <- merge(frn.dta, line.items.2016, by='id', all.y=T)
+
+## SP DATA
+## merge in reporting name with raw data
+dta <- merge(dta, sp.2016, by="service_provider_name", all.x=T)
 
 ##**************************************************************************************************************************************************
 ## examine how often line items that came in as Not Broadband changed to Broadband

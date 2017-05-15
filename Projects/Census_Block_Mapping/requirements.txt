@@ -1,0 +1,5 @@
+pip install sys
+pip install os
+pip install psycopg2
+pip install pandas 
+pip install requests
