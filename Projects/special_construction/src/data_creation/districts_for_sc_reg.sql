@@ -29,7 +29,7 @@
                         else 0
                     end) > 0 as frns_2_bid_indicator,
                 sum(case
-                        when num_bids_received = 2
+                        when num_bids_received > 2
                             then 1
                         else 0
                     end) > 0 as frns_3p_bid_indicator,
@@ -61,7 +61,7 @@
                         else 0
                     end) > 0 as frns_2_bid_ia_indicator,
                 sum(case
-                        when    num_bids_received = 2
+                        when    num_bids_received > 2
                                 and (   internet_indicator
                                         or upstream_indicator
                                         or backbone_indicator

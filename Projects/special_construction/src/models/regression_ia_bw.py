@@ -12,7 +12,7 @@ import statsmodels.api as sm
 
 ## data prep
 #import
-districts_for_ia_bw_reg = pd.read_csv('data/interim/districts_for_sc_reg.csv')
+districts_for_ia_bw_reg = pd.read_csv('C:/Users/Justine/Documents/GitHub/ficher/Projects/special_construction/data/interim/districts_for_sc_reg.csv')
 #clean for cost only for regression
 districts_for_ia_bw_reg = districts_for_ia_bw_reg.loc[districts_for_ia_bw_reg['exclude_from_ia_analysis'] == False]
 #aggregate 2+,3+
