@@ -14,9 +14,6 @@ with state_level_extrap as (
 
 	group by postal_cd)
 
-
-
-
 select distinct
 
 	esh_id,
@@ -55,9 +52,9 @@ select distinct
 
 	frl_percent,
 
-	discount_rate_c1,
+	--discount_rate_c1, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	discount_rate_c2,
+	--discount_rate_c2, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
 	address,
 
@@ -265,25 +262,25 @@ select distinct
 
   	backbone_monthly_cost,
 
-	needs_wifi,
+	--needs_wifi,  /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	c2_prediscount_budget_15,
+	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	c2_prediscount_remaining_15,
+	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	c2_prediscount_remaining_16,
+	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	c2_postdiscount_remaining_15,
+	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	c2_postdiscount_remaining_16,
+	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	received_c2_15,
+	--received_c2_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	received_c2_16,
+	--received_c2_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	budget_used_c2_15,
+	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
-	budget_used_c2_16,
+	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
 
 	fiber_target_status,
 
@@ -298,8 +295,6 @@ select distinct
 	ia_monthly_funding_total,
 
 	service_provider_assignment
-
-
 
 
 from fy2017_districts_fiberpredeluxe_matr dfpd

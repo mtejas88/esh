@@ -40,7 +40,7 @@ select distinct
 
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
-	c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
+	--c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget, /* JAMIE-TEMP-EDIT does not exist yet */
 
 	address,
 
@@ -370,31 +370,31 @@ select distinct
 
   	ia_monthly_cost_no_backbone,
 
-	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
+	--CASE 	WHEN wifi.count_wifi_needed > 0 THEN true /* JAMIE-TEMP-EDIT Table needs to be updated, does not have these columns yet */
 
-   			WHEN wifi.count_wifi_needed = 0 THEN false
+   	--		WHEN wifi.count_wifi_needed = 0 THEN false
 
-        	ELSE null
+    --    	ELSE null
 
-		   	END as needs_wifi,
+	--	   	END as needs_wifi,  
 
-	c2_prediscount_budget_15,
+	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	c2_prediscount_remaining_15,
+	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	c2_prediscount_remaining_16,
+	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	c2_postdiscount_remaining_15,
+	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	c2_postdiscount_remaining_16,
+	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	received_c2_15,
+	--received_c2_15, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	received_c2_16,
+	--received_c2_16, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	budget_used_c2_15,
+	--budget_used_c2_15, /* JAMIE-TEMP-EDIT does not exist yet */
 
-	budget_used_c2_16,
+	--budget_used_c2_16, /* JAMIE-TEMP-EDIT does not exist yet */
 
 	wan_lines_w_dirty,
 
@@ -413,9 +413,9 @@ left join public.fy2017_wifi_connectivity_informations_matr wifi
 
 on dm.esh_id = wifi.parent_entity_id::varchar
 
-left join public.fy2017_districts_c2_funding_matr c2
+--left join public.fy2017_districts_c2_funding_matr c2 /* JAMIE-TEMP-EDIT does not exist yet */
 
-on dm.esh_id = c2.esh_id::varchar
+--on dm.esh_id = c2.esh_id::varchar /* JAMIE-TEMP-EDIT does not exist yet */
 
 
 

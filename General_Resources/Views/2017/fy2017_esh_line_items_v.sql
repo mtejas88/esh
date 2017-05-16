@@ -77,7 +77,7 @@ eli.upload_bandwidth_in_mbps,
 case
 	when eli.num_lines = -1
 	then 'Unknown'
-	else eli.num_lines::char
+	else eli.num_lines::varchar
 end as num_lines,
 
 eli.one_time_elig_cost,

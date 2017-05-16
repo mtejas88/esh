@@ -36,9 +36,9 @@ select distinct
 
 	frl_percent,
 
-	discount_rate_c1,
+	--discount_rate_c1, /*JAMIE-TEMP-EDIT until predeluxe fixed
 
-	discount_rate_c2,
+	--discount_rate_c2, /*JAMIE-TEMP-EDIT until predeluxe fixed
 
 	address,
 
@@ -466,10 +466,10 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi,
+	--needs_wifi, /*JAMIE-TEMP-EDIT until predeluxe fixed
 
 
-	//*c2_prediscount_budget_15,
+	/*c2_prediscount_budget_15,
 
 	c2_prediscount_remaining_15,
 
@@ -485,7 +485,7 @@ select distinct
 
 	budget_used_c2_15,
 
-	budget_used_c2_16,*//
+	budget_used_c2_16,*/
 
 
 	fbts.fiber_target_status,

@@ -174,13 +174,15 @@ FROM (
 
               when spc.reporting_name is null
 
-                then  li.service_provider_name
+                --then  li.service_provider_name /* JAMIE-TEMP-EDIT until LI_V updated
+             	then li.name 
 
               else spc.reporting_name
 
             end AS reporting_name,
 
-            li.service_provider_name AS service_provider_name,
+            --li.service_provider_name AS service_provider_name, /* JAMIE-TEMP-EDIT until LI_V updated
+            li.name AS service_provider_name,
 
             li.applicant_name AS applicant_name,
 
@@ -220,11 +222,11 @@ FROM (
 
             dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
 
-            d.consortium_member AS recipient_consortium_member
+            dd.consortium_affiliation AS recipient_consortium_member
 
           FROM public.fy2017_lines_to_district_by_line_item_matr lid
 
-          LEFT OUTER JOIN public.line_items li
+          LEFT OUTER JOIN public.fy2017_esh_line_items_v li
 
           ON li.id = lid.line_item_id
 
@@ -240,18 +242,19 @@ FROM (
 
           ) spc
 
-          ON spc.name = li.service_provider_name
+          -- ON spc.name = li.service_provider_name /* JAMIE-TEMP-EDIT until LI_V updated
+          ON spc.name = li.name
 
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
 
           ON dd.esh_id = lid.district_esh_id
 
 
-         //*LEFT OUTER JOIN fy2016.districts d
+         /*LEFT OUTER JOIN fy2016.districts d
 
           ON dd.esh_id::numeric = d.esh_id
 
-          WHERE li.broadband*//
+          WHERE li.broadband*/
 
 ) base
 
@@ -303,17 +306,11 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 
 Author:                   Justine Schott
-
 Created On Date:
-
 Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
-
 Name of QAing Analyst(s):
-
 Purpose:                  2016 district data in terms of 2016 methodology
-
 Methodology:
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
