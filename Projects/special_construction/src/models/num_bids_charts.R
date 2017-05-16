@@ -191,6 +191,7 @@ plot_bids <- function(dta){
   dev.off()
 }
 
+
 ## collect datasets to plot for bids
 plot_bids(bids_urban_summ)
 plot_bids(bids_fiber_summ)
@@ -201,3 +202,19 @@ plot_bids(bids_cable_summ)
 plot_bids(bids_copper_summ)
 plot_bids(filter(bids_fiber_target_summ, !is.na(indicator)))
 
+
+title <- gsub("_", " ", bids_copper_summ$category[1])
+plot.object <- ggplot(data=bids_copper_summ, aes(x=indicator, y=pct_1_bid)) +
+  geom_bar(stat="identity", fill=c("#FDB913","#F09221"), alpha=0.75)+
+  scale_y_continuous(labels = percent_format(), limits = c(0, .5))+
+  labs(x=title, y="") +
+  geom_hline(yintercept=0, size=0.4, color="black")+
+  ggtitle("Frequency of 1 Bids") +
+  theme_esh()
+
+## write out plot
+png(file=paste("figures/", bids_copper_summ$category[1], "_1.png", sep=""), width=1000, height=796, res=120)
+print(plot.object)
+dev.off()
+
+length(bids_copper_summ$pct_1_bid)
