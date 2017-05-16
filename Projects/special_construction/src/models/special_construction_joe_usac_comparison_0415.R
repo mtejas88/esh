@@ -18,7 +18,7 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 ## read in data 
 decisions.joe <- read.csv("data/external/special_construction_funding_decisions_joeF_04152017.csv", as.is=T, header=T)
-decisions.drt <- read.csv("data/external/frn_decisions_joes_applications_04172017.csv", as.is=T, header=T)
+decisions.drt <- read.csv("data/raw/versions/frn_decisions_joes_applications_04172017.csv", as.is=T, header=T)
 
 decisions_only.drt <- select(decisions.drt, application_number, frn_status)
 decisions_only.drt$funded_frn_status <- ifelse(decisions_only.drt$frn_status == 'Funded',1,0)
