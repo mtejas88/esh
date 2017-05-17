@@ -1,14 +1,3 @@
-/*
-Author: Jamie Barnes
-Created On Date: 5/8/2017
-Last Modified Date: 
-Name of QAing Analyst(s): 
-Purpose: View to mimic 2016 version of allocations table for 2017 by adding back in columns we dropped from public.esh_allocations
-Methodology: Columns not from esh_allocations are indented one. 
-Dependencies: public.esh_allocations, public.esh_line_items, public.entity_bens, public.entities
-*/
-
-
 select 
 ea.id,
 ea.line_item_id,
@@ -49,3 +38,13 @@ left join public.entities e
 on e.entity_id = rb.entity_id
 
 where eli.funding_year = 2017
+
+/*
+Author: Jamie Barnes
+Created On Date: 5/8/2017
+Last Modified Date: 5/16/2017
+Name of QAing Analyst(s): 
+Purpose: View to mimic 2016 version of allocations table for 2017 by adding back in columns we dropped from public.esh_allocations
+Methodology: Columns not from esh_allocations are indented one. 
+
+*/

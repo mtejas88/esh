@@ -1,18 +1,7 @@
-/*
-Author: Jamie Barnes
-Created On Date: 5/8/2017
-Last Modified Date: 
-Name of QAing Analyst(s): 
-Purpose: View to mimic 2016 version of circuits table for 2017 by adding back in columns we dropped from public.esh_circuits
-Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one.
-Dependencies: public.esh_circuits, public.esh_line_items, public.esh_service_providers, public.flags, public.tags, public.esh_allocations
-*/
-
-
 with f as (select
 	flaggable_id,
 	count(distinct label) as num_open_flags,
-	array_agg(label) as open_flag_labels
+	array_agg(distinct label) as open_flag_labels
 
 	from public.flags 
 	where status = 'open'
@@ -24,7 +13,7 @@ with f as (select
 t as (select
 	taggable_id,
 	count(distinct label) as num_open_tags,
-	array_agg(label) as open_tag_labels
+	array_agg(distinct label) as open_tag_labels
 
 	from public.tags
 	where deleted_at is null
@@ -85,9 +74,8 @@ from public.esh_circuits ec
 left join public.esh_line_items eli 
 on eli.id = ec.line_item_id
 
-/*using 2016 service provider table until 2017 is ready*/
-left join fy2016.service_providers esp 
-on esp.id::varchar = eli.service_provider_id::varchar
+left join public.esh_service_providers esp 
+on esp.id = eli.service_provider_id
 
 left join f
 on f.flaggable_id = eli.id
@@ -100,3 +88,13 @@ on r.line_item_id = eli.id
 
 where ec.funding_year = 2017
 and eli.funding_year = 2017
+
+/*
+Author: Jamie Barnes
+Created On Date: 5/8/2017
+Last Modified Date: 5/16/2017
+Name of QAing Analyst(s): 
+Purpose: View to mimic 2016 version of circuits table for 2017 by adding back in columns we dropped from public.esh_circuits
+Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one.
+
+*/
