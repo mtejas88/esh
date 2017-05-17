@@ -37,7 +37,7 @@ Author:                       Jeremy Holtzman
 Created On Date:              05/17/2017
 Last Modified Date:
 Name of QAing Analyst(s):
-Purpose: To append a list of all facilities and their associated district_esh_id
+Purpose: To append a list of all facilities / NIFs and their associated district_esh_id
 in order to aggregate services received by all these to the appropriate district (2017)
 
 Methodology: Uses district_lookup for all instructional facilities. To add non_schools, uses
