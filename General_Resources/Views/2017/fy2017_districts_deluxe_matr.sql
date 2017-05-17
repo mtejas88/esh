@@ -6,13 +6,14 @@ with state_level_extrap as (
 
 	from fy2017_districts_fiberpredeluxe_matr
 
-	where include_in_universe_of_districts
+	where include_in_universe_of_districts = true 
 
 	and district_type = 'Traditional'
 
 	and fiber_metric_calc_group = 'metric_extrapolation'
 
 	group by postal_cd)
+
 
 select distinct
 
@@ -52,9 +53,9 @@ select distinct
 
 	frl_percent,
 
-	--discount_rate_c1, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	discount_rate_c1, 
 
-	--discount_rate_c2, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	discount_rate_c2, 
 
 	address,
 
@@ -137,8 +138,14 @@ select distinct
 	case
 
 		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type = 'Traditional' --adding district_type logic to cater for SOTS for now, per Justine
 
 		then 0
+
+		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type not in ('Traditional')
+
+		then null
 
 		else current_known_scalable_campuses
 
@@ -147,8 +154,13 @@ select distinct
 	case
 
 		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type = 'Traditional'  --adding district_type logic to cater for SOTS for now, per Justine
 
 		then (num_campuses * (1-extrap_percent))
+
+		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type not in ('Traditional')
+		then null
 
 		else current_assumed_scalable_campuses
 
@@ -157,8 +169,13 @@ select distinct
 	case
 
 		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type = 'Traditional'  --adding district_type logic to cater for SOTS for now, per Justine
 
 		then 0
+
+		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type not in ('Traditional')
+		then null
 
 		else current_known_unscalable_campuses
 
@@ -167,8 +184,13 @@ select distinct
 	case
 
 		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type = 'Traditional'  --adding district_type logic to cater for SOTS for now, per Justine
 
 		then (num_campuses * extrap_percent)
+
+		when fiber_metric_calc_group = 'extrapolate_to'
+		and district_type not in ('Traditional')
+		then null -- adding this logic in all extrapolate to instances to add the logic for district types that are not traditional
 
 		else current_assumed_unscalable_campuses
 
@@ -262,25 +284,25 @@ select distinct
 
   	backbone_monthly_cost,
 
-	--needs_wifi,  /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--needs_wifi,  /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--received_c2_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--received_c2_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until fiber_predeluxe and predeluxe are updated to include */
+	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
 	fiber_target_status,
 
@@ -295,7 +317,6 @@ select distinct
 	ia_monthly_funding_total,
 
 	service_provider_assignment
-
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
 

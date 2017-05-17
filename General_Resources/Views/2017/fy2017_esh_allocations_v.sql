@@ -35,7 +35,7 @@ left join public.entity_bens rb
 on rb.ben = ea.recipient_ben
 
 left join public.entities e 
-on e.entity_id = rb.entity_id
+on e.entity_id::varchar = rb.entity_id::varchar
 
 where eli.funding_year = 2017
 

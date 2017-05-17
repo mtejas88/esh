@@ -466,27 +466,25 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	--needs_wifi, /*JAMIE-TEMP-EDIT until predeluxe fixed
+	--needs_wifi,  /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
+	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	/*c2_prediscount_budget_15,
+	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_prediscount_remaining_15,
+	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_prediscount_remaining_16,
+	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_postdiscount_remaining_15,
+	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_postdiscount_remaining_16,
+	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	received_c2_15,
+	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	received_c2_16,
+	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	budget_used_c2_15,
-
-	budget_used_c2_16,*/
-
+	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
 	fbts.fiber_target_status,
 
@@ -517,15 +515,15 @@ from public.fy2017_districts_predeluxe_matr dpd
 
 left join public.fy2017_fiber_bw_target_status_matr fbts
 
-on dpd.esh_id = fbts.esh_id
+on dpd.esh_id::varchar = fbts.esh_id::varchar
 
 left join public.fy2016_fy2017_districts_upgrades_m du
 
-on dpd.esh_id = du.esh_id_2016
+on dpd.esh_id::varchar = du.esh_id_2017::varchar --correcting year to 2017
 
 left join public.fy2017_districts_service_provider_assignments_matr dspa
 
-on dpd.esh_id = dspa.esh_id
+on dpd.esh_id::varchar = dspa.esh_id::varchar
 
 
 

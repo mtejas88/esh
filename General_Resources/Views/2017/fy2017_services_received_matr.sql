@@ -75,9 +75,6 @@ select base.*,
 
     end as monthly_circuit_cost_total
 
-
-
-
 FROM (
 
           SELECT
@@ -174,15 +171,13 @@ FROM (
 
               when spc.reporting_name is null
 
-                --then  li.service_provider_name /* JAMIE-TEMP-EDIT until LI_V updated
-             	then li.name 
+             	then li.service_provider_name
 
               else spc.reporting_name
 
             end AS reporting_name,
 
-            --li.service_provider_name AS service_provider_name, /* JAMIE-TEMP-EDIT until LI_V updated
-            li.name AS service_provider_name,
+            li.service_provider_name AS service_provider_name,
 
             li.applicant_name AS applicant_name,
 
@@ -242,12 +237,11 @@ FROM (
 
           ) spc
 
-          -- ON spc.name = li.service_provider_name /* JAMIE-TEMP-EDIT until LI_V updated
-          ON spc.name = li.name
+          ON spc.name = li.service_provider_name
 
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
 
-          ON dd.esh_id = lid.district_esh_id
+          ON dd.esh_id::varchar = lid.district_esh_id::varchar
 
 
          /*LEFT OUTER JOIN fy2016.districts d
@@ -264,35 +258,19 @@ left join (
 
                   sum(d.num_students::numeric) as num_students_served
 
-
-
-
           from fy2017_lines_to_district_by_line_item_matr ldli
-
-
-
 
           left join public.fy2017_districts_demog_matr d
 
-          on ldli.district_esh_id = d.esh_id
-
-
-
+          on ldli.district_esh_id::varchar = d.esh_id::varchar
 
           left join public.esh_line_items li
 
           on ldli.line_item_id = li.id
-
-
-
-
           where (li.consortium_shared=true
 
              OR li.backbone_conditions_met=true)
              and funding_year = 2017
-
-
-
 
           group by ldli.line_item_id
 
