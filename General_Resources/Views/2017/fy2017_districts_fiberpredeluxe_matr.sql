@@ -517,7 +517,7 @@ left join public.fy2017_fiber_bw_target_status_matr fbts
 
 on dpd.esh_id::varchar = fbts.esh_id::varchar
 
-left join public.fy2016_fy2017_districts_upgrades_m du
+left join public.fy2016_fy2017_districts_upgrades_matr du
 
 on dpd.esh_id::varchar = du.esh_id_2017::varchar --correcting year to 2017
 
