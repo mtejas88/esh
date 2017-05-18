@@ -1,4 +1,8 @@
-select distinct on (esh_id) * from (
+select distinct on (esh_id) a.*,
+        e.entity_type,
+        e.name
+
+from (
   
   select eb.entity_id::varchar as esh_id,
          eb2.entity_id::varchar as district_esh_id
@@ -27,9 +31,13 @@ select distinct on (esh_id) * from (
   select  dl.esh_id,
           dl.district_esh_id
           
-  from public.fy2017_district_lookup_matr dl) all_2017_ids
+  from public.fy2017_district_lookup_matr dl
+) a
 
-where not(esh_id is null and district_esh_id is null)
+left join public.entities e
+on a.esh_id = e.entity_id::varchar
+
+where not(a.esh_id is null and a.district_esh_id is null)
 
 /*
 
