@@ -16,6 +16,42 @@ ror_fmt as (
     and ror_funded_blocks.state = ror_r2_authorizations.state
     group by 1
 ),
+cam43_eligible_fmt as (
+	select distinct cb as census_block,
+					short_name as cam_carrier,
+					state,
+					locations
+	from caf.cam43_eligible_blocks
+),
+cam43_ex_high_cost_fmt as (
+	select distinct cb as census_block,
+					carrier as cam_carrier,
+					carrier_offer_state as state,
+					price_cap__extremely_high_cost_locations as locations
+	from caf.cam43_es_high_cost
+),/* need to check if there are any census blocks that are accepted by multiple state/carrier combos
+cam43_fmt as(
+	select elig.census_block,
+	sum(support_amount_dollars * locations / homes_businesses_served) as cam43_funding_authorized_assumed,
+	array_agg(distinct cam_carrier) as cam43_carriers
+	from (
+		select *
+		from cam43_eligible_fmt
+		UNION
+		select *
+		from cam43_ex_high_cost_fmt
+	) elig
+	join caf.caf_p2_commitments funded
+	on elig.cam_carrier = funded.shortname
+	and elig.cam_state = funded.state
+	group by 1
+), need to add funding amounts based on PDFs by state/carrier
+rbe_fmt as (
+	select census_block,
+	array_agg(distinct long_name) as rbe_carriers
+	from caf.rbe_authorized
+	group by 1
+),*/
 j1 as (
 	select 	case
 				when p1.census_block is null
@@ -29,7 +65,37 @@ j1 as (
 	from caf_p1_fmt p1
 	full outer join ror_fmt ro
 	on p1.census_block = ro.census_block
-)
+)/*,
+j2 as (
+	select 	case
+				when ca.census_block is null
+					then rb.census_block
+				else ca.census_block
+			end as census_block,
+			cam43_funding_authorized_assumed,
+			cam43_carriers,
+			rbe_carriers
+	from cam43_fmt ca
+	full outer join rbe_fmt rb
+	on p1.census_block = ro.census_block
+),
+j3 as (
+	select 	case
+				when j1.census_block is null
+					then j2.census_block
+				else j1.census_block
+			end as census_block,
+			p1_funding_authorized,
+			ror_funding_authorized_assumed,
+			cam43_funding_authorized_assumed,
+			p1_carriers,
+			ror_carriers,
+			cam43_carriers,
+			rbe_carriers
+	from j1
+	full outer join j2
+	on j1.census_block = j2.census_block
+)*/
 
 select
 	case
