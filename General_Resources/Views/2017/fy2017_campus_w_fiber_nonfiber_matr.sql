@@ -1,5 +1,5 @@
 select d.esh_id as district_esh_id,
-case when ds.campus_id = 'Unknown' then ds.address else ds.campus_id end as campus_id,
+case when (ds.campus_id = 'Unknown' or ds.campus_id is null) then ds.address else ds.campus_id end as campus_id,
 
 --counting non fiber circuits to specific campus
 count(distinct  case
