@@ -7,13 +7,23 @@ rm(list = ls())
 #install and load packages
 lib <- c("dplyr", "ggplot2", "maps", "reshape2", "scales")
 
-# uncomment and run the command below if you do not have packages installed
-# sapply(lib, functigon(x) install.packages(x))
-sapply(lib, function(x) require(x, character.only = TRUE))
+#this installs packages only if you don't have them
+for (i in 1:length(lib)){
+  if (!lib[i] %in% rownames(installed.packages())){
+    install.packages(lib[i])
+  }
+}
+library(dplyr)
+library(ggplot2)
+library(maps)
+library(reshape2)
+library(scales)
+
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
-wd <- "~/Documents/Saptarshi/EducationSuperHighway/R/outlier_detection/scripts/"
-setwd(wd)
+#this is my github path. DONT FORGET TO COMMENT OUT
+#github_path <- '~/Documents/Analysis/ficher/'
+setwd(paste(github_path, 'Projects/outlier_detection', sep=''))
 
 # initiate export data table
 export_data <- c()
@@ -22,7 +32,7 @@ export_data <- c()
 # note that the credentials are pointed to the live ONYX database as of 1/17/2017
 # check regularly to see that credentials are accurate since they may change periodically
 # raw mode data is saved in the data/mode folder with the data pull date added to the suffix
-source("01_get_tables.R")
+source('scripts/01_get_tables.R')
 
 # let's apply general filters
 # this stage is about getting the data fit for analysis in a very general sense.
@@ -30,7 +40,7 @@ source("01_get_tables.R")
 # we also want to look for outliers only within clean data since 
 # identifying outliers within dirty and clean data may lead to conversations such as 
 # "well, that's because that line item is dirty and has the purpose wrong. duh."
-source("02_apply_general_filters.R")
+source("scripts/02_apply_general_filters.R")
 
 # now, we have the line item-level data fit for analysis
 # it's time to apply filters for your custom case
@@ -46,8 +56,9 @@ master_output <- data.frame('use_case_parameters',    'outlier_test_parameters',
 colnames(master_output) <- c('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
 master_output <- transform(master_output, outlier_unique_id = as.numeric(outlier_unique_id), outlier_value = as.numeric(outlier_value),R = as.numeric(R), lam = as.numeric(lam)) 
 
+
 # identify outliers
-source("03_use_cases.R")
+source("scripts/03_use_cases.R")
 
 ###
 # run use case 1
@@ -84,5 +95,4 @@ analysis_data <- use_case_2(c("Rural"), c("Mega"))
 
 
 # export
-export_dir <- "~/Documents/Saptarshi/EducationSuperHighway/R/outlier_detection/data/export/"
-write.csv(analysis_data, paste0(export_dir, "outlier_export_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(analysis_data, paste0("data/export/outlier_export_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)

@@ -1,14 +1,15 @@
-
-wd <- "~/Documents/Saptarshi/EducationSuperHighway/R/outlier_detection/data/"
+# clear the console
+cat("\014")
+rm(list=ls())
 
 # disable scientific notation
 options(scipen=999)
 
 # load csv files
 # deluxe districts
-d_16_all <- read.csv(paste0(wd, "mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), as.is = TRUE)
+d_16_all <- read.csv(paste0("data/mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), as.is = TRUE)
 # services received
-s_16_all <- read.csv(paste0(wd, "mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), as.is = TRUE)
+s_16_all <- read.csv(paste0("data/mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), as.is = TRUE)
 
 # Munge Deluxe Districts
 logical <- c("exclude_from_ia_analysis", "exclude_from_ia_cost_analysis", "exclude_from_wan_analysis",

@@ -60,7 +60,6 @@ ec.connect_category,
 
 ec.broadband,
 	
-	eli.exclude,
 	eli.erate,
 
 ec.consortium_shared,
