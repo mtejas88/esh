@@ -1,4 +1,4 @@
-select 			si.esh_id,
+select 			distinct si.esh_id,
 				si.postal_cd,
 			  	bi.exclude_from_analysis_2016 as exclude_from_ia_analysis,
 				si.exclude_from_wan_analysis,

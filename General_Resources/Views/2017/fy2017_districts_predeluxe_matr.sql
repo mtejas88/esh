@@ -2,15 +2,15 @@ select distinct
 
 	dm.esh_id,
 
-	nces_cd,
+	dm.nces_cd,
 
-	name,
+	dm.name,
 
 	union_code,
 
-	null as state_senate_district,
+	ldi.state_senate_district,
 
-	null as state_assembly_district,
+	ldi.state_assembly_district,
 
 	ulocal,
 
@@ -436,7 +436,8 @@ on dm.esh_id::varchar = wifi.parent_entity_id::varchar
 
 on dm.esh_id = c2.esh_id::varchar*/ -- commenting out as c2 funding view is not ready
 
-
+left join fy2016.legislative_district_infos ldi /* JAMIE: we currently only have this mapping for 2016 */
+on ldi.esh_id::varchar = dm.esh_id
 
 
 /*

@@ -36,9 +36,9 @@ select distinct
 
 	frl_percent,
 
-	--discount_rate_c1, /*JAMIE-TEMP-EDIT until predeluxe fixed
+	discount_rate_c1, 
 
-	--discount_rate_c2, /*JAMIE-TEMP-EDIT until predeluxe fixed
+	discount_rate_c2, 
 
 	address,
 
