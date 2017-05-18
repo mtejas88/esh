@@ -1,31 +1,15 @@
-
-
 select dl.district_esh_id,
-
          c.line_item_id,
-
          count(distinct circuit_id) as allocation_lines
-
-
-
-
 from public.esh_entity_ben_circuits ec
-
 join public.esh_circuits c
-
 on ec.circuit_id = c.id
-where funding_year = 2017 --public.esh_circuits to be filtered by funding year
-
+left join entity_bens eb
+on ec.ben = eb.ben
 join fy2017_district_lookup_matr dl
-
-on ec.entity_id::varchar = dl.esh_id
-
-
-
-
-
+on eb.entity_id::varchar = dl.esh_id
+where funding_year = 2017 --public.esh_circuits to be filtered by funding year
 group by  district_esh_id,
-
           line_item_id
 
 
