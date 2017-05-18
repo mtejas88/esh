@@ -48,8 +48,18 @@ cam43_fmt as(
 ), need to add funding amounts based on PDFs by state/carrier
 rbe_fmt as (
 	select census_block,
+	sum(selected_bid_amount * / census_blocks) as rbe_funding_authorized_assumed,
 	array_agg(distinct long_name) as rbe_carriers
-	from caf.rbe_authorized
+	from caf.rbe_authorized ra
+	left join caf.rbe_authorized_amounts raa
+	on ra.da_no = raa.da_no
+	and ra.long_name = raa.long_name
+	and ra.bid_no = raa.bid_no
+	and case
+			when raa.state is not null
+				then ra.state = raa.state
+			else true
+		end
 	group by 1
 ),*/
 j1 as (
@@ -73,6 +83,7 @@ j2 as (
 				else ca.census_block
 			end as census_block,
 			cam43_funding_authorized_assumed,
+			rbe_funding_authorized_assumed,
 			cam43_carriers,
 			rbe_carriers
 	from cam43_fmt ca
@@ -88,6 +99,7 @@ j3 as (
 			p1_funding_authorized,
 			ror_funding_authorized_assumed,
 			cam43_funding_authorized_assumed,
+			rbe_funding_authorized_assumed,
 			p1_carriers,
 			ror_carriers,
 			cam43_carriers,
