@@ -1,7 +1,9 @@
 /*public.line_items vs public.esh_line_items
 ALSO >>> funding year clause */
 
-select base.*,
+select distinct
+
+	base.*,
 
     CASE
 
@@ -169,11 +171,11 @@ FROM (
 
             case
 
-              when spc.reporting_name is null
+              when li.reporting_name is null
 
              	then li.service_provider_name
 
-              else spc.reporting_name
+              else li.reporting_name
 
             end AS reporting_name,
 
@@ -228,16 +230,6 @@ FROM (
           LEFT OUTER JOIN public.entity_bens eb
 
           ON eb.ben = li.applicant_ben
-
-          LEFT OUTER JOIN (
-
-            select distinct name, reporting_name
-
-            from public.esh_service_providers
-
-          ) spc
-
-          ON spc.name = li.service_provider_name
 
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
 

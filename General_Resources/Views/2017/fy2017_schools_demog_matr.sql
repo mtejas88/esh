@@ -59,6 +59,7 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 where flaggable_id is null
+and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -123,6 +124,7 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 where flaggable_id is null
+and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -186,6 +188,7 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 where flaggable_id is null
+and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -255,6 +258,7 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 where flaggable_id is null
+and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
