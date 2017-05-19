@@ -1,7 +1,9 @@
 /*public.line_items vs public.esh_line_items
 ALSO >>> funding year clause */
 
-select base.*,
+select distinct
+
+	base.*,
 
     CASE
 
@@ -74,9 +76,6 @@ select base.*,
       else NULL
 
     end as monthly_circuit_cost_total
-
-
-
 
 FROM (
 
@@ -172,11 +171,11 @@ FROM (
 
             case
 
-              when spc.reporting_name is null
+              when li.reporting_name is null
 
-                then  li.service_provider_name
+             	then li.service_provider_name
 
-              else spc.reporting_name
+              else li.reporting_name
 
             end AS reporting_name,
 
@@ -220,11 +219,11 @@ FROM (
 
             dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
 
-            d.consortium_member AS recipient_consortium_member
+            dd.consortium_affiliation AS recipient_consortium_member
 
           FROM public.fy2017_lines_to_district_by_line_item_matr lid
 
-          LEFT OUTER JOIN public.line_items li
+          LEFT OUTER JOIN public.fy2017_esh_line_items_v li
 
           ON li.id = lid.line_item_id
 
@@ -232,26 +231,16 @@ FROM (
 
           ON eb.ben = li.applicant_ben
 
-          LEFT OUTER JOIN (
-
-            select distinct name, reporting_name
-
-            from public.esh_service_providers
-
-          ) spc
-
-          ON spc.name = li.service_provider_name
-
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
 
-          ON dd.esh_id = lid.district_esh_id
+          ON dd.esh_id::varchar = lid.district_esh_id::varchar
 
 
-         //*LEFT OUTER JOIN fy2016.districts d
+         /*LEFT OUTER JOIN fy2016.districts d
 
           ON dd.esh_id::numeric = d.esh_id
 
-          WHERE li.broadband*//
+          WHERE li.broadband*/
 
 ) base
 
@@ -261,35 +250,19 @@ left join (
 
                   sum(d.num_students::numeric) as num_students_served
 
-
-
-
           from fy2017_lines_to_district_by_line_item_matr ldli
-
-
-
 
           left join public.fy2017_districts_demog_matr d
 
-          on ldli.district_esh_id = d.esh_id
-
-
-
+          on ldli.district_esh_id::varchar = d.esh_id::varchar
 
           left join public.esh_line_items li
 
           on ldli.line_item_id = li.id
-
-
-
-
           where (li.consortium_shared=true
 
              OR li.backbone_conditions_met=true)
              and funding_year = 2017
-
-
-
 
           group by ldli.line_item_id
 
@@ -303,17 +276,11 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 
 Author:                   Justine Schott
-
 Created On Date:
-
 Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
-
 Name of QAing Analyst(s):
-
 Purpose:                  2016 district data in terms of 2016 methodology
-
 Methodology:
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):

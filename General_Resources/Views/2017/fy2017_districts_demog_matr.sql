@@ -539,6 +539,7 @@ where case --only include the HS district when smushing MT districts (exclude th
 and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
 and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'geographic' districts in NYPS
 
+and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */
 /*
 Author: Justine Schott
 Date: 6/20/2016

@@ -1,19 +1,7 @@
-/*
-Author: Jamie Barnes
-Created On Date: 5/8/2017
-Last Modified Date: 
-Name of QAing Analyst(s): 
-Purpose: View to mimic 2016 version of line items table for 2017 by adding back in columns we dropped from public.esh_line_items
-Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one. 
-Dependencies: public.esh_line_items, fy2017.frn_line_items, fy2017.basic_informations, 
-	public.esh_service_providers, public.flags, public.tags, public.esh_allocations, public.entity_bens
-*/
-
-
 with f as (select
 	flaggable_id,
 	count(distinct label) as num_open_flags,
-	array_agg(label) as open_flag_labels
+	array_agg(distinct label) as open_flag_labels
 
 	from public.flags 
 	where status = 'open'
@@ -25,7 +13,7 @@ with f as (select
 t as (select
 	taggable_id,
 	count(distinct label) as num_open_tags,
-	array_agg(label) as open_tag_labels
+	array_agg(distinct label) as open_tag_labels
 
 	from public.tags
 	where deleted_at is null
@@ -61,6 +49,7 @@ eli.applicant_ben,
 eli.service_provider_id,
 
 	esp.name as service_provider_name,
+	esp.reporting_name,
 	bi.category_of_service as service_category,
 
 eli.base_line_item_id,
@@ -77,16 +66,16 @@ eli.upload_bandwidth_in_mbps,
 case
 	when eli.num_lines = -1
 	then 'Unknown'
-	else eli.num_lines::char
+	else eli.num_lines::varchar
 end as num_lines,
 
 eli.one_time_elig_cost,
 eli.rec_elig_cost,
+eli.total_cost,
 eli.months_of_service,
 eli.contract_end_date,
 eli.erate,
 eli.connect_category,
-eli.total_cost,
 eli.consortium_shared,
 eli.broadband,
 eli.isp_conditions_met,
@@ -116,9 +105,8 @@ on fli.line_item = eli.frn_complete
 left join fy2017.basic_informations bi 
 on bi.application_number =  eli.application_number
 
-/*using 2016 service provider table until 2017 is ready*/
-left join fy2016.service_providers esp 
-on esp.id::varchar = eli.service_provider_id::varchar
+left join public.esh_service_providers esp
+on esp.id = eli.service_provider_id
 
 left join f
 on f.flaggable_id = eli.id
@@ -133,3 +121,13 @@ left join public.entity_bens eb
 on eb.ben = eli.applicant_ben
 
 where eli.funding_year = 2017
+
+/*
+Author: Jamie Barnes
+Created On Date: 5/8/2017
+Last Modified Date: 5/16/2017
+Name of QAing Analyst(s): 
+Purpose: View to mimic 2016 version of line items table for 2017 by adding back in columns we dropped from public.esh_line_items
+Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one. 
+
+*/

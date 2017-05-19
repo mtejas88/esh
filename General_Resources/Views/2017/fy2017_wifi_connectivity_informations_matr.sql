@@ -67,10 +67,6 @@ where dd.esh_id is not null
 
 and sd.school_esh_id is not null
 
-
-
-
-
 group by 	ci.postal_cd,
 
 			ci.parent_entity_name,
@@ -104,4 +100,4 @@ Methodology: Using updated tables names for 2017 underline tables, as per discus
 usage of public.tags with funding year filter
 no funding year column in public.entiy_bens tables
 */
- */
+

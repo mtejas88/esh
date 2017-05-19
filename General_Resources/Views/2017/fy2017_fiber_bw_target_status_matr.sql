@@ -1,4 +1,4 @@
-select 			si.esh_id,
+select 			distinct si.esh_id,
 				si.postal_cd,
 			  	bi.exclude_from_analysis_2016 as exclude_from_ia_analysis,
 				si.exclude_from_wan_analysis,
@@ -18,9 +18,9 @@ select 			si.esh_id,
 				from public.fy2017_stage_indicator_matr si
 				
 				left join public.fy2017_bw_indicator_matr bi
-				on si.esh_id = bi.esh_id
+				on si.esh_id::varchar = bi.esh_id::varchar
 				left join public.fy2017_districts_predeluxe_matr dd
-				on si.esh_id = dd.esh_id
+				on si.esh_id::varchar = dd.esh_id::varchar
 
 /*
 Author:                      Jeremy Holtzman
