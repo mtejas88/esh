@@ -1,18 +1,14 @@
-select distinct on (esh_id) a.*,
-        e.entity_type,
-        e.name
-
-from (
+with a as (
   
   select distinct eb.entity_id::varchar as esh_id,
          eb2.entity_id::varchar as district_esh_id
   
   from fy2017.discount_calculations dc
   
-  left join public.entity_bens eb
+  join public.entity_bens eb
     on dc.child_entity_ben = eb.ben
   
-  left join public.entity_bens eb2
+  join public.entity_bens eb2
     on dc.parent_entity_ben = eb2.ben
   
   join public.fy2017_district_lookup_matr dl
@@ -28,12 +24,15 @@ from (
           dl.district_esh_id
           
   from public.fy2017_district_lookup_matr dl
-) a
+) 
+
+select distinct a.*,
+e.entity_type,
+e.name 
+from a 
 
 left join public.entities e
 on a.esh_id = e.entity_id::varchar
-
-where not(a.esh_id is null and a.district_esh_id is null)
 
 /*
 
