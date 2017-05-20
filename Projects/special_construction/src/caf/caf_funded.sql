@@ -109,14 +109,5 @@ j3 as (
 	on j1.census_block = j2.census_block
 )*/
 
-select
-	case
-		when p1_funding_authorized > 0 and ror_funding_authorized_assumed > 0
-			then 'overlap'
-		else 'no overlap'
-	end as block_type,
-	count(*) as census_blocks,
-	sum(p1_funding_authorized) as p1_funding_authorized,
-	sum(ror_funding_authorized_assumed) as ror_funding_authorized_assumed
+select *
 from j1
-group by 1

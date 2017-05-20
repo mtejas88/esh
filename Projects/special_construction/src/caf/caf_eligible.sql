@@ -234,26 +234,5 @@ eligible_census_blocks as (
 	on j10.census_block = j11.census_block
 )
 
-select 	pc_indicator,
-		challenge_indicator,
-		rbe_indicator,
-		cam43_indicator,
-		cam43_ex_high_cost_indicator,
-		ror_r1_indicator,
-		pc_ph2_indicator,
-		ror_r2_indicator,
-		frontier_indicator,
-		centurylink_indicator,
-		acam232_indicator,
-		frontier_r2_indicator,
-		ny_auction_indicator,
-		count(*) as num_census_blocks,
-		count(*)/num_census_blocks as pct_census_blocks
+select *
 from eligible_census_blocks
-left join (
-	select count(*) as num_census_blocks
-	from eligible_census_blocks
-) agg
-on true
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13, agg.num_census_blocks
-order by 1,2,3,4,5,6,7,8,9,10,11,12,13
