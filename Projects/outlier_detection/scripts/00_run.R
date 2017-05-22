@@ -5,7 +5,7 @@ cat("\014")
 rm(list = ls())
 
 #install and load packages
-lib <- c("dplyr", "ggplot2", "maps", "reshape2", "scales")
+lib <- c("dplyr")
 
 #this installs packages only if you don't have them
 for (i in 1:length(lib)){
@@ -14,16 +14,10 @@ for (i in 1:length(lib)){
   }
 }
 library(dplyr)
-library(ggplot2)
-library(maps)
-library(reshape2)
-library(scales)
-
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/outlier_detection', sep=''))
+github_path <- '~/Documents/ESH/ficher/'
 
 # initiate export data table
 export_data <- c()
@@ -32,7 +26,7 @@ export_data <- c()
 # note that the credentials are pointed to the live ONYX database as of 1/17/2017
 # check regularly to see that credentials are accurate since they may change periodically
 # raw mode data is saved in the data/mode folder with the data pull date added to the suffix
-source('scripts/01_get_tables.R')
+source('01_get_tables.R')
 
 # let's apply general filters
 # this stage is about getting the data fit for analysis in a very general sense.
@@ -40,7 +34,7 @@ source('scripts/01_get_tables.R')
 # we also want to look for outliers only within clean data since 
 # identifying outliers within dirty and clean data may lead to conversations such as 
 # "well, that's because that line item is dirty and has the purpose wrong. duh."
-source("scripts/02_apply_general_filters.R")
+source("02_apply_general_filters.R")
 
 # now, we have the line item-level data fit for analysis
 # it's time to apply filters for your custom case
@@ -51,48 +45,64 @@ source("scripts/02_apply_general_filters.R")
 # https://docs.google.com/a/educationsuperhighway.org/spreadsheets/d/1SthiXVF1XaGg_Sr9AjKD-k-KnYIw6o2fNokMquO9DIY/edit?usp=drive_web
 
 
-#Create empty data frame
-master_output <- data.frame('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
-colnames(master_output) <- c('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
-master_output <- transform(master_output, outlier_unique_id = as.numeric(outlier_unique_id), outlier_value = as.numeric(outlier_value),R = as.numeric(R), lam = as.numeric(lam)) 
-
+# load csv files
+# deluxe districts
+d_16 <- read.csv("../data/intermediate/d16_custom_filters.csv", as.is = TRUE)
+#d_17 <- read.csv("../data/intermediate/d17_custom_filters.csv", as.is = TRUE)
+# services received
+s_16 <- read.csv("../data/intermediate/s16_custom_filters.csv", as.is = TRUE)
+#s_17 <- read.csv("../data/intermediate/s17_custom_filters.csv", as.is = TRUE)
 
 # identify outliers
-source("scripts/03_use_cases.R")
+source("03_use_cases.R")
+
+#Create empty data frame
+master_output <- data.frame(outlier_use_case_name=character(),
+                            outlier_use_case_cd=character(),
+                            outlier_use_case_parameters=character(),
+                            outlier_test_parameters=character(),
+                            outlier_unique_id=numeric(),
+                            outlier_value=numeric(),
+                            R=numeric(),
+                            lam=numeric())
 
 ###
-# run use case 1
-###
-analysis_data <- use_case_1(c(100), c("Lit Fiber"), c("WAN"))
-# run outlier test
+# run line item use case 1 
+### 
+# Cable Internet
+use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(150), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+# Fiber (Internet and WAN) - takes a few mins
+s_matrix_fiber=s_16 %>% group_by(bandwidth_in_mbps, connect_category, purpose) %>% filter (bandwidth_in_mbps %in% c(100,200,500,1000,10000), connect_category=='Lit Fiber', purpose %in% c('WAN','Internet')) %>% select(bandwidth_in_mbps, connect_category, purpose) %>% unique() %>% arrange(bandwidth_in_mbps, connect_category, purpose)
+for(i in 1:nrow(s_matrix_fiber)) {
+  use_case_cost_per_mbps_li(s_16,s_17,s_matrix_fiber[i,1], s_matrix_fiber[i,2], s_matrix_fiber[i,3],with_16=0,n_17_at_time=1)
+}
+# Fixed Wireless
+use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(1000), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
+# DSL Internet
+use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(10), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
+# T-1
+use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("Internet"),with_16=0,n_17_at_time=1)
+use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("WAN"),with_16=0,n_17_at_time=1)
 
 ###
-# run use case 2
+# run district use cases (2-7)
+# TIME WARNING: takes ~ 25 mins 
 ###
-analysis_data <- use_case_2(c("Urban"), c("Tiny"))
-analysis_data <- use_case_2(c("Urban"), c("Small"))
-analysis_data <- use_case_2(c("Urban"), c("Medium"))
-analysis_data <- use_case_2(c("Urban"), c("Large"))
-analysis_data <- use_case_2(c("Urban"), c("Mega"))
-
-analysis_data <- use_case_2(c("Suburban"), c("Tiny"))
-analysis_data <- use_case_2(c("Suburban"), c("Small"))
-analysis_data <- use_case_2(c("Suburban"), c("Medium"))
-analysis_data <- use_case_2(c("Suburban"), c("Large"))
-analysis_data <- use_case_2(c("Suburban"), c("Mega"))
-
-analysis_data <- use_case_2(c("Town"), c("Tiny"))
-analysis_data <- use_case_2(c("Town"), c("Small"))
-analysis_data <- use_case_2(c("Town"), c("Medium"))
-analysis_data <- use_case_2(c("Town"), c("Large"))
-analysis_data <- use_case_2(c("Town"), c("Mega"))
-
-analysis_data <- use_case_2(c("Rural"), c("Tiny"))
-analysis_data <- use_case_2(c("Rural"), c("Small"))
-analysis_data <- use_case_2(c("Rural"), c("Medium"))
-analysis_data <- use_case_2(c("Rural"), c("Large"))
-analysis_data <- use_case_2(c("Rural"), c("Mega"))
-
+d_matrix=d_16 %>% group_by(locale, district_size) %>% select(locale, district_size) %>% unique() %>% arrange(locale, district_size)
+system.time(for(i in 1:nrow(d_matrix)) {
+  use_case_total_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  use_case_pct_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  use_case_total_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  use_case_pct_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  use_case_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  use_case_bw_per_student(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+})
 
 # export
-write.csv(analysis_data, paste0("data/export/outlier_export_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
