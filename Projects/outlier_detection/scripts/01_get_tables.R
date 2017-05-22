@@ -1,6 +1,3 @@
-# header
-# please refer to https://educationsuperhighway.atlassian.net/wiki/pages/editpage.action?pageId=86605836
-# for details on DB access throguh R
 
 # clear the console
 cat("\014")
@@ -21,8 +18,7 @@ library(dotenv)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/outlier_detection', sep=''))
+github_path <- '~/Documents/ESH/ficher/'
 
 
 options(java.parameters = "-Xmx4g" )
@@ -48,14 +44,19 @@ querydb <- function(query_name){
   return(data)
 }
 
-crusher_sr_fy2016 <- querydb('scripts/db/sql/crusher_fy2016_sr.sql')
-crusher_dd_fy2016 <- querydb('scripts/db/sql/crusher_fy2016_dd.sql')
+crusher_sr_fy2016 <- querydb('db/sql/crusher_fy2016_sr.sql')
+crusher_dd_fy2016 <- querydb('db/sql/crusher_fy2016_dd.sql')
+# placeholder for 2017 tables
+# crusher_sr_fy2017 <- querydb('db/sql/crusher_fy2017_sr.sql')
+# crusher_dd_fy2017 <- querydb('db/sql/crusher_fy2017_dd.sql')
 
 ## disconnect from database
 dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
 
-# services received
-write.csv(crusher_dd_fy2016, paste0("data/mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
-write.csv(crusher_sr_fy2016, paste0("data/mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
+write.csv(crusher_dd_fy2016, paste0("../data/mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
+write.csv(crusher_sr_fy2016, paste0("../data/mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
+# placeholder for 2017 tables 
+# write.csv(crusher_dd_fy2017, paste0("../data/mode/crusher_dd_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
+# write.csv(crusher_sr_fy2017, paste0("../data/mode/crusher_sr_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
