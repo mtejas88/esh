@@ -9,6 +9,7 @@ rm(list=ls())
 
 
 library(data.table)
+library(dplyr)
 
 ##**************************************************************************************************************************************************
 ## 2017 FORM 470s
@@ -196,3 +197,88 @@ names(by_congress_wifi_2) <- c('state_and_district','has_wifi_schools')
 by_congress_wifi_2$has_wifi_schools <- round(by_congress_wifi_2$has_wifi_schools,0)
 by_congress_wifi_2 <- merge(x= by_congress_wifi_2, y = by_congress_schools, on = 'state_and_district')
 by_congress_wifi_2$has_wifi_perc <- by_congress_wifi_2$has_wifi_schools / by_congress_wifi_2$num_schools
+
+
+##**************************************************************************************************************************************************
+## Differentiating between self-provisioned and other conn types
+
+applicant_summary_16 <- read.csv("data/interim/applicant_summary_16.csv", as.is=T, header=T, stringsAsFactors=F)
+form_470s_16 <- read.csv("data/raw/form_470s_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+sr_16 <- read.csv("data/raw/sr_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_16 <- read.csv("data/raw/dd_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+
+line_items <- read.csv("data/raw/special_fiber_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+
+#correcting columns for 2016 self provision vs other conn types
+source('../../General_Resources/common_functions/correct_dataset.R')
+line_items <- correct.dataset(line_items, 0 , 0)
+
+line_items <- select(line_items, line_item_id, applicant_id, line_item_recurring_elig_cost)
+line_items <- distinct(line_items)
+
+line_items <- merge(applicant_summary_16, line_items, by = 'line_item_id', all.x = T)
+line_items$has_recurring <- ifelse(line_items$line_item_recurring_elig_cost > 0,T,F)
+
+#defining self provisioning by line items that have no recurring cost (and were included in the special_construction original line items)
+line_items$summary_category <- ifelse(line_items$has_recurring == F, 'self-provisioning', line_items$connect_category)
+summary_category <- summarise(group_by(line_items, summary_category), special_cost = sum(line_item_total_cost, na.rm = T))
+
+# how many people filed self provisioned 470s (in our universe - 
+# there are some null Applicant IDs, so not including them)
+x <- distinct(form_470s_16, applicant_id) %>% filter(!is.na(applicant_id))
+self_provision <- filter(line_items, summary_category == 'self-provisioning')
+y <- distinct(self_provision, applicant_id)
+
+#number of applicants in 470 who filed for self provisioning
+self_provision_470_applicants_16 <- nrow(x)
+
+#number of applicants who filed 470 and ended up with self provisioning
+in_both <- data.frame(intersect(y$applicant_id, x$applicant_id))
+names(in_both) <- 'applicant_id'
+self_provision_470_and_471_16 <- nrow(in_both)
+
+#number of applicants who filed 471 for self-provisioning but no 470 with that Function
+only_471 <- nrow(y) - self_provision_470_and_471_16
+
+print(paste(self_provision_470_applicants_16,'applicants filed 470s for self provisioning'))
+print(paste(self_provision_470_and_471_16,'applicants filed 470s and 471s for self provisioning'))
+print(paste(only_471,'applicants only filed 471s for self provisioning'))
+
+# just looking at the applicants who didn't end up with self-provisioning, but filed a 470 for it
+just_470 <- filter(x, !(x$applicant_id %in% in_both$applicant_id))
+
+sr_16 <- correct.dataset(sr_16, 0, 0)
+sr_16 <- select(sr_16, line_item_id, applicant_id, inclusion_status, purpose, connect_category, line_item_total_cost, line_item_total_num_lines, bandwidth_in_mbps)
+sr_16 <- distinct(sr_16)
+
+just_470 <- merge(x = just_470, y = sr_16, by = 'applicant_id', all.x = T)
+table(just_470$inclusion_status)
+
+summary_just_470 <- summarise(group_by(just_470, connect_category), num_lines = sum(line_item_total_num_lines, na.rm = T))
+summary_just_470 <- filter(summary_just_470, !connect_category == 'ISP Only')
+summary_just_470$percent <- summary_just_470$num_lines / sum(summary_just_470$num_lines, na.rm = T)
+
+#% fiber lines applied for
+z <- filter(summary_just_470, connect_category %in% c('Lit Fiber','Dark Fiber')) %>% summarise(sum(percent)) %>% round(2)
+print(paste(z*100,'percent of the services received from applicants who filed 470s for self-provision fiber but chose something else were fiber'))
+
+
+#looking at the district metrics for the districts who applied for self provision form 470s but chose something else
+dd_16 <- correct.dataset(dd_16, 0, 0)
+
+#merging just_470 back with sr16, so I can join the recipients of services to the DD
+just_470 <- filter(x, !(x$applicant_id %in% in_both$applicant_id))
+sr_16 <- read.csv("data/raw/sr_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+sr_16 <- correct.dataset(sr_16, 0, 0)
+sr_16 <- select(sr_16, line_item_id, applicant_id, inclusion_status, purpose, connect_category, line_item_total_cost, line_item_total_num_lines, bandwidth_in_mbps, recipient_id)
+just_470 <- merge(x = just_470, y = sr_16, by = 'applicant_id', all.x = T)
+
+
+no_self_provision_dd <- merge(x = distinct(just_470, recipient_id), y = dd_16, by.x = 'recipient_id', by.y = 'esh_id', all.x = T)
+no_self_provision_dd <- filter(no_self_provision_dd, !is.na(nces_cd), exclude_from_ia_analysis == F) 
+
+meeting_goals <- summarise(group_by(no_self_provision_dd, meeting_2014_goal_no_oversub), count = n())
+meeting_goals$percent <- meeting_goals$count / sum(meeting_goals$count)
+meeting_goals_percent <- as.numeric(meeting_goals[meeting_goals$meeting_2014_goal_no_oversub == T, 'percent']) %>% round(2)
+
+print(paste(meeting_goals_percent*100,'percent of the districts who were recipients of an services from an applicant that filed 470s for self-provision fiber but chose something else are meeting 100 kbps / student'))
