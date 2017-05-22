@@ -1,0 +1,182 @@
+# header
+# please refer to https://educationsuperhighway.atlassian.net/wiki/pages/editpage.action?pageId=86605836
+# for details on DB access throguh R
+
+# run source code
+## set the current directory as the working directory
+wd <- setwd(".") 
+setwd(wd)
+
+
+## read in libraries
+library(rJava)
+library(RJDBC)
+library(DBI)
+source("scripts/sql_script_builder.R")
+## read in functions
+func.dir <- "functions/"
+func.list <- list.files(func.dir)
+for (file in func.list[grepl('.R', func.list)]){
+  source(paste(func.dir, file, sep=''))
+}
+source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
+
+
+
+## load PostgreSQL Driver
+pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
+
+## connect to the database
+con <- dbConnect(pgsql, url=url, user=user, password=password)
+
+## DB FUNCTIONS
+querydb <- function(query_name) {
+  query <- readChar(query_name, file.info(query_name)$size)
+  data <- dbGetQuery(con, query)
+  return(data)
+}
+
+## execute function
+executedb <- function(script_name) {
+  print("made it into the execute block")
+  query <- readChar(script_name, file.info(script_name)$size)
+  data <- dbExecute(con, query)
+  return(data)
+}
+
+
+options(java.parameters = "-Xmx1000m")
+
+
+##retrieve outlier use cases
+outlier_use_cases <- querydb("../sql/retrieve_use_cases.SQL")
+
+new_use_cases <- data.frame("outlier_use_case_cd"=setdiff(master_output$outlier_use_case_cd,outlier_use_cases$outlier_use_case_cd))
+
+print(paste0("length of use cases is...",length(new_use_cases$outlier_use_case_cd)))
+
+if (length(new_use_cases$outlier_use_case_cd) != 0){
+  print("New Use Cases Found:")
+  print(new_use_cases)
+  
+  
+  dml_script <- dml_builder(new_use_cases,"insert","outlier_use_cases" )
+  print("Running the following command")
+  print(dml_script)
+  
+  fileConn<-file(paste0("../sql/insert_outlier_use_case_", Sys.Date(), ".SQL"))
+  writeLines(dml_script, fileConn)
+  close(fileConn)
+  
+}else{
+  print("No new use cases")
+}
+
+
+insert_error <- tryCatch(dbExecute(con,dml_script),error=function(e) e)
+#print(lines_inserted)
+
+
+## Look for new Outlier Use Cases
+print("Loading use case detail candidates")
+load_script <- load_candidate_details(master_output,"outlier_use_case_details")
+
+print("Writing Script to file")
+scriptName <- paste0("../sql/create_temp_outlier_use_case_detail", Sys.Date(), ".SQL")
+fileConn<-file(scriptName)
+writeLines(load_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running Load Script")
+insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
+
+print("Determining New Use Cases")
+new_use_case_detail_script <- find_new_cases("outlier_use_case_details")
+
+print("Writing new use cases sql file")
+queryName <- paste0("../sql/retrieve_new_use_case_details_", Sys.Date(), ".SQL")
+fileConn<-file(queryName)
+writeLines(new_use_case_detail_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running new use case finder")
+new_outlier_use_case_details <- querydb(queryName)
+new_outlier_use_case_details <- unique(new_outlier_use_case_details)
+
+
+print("Inserting New Outlier Use Case Details:")
+if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
+  print("New Use Cases Found:")
+  print(new_outlier_use_case_details)
+  
+  
+  dml_script_outlier_use_case_details <- dml_builder(new_outlier_use_case_details,"insert","outlier_use_case_details" )
+  print("Running the following command")
+  print(dml_script_outlier_use_case_details)
+  
+  fileConn<-file(paste0("../sql/insert_outlier_use_case_details_", Sys.Date(), ".SQL"))
+  writeLines(dml_script_outlier_use_case_details, fileConn)
+  close(fileConn)
+  
+}else{
+  print("No new use cases")
+}
+
+insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),error=function(e) e)
+
+
+## Look for outliers to upsert
+print("Loading use case detail candidates")
+load_script <- load_candidate_details(master_output,"outliers")
+
+print("Writing Script to file")
+scriptName <- paste0("../sql/create_temp_outlier_", Sys.Date(), ".SQL")
+scriptName <- paste0("create_temp_outlier_", Sys.Date(), ".SQL")
+
+fileConn<-file(scriptName)
+writeLines(load_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running Load Script")
+insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
+
+print("Determining New Use Cases")
+new_outliers_script <- find_new_cases("outliers")
+
+print("Writing new use cases sql file")
+queryName <- paste0("../sql/retrieve_new_outliers_", Sys.Date(), ".SQL")
+fileConn<-file(queryName)
+writeLines(new_outliers_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running new use case finder")
+new_outliers <- querydb(queryName)
+new_outliers <- unique(new_outliers)
+ 
+
+print("Inserting New Outliers:")
+if (length(new_outliers$outlier_use_case_detail_id) != 0){
+  print("New Use Cases Found:")
+  print(new_outliers)
+  
+  update_ids <- new_outliers[which(new_outliers$outlier_action =="updated"),c("outlier_id")]
+  
+  dml_script_outliers <- dml_builder(update_ids,"update","outliers" ) 
+  
+  dml_script_outliers <- dml_builder(new_outliers,"insert","outliers" )
+  print("Running the following command")
+  print(dml_script_outliers)
+  
+  fileConn<-file(paste0("../sql/insert_outliers_", Sys.Date(), ".SQL"))
+  writeLines(dml_script_outliers, fileConn)
+  close(fileConn)
+  
+}else{
+  print("No new use cases")
+}
+
+insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
+
+
+# disconnect from database  
+dbDisconnect(con)

@@ -22,8 +22,8 @@ library(scales)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/outlier_detection', sep=''))
+github_path <- '/Users/sdelosreyes/GitHub/ficher/Projects/'
+setwd(paste(github_path, 'outlier_detection', sep=''))
 
 # initiate export data table
 export_data <- c()
@@ -52,9 +52,15 @@ source("scripts/02_apply_general_filters.R")
 
 
 #Create empty data frame
-master_output <- data.frame('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
-colnames(master_output) <- c('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
-master_output <- transform(master_output, outlier_unique_id = as.numeric(outlier_unique_id), outlier_value = as.numeric(outlier_value),R = as.numeric(R), lam = as.numeric(lam)) 
+
+master_output <- data.frame(outlier_use_case_name=character(),
+                            outlier_use_case_cd=character(),
+                            outlier_use_case_parameters=character(),
+                            outlier_test_parameters=character(),
+                            outlier_unique_id=numeric(),
+                            outlier_value=numeric(),
+                            R=numeric(),
+                            lam=numeric())
 
 
 # identify outliers
@@ -63,36 +69,37 @@ source("scripts/03_use_cases.R")
 ###
 # run use case 1
 ###
-analysis_data <- use_case_1(c(100), c("Lit Fiber"), c("WAN"))
+analysis_data <- use_case_cost_per_mbps_li(c(100), c("Lit Fiber"), c("WAN"))
 # run outlier test
 
 ###
 # run use case 2
 ###
-analysis_data <- use_case_2(c("Urban"), c("Tiny"))
-analysis_data <- use_case_2(c("Urban"), c("Small"))
-analysis_data <- use_case_2(c("Urban"), c("Medium"))
-analysis_data <- use_case_2(c("Urban"), c("Large"))
-analysis_data <- use_case_2(c("Urban"), c("Mega"))
+analysis_data <- use_case_total_bw_d(c("Urban"), c("Tiny"))
+analysis_data <- use_case_total_bw_d(c("Urban"), c("Small"))
+analysis_data <- use_case_total_bw_d(c("Urban"), c("Medium"))
+analysis_data <- use_case_total_bw_d(c("Urban"), c("Large"))
+analysis_data <- use_case_total_bw_d(c("Urban"), c("Mega"))
 
-analysis_data <- use_case_2(c("Suburban"), c("Tiny"))
-analysis_data <- use_case_2(c("Suburban"), c("Small"))
-analysis_data <- use_case_2(c("Suburban"), c("Medium"))
-analysis_data <- use_case_2(c("Suburban"), c("Large"))
-analysis_data <- use_case_2(c("Suburban"), c("Mega"))
+analysis_data <- use_case_total_bw_d(c("Suburban"), c("Tiny"))
+analysis_data <- use_case_total_bw_d(c("Suburban"), c("Small"))
+analysis_data <- use_case_total_bw_d(c("Suburban"), c("Medium"))
+analysis_data <- use_case_total_bw_d(c("Suburban"), c("Large"))
+analysis_data <- use_case_total_bw_d(c("Suburban"), c("Mega"))
 
-analysis_data <- use_case_2(c("Town"), c("Tiny"))
-analysis_data <- use_case_2(c("Town"), c("Small"))
-analysis_data <- use_case_2(c("Town"), c("Medium"))
-analysis_data <- use_case_2(c("Town"), c("Large"))
-analysis_data <- use_case_2(c("Town"), c("Mega"))
+analysis_data <- use_case_total_bw_d(c("Town"), c("Tiny"))
+analysis_data <- use_case_total_bw_d(c("Town"), c("Small"))
+analysis_data <- use_case_total_bw_d(c("Town"), c("Medium"))
+analysis_data <- use_case_total_bw_d(c("Town"), c("Large"))
+analysis_data <- use_case_total_bw_d(c("Town"), c("Mega"))
 
-analysis_data <- use_case_2(c("Rural"), c("Tiny"))
-analysis_data <- use_case_2(c("Rural"), c("Small"))
-analysis_data <- use_case_2(c("Rural"), c("Medium"))
-analysis_data <- use_case_2(c("Rural"), c("Large"))
-analysis_data <- use_case_2(c("Rural"), c("Mega"))
+analysis_data <- use_case_total_bw_d2(c("Rural"), c("Tiny"))
+analysis_data <- use_case_total_bw_d2(c("Rural"), c("Small"))
+analysis_data <- use_case_total_bw_d(c("Rural"), c("Medium"))
+analysis_data <- use_case_total_bw_d(c("Rural"), c("Large"))
+analysis_data <- use_case_total_bw_d(c("Rural"), c("Mega"))
 
 
 # export
 write.csv(analysis_data, paste0("data/export/outlier_export_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)

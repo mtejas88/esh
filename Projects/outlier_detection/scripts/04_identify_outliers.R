@@ -22,7 +22,7 @@ rval <- function(input, y) {
 ####################
 
 identify_outliers <- 
-  function(data, significance_level, cost_column, unique_id) {
+  function(data, significance_level, cost_column, unique_id,use_case_name) {
     
     #data <-output
     
@@ -87,22 +87,26 @@ identify_outliers <-
   
   # will output an error message if there are no outliers identified
   # otherwise return the outlier IDs and test statistics
-  if(nrow(results) == 0)
-    stop("Congratulations! There are no outliers.", call. = FALSE)
-  
-  
-  # also bind parameters into a string for export
-
-  use_case_parameters <- as.character(unique(data$use_case_parameters))
-  str1 <- paste0("significance_level: ", significance_level)
-  str2 <- paste0("outlier_value_type: ", cost_column)
-  str3 <- paste0("outlier_id_type: ", unique_id)
-  
-
-  outlier_test_parameters <- paste(str1, str2, str3, sep = " | ")
-  output_list <- cbind(use_case_parameters, outlier_test_parameters, results)
-  colnames(output_list) <- c('use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
-  
-  master_output <- rbind(master_output, output_list)
-  assign('master_output',master_output,envir=.GlobalEnv)
+  if(nrow(results) != 0)
+  {
+    # stop("Congratulations! There are no outliers.", call. = FALSE) 
+    
+    # also bind parameters into a string for export
+    
+    use_case_parameters <- as.character(unique(data$use_case_parameters))
+    str1 <- paste0("\"significance_level\" => \"", significance_level,"\"")
+    str2 <- paste0("\"outlier_value_type\" => \"", cost_column,"\"")
+    str3 <- paste0("\"outlier_id_type\" => \"", unique_id,"\"")
+    
+    use_case_cd <- tolower(gsub(" ","_",use_case_name))
+    
+    outlier_test_parameters <- paste(str1, str2, str3, sep = ",")
+    output_list <- cbind(use_case_name, use_case_cd, use_case_parameters, outlier_test_parameters, results)
+    colnames(output_list) <- c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
+    
+    master_output <- rbind(master_output, output_list)
   }
+  assign('master_output',master_output,envir=.GlobalEnv)
+  
+  }
+
