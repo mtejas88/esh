@@ -7,8 +7,7 @@ select *,
 	num_fiber_470s > 0 as fiber_470s,
 	num_maybe_fiber_470s > 0 as maybe_fiber_470s,
 	num_0_bids > 0 as zero_bids,
-	num_1_bids > 0 as one_bid,
-	all_bids_null
+	num_1_bids > 0 as one_bid
 from (
 	select
 		esh_id,
@@ -24,11 +23,6 @@ from (
 								or "Function" in ('Other', 'Self-provisioning'))
 								then "470 Number"
 						end) as num_maybe_fiber_470s,
-		sum(case
-				when num_bids_received is null
-					then 1
-				else 0
-			end) = count(*) as all_bids_null,
 		sum(case
 				when num_bids_received =0
 					then 1
@@ -49,7 +43,11 @@ from (
 			form470s."Function",
 			frns.num_bids_received::numeric
 		from public.fy2016_districts_deluxe_matr dd16
-		left join public.fy2017_services_received_matr sr17
+		left join (
+			select *
+			from public.fy2017_services_received_matr
+			where broadband
+		) sr17
 		on dd16.esh_id = sr17.recipient_id
 		left join entity_bens eb
 		on sr17.applicant_id = eb.entity_id
@@ -61,7 +59,6 @@ from (
 		on li17.frn = frns.frn
 		where current_known_unscalable_campuses + current_assumed_unscalable_campuses > 0
 		and include_in_universe_of_districts_all_charters
-		and sr17.broadband
 	) tgt16_470_frns
 	group by 1,2
 ) tgt16_agg
