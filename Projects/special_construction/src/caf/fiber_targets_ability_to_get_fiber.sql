@@ -7,8 +7,7 @@ select *,
 	num_fiber_470s > 0 as fiber_470s,
 	num_maybe_fiber_470s > 0 as maybe_fiber_470s,
 	num_0_bids > 0 as zero_bids,
-	num_1_bids > 0 as one_bid,
-	all_bids_null
+	num_1_bids > 0 as one_bid
 from (
 	select
 		esh_id,
@@ -24,11 +23,6 @@ from (
 								or "Function" in ('Other', 'Self-provisioning'))
 								then "470 Number"
 						end) as num_maybe_fiber_470s,
-		sum(case
-				when num_bids_received is null
-					then 1
-				else 0
-			end) = count(*) as all_bids_null,
 		sum(case
 				when num_bids_received =0
 					then 1
