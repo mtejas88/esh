@@ -24,12 +24,12 @@ cam43_eligible_fmt as (
 	from caf.cam43_eligible_blocks
 ),
 cam43_ex_high_cost_fmt as (
-	select distinct cb as census_block,
+	select distinct census_block,
 					carrier as cam_carrier,
 					carrier_offer_state as state,
 					price_cap__extremely_high_cost_locations as locations
 	from caf.cam43_es_high_cost
-),/* need to check if there are any census blocks that are accepted by multiple state/carrier combos
+),
 cam43_fmt as(
 	select elig.census_block,
 	sum(support_amount_dollars * locations / homes_businesses_served) as cam43_funding_authorized_assumed,
@@ -42,14 +42,14 @@ cam43_fmt as(
 		from cam43_ex_high_cost_fmt
 	) elig
 	join caf.caf_p2_commitments funded
-	on elig.cam_carrier = funded.shortname
-	and elig.cam_state = funded.state
+	on elig.cam_carrier = funded.short_name
+	and elig.state = funded.state
 	group by 1
-), need to add funding amounts based on PDFs by state/carrier
+),
 rbe_fmt as (
 	select census_block,
-	sum(selected_bid_amount * / census_blocks) as rbe_funding_authorized_assumed,
-	array_agg(distinct long_name) as rbe_carriers
+	sum(selected_bid_amount / census_blocks) as rbe_funding_authorized_assumed,
+	array_agg(distinct raa.long_name) as rbe_carriers
 	from caf.rbe_authorized ra
 	left join caf.rbe_authorized_amounts raa
 	on ra.da_no = raa.da_no
@@ -61,7 +61,7 @@ rbe_fmt as (
 			else true
 		end
 	group by 1
-),*/
+),
 j1 as (
 	select 	case
 				when p1.census_block is null
@@ -75,7 +75,7 @@ j1 as (
 	from caf_p1_fmt p1
 	full outer join ror_fmt ro
 	on p1.census_block = ro.census_block
-)/*,
+),
 j2 as (
 	select 	case
 				when ca.census_block is null
@@ -88,7 +88,7 @@ j2 as (
 			rbe_carriers
 	from cam43_fmt ca
 	full outer join rbe_fmt rb
-	on p1.census_block = ro.census_block
+	on ca.census_block = rb.census_block
 ),
 j3 as (
 	select 	case
@@ -107,7 +107,7 @@ j3 as (
 	from j1
 	full outer join j2
 	on j1.census_block = j2.census_block
-)*/
+)
 
 select *
-from j1
+from j3
