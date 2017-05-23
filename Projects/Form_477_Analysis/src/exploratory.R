@@ -28,7 +28,7 @@
 rm(list=ls())
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("dplyr","tidyr","ggplot2", "plyr")
+packages.to.install <- c("dplyr","tidyr","ggplot2", "plyr", "scales")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
@@ -36,8 +36,6 @@ for (i in 1:length(packages.to.install)){
 }
 library(dplyr)
 library(tidyr)
-library(ggplot2)
-library(plyr)
 
 ## read in data
 dd_blocks_sp <- read.csv("../data/interim/dd_blocks_sp.csv", as.is=T, header=T, stringsAsFactors=F,colClasses=c("blockcode"="character"))
@@ -59,6 +57,10 @@ mean(dd_blocks_sp$nproviders) #6.943
 ##**************************************************************************************************************************************************
 ## distribution of service providers by fiber target status (national level)
 
+library(ggplot2)
+library(plyr)
+library(scales)
+
 dd_blocks_2tgts = dd_blocks_sp %>% filter(fiber_target_status %in% c("Target","Not Target")) 
 #get means by Fiber Target/Not Fiber Target
 sdat <- ddply(dd_blocks_2tgts, "fiber_target_status", summarise, nprov.mean=mean(nproviders))
@@ -70,10 +72,11 @@ png("../figures/hist-2target.png",width=580, height=410)
 ggplot(dd_blocks_2tgts, aes(x=nproviders, fill=..count..)) + geom_histogram(aes(y=..density..,fill=..density..), binwidth=1, colour="black") +
   facet_grid(fiber_target_status ~ .) + labs(title="Distribution of # Form 477 Service Providers in Census Block, by Fiber Target Status", x="Number of Providers in Census Block", y="% Districts") + 
   theme(legend.position="none", plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(limits=c(0,15), breaks = seq(0, 15, by = 1)) + scale_y_continuous(labels=percent, breaks = seq(0, 0.3, by = 0.05)) +
+  scale_x_continuous(limits=c(0,10), breaks = seq(0, 10, by = 1)) + scale_y_continuous(labels=percent, breaks = seq(0, 0.3, by = 0.05)) +
   geom_vline(data=sdat, aes(xintercept=nprov.mean),
              linetype="dashed", size=1, colour="red")
 dev.off()
+
 ## generate figure for all fiber target statuses for appendix
 png("../figures/hist-alltarget.png",width=580, height=425)
 ggplot(dd_blocks_sp, aes(x=nproviders, fill=..count..)) + geom_histogram(aes(y=..density..,fill=..density..), binwidth=0.9, colour="black") +
@@ -85,7 +88,16 @@ ggplot(dd_blocks_sp, aes(x=nproviders, fill=..count..)) + geom_histogram(aes(y=.
 dev.off()
 
 detach("package:ggplot2", unload=TRUE) 
+detach("package:scales", unload=TRUE) 
 detach("package:plyr", unload=TRUE) 
+
+## get the % districts with 4 or less service providers for 'target' vs. 'not target'. To get 5 or less, switch to a 5
+dd_blocks_2tgts %>% mutate(l4_providers=(nproviders<=4)) %>% 
+  group_by(fiber_target_status,l4_providers) %>%
+  summarise (n = n()) %>%
+  mutate(pct = n / sum(n))
+# Not_Target         TRUE   217 0.02294839
+# Target         TRUE    71 0.05159884
 
 ## explore interesting states - those with largest absolute % difference in mean # providers in districts' blocks, adjusted for % fiber target districts in the state
 
@@ -110,6 +122,8 @@ states =  by_state_means$postal_cd[1:5]
 #plot
 library(ggplot2)
 library(plyr)
+library(scales)
+
 sdat_pc=ddply(dd_blocks_2tgts[dd_blocks_2tgts$postal_cd %in% states,], c("postal_cd","fiber_target_status"), summarise, nprov.mean=mean(nproviders))
 
 dd_blocks_2tgts_pc=dd_blocks_2tgts[dd_blocks_2tgts$postal_cd %in% states,]
@@ -136,4 +150,4 @@ t.test(x,y, var.equal = FALSE) #p-value = 0.05516,
 #mean of x mean of y 
 #7.020910  6.950296 
 ##**************************************************************************************************************************************************
-## blocks with few service providers (3-..) - what are the most common
+## blocks with few service providers (4-..) - what are the most common

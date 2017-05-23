@@ -39,8 +39,8 @@ d_16 <- d_16_all %>%
           filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE)
 # d_17 <- d_17_all %>%
-#   filter(exclude_from_ia_analysis == FALSE,
-#   include_in_universe_of_districts==TRUE)
+#           filter(exclude_from_ia_analysis==FALSE,
+#           include_in_universe_of_districts==TRUE)
 
 # Munge Services Received
 ## ensure all binary columns appear as TRUE/FALSE rather than t/f (error unique to the R script)
