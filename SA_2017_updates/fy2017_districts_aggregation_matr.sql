@@ -1082,7 +1082,7 @@ select  		dd.esh_id as district_esh_id,
 
 																and real_applicant_id::varchar not in (	select esh_id
 
-																							from public.fy2016_districts_demog_matr
+																							from public.fy2017_districts_demog_matr
 
 																							where include_in_universe_of_districts=true)
 
@@ -1116,7 +1116,7 @@ select  		dd.esh_id as district_esh_id,
 
 													and real_applicant_id::varchar not in (	select esh_id
 
-																				from public.fy2016_districts_demog_matr
+																				from public.fy2017_districts_demog_matr
 
 																				where include_in_universe_of_districts=true)
 
@@ -1185,7 +1185,7 @@ select  		dd.esh_id as district_esh_id,
 
 													and real_applicant_id::varchar not in (	select esh_id
 
-																				from public.fy2016_districts_demog_matr
+																				from public.fy2017_districts_demog_matr
 
 																				where include_in_universe_of_districts=true)
 
