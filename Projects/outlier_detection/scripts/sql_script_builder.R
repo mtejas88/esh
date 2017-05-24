@@ -66,15 +66,28 @@ if(table_name =='outlier_use_case_details'){
       o.outlier_id,
       cand.outlier_use_case_detail_id,
       CASE
-        WHEN cand.outlier_use_case_detail_id not in (select outlier_use_case_detail_id from outliers)
+        WHEN NOT EXISTS 
+                  (select 
+                    1
+                  from 
+                    outliers o2
+                  where 
+                    cand.outlier_use_case_detail_id = o2.outlier_use_case_detail_id and
+                    cand.ref_id = o2.ref_id)  
           THEN 'insert'
-        WHEN cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
-          cand.ref_id = o.ref_id and 
-          cand.value = o.value and
-          cand.lambda = o.lambda 
+        WHEN  (cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
+                    cand.ref_id = o.ref_id) 
+                and
+                  (cand.value != o.value or
+                      cand.lambda != o.lambda)
+        THEN 'update'
+      WHEN cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
+                cand.ref_id = o.ref_id and 
+                cand.value = o.value and
+                cand.lambda = o.lambda 
         THEN 'ignore'
       ELSE
-        'update'
+        'unknown'
       END AS outlier_action,
       cand.ref_id,
       cand.value,
@@ -92,7 +105,8 @@ if(table_name =='outlier_use_case_details'){
       toc.outlier_test_case_params =oucd.outlier_test_case_params) cand
     left join
       outliers o
-        on cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id
+        on (cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
+        cand.ref_id = o.ref_id)
     where
       o.end_dt is null;"  
     
@@ -185,38 +199,35 @@ dml_builder <- function(values,script_type,postgres_table){
                                                     updated_values$r,",",
                                                     updated_values$lambda,",",
                                                     "current_timestamp)"))
-      
-      
     }
+    final_script <- syntax_stitcher(script_content,script_begin,script_end)
     
-        
   }else if(script_type == 'update'){
     if(postgres_table == 'outliers'){ 
     
       ## Script Beginning            
       script_begin <- paste0("update outliers set end_dt = ","current_timestamp where outlier_id in (")
 
-      
       ## Script Ending            
       script_end <- ");"
       
       ## Script Content    
-      for(i in 1:nrow(values)){
+      for(i in 1:length(values)){
         if (i==1){
-          script <- paste0(script_begin,values[i,],",")
-        }else if (i==nrow(script_content)) {
-          script <- paste0(script,values[i,],",")
+          script <- paste0(script_begin,values[i],",")
+        }else if (i==length(values)) {
+          script <- paste0(script,values[i],script_end)
         } else {
-          script <- paste0(script,script_content[i,],script_end)
+          script <- paste0(script,values[i],",")
         }
         
       }
   
       
       }
-    return(script)
+    final_script <- script
     }   
-  final_script <- syntax_stitcher(script_content,script_begin,script_end)
+
   
   return(final_script)
   

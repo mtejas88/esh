@@ -159,10 +159,23 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
   print("New Use Cases Found:")
   print(new_outliers)
   
-  update_ids <- new_outliers[which(new_outliers$outlier_action =="updated"),c("outlier_id")]
+  update_ids <- new_outliers[which(new_outliers$outlier_action =="update"),c("outlier_id")]
+  update_ids <- unique(update_ids)
   
-  dml_script_outliers <- dml_builder(update_ids,"update","outliers" ) 
-  
+  print("Endating existing outliers for updates")
+  if(length(update_ids) !=0){
+    print("Outliers Id's for update...")
+    print(update_ids)
+    dml_script_outliers_for_update <- dml_builder(update_ids,"update","outliers" ) 
+    
+    fileConn<-file(paste0("../sql/update_outliers_", Sys.Date(), ".SQL"))
+    writeLines(dml_script_outliers_for_update, fileConn)
+    close(fileConn)
+  }else{
+    print("No updates")
+  }
+
+    print("Inserting new outliers")  
   dml_script_outliers <- dml_builder(new_outliers,"insert","outliers" )
   print("Running the following command")
   print(dml_script_outliers)
