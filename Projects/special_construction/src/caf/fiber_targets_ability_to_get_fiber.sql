@@ -7,7 +7,9 @@ select *,
 	num_fiber_470s > 0 as fiber_470s,
 	num_maybe_fiber_470s > 0 as maybe_fiber_470s,
 	num_0_bids > 0 as zero_bids,
-	num_1_bids > 0 as one_bid
+	num_1_bids > 0 as one_bid,
+	array_to_string(fiber_470s_array, ';') as fiber_470s_array,
+	array_to_string(maybe_fiber_470s_array, ';') as maybe_fiber_470s_array
 from (
 	select
 		esh_id,
@@ -23,6 +25,17 @@ from (
 								or "Function" in ('Other', 'Self-provisioning'))
 								then "470 Number"
 						end) as num_maybe_fiber_470s,
+		array_agg(distinct 	case
+								when "Service Category" ilike '%internet access%'
+								and "Function" ilike '%fiber%'
+									then "470 Number"
+							end) as fiber_470s_array,
+		array_agg(distinct 	case
+								when "Service Category" ilike '%internet access%'
+								and ("Function" ilike '%transport%'
+									or "Function" in ('Other', 'Self-provisioning'))
+									then "470 Number"
+							end) as maybe_fiber_470s_array,
 		sum(case
 				when num_bids_received =0
 					then 1

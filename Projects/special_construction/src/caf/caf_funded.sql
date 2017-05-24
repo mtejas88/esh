@@ -4,7 +4,8 @@ with caf_p1_fmt as (
 			array_agg(distinct carrier) as p1_carriers
 	from caf.caf_p1_funds
 	group by 1
-),
+	having sum(final_funding) > 0
+	),
 ror_fmt as (
     select ror_funded_blocks.census_block,
     sum(annual_a_cam_support::numeric * supported_locations_232 / total_ror_locations_in_cbs_receiving_model_based_funding)
@@ -15,6 +16,7 @@ ror_fmt as (
     on trim(both ' ' from ror_funded_blocks.short_name) = trim(both ' ' from ror_r2_authorizations.rate_of_return_carrier)
     and ror_funded_blocks.state = ror_r2_authorizations.state
     group by 1
+	having sum(annual_a_cam_support::numeric * supported_locations_232 / total_ror_locations_in_cbs_receiving_model_based_funding) > 0
 ),
 cam43_eligible_fmt as (
 	select distinct cb as census_block,
@@ -45,7 +47,8 @@ cam43_fmt as(
 	on elig.cam_carrier = funded.short_name
 	and elig.state = funded.state
 	group by 1
-),
+	having sum(support_amount_dollars * locations / homes_businesses_served) > 0
+	),
 rbe_fmt as (
 	select census_block,
 	sum(selected_bid_amount / census_blocks) as rbe_funding_authorized_assumed,
@@ -61,7 +64,8 @@ rbe_fmt as (
 			else true
 		end
 	group by 1
-),
+	having sum(selected_bid_amount / census_blocks) > 0
+	),
 j1 as (
 	select 	case
 				when p1.census_block is null
