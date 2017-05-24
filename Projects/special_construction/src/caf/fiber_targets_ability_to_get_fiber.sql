@@ -1,15 +1,23 @@
-select *,
+select
+	tgt16_agg.esh_id,
+	dd.name,
+	dd.postal_cd,
+	dd.district_type,
+	dd.locale,
+	dd.district_size,
+	dd.num_students,
 	case
-		when fiber_metric_status in ('clean_target', 'dirty_target')
+		when tgt16_agg.fiber_metric_status in ('clean_target', 'dirty_target')
 			then true
 		else false
-	end as fiber_target_specifically_identified,
+	end as specifically_idd_as_fiber_target,
 	num_fiber_470s > 0 as fiber_470s,
 	num_maybe_fiber_470s > 0 as maybe_fiber_470s,
 	num_0_bids > 0 as zero_bids,
 	num_1_bids > 0 as one_bid,
 	array_to_string(fiber_470s_array, ';') as fiber_470s_array,
-	array_to_string(maybe_fiber_470s_array, ';') as maybe_fiber_470s_array
+	array_to_string(maybe_fiber_470s_array, ';') as maybe_fiber_470s_array,
+	array_to_string(c1_470s_array, ';') as c1_470s_array
 from (
 	select
 		esh_id,
@@ -36,6 +44,10 @@ from (
 									or "Function" in ('Other', 'Self-provisioning'))
 									then "470 Number"
 							end) as maybe_fiber_470s_array,
+		array_agg(distinct case
+								when "Service Category" ilike '%internet access%'
+									then "Function"
+							end) as c1_470s_array,
 		sum(case
 				when num_bids_received =0
 					then 1
@@ -75,3 +87,5 @@ from (
 	) tgt16_470_frns
 	group by 1,2
 ) tgt16_agg
+left join fy2016_districts_deluxe_matr dd
+on tgt16_agg.esh_id = dd.esh_id
