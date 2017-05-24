@@ -24,6 +24,7 @@ s_16_all <- read.csv(  paste0("../data/mode/crusher_sr_fy2016_", Sys.Date(), ".c
 #s_17_all <- read.csv(  paste0("../data/mode/crusher_sr_fy2017_", Sys.Date(), ".csv"), as.is = TRUE)
 
 
+
 # Munge Deluxe Districts
 logical <- c("exclude_from_ia_analysis", "exclude_from_ia_cost_analysis", "exclude_from_wan_analysis",
              "exclude_from_wan_cost_analysis", "exclude_from_current_fiber_analysis", "include_in_universe_of_districts",

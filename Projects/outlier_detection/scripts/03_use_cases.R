@@ -90,6 +90,7 @@ use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, 
   data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
+
     filter(
       bandwidth_in_mbps %in% circuit_size,
       connect_category %in% technology,
@@ -109,12 +110,7 @@ use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, 
   else {
     output=output16  
   }
-str1 <- paste0("\"circuit_size_in_mbps\" => \"", circuit_size,"\"")
-str2 <- paste0("\"technology\" => \"", technology,  "\"")
-str3 <- paste0("\"purpose\" => \"", line_item_purpose, "\"")
 
-use_case_parameters <- paste(str1, str2, str3, sep = ", ")
-output <- cbind(use_case_parameters, output)
 identify_outliers_loop(o_16,output,0.05,"monthly_cost_per_circuit", "line_item_id","Cost per Mbps",with_16,n_17_at_time)
 }
 
@@ -208,6 +204,7 @@ use_case_total_cost <- function (data, data_17, district_locale, size, with_16,n
   data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
+
     filter(
       locale %in% district_locale,
       district_size %in% size,
@@ -307,7 +304,7 @@ use_case_cost <- function (data, data_17, district_locale, size, with_16,n_17_at
   }
   str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
   str2 <- paste0("\"district_size\" => \"", size,"\"")
-  
+
   use_case_parameters <- paste(str1, str2, sep = ",")
   output <- cbind(use_case_parameters, output)
   identify_outliers_loop(o_16,output,0.05,"ia_monthly_cost_per_mbps", "esh_id","Monthly Cost",with_16,n_17_at_time)  
