@@ -47,8 +47,11 @@ on sc141a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, esh_id__c as campus_id
-            from salesforce.facilities__c ) ds --per Meghan, campus id will be added to this table
+left join ( select distinct esh_id__c, campus__c as campus_id
+            from salesforce.facilities__c 
+            where out_of_business__c = false --not closed
+            and recordtypeid = '01244000000DHd0AAG' --string for schools
+            and charter__c = false) ds  -- not charters
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -58,8 +61,18 @@ left join (
   and funding_year = 2017 --per engineering, funding year is integer data type in all tables
 ) t
 on eim.entity_id = t.flaggable_id
+left join (
+  select esh_id__c
+  from salesforce.facilities__c 
+  where (out_of_business__c = true
+    or recordtypeid != '01244000000DHd0AAG'
+    or charter__c = true)
+) sc
+on eim.entity_id::varchar = sc.esh_id__c
+
 where flaggable_id is null
 and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
+and sc.esh_id__c is null --this removes any schools that are closed, non_school, or charter in salesforce
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -112,8 +125,11 @@ and sc141a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, esh_id__c as campus_id
-            from salesforce.facilities__c) ds --assuming the campus ids will be added to this table, per discussion with Meghan at 4:30 pm on May 9, 2017
+left join ( select distinct esh_id__c, campus__c as campus_id
+            from salesforce.facilities__c 
+            where out_of_business__c = false --not closed
+            and recordtypeid = '01244000000DHd0AAG' --string for schools
+            and charter__c = false) ds  -- not charters
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -123,8 +139,18 @@ left join (
   and funding_year = 2017
 ) t
 on eim.entity_id = t.flaggable_id
+left join (
+  select esh_id__c
+  from salesforce.facilities__c 
+  where (out_of_business__c = true
+    or recordtypeid != '01244000000DHd0AAG'
+    or charter__c = true)
+) sc
+on eim.entity_id::varchar = sc.esh_id__c
+
 where flaggable_id is null
 and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
+and sc.esh_id__c is null --this removes any schools that are closed, non_school, or charter in salesforce
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -175,9 +201,11 @@ and sc141a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, esh_id__c as campus_id
-            from salesforce.facilities__c ) ds
---per discussion with Meghan at 4:30 pm on May 9, 2017, the campus id field will be added to salesforce.facilities__c table
+left join ( select distinct esh_id__c, campus__c as campus_id
+            from salesforce.facilities__c 
+            where out_of_business__c = false --not closed
+            and recordtypeid = '01244000000DHd0AAG' --string for schools
+            and charter__c = false) ds  -- not charters
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -187,8 +215,18 @@ left join (
   and funding_year = 2017
 ) t
 on eim.entity_id = t.flaggable_id
+left join (
+  select esh_id__c
+  from salesforce.facilities__c 
+  where (out_of_business__c = true
+    or recordtypeid != '01244000000DHd0AAG'
+    or charter__c = true)
+) sc
+on eim.entity_id::varchar = sc.esh_id__c
+
 where flaggable_id is null
 and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
+and sc.esh_id__c is null --this removes any schools that are closed, non_school, or charter in salesforce
 UNION
 select  d.esh_id as district_esh_id,
         case
@@ -246,8 +284,11 @@ on sc141af."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141af."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, esh_id__c as campus_id
-            from salesforce.facilities__c) ds --per Meghan, campus id will be added to this table
+left join ( select distinct esh_id__c, campus__c as campus_id
+            from salesforce.facilities__c 
+            where out_of_business__c = false --not closed
+            and recordtypeid = '01244000000DHd0AAG' --string for schools
+            and charter__c = false) ds  -- not charters
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -257,21 +298,25 @@ left join (
   and funding_year = 2017
 ) t
 on eim.entity_id = t.flaggable_id
+left join (
+  select esh_id__c
+  from salesforce.facilities__c 
+  where (out_of_business__c = true
+    or recordtypeid != '01244000000DHd0AAG'
+    or charter__c = true)
+) sc
+on eim.entity_id::varchar = sc.esh_id__c
+
 where flaggable_id is null
 and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */ 
+and sc.esh_id__c is null --this removes any schools that are closed, non_school, or charter in salesforce
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 10/26/2016
-Name of QAing Analyst(s): Greg Kurzhals
-Purpose: Schools demographics of those in the universe
-Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before
-metrics aggregation so school-district association can be created.
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
+Modified Date: 5/24/2017
+Name of Modifier: Jeremy - updated the campus id from salesforce. also removed closed, non, and charter schools using salesforce
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 usage of public.flags with funding year
-district_schools vs salesforce.facilities__c don’t match
 */
