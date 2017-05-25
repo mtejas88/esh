@@ -70,7 +70,7 @@ left join (
   on s.account__c = d.sfid
   where (s.out_of_business__c = true
     or s.recordtypeid != '01244000000DHd0AAG'
-    (or s.charter__c = true and d.type != 'Charter'))
+    or (s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -152,7 +152,7 @@ left join (
   on s.account__c = d.sfid
   where (s.out_of_business__c = true
     or s.recordtypeid != '01244000000DHd0AAG'
-    (or s.charter__c = true and d.type != 'Charter'))
+    or ( s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -232,7 +232,7 @@ left join (
   on s.account__c = d.sfid
   where (s.out_of_business__c = true
     or s.recordtypeid != '01244000000DHd0AAG'
-    (or s.charter__c = true and d.type != 'Charter'))
+    or ( s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -319,7 +319,7 @@ left join (
   on s.account__c = d.sfid
   where (s.out_of_business__c = true
     or s.recordtypeid != '01244000000DHd0AAG'
-    (or s.charter__c = true and d.type != 'Charter'))
+    or (s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
