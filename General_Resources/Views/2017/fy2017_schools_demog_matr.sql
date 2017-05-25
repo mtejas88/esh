@@ -47,11 +47,13 @@ on sc141a."LEAID" = d.nces_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, campus__c as campus_id
-            from salesforce.facilities__c 
-            where out_of_business__c = false --not closed
-            and recordtypeid = '01244000000DHd0AAG' --string for schools
-            and charter__c = false) ds  -- not charters
+left join ( select distinct s.esh_id__c, s.campus__c as campus_id
+            from salesforce.facilities__c s
+            left join salesforce.account d
+            on s.account__c = d.sfid
+            where s.out_of_business__c = false --not closed
+            and s.recordtypeid = '01244000000DHd0AAG' --string for schools
+            and (s.charter__c = false or d.type = 'Charter')) ds  -- not charters in regular districts
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -62,11 +64,13 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 left join (
-  select esh_id__c
-  from salesforce.facilities__c 
-  where (out_of_business__c = true
-    or recordtypeid != '01244000000DHd0AAG'
-    or charter__c = true)
+  select s.esh_id__c
+  from salesforce.facilities__c s
+  left join salesforce.account d
+  on s.account__c = d.sfid
+  where (s.out_of_business__c = true
+    or s.recordtypeid != '01244000000DHd0AAG'
+    (or s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -125,11 +129,13 @@ and sc141a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, campus__c as campus_id
-            from salesforce.facilities__c 
-            where out_of_business__c = false --not closed
-            and recordtypeid = '01244000000DHd0AAG' --string for schools
-            and charter__c = false) ds  -- not charters
+left join ( select distinct s.esh_id__c, s.campus__c as campus_id
+            from salesforce.facilities__c s
+            left join salesforce.account d
+            on s.account__c = d.sfid
+            where s.out_of_business__c = false --not closed
+            and s.recordtypeid = '01244000000DHd0AAG' --string for schools
+            and (s.charter__c = false or d.type = 'Charter')) ds  -- not charters in regular districts
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -140,11 +146,13 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 left join (
-  select esh_id__c
-  from salesforce.facilities__c 
-  where (out_of_business__c = true
-    or recordtypeid != '01244000000DHd0AAG'
-    or charter__c = true)
+  select s.esh_id__c
+  from salesforce.facilities__c s
+  left join salesforce.account d
+  on s.account__c = d.sfid
+  where (s.out_of_business__c = true
+    or s.recordtypeid != '01244000000DHd0AAG'
+    (or s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -201,11 +209,13 @@ and sc141a."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141a."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, campus__c as campus_id
-            from salesforce.facilities__c 
-            where out_of_business__c = false --not closed
-            and recordtypeid = '01244000000DHd0AAG' --string for schools
-            and charter__c = false) ds  -- not charters
+left join ( select distinct s.esh_id__c, s.campus__c as campus_id
+            from salesforce.facilities__c s
+            left join salesforce.account d
+            on s.account__c = d.sfid
+            where s.out_of_business__c = false --not closed
+            and s.recordtypeid = '01244000000DHd0AAG' --string for schools
+            and (s.charter__c = false or d.type = 'Charter')) ds  -- not charters in regular districts
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -216,11 +226,13 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 left join (
-  select esh_id__c
-  from salesforce.facilities__c 
-  where (out_of_business__c = true
-    or recordtypeid != '01244000000DHd0AAG'
-    or charter__c = true)
+  select s.esh_id__c
+  from salesforce.facilities__c s
+  left join salesforce.account d
+  on s.account__c = d.sfid
+  where (s.out_of_business__c = true
+    or s.recordtypeid != '01244000000DHd0AAG'
+    (or s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
@@ -284,11 +296,13 @@ on sc141af."LSTATE" = d.postal_cd
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on sc141af."NCESSCH" = eim.nces_code
-left join ( select distinct esh_id__c, campus__c as campus_id
-            from salesforce.facilities__c 
-            where out_of_business__c = false --not closed
-            and recordtypeid = '01244000000DHd0AAG' --string for schools
-            and charter__c = false) ds  -- not charters
+left join ( select distinct s.esh_id__c, s.campus__c as campus_id
+            from salesforce.facilities__c s
+            left join salesforce.account d
+            on s.account__c = d.sfid
+            where s.out_of_business__c = false --not closed
+            and s.recordtypeid = '01244000000DHd0AAG' --string for schools
+            and (s.charter__c = false or d.type = 'Charter')) ds  -- not charters in regular districts
 on eim.entity_id::varchar = ds.esh_id__c
 left join (
   select distinct flaggable_id
@@ -299,11 +313,13 @@ left join (
 ) t
 on eim.entity_id = t.flaggable_id
 left join (
-  select esh_id__c
-  from salesforce.facilities__c 
-  where (out_of_business__c = true
-    or recordtypeid != '01244000000DHd0AAG'
-    or charter__c = true)
+  select s.esh_id__c
+  from salesforce.facilities__c s
+  left join salesforce.account d
+  on s.account__c = d.sfid
+  where (s.out_of_business__c = true
+    or s.recordtypeid != '01244000000DHd0AAG'
+    (or s.charter__c = true and d.type != 'Charter'))
 ) sc
 on eim.entity_id::varchar = sc.esh_id__c
 
