@@ -6,13 +6,15 @@ with state_level_extrap as (
 
 	from fy2017_districts_fiberpredeluxe_matr
 
-	where include_in_universe_of_districts = true
+	where include_in_universe_of_districts = true 
 
 	and district_type = 'Traditional'
 
 	and fiber_metric_calc_group = 'metric_extrapolation'
 
 	group by postal_cd)
+
+
 
 
 select distinct
@@ -53,9 +55,9 @@ select distinct
 
 	frl_percent,
 
-	discount_rate_c1,
+	/*discount_rate_c1,
 
-	discount_rate_c2,
+	discount_rate_c2,*/ -- commenting out as the c2_funding view is not ready
 
 	address,
 
@@ -284,25 +286,25 @@ select distinct
 
   	backbone_monthly_cost,
 
-	--needs_wifi,  /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	needs_wifi,
 
-	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	/*c2_prediscount_budget_15,
 
-	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_remaining_15,
 
-	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_remaining_16,
 
-	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_postdiscount_remaining_15,
 
-	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_postdiscount_remaining_16,
 
-	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	received_c2_15,
 
-	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	received_c2_16,
 
-	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	budget_used_c2_15,
 
-	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	budget_used_c2_16,*/
 
 	fiber_target_status,
 
@@ -318,6 +320,9 @@ select distinct
 
 	service_provider_assignment
 
+
+
+
 from fy2017_districts_fiberpredeluxe_matr dfpd
 
 left join state_level_extrap sle
@@ -331,15 +336,23 @@ on sle.postal_cd = dfpd.postal_cd
 
 
 /*
+
 Author: Justine Schott, Jamie Barnes
+
 Created On Date: 8/15/2016
+
 Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
+
 Name of QAing Analyst(s):
+
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
+
 Methodology:
+
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
+
 */

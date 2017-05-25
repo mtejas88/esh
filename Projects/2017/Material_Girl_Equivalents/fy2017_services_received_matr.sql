@@ -1,9 +1,7 @@
 /*public.line_items vs public.esh_line_items
 ALSO >>> funding year clause */
 
-select distinct
-
-	base.*,
+select base.*,
 
     CASE
 
@@ -76,6 +74,9 @@ select distinct
       else NULL
 
     end as monthly_circuit_cost_total
+
+
+
 
 FROM (
 
@@ -171,11 +172,11 @@ FROM (
 
             case
 
-              when li.reporting_name is null
+              when spc.reporting_name is null
 
-             	then li.service_provider_name
+                then  li.service_provider_name
 
-              else li.reporting_name
+              else spc.reporting_name
 
             end AS reporting_name,
 
@@ -219,32 +220,43 @@ FROM (
 
             dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
 
-            dd.consortium_affiliation AS recipient_consortium_member
+            case when dd.consortium_affiliation is null then false else true
+            end AS recipient_consortium_member,
+
+            dd.consortium_member AS recipient_consortium_member
 
           FROM public.fy2017_lines_to_district_by_line_item_matr lid
 
-          LEFT OUTER JOIN public.fy2017_esh_line_items_v li
+          LEFT OUTER JOIN public.fy2017_esh_line_items_v li --pointing this to the view for esh line items
 
           ON li.id = lid.line_item_id
+		  where li.funding_year = 2017 -- adding funding year filer
 
           LEFT OUTER JOIN public.entity_bens eb
 
           ON eb.ben = li.applicant_ben
 
-          LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
+          LEFT OUTER JOIN (
 
-          ON dd.esh_id::varchar = lid.district_esh_id::varchar
+            select distinct name, reporting_name
 
-					left outer join salesforce.facilities__c sfdc
-					on sfdc.esh_id__c::varchar = dd.esh_id::varchar
-          where sfdc.out_of_business__c <> true --not closed
+            from public.esh_service_providers
+
+          ) spc
+
+          ON spc.name = li.service_provider_name
+
+          LEFT OUTER JOIN
+		  (public.fy2017_districts_predeluxe_matr  dd
+
+          ON dd.esh_id = lid.district_esh_id
 
 
-					 --adding sfdc integration and filtering out out of business schools/districts
+         LEFT OUTER JOIN fy2017_districts_deluxe_matr
 
-         /*LEFT OUTER JOIN fy2016.districts d
-          ON dd.esh_id::numeric = d.esh_id
-          WHERE li.broadband*/
+          ON dd.esh_id::varchar = d.esh_id::varchar --adding correct column name for salesforce.account table for joining
+
+
 
 ) base
 
@@ -254,19 +266,35 @@ left join (
 
                   sum(d.num_students::numeric) as num_students_served
 
+
+
+
           from fy2017_lines_to_district_by_line_item_matr ldli
+
+
+
 
           left join public.fy2017_districts_demog_matr d
 
-          on ldli.district_esh_id::varchar = d.esh_id::varchar
+          on ldli.district_esh_id = d.esh_id__c --adding correct column name for salesforce.account table for joining
 
-          left join public.esh_line_items li
 
-          on ldli.line_item_id = li.id
+
+
+          left join public.fy2017_esh_line_items_v li --pointing to the view
+
+          on ldli.line_item_id = li.id::varchar -- esh id for 2017 is not varchar so need conversion
+
+
+
+
           where (li.consortium_shared=true
 
-             OR li.backbone_conditions_met=true)
-             and funding_year = 2017
+             OR li.backbone_conditions_met=true) --these columns are same in the salesforce.account table similar to fy2016.districts table
+             and funding_year = 2017 --confirmed with engineering, funding_year will be integer in all cases, also fixed it in public.flags as well
+
+
+
 
           group by ldli.line_item_id
 
@@ -277,21 +305,25 @@ on base.line_item_id=district_info_by_li.line_item_id
 
 
 
-
 /*
+
 Author:                   Justine Schott
+
 Created On Date:
+
 Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
+
 Name of QAing Analyst(s):
+
 Purpose:                  2016 district data in terms of 2016 methodology
+
 Methodology:
+
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-might need to add below two additional attributes
---and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
---and sfdc.charter__c = false -- not charters
+
 */
