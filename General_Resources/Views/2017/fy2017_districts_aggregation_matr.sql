@@ -1445,13 +1445,13 @@ left join
 
 public.fy2017_esh_line_items_v.id,public.fy2017_esh_line_items_v.frn_complete,public.fy2017_esh_line_items_v.frn,public.fy2017_esh_line_items_v.application_number,public.fy2017_esh_line_items_v.application_type,
 public.fy2017_esh_line_items_v.applicant_ben,public.fy2017_esh_line_items_v.applicant_name,public.fy2017_esh_line_items_v.applicant_postal_cd,public.fy2017_esh_line_items_v.service_provider_id,
-public.fy2017_esh_line_items_v.name,public.fy2017_esh_line_items_v.service_type,public.fy2017_esh_line_items_v.service_category,public.fy2017_esh_line_items_v.connect_type,
+/*public.fy2017_esh_line_items_v.name,*/public.fy2017_esh_line_items_v.service_type,public.fy2017_esh_line_items_v.service_category,public.fy2017_esh_line_items_v.connect_type,
 public.fy2017_esh_line_items_v.connect_category,public.fy2017_esh_line_items_v.purpose,public.fy2017_esh_line_items_v.bandwidth_in_mbps,public.fy2017_esh_line_items_v.bandwidth_in_original_units,
 public.fy2017_esh_line_items_v.num_lines,public.fy2017_esh_line_items_v.total_cost,public.fy2017_esh_line_items_v.one_time_elig_cost,public.fy2017_esh_line_items_v.rec_elig_cost,
 public.fy2017_esh_line_items_v.months_of_service,public.fy2017_esh_line_items_v.contract_end_date,public.fy2017_esh_line_items_v.num_open_flags,public.fy2017_esh_line_items_v.open_flag_labels,
 public.fy2017_esh_line_items_v.open_tag_labels,public.fy2017_esh_line_items_v.num_recipients,public.fy2017_esh_line_items_v.erate,public.fy2017_esh_line_items_v.broadband,
 public.fy2017_esh_line_items_v.consortium_shared,public.fy2017_esh_line_items_v.isp_conditions_met,public.fy2017_esh_line_items_v.upstream_conditions_met,
-public.fy2017_esh_line_items_v.internet_conditions_met,public.fy2017_esh_line_items_v.wan_conditions_met,public.fy2017_esh_line_items_v.exclude,public.fy2017_esh_line_items_v.upload_bandwidth_in_mbps,
+public.fy2017_esh_line_items_v.internet_conditions_met,public.fy2017_esh_line_items_v.wan_conditions_met,/*public.fy2017_esh_line_items_v.exclude,*/public.fy2017_esh_line_items_v.upload_bandwidth_in_mbps,
 public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_items_v.function,
 
 
@@ -1475,7 +1475,7 @@ public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_it
 
            END AS esh_rec_cost,
 
-           reporting_name,
+           --adda.reporting_name
            spc.name as service_provider_name,
 
            frns.discount_rate::numeric/100 as discount_rate
@@ -1497,7 +1497,7 @@ public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_it
 
     select distinct id, reporting_name, name
 
-    from public.service_provider_categories --using the same public table that we used in 2016
+    from public.service_provider_categories  --using the same public table that we used in 2016
 
     ) spc
 
