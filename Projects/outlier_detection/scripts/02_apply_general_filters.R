@@ -88,6 +88,7 @@ s_16=munge_sr(s_16_all)
 #while 2017 data is still dirty
 # s_17=s_17_all %>%
 #   filter(
+#   recipient_postal_cd != "AK",
 #   recipient_include_in_universe_of_districts == TRUE,
 #     # non-duplicates
 #     !duplicated(line_item_id)) %>%
