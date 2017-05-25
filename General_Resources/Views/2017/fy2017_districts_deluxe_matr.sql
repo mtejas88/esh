@@ -6,7 +6,7 @@ with state_level_extrap as (
 
 	from fy2017_districts_fiberpredeluxe_matr
 
-	where include_in_universe_of_districts = true 
+	where include_in_universe_of_districts = true
 
 	and district_type = 'Traditional'
 
@@ -53,9 +53,9 @@ select distinct
 
 	frl_percent,
 
-	discount_rate_c1, 
+	discount_rate_c1,
 
-	discount_rate_c2, 
+	discount_rate_c2,
 
 	address,
 
@@ -331,23 +331,15 @@ on sle.postal_cd = dfpd.postal_cd
 
 
 /*
-
 Author: Justine Schott, Jamie Barnes
-
 Created On Date: 8/15/2016
-
 Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
-
 Name of QAing Analyst(s):
-
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
-
 Methodology:
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-
 */

@@ -3,7 +3,7 @@ with f as (select
 	count(distinct label) as num_open_flags,
 	array_agg(distinct label) as open_flag_labels
 
-	from public.flags 
+	from public.flags
 	where status = 'open'
 	and flaggable_type = 'LineItem'
 	and funding_year = 2017
@@ -24,24 +24,24 @@ t as (select
 	),
 r as (select line_item_id,
 	count(distinct recipient_ben) as num_recipients
-	
+
 	from public.esh_allocations
 
 	group by line_item_id
 	)
 
-select 
+select distinct
 eli.id,
 eli.frn_complete,
-	
+
 	fli.frn,
 
 eli.application_number,
-	
+
 	bi.applicant_type as application_type, /*USAC identifcation */
 
 eli.applicant_ben,
-	
+
 	bi.billed_entity_name as applicant_name,
 	eb.entity_type as applicant_type, /*ESH identification*/
 	bi.postal_cd as applicant_postal_cd,
@@ -87,7 +87,7 @@ eli.created_at,
 eli.updated_at,
 
 	r.num_recipients,
-/* intentionally putting open flag and tag arrays at the end 
+/* intentionally putting open flag and tag arrays at the end
 since presence of nulls in these will offset column values in spreadsheets */
 	case
 		when f.num_open_flags is null
@@ -99,10 +99,10 @@ since presence of nulls in these will offset column values in spreadsheets */
 
 from public.esh_line_items eli
 
-left join fy2017.frn_line_items fli 
+left join fy2017.frn_line_items fli
 on fli.line_item = eli.frn_complete
 
-left join fy2017.basic_informations bi 
+left join fy2017.basic_informations bi
 on bi.application_number =  eli.application_number
 
 left join public.esh_service_providers esp
@@ -126,8 +126,7 @@ where eli.funding_year = 2017
 Author: Jamie Barnes
 Created On Date: 5/8/2017
 Last Modified Date: 5/16/2017
-Name of QAing Analyst(s): 
+Name of QAing Analyst(s):
 Purpose: View to mimic 2016 version of line items table for 2017 by adding back in columns we dropped from public.esh_line_items
-Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one. 
-
+Methodology: All aggregation done in temp tables prior to joining them into esh_line_items. Columns not from esh_line_items are indented one.
 */

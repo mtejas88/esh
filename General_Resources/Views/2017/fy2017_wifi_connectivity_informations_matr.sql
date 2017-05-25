@@ -1,10 +1,11 @@
-
-
 select 	ci.postal_cd,
 
 		ci.parent_entity_name,
 
-		eb_parent.entity_id as parent_entity_id,
+(select distinct (eb_parent.entity_id) as parent_entity_id),
+
+
+		--eb_parent.entity_id as parent_entity_id, using distinct entity id above and commenting non unique column
 
 		sum(case
 
@@ -77,21 +78,13 @@ group by 	ci.postal_cd,
 
 
 /*
-
 Author: Justine Schott
-
 Created On Date:
-
 Last Modified Date: 1/26/2017 - added appropriate tage names so dqt can override a district's 471 response, used fy2016.tags table to check for tags (JH)
-
 Name of QAing Analyst(s):
-
 Purpose: Determine how a district responded to WiFi connectivity questions
-
 Methodology: JOIN parent to districts and child to schools separately
-
 Dependencies: [public.fy2016_districts_demog_matr, public.fy2016_schools_demog_matr, fy2016.tags]
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
@@ -100,4 +93,3 @@ Methodology: Using updated tables names for 2017 underline tables, as per discus
 usage of public.tags with funding year filter
 no funding year column in public.entiy_bens tables
 */
-

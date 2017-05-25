@@ -235,11 +235,15 @@ FROM (
 
           ON dd.esh_id::varchar = lid.district_esh_id::varchar
 
+					left outer join salesforce.facilities__c sfdc
+					on sfdc.esh_id__c::varchar = dd.esh_id::varchar
+          where sfdc.out_of_business__c <> true --not closed
+
+
+					 --adding sfdc integration and filtering out out of business schools/districts
 
          /*LEFT OUTER JOIN fy2016.districts d
-
           ON dd.esh_id::numeric = d.esh_id
-
           WHERE li.broadband*/
 
 ) base
@@ -273,8 +277,8 @@ on base.line_item_id=district_info_by_li.line_item_id
 
 
 
-/*
 
+/*
 Author:                   Justine Schott
 Created On Date:
 Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
@@ -287,5 +291,7 @@ Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-
+might need to add below two additional attributes
+--and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
+--and sfdc.charter__c = false -- not charters
 */
