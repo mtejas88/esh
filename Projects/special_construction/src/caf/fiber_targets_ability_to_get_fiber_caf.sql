@@ -1,10 +1,10 @@
 select distinct
 	dl.esh_id,
 	dl.district_esh_id,
-	duf.fiber_target_specifically_identified,
+	duf.specifically_idd_as_fiber_target,
 	case
-		when 	(num_fiber_470s > 0 or num_maybe_fiber_470s > 0) and
-				(num_0_bids > 0 or num_1_bids > 0)
+		when 	(fiber_470s or maybe_fiber_470s) and
+				(zero_bids or one_bid)
 			then true
 		else false
 	end as unable_to_get_fiber,
