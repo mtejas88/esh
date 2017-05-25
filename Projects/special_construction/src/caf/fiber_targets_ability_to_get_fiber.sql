@@ -17,7 +17,9 @@ select
 	num_1_bids > 0 as one_bid,
 	array_to_string(fiber_470s_array, ';') as fiber_470s_array,
 	array_to_string(maybe_fiber_470s_array, ';') as maybe_fiber_470s_array,
-	array_to_string(c1_470s_array, ';') as c1_470s_array
+	array_to_string(c1_470s_array, ';') as c1_470s_array,
+	array_to_string(zero_bids_frn_array, ';') as zero_bids_frn_array,
+	array_to_string(one_bid_frn_array, ';') as one_bid_frn_array
 from (
 	select
 		esh_id,
@@ -48,6 +50,14 @@ from (
 								when "Service Category" ilike '%internet access%'
 									then "Function"
 							end) as c1_470s_array,
+		array_agg(distinct case
+								when num_bids_received =0
+									then frn
+							end) as zero_bids_frn_array,
+		array_agg(distinct case
+								when num_bids_received =1
+									then frn
+							end) as one_bid_frn_array,
 		sum(case
 				when num_bids_received =0
 					then 1
@@ -66,7 +76,8 @@ from (
 			form470s."470 Number",
 			form470s."Service Category",
 			form470s."Function",
-			frns.num_bids_received::numeric
+			frns.num_bids_received::numeric,
+			frns.frn
 		from public.fy2016_districts_deluxe_matr dd16
 		left join (
 			select *
