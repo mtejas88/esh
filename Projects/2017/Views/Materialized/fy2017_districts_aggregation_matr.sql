@@ -199,13 +199,9 @@ select  		dd.esh_id as district_esh_id,
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 
 																	/* case
-
 																		when months_of_service = 0 or months_of_service is null
-
 																			then 12
-
 																		else months_of_service
-
 																	  end*/
 
 									else	0
@@ -261,13 +257,9 @@ select  		dd.esh_id as district_esh_id,
 										then	esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric)
 
 																	/* case
-
 																		when months_of_service = 0 or months_of_service is null
-
 																			then 12
-
 																		else months_of_service
-
 																	  end*/
 
 									else	0
@@ -687,13 +679,9 @@ select  		dd.esh_id as district_esh_id,
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
 																				/* case
-
 																					when months_of_service = 0 or months_of_service is null
-
 																						then 12
-
 																					else months_of_service
-
 																				  end*/, '/mth')
 
 					                end), ' | ') as dedicated_isp_services,
@@ -745,13 +733,9 @@ select  		dd.esh_id as district_esh_id,
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
 																				/* case
-
 																					when months_of_service = 0 or months_of_service is null
-
 																						then 12
-
 																					else months_of_service
-
 																				  end*/, '/mth')
 
 					                end), ' | ') as bundled_internet_services,
@@ -803,13 +787,9 @@ select  		dd.esh_id as district_esh_id,
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
 																				/* case
-
 																					when months_of_service = 0 or months_of_service is null
-
 																						then 12
-
 																					else months_of_service
-
 																				  end*/, '/mth')
 
 					                end), ' | ') as upstream_services,
@@ -871,13 +851,9 @@ select  		dd.esh_id as district_esh_id,
 								                        	round(esh_rec_cost::numeric	*	(allocation_lines::numeric	/	num_lines::numeric),2)
 
 																				/*/ case
-
 																					when months_of_service = 0 or months_of_service is null
-
 																						then 12
-
 																					else months_of_service
-
 																				  end*/, '/mth')
 
 					                end), ' | ') as wan_services,
@@ -1082,7 +1058,7 @@ select  		dd.esh_id as district_esh_id,
 
 																and real_applicant_id::varchar not in (	select esh_id
 
-																							from public.fy2016_districts_demog_matr
+																							from public.fy2017_districts_demog_matr
 
 																							where include_in_universe_of_districts=true)
 
@@ -1116,7 +1092,7 @@ select  		dd.esh_id as district_esh_id,
 
 													and real_applicant_id::varchar not in (	select esh_id
 
-																				from public.fy2016_districts_demog_matr
+																				from public.fy2017_districts_demog_matr
 
 																				where include_in_universe_of_districts=true)
 
@@ -1185,7 +1161,7 @@ select  		dd.esh_id as district_esh_id,
 
 													and real_applicant_id::varchar not in (	select esh_id
 
-																				from public.fy2016_districts_demog_matr
+																				from public.fy2017_districts_demog_matr
 
 																				where include_in_universe_of_districts=true)
 
@@ -1693,11 +1669,8 @@ left join (
 
 		on dc.parent_entity_ben = eim.ben
 /*join ( select distinct id, ben__c
-
             from salesforce.facilities__c
-
 		--on tag_info.parent_entity_ben = salesforce.facilities__c.ben__c
-
 		group by entity_ben*/
 		group by 1
 
@@ -1731,25 +1704,16 @@ group by	dd.esh_id,
 
 
 /*
-
 Author: Justine Schott
-
 Created On Date: 6/20/2016
-
 Last Modified Date: 4/13/2017 - js remove references to applicant_id and applicant_type from li
-
 Name of QAing Analyst(s):
-
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
-
 as well as school metric, flag/tag, and discount rate aggregation
-
 Methodology: Utilizing other aggregation tables
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-
 */

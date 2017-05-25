@@ -36,9 +36,9 @@ select distinct
 
 	frl_percent,
 
-	/*discount_rate_c1,
+	discount_rate_c1,
 
-	discount_rate_c2,*/ --commenting out these as c2 funding view logic is not ready
+	discount_rate_c2,
 
 	address,
 
@@ -466,27 +466,25 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi,
+	--needs_wifi,  /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
+	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	//*c2_prediscount_budget_15,
+	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_prediscount_remaining_15,
+	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_prediscount_remaining_16,
+	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_postdiscount_remaining_15,
+	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	c2_postdiscount_remaining_16,
+	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	received_c2_15,
+	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	received_c2_16,
+	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
-	budget_used_c2_15,
-
-	budget_used_c2_16,*// --commenting out since c2 views not ready
-
+	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
 
 	fbts.fiber_target_status,
 
@@ -519,7 +517,7 @@ left join public.fy2017_fiber_bw_target_status_matr fbts
 
 on dpd.esh_id::varchar = fbts.esh_id::varchar
 
-left join public.fy2016_fy2017_districts_upgrades_m du
+left join public.fy2016_fy2017_districts_upgrades_matr du
 
 on dpd.esh_id::varchar = du.esh_id_2017::varchar --correcting year to 2017
 
@@ -531,24 +529,16 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 
 
 /*
-
 Author: Justine Schott
-
 Created On Date: 8/15/2016
-
 Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
-
 Name of QAing Analyst(s):
-
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
-
 Methodology:
-
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Commenting out certain columns as they are all sourced from `fy2016_districts_c2_funding_matr` which is not within the scope for this view to update. Justine will be incorporating those in the fy2017_districts_c2_funding_matr view.
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
-
 */
