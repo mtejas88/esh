@@ -40,8 +40,8 @@ d_16 <- d_16_all %>%
           filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE)
 # d_17 <- d_17_all %>%
-#   filter(exclude_from_ia_analysis == FALSE,
-#   include_in_universe_of_districts==TRUE)
+#           filter(exclude_from_ia_analysis==FALSE,
+#           include_in_universe_of_districts==TRUE)
 
 # Munge Services Received
 ## ensure all binary columns appear as TRUE/FALSE rather than t/f (error unique to the R script)
@@ -89,6 +89,7 @@ s_16=munge_sr(s_16_all)
 #while 2017 data is still dirty
 # s_17=s_17_all %>%
 #   filter(
+#   recipient_postal_cd != "AK",
 #   recipient_include_in_universe_of_districts == TRUE,
 #     # non-duplicates
 #     !duplicated(line_item_id)) %>%
