@@ -18,7 +18,14 @@ count(distinct case when exclude_from_ia_cost_analysis = false and meeting_knaps
 count(distinct case when exclude_from_ia_cost_analysis = true then d.esh_id end) as num_unknown_affordability_districts_served,
 count(distinct case when d.fiber_target_status = 'Target' or d.bw_target_status = 'Target' then d.esh_id end) as num_fiber_or_bw_target_districts_served,
 count(distinct case when d.fiber_target_status = 'Potential Target' or d.bw_target_status = 'Potential Target' then d.esh_id end) as num_fiber_or_bw_potential_target_districts_served,
-count(c.application_number) as num_applications
+count(distinct case when d.fiber_target_status = 'Potential Target' and d.exclude_from_ia_analysis = true then d.esh_id end) as num_dirty_potential_fiber_target_districts_served,
+count(distinct case when 'district_missing_ia' = any(d.flag_array) then d.esh_id end) as missing_ia_districts,
+count(distinct case when 'district_upstream_missing_isp' = any(d.flag_array) then d.esh_id end) as missing_isp_districts,
+count(distinct case when 'district_isp_missing_upstream' = any(d.flag_array) then d.esh_id end) as missing_upstream_districts,
+count(distinct case when 'district_dirty_services_received' = any(d.flag_array) then d.esh_id end) as district_dirty_services_received_districts,
+count(distinct case when 'missing_wan_small' = any(d.flag_array) or 'missing_wan_large' = any(d.flag_array) then d.esh_id end) as missing_wan_districts,
+count(c.application_number) as num_applications,
+array_agg(distinct d.esh_id) as districts_served
 
 
 from public.fy2016_district_lookup_matr dl
@@ -47,6 +54,7 @@ and c.application_number in (
 group by  d.postal_cd,
           c.name,
           c.consultant_registration_number
+
 
 order by  d.postal_cd,
           c.name asc
