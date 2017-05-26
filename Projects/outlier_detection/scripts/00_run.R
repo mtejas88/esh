@@ -17,10 +17,7 @@ library(dplyr)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-
-#github_path <- '~/Documents/ESH/ficher/'
-github_path <- '/Users/sdelosreyes/GitHub/ficher/Projects/'
-setwd(paste(github_path, 'outlier_detection', sep=''))
+github_path <- '~/Documents/ESH/ficher/'
 
 # initiate export data table
 export_data <- c()
@@ -48,16 +45,18 @@ source("02_apply_general_filters.R")
 # https://docs.google.com/a/educationsuperhighway.org/spreadsheets/d/1SthiXVF1XaGg_Sr9AjKD-k-KnYIw6o2fNokMquO9DIY/edit?usp=drive_web
 
 
-## load csv files
-## deluxe districts
-#d_16 <- read.csv("../data/intermediate/d16_custom_filters.csv", as.is = TRUE)
-#d_17 <- read.csv("../data/intermediate/d17_custom_filters.csv", as.is = TRUE)
-## services received
-#s_16 <- read.csv("../data/intermediate/s16_custom_filters.csv", as.is = TRUE)
-#s_17 <- read.csv("../data/intermediate/s17_custom_filters.csv", as.is = TRUE)
+# load csv files
+# deluxe districts
+d_16 <- read.csv("../data/intermediate/d16_custom_filters.csv", as.is = TRUE)
+d_17 <- read.csv("../data/intermediate/d17_custom_filters.csv", as.is = TRUE)
+# services received
+s_16 <- read.csv("../data/intermediate/s16_custom_filters.csv", as.is = TRUE)
+s_17 <- read.csv("../data/intermediate/s17_custom_filters.csv", as.is = TRUE)
+
+# identify outliers
+source("03_use_cases.R")
 
 #Create empty data frame
-
 master_output <- data.frame(outlier_use_case_name=character(),
                             outlier_use_case_cd=character(),
                             outlier_use_case_parameters=character(),
@@ -66,12 +65,6 @@ master_output <- data.frame(outlier_use_case_name=character(),
                             outlier_value=numeric(),
                             R=numeric(),
                             lam=numeric())
-
-
-# identify outliers
-source("03_use_cases.R")
-
-
 
 ###
 # run line item use case 1 
@@ -97,7 +90,6 @@ use_case_cost_per_mbps_li(s_16,s_17,c(10), c("DSL"), c("Internet"),with_16=0,n_1
 use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("Internet"),with_16=0,n_17_at_time=1)
 use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("WAN"),with_16=0,n_17_at_time=1)
 
-
 ###
 # run district use cases (2-7)
 # TIME WARNING: takes ~ 25 mins 
@@ -112,10 +104,5 @@ system.time(for(i in 1:nrow(d_matrix)) {
   use_case_bw_per_student(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
 })
 
-
-
-source("05_export_to_postgres.R")
-
 # export
-write.csv(analysis_data, paste0("data/export/outlier_export_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
-write.csv(master_output, paste0("data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
