@@ -17,7 +17,6 @@ rval <- function(input, y) {
   list(r, df)
    
 }
-<<<<<<< HEAD
 # Function that computes the test statistics and identifies the outliers
 # NOTE: setting the loop to run from 1 to N means the following in statistical language:
 # H^a: There are up to N outliers in the data
@@ -35,7 +34,7 @@ outliers_loop <- function(N,data,alpha,cost_column,unique_id,n_17_at_time) {
       outlier_value <- df[which(df$ares == max(df$ares)), cost_column]
       outlier_year <- df[which(df$ares == max(df$ares)), "year"]     
       newdf <- df[df$ares!=max(df$ares),]}
-
+    
     else if (i != 1) {
       rt <- rval(newdf, cost_column)
       R <- unlist(rt[1])
@@ -113,9 +112,8 @@ identify_outliers <-
     output_list <- cbind(use_case_name, use_case_cd, use_case_parameters, outlier_test_parameters, results)
     colnames(output_list) <- c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters',    'outlier_test_parameters',    'outlier_unique_id',    'outlier_value',    'R',    'lam')
     
-    master_output <- rbind(master_output, output_list)
+    return(output_list)
   }
-  assign('master_output',master_output,envir=.GlobalEnv)
   
-  }
+}
 
