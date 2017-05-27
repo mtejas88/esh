@@ -29,6 +29,7 @@ with school_calc as (
               user_entered_urban_rural_status,
               number_of_full_time_students,
               total_number_of_part_time_students,
+              schools_demog_num_students,
               number_of_nlsp_students,
               cep_percentage,
               alternative_discount_method,
@@ -63,14 +64,32 @@ with school_calc as (
           user_entered_urban_rural_status,
           number_of_full_time_students::numeric,
           total_number_of_part_time_students::numeric,
+          sd.num_students as schools_demog_num_students,
           number_of_nlsp_students::numeric,
           cep_percentage::numeric,
           alternative_discount_method,
       --c2 budgeting from 2016 from: https://www.fundsforlearning.com/blog/2017/03/category-2-budget-caps-adjusted-for-2017
           case
-            when (number_of_full_time_students::numeric+total_number_of_part_time_students::numeric)*151.50 < 9292
+            when eb.ben is null then 0
+            when (case  when number_of_full_time_students is null then 0 
+                        else number_of_full_time_students::numeric end
+                  + case  when total_number_of_part_time_students is null then 0
+                          else total_number_of_part_time_students::numeric end)*151.50 < 9292
               then 9292
-            else (number_of_full_time_students::numeric+total_number_of_part_time_students::numeric)*151.50
+            
+            --adding this condition because there are some schools that clearly have user entered mistakes for num students.
+            --this condition changes the student count that we use for ~630 schools
+            when 5 * sd.num_students < (case  when number_of_full_time_students is null then 0 
+                                            else number_of_full_time_students::numeric end
+                                        + case  when total_number_of_part_time_students is null then 0
+                                                else total_number_of_part_time_students::numeric end)
+              then  case  when sd.num_students * 151.50 < 9292 then 9292
+                          else sd.num_students * 151.50
+                    end
+            else (case  when number_of_full_time_students is null then 0 
+                        else number_of_full_time_students::numeric end
+                  + case  when total_number_of_part_time_students is null then 0
+                          else total_number_of_part_time_students::numeric end)*151.50
           end as c2_budget,
           case
             when number_of_full_time_students::numeric > 0 then
@@ -107,10 +126,9 @@ with school_calc as (
         on sd.school_esh_id = eb.entity_id::varchar
         left join fy2016.entity_reports er
         on er.entity_number = eb.ben
-        where sd.district_include_in_universe_of_districts = true
-        --removing duplicate BEN matches
---        and (eb.ben not in ('16066179', '16051537', '95372', '95348', '204335', '95071') or eb.ben is null)
-    --to-do: this only includes schools in districts included in our universe. we will want to analyze the other schools at a later date.
+        left join public.fy2016_districts_deluxe_matr dd
+        on sd.district_esh_id = dd.esh_id
+        where dd.include_in_universe_of_districts_all_charters = true
       ) entities
       left join (
         select
@@ -216,6 +234,8 @@ ben,
 entity_type,
 entity_name,
 number_of_full_time_students,
+total_number_of_part_time_students,
+schools_demog_num_students,
 c2_discount_rate,
 c2_budget,
 c2_budget_postdiscount,
@@ -233,3 +253,5 @@ budget_remaining_c2_2016_postdiscount,
 from school_calc
 
 where filtering_number = 1
+
+order by budget_remaining_c2_2016_postdiscount desc
