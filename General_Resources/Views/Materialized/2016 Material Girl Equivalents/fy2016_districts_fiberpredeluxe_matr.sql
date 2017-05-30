@@ -18,7 +18,7 @@ select distinct
 	num_other_staff,
 	frl_percent,
 	discount_rate_c1,
-	adj_discount_rate_c1,
+	discount_rate_c1_matrix,
 	discount_rate_c2,
 	address,
 	city,

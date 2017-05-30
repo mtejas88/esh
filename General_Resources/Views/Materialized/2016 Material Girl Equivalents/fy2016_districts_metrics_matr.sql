@@ -235,7 +235,7 @@ select	dd.*,
 			                when frl_percent >= .75 then 90
 			                else 70
 			      end
-			end as adj_discount_rate_c1,
+			end as discount_rate_c1_matrix,
 		    c2_discount_rate as discount_rate_c2,
 		    flag_count,
 		    wan_monthly_cost,

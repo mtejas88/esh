@@ -18,7 +18,7 @@ select distinct
 	num_other_staff,
 	frl_percent,
 	discount_rate_c1::numeric/100 as discount_rate_c1,
-	adj_discount_rate_c1::numeric/100 as adj_discount_rate_c1,
+	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 	c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
 	address,
