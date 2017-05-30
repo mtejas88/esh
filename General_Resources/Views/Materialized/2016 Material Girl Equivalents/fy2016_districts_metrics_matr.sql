@@ -217,6 +217,25 @@ select	dd.*,
 			wan_contract_expiration,
 			frl_percent,
 		    c1_discount_rate as discount_rate_c1,
+		    case  when c1_discount_rate::numeric is not null then c1_discount_rate::numeric
+			      when locale in ('Urban', 'Suburban') then
+			        case  when frl_percent < .01 then 20
+			              when frl_percent < .20 then 40
+			              when frl_percent < .35 then 50
+			              when frl_percent < .50 then 60
+			              when frl_percent < .75 then 80
+			              when frl_percent >= .75 then 90
+			              else 70
+			        end
+			      else case when frl_percent < .01 then 25
+			                when frl_percent < .20 then 50
+			                when frl_percent < .35 then 60
+			                when frl_percent < .50 then 70
+			                when frl_percent < .75 then 80
+			                when frl_percent >= .75 then 90
+			                else 70
+			      end
+			end as discount_rate_c1_matrix,
 		    c2_discount_rate as discount_rate_c2,
 		    flag_count,
 		    wan_monthly_cost,
@@ -249,7 +268,7 @@ on	dd.esh_id	=	da.district_esh_id
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 12/13/2016
+Last Modified Date: 5/26/2017 - added adjusted c1 discount rate
 Name of QAing Analyst(s):
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 Methodology: Utilizing other aggregation tables
