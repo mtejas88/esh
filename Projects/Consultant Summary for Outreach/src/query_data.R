@@ -48,7 +48,8 @@ querydb <- function(query_name){
 
 state <- querydb('src/consultant_summary_by_state.sql')
 national <- querydb('src/consultant_summary_national.sql')
-c2 <- querydb('src/consultant_summary_c2.sql')
+c2_16 <- querydb('src/consultant_summary_c2_16.sql')
+c2_17 <- querydb('src/consultant_summary_c2_17.sql')
 
 ## disconnect from database
 dbDisconnect(con)
@@ -57,4 +58,5 @@ dbDisconnect(con)
 
 write.csv(state, 'data/consultant_summary_by_state.csv', row.names = FALSE)
 write.csv(national, 'data/consultant_summary_national.csv', row.names = FALSE)
-write.csv(c2, 'data/consultant_summary_c2.csv', row.names = FALSE)
+write.csv(c2_16, 'data/consultant_summary_c2_16.csv', row.names = FALSE)
+write.csv(c2_17, 'data/consultant_summary_c2_17.csv', row.names = FALSE)

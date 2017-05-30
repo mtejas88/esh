@@ -7,15 +7,6 @@ d.num_schools,
 d.num_students,
 d.postal_cd
 
-/*
-count(distinct d.esh_id) as num_districts_served,
-sum(d.num_schools) as num_schools_served,
-sum(d.num_students) as num_students_served,
-array_agg(distinct postal_cd) as states_served,
-count(distinct application_number) as num_applications,
-round(sum(li.total_cost)::numeric,2) as total_funding
-*/
-
 from public.fy2016_district_lookup_matr dl
 
 left join public.entity_bens eb
