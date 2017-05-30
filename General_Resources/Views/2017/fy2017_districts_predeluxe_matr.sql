@@ -40,7 +40,7 @@ select distinct
 
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
-	--c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, 
 
 	address,
 
@@ -384,31 +384,31 @@ when
 
   	ia_monthly_cost_no_backbone,
 
-	--CASE 	WHEN wifi.count_wifi_needed > 0 THEN true /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true 
 
-   	--		WHEN wifi.count_wifi_needed = 0 THEN false
+   			WHEN wifi.count_wifi_needed = 0 THEN false
 
-    --    	ELSE null
+        	ELSE null
 
-	--	   	END as needs_wifi,
+		   	END as needs_wifi,
 
-	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.c2_budget_haircut as c2_prediscount_budget_15, 
 
-	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2015_haircut as c2_prediscount_remaining_15, 
 
-	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2016_haircut as c2_prediscount_remaining_16,
 
-	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2015_postdiscount_haircut as c2_postdiscount_remaining_15,
 
-	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2016_postdiscount_haircut as c2_postdiscount_remaining_16, 
 
-	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.received_c2_15,
 
-	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.received_c2_16,
 
-	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_used_c2_15,
 
-	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_used_c2_16,
 
 	wan_lines_w_dirty,
 
@@ -427,8 +427,8 @@ left join public.fy2017_wifi_connectivity_informations_matr wifi
 
 on dm.esh_id::varchar = wifi.parent_entity_id::varchar
 
-/*left join public.fy2017_districts_c2_funding_matr c2
-on dm.esh_id = c2.esh_id::varchar*/ -- commenting out as c2 funding view is not ready
+left join public.fy2017_districts_c2_funding_matr c2
+on dm.esh_id = c2.esh_id::varchar
 
 left join fy2016.legislative_district_infos ldi /* JAMIE: we currently only have this mapping for 2016 */
 on ldi.esh_id::varchar = dm.esh_id
@@ -437,13 +437,8 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
+Last Modified Date: 5/30/2017 -- JH updated wifi fields
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 */

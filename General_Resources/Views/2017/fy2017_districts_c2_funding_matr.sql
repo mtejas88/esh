@@ -248,10 +248,40 @@ budget_remaining_c2_2016_postdiscount,
 .9 * budget_remaining_c2_2015 as budget_remaining_c2_2015_haircut,
 .9 * budget_remaining_c2_2016 as budget_remaining_c2_2016_haircut,
 .9 * budget_remaining_c2_2015_postdiscount as budget_remaining_c2_2015_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut
+.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut,
+case 
+  when (.9 * c2_budget) > (.9 * budget_remaining_c2_2015)
+    then true
+  else false
+end as received_c2_15,
+case 
+  when (.9 * budget_remaining_c2_2015) > (.9 * budget_remaining_c2_2016)
+    then true
+  else false
+end as received_c2_16,
+case
+  when (.9 * budget_remaining_c2_2015) = 0
+    then true
+  else false
+end as budget_used_c2_15,
+case
+  when (.9 * budget_remaining_c2_2016) = 0
+    then true
+  else false
+end as budget_used_c2_16
 
 from school_calc
 
 where filtering_number = 1
 
 order by budget_remaining_c2_2016_postdiscount desc
+
+/*
+Author: Jeremy Holtzman
+Created On Date: 5/30/2017
+Last Modified Date: 
+Name of QAing Analyst(s):
+Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget. Still need to add in 2017 line items
+Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
+that the C2 remaining budget does not always match USAC
+*/
