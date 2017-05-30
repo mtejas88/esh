@@ -224,7 +224,9 @@ with school_calc as (
       on entities.ben = c2_allocations_2016.ben
     ) c2_budgeting
   ) c2_remaining
-)
+),
+
+schools as (
 
 select district_esh_id,
 school_esh_id,
@@ -275,6 +277,46 @@ from school_calc
 where filtering_number = 1
 
 order by budget_remaining_c2_2016_postdiscount desc
+
+)
+
+select district_esh_id as esh_id,
+sum(c2_budget) as c2_budget,
+sum(c2_budget_postdiscount) as c2_budget_postdiscount,
+sum(budget_remaining_c2_2015) as budget_remaining_c2_2015,
+sum(budget_remaining_c2_2016) as budget_remaining_c2_2016,
+sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
+sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
+sum(c2_budget_haircut) as c2_budget_haircut,
+sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
+sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
+sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
+sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
+sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
+case 
+  when sum(.9 * c2_budget) > sum(.9 * budget_remaining_c2_2015)
+    then true
+  else false
+end as received_c2_15,
+case 
+  when sum(.9 * budget_remaining_c2_2015) > sum(.9 * budget_remaining_c2_2016)
+    then true
+  else false
+end as received_c2_16,
+case
+  when sum(.9 * budget_remaining_c2_2015) = 0
+    then true
+  else false
+end as budget_used_c2_15,
+case
+  when sum(.9 * budget_remaining_c2_2016) = 0
+    then true
+  else false
+end as budget_used_c2_16
+
+from schools
+
+group by district_esh_id
 
 /*
 Author: Jeremy Holtzman
