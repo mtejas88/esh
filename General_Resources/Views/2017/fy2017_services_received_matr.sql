@@ -1,297 +1,169 @@
-/*public.line_items vs public.esh_line_items
-ALSO >>> funding year clause */
+select  recipient_sp_bw_rank.recipient_id as esh_id,
 
-select distinct
+reporting_name,
 
-	base.*,
+recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
 
-    CASE
+recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
 
-      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
 
-            then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_recurring_elig_cost
 
-      WHEN consortium_shared=true OR purpose = 'Backbone'
 
-        then null
+  from (
 
-      WHEN base.line_item_total_num_lines = 'Unknown'
+    select  *,
 
-        THEN null
+            row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
 
-      when base.line_item_total_num_lines::numeric > 0
+    from (
 
-        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_recurring_elig_cost
+      select  recipient_id,
 
-      ELSE NULL
+              case
 
-    END AS line_item_district_monthly_cost_recurring,
+                when reporting_name = 'Ed Net of America'
 
-    CASE
+                  then 'ENA Services, LLC'
 
-      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
-            then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_total_monthly_cost
+                  then 'Charter'
 
-      WHEN consortium_shared=true OR purpose = 'Backbone'
+                else reporting_name
 
-        then null
+              end as reporting_name,
 
-      WHEN base.line_item_total_num_lines = 'Unknown'
+              num_students,
 
-        THEN null
+              meeting_2014_goal_no_oversub,
 
-      when base.line_item_total_num_lines::numeric > 0
+              sum(bandwidth_in_mbps * quantity_of_line_items_received_by_district) as bandwidth,
 
-        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
+              sum(case
 
-      ELSE NULL
+                    when purpose = 'Upstream'
 
-    END AS line_item_district_monthly_cost_total,
+                      then bandwidth_in_mbps * quantity_of_line_items_received_by_district
 
-    case
+                    else 0
 
-      when line_item_total_num_lines = 'Unknown'
+                  end) as upstream_bandwidth
 
-        then null
+      from public.fy2017_services_received_matr sr
 
-      when base.line_item_total_num_lines::numeric > 0
+      left join public.fy2017_districts_predeluxe_matr dd
 
-        then line_item_recurring_elig_cost/line_item_total_num_lines::numeric
+      on sr.recipient_id = dd.esh_id
 
-      else NULL
+      where purpose in ('Upstream', 'Internet')
 
-    end as monthly_circuit_cost_recurring,
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
 
-    case
+      and recipient_include_in_universe_of_districts
 
-      when line_item_total_num_lines = 'Unknown'
+      and district_type = 'Traditional'
 
-        then null
+      and recipient_exclude_from_ia_analysis = false
 
-      when base.line_item_total_num_lines::numeric > 0
+      group by 1,2,3,4
 
-        then line_item_total_monthly_cost/line_item_total_num_lines::numeric
+    )recipient_sp_bw
 
-      else NULL
+  ) recipient_sp_bw_rank
 
-    end as monthly_circuit_cost_total
+  left join (
 
-FROM (
+    select  recipient_id,
 
-          SELECT
+            sum(bandwidth) as bw_total
 
-            li.id AS line_item_id,
+    from (
 
-            CASE
+      select  recipient_id,
 
-              WHEN  'exclude' = any(li.open_flag_labels) or
+              case
 
-                    'canceled' = any(li.open_flag_labels) or
+                when reporting_name = 'Ed Net of America'
 
-                    'video_conferencing' = any(li.open_flag_labels)
+                  then 'ENA Services, LLC'
 
-                THEN 'dqs_excluded'
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
-              WHEN 'exclude_for_cost_only_free' = any(li.open_tag_labels) OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) and li.num_open_flags = 0
+                  then 'Charter'
 
-                THEN 'clean_no_cost'
+                else reporting_name
 
-              WHEN li.num_open_flags > 0
+              end as reporting_name,
 
-                THEN  'dirty'
+              num_students,
 
-              ELSE 'clean_with_cost'
+              meeting_2014_goal_no_oversub,
 
-            END AS inclusion_status,
+              sum(bandwidth_in_mbps * quantity_of_line_items_received_by_district) as bandwidth,
 
-            li.open_tag_labels AS open_tags,
+              sum(case
 
-            li.open_flag_labels AS open_flags,
+                    when purpose = 'Upstream'
 
-            li.erate AS erate,
+                      then bandwidth_in_mbps * quantity_of_line_items_received_by_district
 
-            li.consortium_shared AS consortium_shared,
+                    else 0
 
-            CASE
+                  end) as upstream_bandwidth
 
-              WHEN li.isp_conditions_met
+      from public.fy2017_services_received_matr sr
 
-                THEN 'ISP'
+      left join public.fy2017_districts_predeluxe_matr dd
 
-              WHEN li.internet_conditions_met
+      on sr.recipient_id = dd.esh_id
 
-                THEN 'Internet'
+      where purpose in ('Upstream', 'Internet')
 
-              WHEN li.wan_conditions_met
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
 
-                THEN 'WAN'
+      and recipient_include_in_universe_of_districts
 
-              WHEN li.upstream_conditions_met
+      and district_type = 'Traditional'
 
-                THEN 'Upstream'
+      and recipient_exclude_from_ia_analysis = false
 
-              WHEN li.backbone_conditions_met
+      group by 1,2,3,4
 
-                THEN 'Backbone'
+    )recipient_sp_bw
 
-              ELSE 'Not broadband'
 
-            END AS purpose,
 
-            li.broadband AS broadband,
 
-            lid.allocation_lines AS quantity_of_line_items_received_by_district,
+    group by 1
 
-            li.num_lines AS line_item_total_num_lines,
+  ) recipient_sp_bw_total
 
-            li.connect_category AS connect_category,
+  on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
 
-            CASE
+  where bw_rank = 1
 
-              WHEN li.months_of_service > 0
+  and recipient_sp_bw_total.bw_total > 0
+  /*adding this small piece as the new Rose staging db has a lot more rows and
+  there are 11 events where `bw_total` is 0 which prevents to create the materialized view due to division errror (see next line of code) */
+  and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
 
-                THEN li.total_cost / li.months_of_service
 
-              ELSE li.total_cost / 12
-
-            END AS line_item_total_monthly_cost,
-
-            li.total_cost AS line_item_total_cost,
-
-            li.rec_elig_cost AS line_item_recurring_elig_cost,
-
-            li.one_time_elig_cost AS line_item_one_time_cost,
-
-            li.bandwidth_in_mbps AS bandwidth_in_mbps,
-
-            li.months_of_service AS months_of_service,
-
-            li.contract_end_date AS contract_end_date,
-
-            case
-
-              when li.reporting_name is null
-
-             	then li.service_provider_name
-
-              else li.reporting_name
-
-            end AS reporting_name,
-
-            li.service_provider_name AS service_provider_name,
-
-            li.applicant_name AS applicant_name,
-
-            eb.entity_id AS applicant_id,
-
-            dd.esh_id AS recipient_id,
-
-            dd.name AS recipient_name,
-
-            dd.postal_cd AS recipient_postal_cd,
-
-            dd.ia_monthly_cost_per_mbps AS recipient_ia_monthly_cost_per_mbps,
-
-            dd.ia_bw_mbps_total AS recipient_ia_bw_mbps_total,
-
-            dd.ia_bandwidth_per_student_kbps AS recipient_ia_bandwidth_per_student_kbps,
-
-            dd.num_students AS recipient_num_students,
-
-            dd.num_schools AS recipient_num_schools,
-
-            dd.latitude AS recipient_latitude,
-
-            dd.longitude AS recipient_longitude,
-
-            dd.locale AS recipient_locale,
-
-            dd.district_size AS recipient_district_size,
-
-            dd.exclude_from_ia_analysis AS recipient_exclude_from_ia_analysis,
-
-            dd.exclude_from_ia_cost_analysis AS recipient_exclude_from_ia_cost_analysis,
-
-            dd.exclude_from_wan_analysis AS recipient_exclude_from_wan_analysis,
-
-            dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
-
-            dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
-
-            dd.consortium_affiliation AS recipient_consortium_member
-
-          FROM public.fy2017_lines_to_district_by_line_item_matr lid
-
-          LEFT OUTER JOIN public.fy2017_esh_line_items_v li
-
-          ON li.id = lid.line_item_id
-
-          LEFT OUTER JOIN public.entity_bens eb
-
-          ON eb.ben = li.applicant_ben
-
-          LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr  dd
-
-          ON dd.esh_id::varchar = lid.district_esh_id::varchar
-
-					left outer join salesforce.facilities__c sfdc
-					on sfdc.esh_id__c::varchar = dd.esh_id::varchar
-          where sfdc.out_of_business__c <> true --not closed
-
-
-					 --adding sfdc integration and filtering out out of business schools/districts
-
-         /*LEFT OUTER JOIN fy2016.districts d
-          ON dd.esh_id::numeric = d.esh_id
-          WHERE li.broadband*/
-
-) base
-
-left join (
-
-          select  ldli.line_item_id,
-
-                  sum(d.num_students::numeric) as num_students_served
-
-          from fy2017_lines_to_district_by_line_item_matr ldli
-
-          left join public.fy2017_districts_demog_matr d
-
-          on ldli.district_esh_id::varchar = d.esh_id::varchar
-
-          left join public.esh_line_items li
-
-          on ldli.line_item_id = li.id
-          where (li.consortium_shared=true
-
-             OR li.backbone_conditions_met=true)
-             and funding_year = 2017
-
-          group by ldli.line_item_id
-
-) district_info_by_li
-
-on base.line_item_id=district_info_by_li.line_item_id
 
 
 
 
 
 /*
-Author:                   Justine Schott
-Created On Date:
-Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
+Author: Justine Schott
+Created On Date: 1/26/2017
+Last Modified Date: 3/30/2017 - - included clean_no_cost line items. Included districts whose primary
+      service provider gives them IA and upstream
 Name of QAing Analyst(s):
-Purpose:                  2016 district data in terms of 2016 methodology
+Purpose: Service provider assignment as done in 2016 SotS
 Methodology:
 Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
-Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
-Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-might need to add below two additional attributes
---and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
---and sfdc.charter__c = false -- not charters
+Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
 */
