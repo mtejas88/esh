@@ -119,6 +119,105 @@ regularize.names <- function(names){
   return(names)
 }
 
+## function to disaggregate and regularize school address
+regularize.addresses <- function(address){
+  
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## sub . for no space (unlike punctuation command later)
+  address <- gsub("\\.", "", address)
+  
+  ## sub & for "AND" (unlike punctuation command later)
+  address <- gsub("\\&", "AND", address)
+  
+  ## change "ST" to "STREET"
+  address <- gsub("\\b[ST]{2}\\b", "STREET ", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "BLVD" to "BOULEVARD"
+  address <- gsub("\\b[BLVD]{4}\\b", "BOULEVARD", address)
+  
+  ## change "RD" to "ROAD"
+  address <- gsub("\\b[RD]{2}\\b", "ROAD", address)
+  
+  ## change "LN" to "LANE"
+  address <- gsub("\\b[LN]{2}\\b", "LANE", address)
+  
+  ## change "DR" to "DRIVE"
+  address <- gsub("\\b[DR]{2}\\b", "DRIVE", address)
+  
+  ## change "HWY" to "HIGHWAY"
+  address <- gsub("\\b[HWY]{3}\\b", "HIGHWAY", address)
+  
+  ## change "CT" to "COURT"
+  address <- gsub("\\b[CT]{2}\\b", "COURT", address)
+  
+  ## change "PL" to "PLACE"
+  address <- gsub("\\b[PL]{2}\\b", "PLACE", address)
+  
+  ## change "CIR" to "CIRCLE"
+  address <- gsub("\\b[CIR]{3}\\b", "CIRCLE", address)
+  
+  ## change "AVE" to "AVENUE"
+  address <- gsub("\\b[AVE]{3}\\b", "AVENUE", address)
+  
+  ## change "AV" to "AVENUE"
+  address <- gsub("\\b[AV]{2}\\b", "AVENUE", address)
+  
+  ## change "SW" to "SOUTHWEST"
+  address <- gsub("\\b[SW]{2}\\b", "SOUTHWEST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "SE" to "SOUTHEAST"
+  address <- gsub("\\b[SE]{2}\\b", "SOUTHEAST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "NW" to "NORTHWEST"
+  address <- gsub("\\b[NW]{2}\\b", "NORTHWEST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "NE" to "NORTHEAST"
+  address <- gsub("\\b[NE]{2}\\b", "NORTHEAST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "S" to "SOUTH"
+  address <- gsub("\\b[S]{1}\\b", "SOUTH", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "N" to "NORTH"
+  address <- gsub("\\b[N]{1}\\b", "NORTH", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "W" to "WEST"
+  address <- gsub("\\b[W]{1}\\b", "WEST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## change "E" to "EAST"
+  address <- gsub("\\b[E]{1}\\b", "EAST", address)
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## remove all punctutation
+  address <- gsub("\\W", " ", address)
+  
+  ## clean all leading and trailing whitespaces
+  address <- gsub("^\\s+|\\s+$", "",  address)
+  
+  ## make all entries upper case
+  address <- toupper(address)
+  
+  return(address)
+}
+
 ##*********************************************************************************************************
 
 ## correct ids using function
@@ -129,28 +228,29 @@ nces$ncessch <- correct_ids(nces$ncessch, district=0)
 nces$sch_name_regularized <- regularize.names(nces$sch_name)
 fuzzy.bens$name_regularized <- regularize.names(fuzzy.bens$name)
 
-## create an indicator involving city, state, zip
-fuzzy.bens$org_zipcode <- ifelse(nchar(fuzzy.bens$org_zipcode) == 4, paste('0', fuzzy.bens$org_zipcode, sep=""), fuzzy.bens$org_zipcode)
-fuzzy.bens$org_city <- gsub("\xd5", "", fuzzy.bens$org_city)
-fuzzy.bens$city.state.zip <- paste(toupper(fuzzy.bens$org_city), toupper(fuzzy.bens$org_state), fuzzy.bens$org_zipcode, sep=".")
+## regularize addresses
+nces$address_regularized <- regularize.addresses(nces$street_name)
+fuzzy.bens$address_regularized <- regularize.addresses(fuzzy.bens$street_name)
 
-nces$lzip <- ifelse(nchar(nces$lzip) == 4, paste('0', nces$lzip, sep=""), nces$lzip)
-nces$city.state.zip <- paste(toupper(nces$lcity), toupper(nces$lstate), nces$lzip, sep=".")
 
 ## for each school needed to be matched, calculate the levenstein distance between it and the other schools, subsetting to same zip, city, state
 
 ## STRICT MATCH ON 0 SCORE
 matches.0 <- data.frame(matrix(NA, nrow=0, ncol=7))
-names(matches.0) <- c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized', 'scores.name')
+names(matches.0) <- c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized_usac', 'scores.name')
 for (i in 1:nrow(fuzzy.bens)){
   print(i)
-  sub <- nces[which(nces$city.state.zip == fuzzy.bens$city.state.zip[i]),]
+  #if (!is.na(fuzzy.bens$applicant_esh_id[i])){
+  #  sub <- nces[which(nces$district_esh_id == fuzzy.bens$applicant_esh_id[i]),]
+  #} else{
+    sub <- nces[which(nces$city.state.zip == fuzzy.bens$city.state.zip[i]),]
+  #}
   ## run levenstein distance on each school name
   if (nrow(sub) > 0){
     sub$ben <- fuzzy.bens$ben[i]
     sub$raw_name_usac <- fuzzy.bens$name[i]
-    sub$name_regularized <- fuzzy.bens$name_regularized[i]
-    sub <- sub[,c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized')]
+    sub$name_regularized_usac <- fuzzy.bens$name_regularized[i]
+    sub <- sub[,c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized_usac')]
     sub$scores.name <- adist(sub$sch_name_regularized, fuzzy.bens$name_regularized[i]) / nchar(fuzzy.bens$name_regularized[i])
     ## grab the matches only if the distance is 0 for now
     sub.0 <- sub[which(sub$scores.name == 0),]
@@ -163,7 +263,7 @@ for (i in 1:nrow(fuzzy.bens)){
 ## MATCH ON VARIABLE SCORE
 var <- 0.10
 matches.var <- data.frame(matrix(NA, nrow=0, ncol=7))
-names(matches.var) <- c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized', 'scores.name')
+names(matches.var) <- c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized_usac', 'scores.name')
 for (i in 1:nrow(fuzzy.bens)){
   print(i)
   sub <- nces[which(nces$city.state.zip == fuzzy.bens$city.state.zip[i]),]
@@ -171,8 +271,8 @@ for (i in 1:nrow(fuzzy.bens)){
   if (nrow(sub) > 0){
     sub$ben <- fuzzy.bens$ben[i]
     sub$raw_name_usac <- fuzzy.bens$name[i]
-    sub$name_regularized <- fuzzy.bens$name_regularized[i]
-    sub <- sub[,c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized')]
+    sub$name_regularized_usac <- fuzzy.bens$name_regularized[i]
+    sub <- sub[,c('ncessch', 'sch_name', 'sch_name_regularized', 'ben', 'raw_name_usac', 'name_regularized_usac')]
     sub$scores.name <- adist(sub$sch_name_regularized, fuzzy.bens$name_regularized[i]) / nchar(fuzzy.bens$name_regularized[i])
     ## grab the matches only if the distance is 0 for now
     sub.var <- sub[which(sub$scores.name <= var & sub$scores.name != 0),]
@@ -182,5 +282,81 @@ for (i in 1:nrow(fuzzy.bens)){
   }
 }
 
+## MATCH ON STREET NUMBER AND ADDRESS
+var.name <- 0.10
+var.address <- 0.30
+## remove the matches that have already been confirmed
+fuzzy.bens.sub <- fuzzy.bens[which(!fuzzy.bens$ben %in% matches.0$ben),]
+matches.street.addr <- data.frame(matrix(NA, nrow=0, ncol=12))
+names(matches.street.addr) <- c('ncessch', 'sch_name_regularized', 'street_number', 'street_name', 'address_regularized',
+                                'ben', 'name_regularized_usac', 'street_number_usac', 'street_name_usac', 'address_regularized_usac',
+                                'scores.address', 'scores.name')
+no.matches <- NULL
+for (i in 1:nrow(fuzzy.bens.sub)){
+  print(i)
+  sub <- nces[which(nces$city.state.zip == fuzzy.bens.sub$city.state.zip[i]),]
+  sub <- sub[which(sub$street_number == fuzzy.bens.sub$street_number[i]),]
+  ## run levenstein distance on each street name only after forcing the street number to be the same
+  if (nrow(sub) > 0){
+    sub$ben <- fuzzy.bens.sub$ben[i]
+    sub$name_regularized_usac <- fuzzy.bens.sub$name_regularized[i]
+    sub$street_number_usac <- fuzzy.bens.sub$street_number[i]
+    sub$street_name_usac <- fuzzy.bens.sub$street_name[i]
+    sub$address_regularized_usac <- fuzzy.bens.sub$address_regularized[i]
+    sub <- sub[,c('ncessch', 'sch_name_regularized', 'street_number', 'street_name', 'address_regularized',
+                  'ben', 'name_regularized_usac', 'street_number_usac', 'street_name_usac', 'address_regularized_usac')]
+    sub$scores.address <- adist(sub$address_regularized, fuzzy.bens.sub$address_regularized[i]) / nchar(fuzzy.bens.sub$address_regularized[i])
+    sub$scores.name <- adist(sub$sch_name_regularized, fuzzy.bens.sub$name_regularized[i]) / nchar(fuzzy.bens.sub$name_regularized[i])
+    
+    ## grab the matches only if the name distance is <= 0.10 AND the address distance is <= 0.30
+    sub.var <- sub[which(sub$scores.address <= var.address & sub$scores.name <= var.name),]
+    if (nrow(sub.var) > 0){
+      matches.street.addr <- rbind(matches.street.addr, sub.var)
+    }
+  } else{
+    no.matches <- append(no.matches, fuzzy.bens.sub$ben[i])
+  }
+}
+length(no.matches)
+no.matches <- fuzzy.bens[which(fuzzy.bens$ben %in% no.matches),]
 
+## combine the matches with 0 scores
+confirmed.matches <- matches.0[,c('ncessch', 'sch_name_regularized', 'ben', 'name_regularized_usac', 'scores.name')]
+confirmed.matches <- rbind(confirmed.matches, matches.street.addr[,c('ncessch', 'sch_name_regularized', 'ben', 'name_regularized_usac', 'scores.name')])
 
+## MATCH ON STREET NUMBER AND ADDRESS
+## pick the smallest match score for both name and address
+## remove the matches that have already been confirmed
+fuzzy.bens.sub <- fuzzy.bens[which(!fuzzy.bens$ben %in% matches.0$ben),]
+fuzzy.bens.sub <- fuzzy.bens.sub[which(!fuzzy.bens.sub$ben %in% matches.street.addr$ben),]
+fuzzy.bens.sub <- fuzzy.bens.sub[which(!fuzzy.bens.sub$ben %in% no.matches),]
+matches.street.addr2 <- data.frame(matrix(NA, nrow=0, ncol=12))
+names(matches.street.addr2) <- c('ncessch', 'sch_name_regularized', 'street_number', 'street_name', 'address_regularized',
+                                'ben', 'name_regularized_usac', 'street_number_usac', 'street_name_usac', 'address_regularized_usac',
+                                'scores.address', 'scores.name')
+for (i in 1:nrow(fuzzy.bens.sub)){
+  print(i)
+  sub <- nces[which(nces$city.state.zip == fuzzy.bens.sub$city.state.zip[i]),]
+  sub <- sub[which(sub$street_number == fuzzy.bens.sub$street_number[i]),]
+  ## run levenstein distance on each street name only after forcing the street number to be the same
+  if (nrow(sub) > 0){
+    sub$ben <- fuzzy.bens.sub$ben[i]
+    sub$name_regularized_usac <- fuzzy.bens.sub$name_regularized[i]
+    sub$street_number_usac <- fuzzy.bens.sub$street_number[i]
+    sub$street_name_usac <- fuzzy.bens.sub$street_name[i]
+    sub$address_regularized_usac <- fuzzy.bens.sub$address_regularized[i]
+    sub <- sub[,c('ncessch', 'sch_name_regularized', 'street_number', 'street_name', 'address_regularized',
+                  'ben', 'name_regularized_usac', 'street_number_usac', 'street_name_usac', 'address_regularized_usac')]
+    sub$scores.address <- adist(sub$address_regularized, fuzzy.bens.sub$address_regularized[i]) / nchar(fuzzy.bens.sub$address_regularized[i])
+    sub$scores.name <- adist(sub$sch_name_regularized, fuzzy.bens.sub$name_regularized[i]) / nchar(fuzzy.bens.sub$name_regularized[i])
+    ## grab the lowest scored match
+    matches.street.addr2 <- rbind(matches.street.addr2, sub[which(sub$scores.address == min(sub$scores.address) & sub$scores.name == min(sub$scores.name)),])
+  }
+}
+
+##**************************************************************************************************************************************************
+## write out the datasets
+
+write.csv(no.matches, "data/processed/no_matches.csv", row.names=F)
+write.csv(matches.street.addr2, "data/processed/fuzzy_matches_to_be_reviewed.csv", row.names=F)
+write.csv(confirmed.matches, "data/processed/recommended_matches.csv", row.names=F)
