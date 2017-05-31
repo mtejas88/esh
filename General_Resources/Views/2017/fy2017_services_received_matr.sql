@@ -127,14 +127,21 @@ FROM (
           ON spc.name = li.service_provider_name
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
-          left outer join public.fy2017_districts_deluxe_matr d
-          on dd.esh_id = d.esh_id
+          left join public.fy2017_districts_aggregation_matr d
+
+
+          on dd.esh_id = d.district_esh_id
+
+          --left outer join public.fy2017_districts_deluxe_matr d
+          --on dd.esh_id = d.esh_id
 
         /*LEFT OUTER JOIN fy2016.districts d
           --LEFT OUTER JOIN fy2017_districts_deluxe_matr d
           --ON dd.esh_id::numeric = d.esh_id
-          --WHERE li.broadband */ --commenting out fy2016 districts table and utilizing districts deluxe for consortum member
-
+          --WHERE li.broadband --commenting out fy2016 districts table and utilizing districts deluxe for consortum member
+          Dropping district deluxe join as it creates circular dependency and utiliing districts aggregation materialized view
+          for consortium_member field decipher
+*/
 ) base
 left join (
           select  ldli.line_item_id,
