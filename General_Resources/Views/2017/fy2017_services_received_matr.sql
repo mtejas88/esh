@@ -142,6 +142,7 @@ FROM (
           Dropping district deluxe join as it creates circular dependency and utiliing districts aggregation materialized view
           for consortium_member field decipher
 */
+		
 ) base
 left join (
           select  ldli.line_item_id,
@@ -161,3 +162,28 @@ left join (
           group by ldli.line_item_id
 ) district_info_by_li
 on base.line_item_id=district_info_by_li.line_item_id
+
+
+
+
+
+/*
+Author:                   Justine Schott
+Created On Date:
+Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
+Name of QAing Analyst(s):
+Purpose:                  2016 district data in terms of 2016 methodology
+Methodology:
+Modified Date: 4/27/2017
+Name of Modifier: Saaim Aslam
+Name of QAing Analyst(s):
+Purpose: Refactoring tables for 2017 data
+Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
+Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
+might need to add below two additional attributes
+--and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
+--and sfdc.charter__c = false -- not charters
+
+Dependencies: [endpoint.fy2017_lines_to_district_by_line_item, fy2017.esh_line_items_v, public.entity_bens, endpoint.fy2017_districts_predeluxe, 
+salesforce.facilities__c, endpoint.fy2017_districts_demog, endpoint.fy2017_districts_aggregation, fy2017.esh_line_items_v]
+*/

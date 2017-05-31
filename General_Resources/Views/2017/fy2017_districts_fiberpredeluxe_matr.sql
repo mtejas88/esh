@@ -1,3 +1,6 @@
+--district fiberpredeluxe
+
+
 select distinct
 
 	dpd.esh_id,
@@ -466,25 +469,25 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi,  
+	--needs_wifi field doesn't exist in 2017 views so commenting out 
 
-	c2_prediscount_budget_15, 
+	c2_prediscount_budget_15,
 
-	c2_prediscount_remaining_15, 
+	c2_prediscount_remaining_15,
 
-	c2_prediscount_remaining_16, 
+	c2_prediscount_remaining_16,
 
-	c2_postdiscount_remaining_15, 
+	c2_postdiscount_remaining_15,
 
-	c2_postdiscount_remaining_16, 
+	c2_postdiscount_remaining_16,
 
-	received_c2_15, 
+	received_c2_15,
 
-	received_c2_16, 
+	received_c2_16,
 
-	budget_used_c2_15, 
+	budget_used_c2_15,
 
-	budget_used_c2_16, 
+	budget_used_c2_16,
 
 	fbts.fiber_target_status,
 

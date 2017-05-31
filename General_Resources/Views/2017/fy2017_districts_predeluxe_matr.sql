@@ -1,3 +1,5 @@
+--district predeluxe
+
 select distinct
 
 	dm.esh_id,
@@ -40,7 +42,7 @@ select distinct
 
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
-	c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, 
+	c2.c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget, 
 
 	address,
 
@@ -384,7 +386,7 @@ when
 
   	ia_monthly_cost_no_backbone,
 
-	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true 
+	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
 
    			WHEN wifi.count_wifi_needed = 0 THEN false
 
@@ -392,15 +394,15 @@ when
 
 		   	END as needs_wifi,
 
-	c2.c2_budget_haircut as c2_prediscount_budget_15, 
+	c2.c2_budget_haircut as c2_prediscount_budget_15,
 
-	c2.budget_remaining_c2_2015_haircut as c2_prediscount_remaining_15, 
+	c2.budget_remaining_c2_2015_haircut as c2_prediscount_remaining_15,
 
 	c2.budget_remaining_c2_2016_haircut as c2_prediscount_remaining_16,
 
 	c2.budget_remaining_c2_2015_postdiscount_haircut as c2_postdiscount_remaining_15,
 
-	c2.budget_remaining_c2_2016_postdiscount_haircut as c2_postdiscount_remaining_16, 
+	c2.budget_remaining_c2_2016_postdiscount_haircut as c2_postdiscount_remaining_16,
 
 	c2.received_c2_15,
 
