@@ -7,8 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
-#args = commandArgs(trailingOnly=TRUE)
-#github_path <- args[1]
+args = commandArgs(trailingOnly=TRUE)
+github_path <- args[1]
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -22,9 +22,6 @@ library(rJava)
 library(RJDBC)
 library(dotenv)
 options(java.parameters = "-Xmx4g" )
-
-#REMEMBER TO REMOVE
-github_path='~/Documents/esh/ficher/'
 
 ## source environment variables
 source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
