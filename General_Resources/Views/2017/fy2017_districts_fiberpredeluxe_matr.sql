@@ -469,7 +469,7 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	--needs_wifi field doesn't exist in 2017 views so commenting out 
+	needs_wifi, 
 
 	c2_prediscount_budget_15,
 

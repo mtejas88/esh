@@ -1,5 +1,3 @@
---district predeluxe
-
 select distinct
 
 	dm.esh_id,
@@ -42,7 +40,7 @@ select distinct
 
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
-	c2.c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget, 
+	--c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, using funding c2 discount columns in the code logic below
 
 	address,
 
