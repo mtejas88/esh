@@ -1,4 +1,4 @@
-select distinct recipient_id, li.frn, frn_status, num_bids_received
+select distinct recipient_id, li.frn, fr.frn_status, num_bids_received
 from public.fy2016_services_received_matr sr
 left join fy2016.line_items li
 on sr.line_item_id = li.id
