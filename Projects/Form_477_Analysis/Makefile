@@ -19,9 +19,11 @@ RFILES := $(wildcard $(CODE_DIR)/*.R)
 
 data: $(CODE_DIR)/out_files/query_data.Rout
 munge: data $(CODE_DIR)/out_files/munge_data.Rout
+munge2: data $(CODE_DIR)/out_files/munge_data2.Rout
 explore: munge $(CODE_DIR)/out_files/exploratory.Rout
+explore2: munge2 $(CODE_DIR)/out_files/exploratory2.Rout
 ## run entire project
-all: data munge explore
+all: data munge munge2 explore explore2
 
 $(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R
 	@echo "querying data"
@@ -31,9 +33,17 @@ $(CODE_DIR)/out_files/munge_data.Rout: $(CODE_DIR)/munge_data.R
 	@echo "munging data"
 	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data.R $(CODE_DIR)/out_files/munge_data.Rout
 
+$(CODE_DIR)/out_files/munge_data2.Rout: $(CODE_DIR)/munge_data2.R
+	@echo "munging data"
+	@R CMD BATCH --no-restore $(CODE_DIR)/munge_data2.R $(CODE_DIR)/out_files/munge_data2.Rout
+
 $(CODE_DIR)/out_files/exploratory.Rout: $(CODE_DIR)/exploratory.R
 	@echo “exploring and analyzing data“
 	@R CMD BATCH --no-restore $(CODE_DIR)/exploratory.R $(CODE_DIR)/out_files/exploratory.Rout
+
+$(CODE_DIR)/out_files/exploratory.Rout: $(CODE_DIR)/exploratory2.R
+	@echo “exploring and analyzing data“
+	@R CMD BATCH --no-restore $(CODE_DIR)/exploratory2.R $(CODE_DIR)/out_files/exploratory2.Rout
 
 ## clean up all generated files
 clean:
