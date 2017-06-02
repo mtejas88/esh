@@ -115,15 +115,9 @@ combined <- combined[combined$state.match == TRUE,]
 combined$diff <- abs(combined$total_num_students_usac - combined$total_num_students_nces)
 
 ## take out FL outlier
-#combined <- combined[combined$nces_cd != 1201290,]
-#combined <- combined[combined$diff <= 100000,]
-
-
-
-## combine NCES and SF
-
-
-
+## 23,404,307 students
+sub <- combined[which(combined$nces_cd == 1201290),]
+combined <- combined[combined$nces_cd != 1201290,]
 
 ##**************************************************************************************************************************************************
 ## TEST
@@ -133,7 +127,7 @@ store.t <- NULL
 mean.true <- NULL
 mean.false <- NULL
 iters <- 5000
-set.seed(533)
+set.seed(233)
 
 ## use t-test to see if there is a statistically significant difference between verified districts and none verified districts
 for (i in 1:iters){
@@ -152,6 +146,4 @@ median(mean.true)
 mean(mean.false)
 median(mean.false)
 
-##**************************************************************************************************************************************************
-## write out the interim datasets
-
+t.test(diff~verified, data=combined)
