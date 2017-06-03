@@ -8,6 +8,9 @@
 ## Clearing memory
 rm(list=ls())
 
+## set working directory
+#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+
 ## load packages (if not already in the environment)
 packages.to.install <- c("dplyr")
 for (i in 1:length(packages.to.install)){
@@ -18,9 +21,9 @@ for (i in 1:length(packages.to.install)){
 library(dplyr)
 
 ##imports
-districts <- read.csv("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/interim/districts_clean_cats.csv")
-frn_statuses <- read.csv("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/raw/frn_statuses.csv")
-negative_barriers <- read.csv("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/raw/negative_barriers.csv")
+districts <- read.csv("data/interim/districts_clean_cats.csv")
+frn_statuses <- read.csv("data/raw/frn_statuses.csv")
+negative_barriers <- read.csv("data/raw/negative_barriers.csv")
 
 
 #count gold plated districts that got denied funding

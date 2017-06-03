@@ -8,6 +8,9 @@
 ## Clearing memory
 rm(list=ls())
 
+## set working directory
+#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+
 ## load packages (if not already in the environment)
 packages.to.install <- c("dplyr" ,"ggplot2", "rgl")
 for (i in 1:length(packages.to.install)){
@@ -17,23 +20,23 @@ for (i in 1:length(packages.to.install)){
 }
 library(dplyr)
 library(ggplot2)
-library(rgl)
+#library(rgl)
 
 ##districts_deluxe and manipulations
-districts <- read.csv("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/raw/districts_deluxe.csv")
-districts$ia_monthly_cost_total <- ifelse (districts$ia_monthly_cost_total > 0, districts$ia_monthly_cost_total, 0)
-districts$wan_monthly_cost_total <- ifelse (districts$wan_monthly_cost_total > 0, districts$wan_monthly_cost_total, 0)
+districts <- read.csv("data/raw/districts_deluxe.csv")
+districts$ia_monthly_cost_total <- ifelse(districts$ia_monthly_cost_total > 0, districts$ia_monthly_cost_total, 0)
+districts$wan_monthly_cost_total <- ifelse(districts$wan_monthly_cost_total > 0, districts$wan_monthly_cost_total, 0)
 districts$monthly_cost_total <- districts$ia_monthly_cost_total + districts$wan_monthly_cost_total
 
-districts$ia_bandwidth_per_student_kbps <- ifelse (districts$ia_bandwidth_per_student_kbps > 0, 
+districts$ia_bandwidth_per_student_kbps <- ifelse(districts$ia_bandwidth_per_student_kbps > 0, 
                                                    districts$ia_bandwidth_per_student_kbps, 
                                                    0)
 districts$monthly_cost_per_student <- districts$monthly_cost_total / districts$num_students
 
-districts$include_in_universe_of_districts_all_charters <- ifelse (districts$include_in_universe_of_districts_all_charters== 'true', 
+districts$include_in_universe_of_districts_all_charters <- ifelse(districts$include_in_universe_of_districts_all_charters== TRUE, 
                                                                    TRUE,
                                                                    FALSE)
-districts$exclude_from_ia_cost_analysis <- ifelse (districts$exclude_from_ia_cost_analysis== 'true',
+districts$exclude_from_ia_cost_analysis <- ifelse (districts$exclude_from_ia_cost_analysis== TRUE,
                                                    TRUE,
                                                    FALSE)
 
@@ -68,6 +71,9 @@ p1 + geom_point(aes(color = category)) +
   ylab("IA kbps/student")+
   xlab("IA+WAN $/student")
 
+## use the cex command to change the size of the points. you can play around with the scalar factor (right now set to 1/5) to make the points fit on the graph.
+#cex=1/5*(sqrt(districts_clean$num_students)/pi)
+
 p2 <- ggplot(districts_clean, aes(y = log(ia_bw_mbps_total), x = log(monthly_cost_total)))
 p2 + geom_point(aes(color = category)) +
   scale_x_continuous(breaks=c(0,5,10,15), labels=c(exp(0), round(exp(5),0),round(exp(10),0),round(exp(15),0)))+
@@ -90,8 +96,7 @@ write.csv(summarize(categories,
           average_bw_per_student_kbps = sum(ia_bw_mbps_total, na.rm = T)/sum(num_students, na.rm = T)*1000, 
           average_students = mean(num_students, na.rm = T),
           districts = n()), 
-          "C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/interim/districts_clean_cats_summary.csv")
+          "data/interim/districts_clean_cats_summary.csv")
 
 write.csv(districts_clean,
-          "C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/data/interim/districts_clean_cats.csv")
-
+          "data/interim/districts_clean_cats.csv")
