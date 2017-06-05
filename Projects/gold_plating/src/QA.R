@@ -17,7 +17,16 @@
 rm(list=ls())
 
 ## set working directory
-setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+
+## load packages (if not already in the environment)
+packages.to.install <- c("dplyr")
+for (i in 1:length(packages.to.install)){
+  if (!packages.to.install[i] %in% rownames(installed.packages())){
+    install.packages(packages.to.install[i])
+  }
+}
+library(dplyr)
 
 ##**************************************************************************************************************************************************
 ## read in data
@@ -57,12 +66,19 @@ round((districts.summary$sum_cost[districts.summary$category == 'high bw'] / sum
 #agg.frns <- aggregate(frn_statuses$num_bids_received, by=list(frn_statuses$recipient_id), FUN=sum, na.rm=T)
 #names(agg.frns) <- c('recipient_id', 'num_bids_received')
 
-##WIP BELOW
+## create indicator whether a district has 0 or 1 bids for a requested service
+recipients.with.0.or.1.bids <- unique(frn_statuses$recipient_id[which(frn_statuses$num_bids_received == 1 | frn_statuses$num_bids_received == 0)])
+districts$low.bids.AB <- ifelse(districts$esh_id %in% recipients.with.0.or.1.bids, TRUE, NA)
+
+## WIP BELOW
 agg.recipients <- select(filter(frn_statuses, num_bids_received == 1 | num_bids_received == 0), recipient_id) %>% distinct(recipient_id)
 agg.recipients$low.bids <- TRUE
 
 ## merge in with districts
 districts <- merge(districts, agg.recipients, by.x='esh_id', by.y='recipient_id', all.x=T)
+
+## make sure the indicators are the same
+districts$same <- ifelse(districts$low.bids == districts$low.bids.AB, TRUE, FALSE)
 
 ## create indicator for less than 2 bids
 districts$less.than.2.bids <- ifelse(is.na(districts$low.bids), FALSE, districts$low.bids)
