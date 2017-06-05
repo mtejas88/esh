@@ -9,7 +9,7 @@
 rm(list=ls())
 
 ## set working directory
-#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("dplyr")

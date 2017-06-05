@@ -16,6 +16,9 @@
 ## Clearing memory
 rm(list=ls())
 
+## set working directory
+setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+
 ##**************************************************************************************************************************************************
 ## read in data
 
@@ -51,13 +54,19 @@ round((districts.summary$sum_cost[districts.summary$category == 'high bw'] / sum
 ## 2) High Cost categorization
 
 ## aggregate number of FRN bids by recipient id
-agg.frns <- aggregate(frn_statuses$num_bids_received, by=list(frn_statuses$recipient_id), FUN=sum, na.rm=T)
-names(agg.frns) <- c('recipient_id', 'num_bids_received')
+#agg.frns <- aggregate(frn_statuses$num_bids_received, by=list(frn_statuses$recipient_id), FUN=sum, na.rm=T)
+#names(agg.frns) <- c('recipient_id', 'num_bids_received')
+
+##WIP BELOW
+agg.recipients <- select(filter(frn_statuses, num_bids_received == 1 | num_bids_received == 0), recipient_id) %>% distinct(recipient_id)
+agg.recipients$low.bids <- TRUE
+
 ## merge in with districts
-districts <- merge(districts, agg.frns, by.x='esh_id', by.y='recipient_id', all.x=T)
+districts <- merge(districts, agg.recipients, by.x='esh_id', by.y='recipient_id', all.x=T)
+
 ## create indicator for less than 2 bids
-districts$less.than.2.bids <- ifelse(districts$num_bids_received < 2, TRUE, FALSE)
-## create indicator for Rural
+districts$less.than.2.bids <- ifelse(is.na(districts$low.bids), FALSE, districts$low.bids)
+## create indicator for rural
 districts$rural <- ifelse(districts$locale == "Rural", TRUE, FALSE)
 ## subset to high cost districts
 sub.high.cost <- districts[which(districts$category == 'high cost'),]
