@@ -115,15 +115,9 @@ combined <- combined[combined$state.match == TRUE,]
 combined$diff <- abs(combined$total_num_students_usac - combined$total_num_students_nces)
 
 ## take out FL outlier
-#combined <- combined[combined$nces_cd != 1201290,]
-#combined <- combined[combined$diff <= 100000,]
-
-
-
-## combine NCES and SF
-
-
-
+## 23,404,307 students
+sub <- combined[which(combined$nces_cd == 1201290),]
+combined <- combined[combined$nces_cd != 1201290,]
 
 ##**************************************************************************************************************************************************
 ## TEST
@@ -133,7 +127,7 @@ store.t <- NULL
 mean.true <- NULL
 mean.false <- NULL
 iters <- 5000
-set.seed(533)
+set.seed(233)
 
 ## use t-test to see if there is a statistically significant difference between verified districts and none verified districts
 for (i in 1:iters){
@@ -152,6 +146,33 @@ median(mean.true)
 mean(mean.false)
 median(mean.false)
 
-##**************************************************************************************************************************************************
-## write out the interim datasets
+## order by decreasing difference
+combined <- combined[order(combined$diff, decreasing=T),]
+## take out the other major outliers (8 more total)
+## TX NCES code: 4834320
+combined <- combined[combined$nces_cd != 4834320,]
+## there are 7 other outliers (the first 7 rows)
+outlier.ids <- combined$nces_cd[1:7]
+combined <- combined[!combined$nces_cd %in% outlier.ids,]
 
+t.test(diff~verified, data=combined)
+
+## randomly sample districts to show the student count for NCES 2013/2014, NCES 2014/2015, and USAC 2016
+
+## aggregate schools at district id
+districts.agg <- aggregate(schools$num_students, by=list(schools$nces_cd), FUN=sum, na.rm=T)
+names(districts.agg) <- c('nces_cd', 'nces_2013_2014_num_students')
+combined <- merge(combined, districts.agg[,c('nces_cd', 'nces_2013_2014_num_students')],
+                  by='nces_cd', all.x=T)
+districts.sample <- combined[sample(1:nrow(combined), 20, replace=F),]
+names(districts.sample)[names(districts.sample) == 'total_num_students_usac'] <- 'usac_2016_num_students'
+names(districts.sample)[names(districts.sample) == 'total_num_students_nces'] <- 'nces_2014_2015_num_students'
+
+districts.sample <- districts.sample[,c('nces_cd', 'physical_state', 'verified',
+                                        'nces_2013_2014_num_students', 'nces_2014_2015_num_students',
+                                        'usac_2016_num_students')]
+
+##**************************************************************************************************************************************************
+## write out data
+
+write.csv(districts.sample, "data/interim/sample_districts.csv", row.names=F)
