@@ -8,11 +8,11 @@ rm(list = ls())
 lib <- c("dplyr")
 
 #this installs packages only if you don't have them
-#for (i in 1:length(lib)){
-#  if (!lib[i] %in% rownames(installed.packages())){
-#    install.packages(lib[i], repos="http://cran.us.r-project.org")
-#  }
-#}
+for (i in 1:length(lib)){
+  if (!lib[i] %in% rownames(installed.packages())){
+    install.packages(lib[i])
+  }
+}
 library(dplyr)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
