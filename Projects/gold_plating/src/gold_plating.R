@@ -79,8 +79,8 @@ p1 + geom_point(aes(color = example)) +
   ylab("IA kbps/student")+
   xlab("IA+WAN $/student")+ 
   scale_color_manual(values=c("grey", "#CB2027"))+ 
-  geom_vline(xintercept = log(4.50), color = '#009296', linetype="dashed", size = 1)+ 
-  geom_hline(yintercept = log(1000), color = '#009296', linetype="dashed", size = 1)
+  geom_vline(xintercept = log(4.50), color = 'black', linetype="dashed", size = 1)+ 
+  geom_hline(yintercept = log(1000), color = 'black', linetype="dashed", size = 1)
 
 ## use the cex command to change the size of the points. you can play around with the scalar factor (right now set to 1/5) to make the points fit on the graph.
 #cex=1/5*(sqrt(districts_clean$num_students)/pi)
