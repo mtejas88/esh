@@ -6,13 +6,12 @@ rm(list=ls())
 options(scipen=999)
 
 #packages needed
-packages.to.install <- c("magrittr","dplyr")
+packages.to.install <- c("dplyr")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
   }
 }
-library(magrittr)
 library(dplyr)
 
 # load csv files
@@ -40,7 +39,8 @@ d_16 <- d_16_all %>%
                  postal_cd != 'AK') %>%
           select(esh_id,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
 d_17 <- d_17_all %>%
-          filter(include_in_universe_of_districts==TRUE,
+          filter(#exclude_from_ia_analysis == FALSE,
+                 include_in_universe_of_districts==TRUE,
                  postal_cd != 'AK') %>%
           select(esh_id,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
 
@@ -90,7 +90,7 @@ s_16=munge_sr(s_16_all)
 s_17=s_17_all %>%
   filter(
   applicant_postal_cd != "AK",
-  erate == 'true') %>%
+  erate == 't') %>%
   select(line_item_id, purpose, bandwidth_in_mbps, connect_category, line_item_recurring_elig_cost, line_item_total_num_lines) %>%
   mutate(
     monthly_cost_per_circuit = line_item_recurring_elig_cost / line_item_total_num_lines,
