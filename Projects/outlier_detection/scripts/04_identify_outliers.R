@@ -74,8 +74,7 @@ outliers_loop <- function(N,data,alpha,cost_column,unique_id,n_17_at_time) {
     #filter to only include 2017 datapoints, if they were flagged as outliers
     results <- results %>%  
       filter(outlier_year > 2016)
-    }
-  
+  }
   return(results[,-ncol(results)])
 }
 ####################

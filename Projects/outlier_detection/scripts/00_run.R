@@ -70,42 +70,44 @@ master_output <- data.frame(outlier_use_case_name=character(),
 # run line item use case 1 
 ### 
 # Cable Internet
-use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(150), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+uc1=use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+uc2=use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
+uc3=use_case_cost_per_mbps_li(s_16,s_17,c(150), c("Cable"), c("Internet"),with_16=0,n_17_at_time=1)
 # Fiber (Internet and WAN) - takes a few mins
+uc4=NULL
 s_matrix_fiber=s_16 %>% group_by(bandwidth_in_mbps, connect_category, purpose) %>% filter (bandwidth_in_mbps %in% c(100,200,500,1000,10000), connect_category=='Lit Fiber', purpose %in% c('WAN','Internet')) %>% select(bandwidth_in_mbps, connect_category, purpose) %>% unique() %>% arrange(bandwidth_in_mbps, connect_category, purpose)
 for(i in 1:nrow(s_matrix_fiber)) {
-  use_case_cost_per_mbps_li(s_16,s_17,s_matrix_fiber[i,1], s_matrix_fiber[i,2], s_matrix_fiber[i,3],with_16=0,n_17_at_time=1)
+  uc4=rbind(uc4,use_case_cost_per_mbps_li(s_16,s_17,s_matrix_fiber[i,1], s_matrix_fiber[i,2], s_matrix_fiber[i,3],with_16=0,n_17_at_time=1))
 }
 # Fixed Wireless
-use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(1000), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
+uc5=use_case_cost_per_mbps_li(s_16,s_17,c(50), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
+uc6=use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("Internet"),with_16=0,n_17_at_time=1)
+uc7=use_case_cost_per_mbps_li(s_16,s_17,c(100), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
+uc8=use_case_cost_per_mbps_li(s_16,s_17,c(1000), c("Fixed Wireless"), c("WAN"),with_16=0,n_17_at_time=1)
 # DSL Internet
-use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(10), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
+uc9=use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
+uc10=use_case_cost_per_mbps_li(s_16,s_17,c(10), c("DSL"), c("Internet"),with_16=0,n_17_at_time=1)
 # T-1
-use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("Internet"),with_16=0,n_17_at_time=1)
-use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("WAN"),with_16=0,n_17_at_time=1)
+uc11=use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("Internet"),with_16=0,n_17_at_time=1)
+uc12=use_case_cost_per_mbps_li(s_16,s_17,c(1.5), c("T-1"), c("WAN"),with_16=0,n_17_at_time=1)
 
+li_distributions=rbind(uc1,uc2,uc3,uc4,uc5,uc6,uc7,uc8,uc9,uc10,uc11,uc12)
 ###
 # run district use cases (2-7)
 # TIME WARNING: takes ~ 25 mins 
 ###
+ucd=NULL
 d_matrix=d_16 %>% group_by(locale, district_size) %>% select(locale, district_size) %>% unique() %>% arrange(locale, district_size)
 system.time(for(i in 1:nrow(d_matrix)) {
-  use_case_total_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
-  use_case_pct_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
-  use_case_total_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
-  use_case_pct_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
-  use_case_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
-  use_case_bw_per_student(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
+  ucd=rbind(ucd,use_case_total_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
+  ucd=rbind(ucd,use_case_pct_bw(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
+  ucd=rbind(ucd,use_case_total_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
+  ucd=rbind(ucd,use_case_pct_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
+  ucd=rbind(ucd,use_case_cost(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
+  ucd=rbind(ucd,use_case_bw_per_student(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1))
 })
 
-source("05_export_to_postgres.R")
-
-
 # export
-write.csv(master_output, paste0("../data/final/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(li_distributions,"../data/export/li_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
+write.csv(ucd,"../data/export/district_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
