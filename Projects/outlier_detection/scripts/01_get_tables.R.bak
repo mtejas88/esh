@@ -18,7 +18,7 @@ library(dotenv)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/ESH/ficher/'
+github_path <- '~/Documents/ESH/ficher/'
 
 
 options(java.parameters = "-Xmx4g" )
@@ -26,7 +26,6 @@ options(java.parameters = "-Xmx4g" )
 ## source environment variables
 source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
 source_env("~/.env")
-#source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
@@ -34,7 +33,6 @@ source_env("~/.env")
 
 ## load PostgreSQL Driver
 pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
-#pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
 
 ## connect to the database
 con <- dbConnect(pgsql, url=url, user=user, password=password)
@@ -49,16 +47,16 @@ querydb <- function(query_name){
 crusher_sr_fy2016 <- querydb('../sql/crusher_fy2016_sr.sql')
 crusher_dd_fy2016 <- querydb('../sql/crusher_fy2016_dd.sql')
 # placeholder for 2017 tables
- crusher_sr_fy2017 <- querydb('../sql/crusher_fy2017_sr.sql')
- crusher_dd_fy2017 <- querydb('../sql/crusher_fy2017_dd.sql')
+# crusher_sr_fy2017 <- querydb('../sql/crusher_fy2017_sr.sql')
+# crusher_dd_fy2017 <- querydb('../sql/crusher_fy2017_dd.sql')
 
 ## disconnect from database
 dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
 
-write.csv(crusher_dd_fy2016, paste0("../data/mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
-write.csv(crusher_sr_fy2016, paste0("../data/mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
+write.csv(crusher_dd_fy2016, paste0("../data/intermediate/crusher_dd_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
+write.csv(crusher_sr_fy2016, paste0("../data/intermediate/crusher_sr_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
 # placeholder for 2017 tables 
-write.csv(crusher_dd_fy2017, paste0("../data/mode/crusher_dd_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
-write.csv(crusher_sr_fy2017, paste0("../data/mode/crusher_sr_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
+# write.csv(crusher_dd_fy2017, paste0("../data/intermediate/crusher_dd_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
+# write.csv(crusher_sr_fy2017, paste0("../data/intermediate/crusher_sr_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)

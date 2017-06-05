@@ -38,7 +38,7 @@ pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/pos
 ## connect to the database
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 
-## query function
+## DB FUNCTIONS
 querydb <- function(query_name) {
   query <- readChar(query_name, file.info(query_name)$size)
   data <- dbGetQuery(con, query)
@@ -101,7 +101,6 @@ insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
 
 print("Determining New Use Cases")
 new_use_case_detail_script <- find_new_cases("outlier_use_case_details")
-print(new_use_case_detail_script)
 
 print("Writing new use cases sql file")
 queryName <- paste0("../sql/retrieve_new_use_case_details_", Sys.Date(), ".SQL")
@@ -129,7 +128,7 @@ if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
   close(fileConn)
   
 }else{
-  print("No new use case details")
+  print("No new use cases")
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),error=function(e) e)
