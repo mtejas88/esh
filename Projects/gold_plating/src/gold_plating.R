@@ -99,7 +99,13 @@ p2 + geom_point() +
   ylab("IA mbps")+
   xlab("IA+WAN $")
 #no color with student size
-p2 + geom_point(aes(color = num_students)) +
+p2 + geom_point(aes(size = num_students)) +
+  scale_x_continuous(breaks=c(0,5,10,15), labels=c(exp(0),round(exp(5),0),round(exp(10),0),round(exp(15),0)))+
+  scale_y_continuous(breaks=c(0,4,8,12), labels=c(exp(0),round(exp(4),0),round(exp(8),0),round(exp(12),0)))+
+  ylab("IA mbps")+
+  xlab("IA+WAN $")
+#color with student size
+p2 + geom_point(aes(color = category, size = num_students)) +
   scale_x_continuous(breaks=c(0,5,10,15), labels=c(exp(0),round(exp(5),0),round(exp(10),0),round(exp(15),0)))+
   scale_y_continuous(breaks=c(0,4,8,12), labels=c(exp(0),round(exp(4),0),round(exp(8),0),round(exp(12),0)))+
   ylab("IA mbps")+
