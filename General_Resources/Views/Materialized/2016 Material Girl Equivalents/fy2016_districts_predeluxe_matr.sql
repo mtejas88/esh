@@ -20,7 +20,7 @@ select distinct
 	discount_rate_c1::numeric/100 as discount_rate_c1,
 	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
 	discount_rate_c2::numeric/100 as discount_rate_c2,
-	c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
+	--c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
 	address,
 	city,
 	zip,
@@ -189,15 +189,15 @@ select distinct
    			WHEN wifi.count_wifi_needed = 0 THEN false
         	ELSE null
 		   	END as needs_wifi,
-	c2_prediscount_budget_15,
-	c2_prediscount_remaining_15,
-	c2_prediscount_remaining_16,
-	c2_postdiscount_remaining_15,
-	c2_postdiscount_remaining_16,
-	received_c2_15,
-	received_c2_16,
-	budget_used_c2_15,
-	budget_used_c2_16,
+	c2.c2_budget_haircut as c2_prediscount_budget_15,
+	c2.budget_remaining_c2_2015_haircut as c2_prediscount_remaining_15,
+	c2.budget_remaining_c2_2016_haircut as c2_prediscount_remaining_16,
+	c2.budget_remaining_c2_2015_postdiscount_haircut as c2_postdiscount_remaining_15,
+	c2.budget_remaining_c2_2016_postdiscount_haircut as c2_postdiscount_remaining_16,
+	c2.received_c2_15,
+	c2.received_c2_16,
+	c2.budget_used_c2_15,
+	c2.budget_used_c2_16,
 	wan_lines_w_dirty,
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
@@ -212,7 +212,8 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 5/26/2017 - added adjusted c1 discount rate
+Last Modified Date: 6/5/2017 - updated the c2 fields to use the haircut metrics. also
+got rid of the c2_discount_rate_for_remaining_budget field
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

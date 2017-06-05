@@ -1,345 +1,329 @@
-select  esh_id,
-        c2_cost_budget as c2_prediscount_budget_15,
-        c2_cost_remaining_2015 as c2_prediscount_remaining_15,
-        c2_cost_budget - c2_cost_remaining_2015 as c2_pre_discount_spent_15,
-        c2_cost_remaining_2016 as c2_prediscount_remaining_16,
-        c2_cost_remaining_2015 - c2_cost_remaining_2016 as c2_pre_discount_spent_16,
-        c2_cost_remaining_2015*c2_discount_rate_for_remaining_budget as c2_postdiscount_remaining_15,
-        c2_cost_remaining_2016*c2_discount_rate_for_remaining_budget as c2_postdiscount_remaining_16,
-        case
-          when c2_cost_budget > c2_cost_remaining_2015
-            then true
-          else false
-        end as received_c2_15,
-        case
-          when c2_cost_remaining_2015 > c2_cost_remaining_2016
-            then true
-          else false
-        end as received_c2_16,
-        case
-          when c2_cost_remaining_2015 = 0
-            then true
-          else false
-        end as budget_used_c2_15,
-        case
-          when c2_cost_remaining_2016 = 0
-            then true
-          else false
-        end as budget_used_c2_16,
-        c2_discount_rate_for_remaining_budget
-from (
-  select
-    districts_2015.esh_id,
-    districts_2015.postal_cd,
-    districts_2015.c2_cost_budget,
-    districts_2015.weighted_avg_dr as district_dr_2015,
-    round(districts_c2_recipient_2016.proportionate_c2_funding::numeric/
-            districts_c2_recipient_2016.proportionate_c2_cost::numeric,2) as district_dr_2016,
-    case
-      when round(districts_c2_recipient_2016.proportionate_c2_funding::numeric/
-                  districts_c2_recipient_2016.proportionate_c2_cost::numeric,2) is null
-        then  case
-                when districts_2015.weighted_avg_dr is null
-                  then round(state_agg_c2_dr::numeric,2)
-                else districts_2015.weighted_avg_dr
+with school_calc as (
+  select  *,
+          budget_remaining_c2_2015*c2_discount_rate as budget_remaining_c2_2015_postdiscount,
+          budget_remaining_c2_2016*c2_discount_rate as budget_remaining_c2_2016_postdiscount,
+          row_number() over(
+            partition by school_esh_id
+            order by budget_remaining_c2_2016*c2_discount_rate asc
+          ) as filtering_number
+  from(
+    select  *,
+            case
+              when budget_remaining_c2_2015 < amount_c2_2016
+                then 0
+              else budget_remaining_c2_2015 - case
+                                                when amount_c2_2016 is null
+                                                  then 0
+                                                else amount_c2_2016
+                                              end
+            end as budget_remaining_c2_2016
+    from (
+      select  school_esh_id,
+              district_esh_id,
+              postal_cd,
+              entities.ben,
+              entity_number,
+              entity_type,
+              entity_name,
+              physical_state,
+              user_entered_urban_rural_status,
+              number_of_full_time_students,
+              total_number_of_part_time_students,
+              schools_demog_num_students,
+              number_of_nlsp_students,
+              cep_percentage,
+              alternative_discount_method,
+              c2_discount_rate,
+              c2_budget,
+              c2_budget*c2_discount_rate as c2_budget_postdiscount,
+              amount_c2_2015,
+              amount_c2_2015_incl_not_funded,
+              amount_c2_2016,
+              amount_c2_2016_incl_denied,
+              case
+                when c2_budget < amount_c2_2015
+                  then 0
+                else c2_budget -  case
+                                    when amount_c2_2015 is null
+                                      then 0
+                                    else amount_c2_2015
+                                  end
+              end as budget_remaining_c2_2015
+
+      from(
+        select distinct
+          sd.school_esh_id,
+          sd.district_esh_id,
+          sd.postal_cd,
+          eb.ben,
+          entity_number,
+          er.entity_type,
+          er.entity_name,
+          status,
+          physical_state,
+          user_entered_urban_rural_status,
+          number_of_full_time_students::numeric,
+          total_number_of_part_time_students::numeric,
+          sd.num_students as schools_demog_num_students,
+          number_of_nlsp_students::numeric,
+          cep_percentage::numeric,
+          alternative_discount_method,
+      --c2 budgeting from 2016 from: https://www.fundsforlearning.com/blog/2017/03/category-2-budget-caps-adjusted-for-2017
+          case
+            when eb.ben is null then 0
+            when (case  when number_of_full_time_students is null then 0 
+                        else number_of_full_time_students::numeric end
+                  + case  when total_number_of_part_time_students is null then 0
+                          else total_number_of_part_time_students::numeric end)*151.50 < 9292
+              then 9292
+            
+            --adding this condition because there are some schools that clearly have user entered mistakes for num students.
+            --this condition changes the student count that we use for ~630 schools
+            when 5 * sd.num_students < (case  when number_of_full_time_students is null then 0 
+                                            else number_of_full_time_students::numeric end
+                                        + case  when total_number_of_part_time_students is null then 0
+                                                else total_number_of_part_time_students::numeric end)
+              then  case  when sd.num_students * 151.50 < 9292 then 9292
+                          else sd.num_students * 151.50
+                    end
+            else (case  when number_of_full_time_students is null then 0 
+                        else number_of_full_time_students::numeric end
+                  + case  when total_number_of_part_time_students is null then 0
+                          else total_number_of_part_time_students::numeric end)*151.50
+          end as c2_budget,
+          case
+            when number_of_full_time_students::numeric > 0 then
+              case
+                when user_entered_urban_rural_status = 'Urban' then
+                  case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .01 then .20
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .20 then .40
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .35 then .50
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .50 then .60
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .75 then .80
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric >= .75 then .85
+                        else .7
+                  end
+                when user_entered_urban_rural_status = 'Rural' then
+                  case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .01 then .25
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .20 then .50
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .35 then .60
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .50 then .70
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .75 then .80
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric >= .75 then .85
+                        else .7
+                  end
+                else
+                  case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .50 then .7
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .75 then .80
+                        when number_of_nlsp_students::numeric/number_of_full_time_students::numeric >= .75 then .85
+                        else .7
+                  end
               end
-      else round(districts_c2_recipient_2016.proportionate_c2_funding::numeric/
-                  districts_c2_recipient_2016.proportionate_c2_cost::numeric,2)
-    end as c2_discount_rate_for_remaining_budget,
-    districts_2015.proportionate_c2_cost as c2_cost_2015,
-    districts_c2_recipient_2016.proportionate_c2_cost as c2_cost_2016,
-    districts_2015.proportionate_c2_funding as c2_funding_2015,
-    districts_c2_recipient_2016.proportionate_c2_funding as c2_funding_2016,
-    c2_cost_remaining as c2_cost_remaining_2015,
-    case
-      when districts_c2_recipient_2016.proportionate_c2_cost is null
-        then c2_cost_remaining
-      when c2_cost_remaining < districts_c2_recipient_2016.proportionate_c2_cost
-        then 0
-      else c2_cost_remaining - districts_c2_recipient_2016.proportionate_c2_cost
-    end as c2_cost_remaining_2016
-
-  from (
-    select
-      esh_id,
-      postal_cd,
-      c2_cost_budget,
-      case
-        when proportionate_c2_cost > 0
-          then round(proportionate_c2_funding/proportionate_c2_cost,2)
-      end as weighted_avg_dr,
-      proportionate_c2_cost,
-      proportionate_c2_funding,
-      case
-        when proportionate_c2_cost is null
-          then c2_cost_budget
-        when c2_cost_budget < proportionate_c2_cost
-          then 0
-        else c2_cost_budget - proportionate_c2_cost
-      end as c2_cost_remaining
-
-    from (
-      select esh_id,
-            dd.postal_cd,
-            sum(case
-              when sd.num_students*150 < 9200
-                then 9200
-              else sd.num_students*150
-            end) as c2_cost_budget
-      from public.fy2016_districts_demog_matr dd
-      left join public.fy2016_schools_demog_matr sd
-      on dd.esh_id = sd.district_esh_id
-      where include_in_universe_of_districts = true
-      group by  esh_id,
-                dd.postal_cd
-    ) universe_districts
-    left join (
-      select
-        district_esh_id,
-        sum((ad_2015.cat_2_cost/a_2015.alloc_cat_2_cost)*case
-                                                when c2_li_2015.total_cost is null
-                                                  then a_2015.alloc_cat_2_cost
-                                                else c2_li_2015.total_cost
-                                              end) as proportionate_c2_cost,
-        sum((ad_2015.cat_2_cost/a_2015.alloc_cat_2_cost)*case
-                                                when c2_li_2015.total_cost is null
-                                                  then a_2015.alloc_cat_2_cost
-                                                else c2_li_2015.total_cost
-                                              end*(case
-                                                    when "Discount" is null
-                                                      then 70
-                                                    else "Discount"
-                                                  end/100)) as proportionate_c2_funding
-      from (
-        select
-          a.line_item_id,
-          dl.district_esh_id,
-          a.cat_2_cost
-          from public.allocations a
-          left join public.entity_bens eb
-          on eb.ben = a.recipient_ben
-          left join public.fy2016_district_lookup_matr dl
-          on eb.entity_id::varchar = dl.esh_id
-          left join (
-            select esh_id,
-                  dd.postal_cd,
-                  sum(case
-                    when sd.num_students*150 < 9200
-                      then 9200
-                    else sd.num_students*150
-                  end) as c2_cost_budget
-            from public.fy2016_districts_demog_matr dd
-            left join public.fy2016_schools_demog_matr sd
-            on dd.esh_id = sd.district_esh_id
-            where include_in_universe_of_districts = true
-            group by  esh_id,
-                      dd.postal_cd
-          ) dd
-          on dl.district_esh_id = dd.esh_id
-          where dl.district_esh_id is not null
-          and a.cat_2_cost > 0
-      ) ad_2015
-      left join (
-        select *
-        from public.line_items
-        where service_category ilike '%internal%'
-      ) c2_li_2015
-      on c2_li_2015.id = ad_2015.line_item_id
-      left join (
-        select
-          a.line_item_id,
-          sum(a.cat_2_cost) as alloc_cat_2_cost
-          from public.allocations a
-          where a.cat_2_cost > 0
-        group by a.line_item_id
-      ) a_2015
-      on a_2015.line_item_id = ad_2015.line_item_id
-      left join public.fy2015_funding_request_key_informations frki
-      on c2_li_2015.frn = frki."FRN"
-
-      group by district_esh_id
-    ) districts_c2_recipient_2015
-    on universe_districts.esh_id = districts_c2_recipient_2015.district_esh_id::varchar
-  ) districts_2015
-  left join (
-    select
-      district_esh_id,
-      sum((ad_2016.cat_2_cost/case
-                          when a_2016.alloc_cat_2_cost>0
-                            then a_2016.alloc_cat_2_cost
-                          else c2_li_2016.total_cost
-                        end) * case
-                                  when c2_li_2016.total_cost is null
-                                  then a_2016.alloc_cat_2_cost
-                                  else c2_li_2016.total_cost
-                               end) as proportionate_c2_cost,
-      sum((ad_2016.cat_2_cost/case
-                          when a_2016.alloc_cat_2_cost>0
-                            then a_2016.alloc_cat_2_cost
-                          else c2_li_2016.total_cost
-                        end)*case
-                                when c2_li_2016.total_cost is null
-                                  then a_2016.alloc_cat_2_cost
-                                else c2_li_2016.total_cost
-                              end*(case
-                                      when discount_rate is null
-                                        then 70
-                                      else discount_rate::numeric
-                                    end/100)) as proportionate_c2_funding
-    from (
-      select
-        a.line_item_id,
-        dl.district_esh_id,
-        a.cat_2_cost
-        from fy2016.allocations a
+          else .7
+        end as c2_discount_rate
+        from public.fy2016_schools_demog_matr sd
         left join public.entity_bens eb
-        on eb.ben = a.recipient_ben
-        left join public.fy2016_district_lookup_matr dl
-        on eb.entity_id::varchar = dl.esh_id
+        on sd.school_esh_id = eb.entity_id::varchar
+        left join fy2016.entity_reports er
+        on er.entity_number = eb.ben
+        left join public.fy2016_districts_deluxe_matr dd
+        on sd.district_esh_id = dd.esh_id
+        where dd.include_in_universe_of_districts_all_charters = true
+      ) entities
+      left join (
+        select
+          "BEN",
+          sum(case
+                when commitment_status != 'NOT FUNDED'
+                --where total_cost is current, the allocations will be proportionate to the new total cost
+                --where total_cost isn't available, then the allocations will be the total cost
+                  then (ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)*case
+                                                                    when li.total_cost is null
+                                                                      then a.alloc_cat_2_cost
+                                                                    else li.total_cost
+                                                                  end
+                else 0
+              end) as amount_c2_2015,
+          sum((ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)* case
+                                                            when li.total_cost is null
+                                                              then a.alloc_cat_2_cost
+                                                            else li.total_cost
+                                                          end) as amount_c2_2015_incl_not_funded
+        from public.fy2015_item21_allocations_by_entities ae
+        left join public.line_items li
+        on concat(ae."FRN",'-',ae."FRN Line Item No") = li.frn_complete
+        left join public.funding_requests fr
+        on ae."FRN" = fr.frn
         left join (
-          select esh_id,
-                dd.postal_cd,
-                sum(case
-                  when sd.num_students*150 < 9200
-                    then 9200
-                  else sd.num_students*150
-                end) as c2_cost_budget
-          from public.fy2016_districts_demog_matr dd
-          left join public.fy2016_schools_demog_matr sd
-          on dd.esh_id = sd.district_esh_id
-          where include_in_universe_of_districts = true
-          group by  esh_id,
-                    dd.postal_cd
-        ) dd
-        on dl.district_esh_id = dd.esh_id
-        where dl.district_esh_id is not null
-        and a.cat_2_cost > 0
-    ) ad_2016
-    left join (
-      select *
-      from fy2016.line_items
-      where service_category::numeric = 2
-    ) c2_li_2016
-    on c2_li_2016.id = ad_2016.line_item_id
-    left join (
-      select
-        a.line_item_id,
-        sum(a.cat_2_cost) as alloc_cat_2_cost
-        from fy2016.allocations a
-        where a.cat_2_cost > 0
-      group by a.line_item_id
-    ) a_2016
-    on a_2016.line_item_id = ad_2016.line_item_id
-    left join fy2016.frns
-    on c2_li_2016.frn = frns.frn
-
-    group by district_esh_id
-  ) districts_c2_recipient_2016
-  on districts_2015.esh_id = districts_c2_recipient_2016.district_esh_id
-  left join (
-    select
-      postal_cd,
-      sum(proportionate_c2_funding)/sum(proportionate_c2_cost) as state_agg_c2_dr
-    from (
-      select
-        district_esh_id,
-        sum((ad_2016.cat_2_cost/case
-                            when a_2016.alloc_cat_2_cost>0
-                              then a_2016.alloc_cat_2_cost
-                            else c2_li_2016.total_cost
-                          end) * case
-                                    when c2_li_2016.total_cost is null
-                                    then a_2016.alloc_cat_2_cost
-                                    else c2_li_2016.total_cost
-                                 end) as proportionate_c2_cost,
-        sum((ad_2016.cat_2_cost/case
-                            when a_2016.alloc_cat_2_cost>0
-                              then a_2016.alloc_cat_2_cost
-                            else c2_li_2016.total_cost
-                          end)*case
-                                  when c2_li_2016.total_cost is null
-                                    then a_2016.alloc_cat_2_cost
-                                  else c2_li_2016.total_cost
-                                end*(case
-                                        when discount_rate is null
-                                          then 70
-                                        else discount_rate::numeric
-                                      end/100)) as proportionate_c2_funding
-      from (
-        select
-          a.line_item_id,
-          dl.district_esh_id,
-          a.cat_2_cost
-          from fy2016.allocations a
-          left join public.entity_bens eb
-          on eb.ben = a.recipient_ben
-          left join public.fy2016_district_lookup_matr dl
-          on eb.entity_id::varchar = dl.esh_id
-          left join (
-            select esh_id,
-                  dd.postal_cd,
-                  sum(case
-                    when sd.num_students*150 < 9200
-                      then 9200
-                    else sd.num_students*150
-                  end) as c2_cost_budget
-            from public.fy2016_districts_demog_matr dd
-            left join public.fy2016_schools_demog_matr sd
-            on dd.esh_id = sd.district_esh_id
-            where include_in_universe_of_districts = true
-            group by  esh_id,
-                      dd.postal_cd
-          ) dd
-          on dl.district_esh_id = dd.esh_id
-          where dl.district_esh_id is not null
-          and a.cat_2_cost > 0
-      ) ad_2016
-      left join (
-        select *
-        from fy2016.line_items
-        where service_category::numeric = 2
-      ) c2_li_2016
-      on c2_li_2016.id = ad_2016.line_item_id
-      left join (
-        select
-          a.line_item_id,
-          sum(a.cat_2_cost) as alloc_cat_2_cost
-          from fy2016.allocations a
-          where a.cat_2_cost > 0
-        group by a.line_item_id
-      ) a_2016
-      on a_2016.line_item_id = ad_2016.line_item_id
-      left join fy2016.frns
-      on c2_li_2016.frn = frns.frn
-
-      group by district_esh_id
-    ) districts_c2_recipient_2016
-    left join (
-      select esh_id,
-            dd.postal_cd,
+          select
+            concat(ae."FRN",'-',ae."FRN Line Item No") as frn_complete,
             sum(case
-              when sd.num_students*150 < 9200
-                then 9200
-              else sd.num_students*150
-            end) as c2_cost_budget
-      from public.fy2016_districts_demog_matr dd
-      left join public.fy2016_schools_demog_matr sd
-      on dd.esh_id = sd.district_esh_id
-      where include_in_universe_of_districts = true
-      group by  esh_id,
-                dd.postal_cd
-    ) universe_districts
-    on districts_c2_recipient_2016.district_esh_id = universe_districts.esh_id
-    where proportionate_c2_cost > 0
-    group by postal_cd
-  ) agg_dr_2016
-  on districts_2015.postal_cd = agg_dr_2016.postal_cd
-) district_cost
+                  when "Cat 2 Cost Alloc" > 0
+                    then "Cat 2 Cost Alloc"
+                  else 0
+                end) as alloc_cat_2_cost
+            from public.fy2015_item21_allocations_by_entities ae
+            left join public.fy2015_funding_request_key_informations frki
+            on ae."FRN" = frki."FRN"
+            where "Service Type" ilike '%internal%'
+          group by 1
+        ) a
+        on a.frn_complete = li.frn_complete
+        left join public.fy2015_funding_request_key_informations frki
+        on ae."FRN" = frki."FRN"
+        where "Service Type" ilike '%internal%'
+        and alloc_cat_2_cost > 0
+        group by 1
+      ) c2_allocations_2015
+      on entities.ben = c2_allocations_2015."BEN"
+      left join (
+        select
+          ros.ben,
+          sum(case
+                when frn_status not in ('Denied', 'Cancelled')
+                --where total_cost is current, the allocations will be proportionate to the new total cost
+                --where total_cost isn't available, then the allocations will be the total cost
+                  then (amount::numeric/a.alloc_cat_2_cost)*case
+                                                              when li.total_cost is null
+                                                                then a.alloc_cat_2_cost
+                                                              else li.total_cost
+                                                            end
+                else 0
+              end) as amount_c2_2016,
+          sum((amount::numeric/a.alloc_cat_2_cost)* case
+                                                      when li.total_cost is null
+                                                        then a.alloc_cat_2_cost
+                                                      else li.total_cost
+                                                    end) as amount_c2_2016_incl_denied
+        from fy2016.recipients_of_services ros
+        left join fy2016.line_items li
+        on ros.line_item = li.frn_complete
+        left join public.funding_requests_2016_and_later fr
+        on ros.frn = fr.frn
+        left join (
+          select
+            line_item,
+            sum(case
+                  when amount::numeric > 0
+                    then amount::numeric
+                  else 0
+                end) as alloc_cat_2_cost
+            from fy2016.recipients_of_services ros
+            left join fy2016.basic_informations bi
+            on ros.application_number = bi.application_number
+            where bi.category_of_service::numeric = 2
+          group by 1
+        ) a
+        on a.line_item = li.frn_complete
+        left join fy2016.basic_informations bi
+        on ros.application_number = bi.application_number
+        where bi.category_of_service::numeric = 2
+        and alloc_cat_2_cost > 0
+        group by 1
+      ) c2_allocations_2016
+      on entities.ben = c2_allocations_2016.ben
+    ) c2_budgeting
+  ) c2_remaining
+),
+
+schools as (
+
+select district_esh_id,
+school_esh_id,
+filtering_number,
+postal_cd,
+ben,
+entity_type,
+entity_name,
+number_of_full_time_students,
+total_number_of_part_time_students,
+schools_demog_num_students,
+c2_discount_rate,
+c2_budget,
+c2_budget_postdiscount,
+budget_remaining_c2_2015,
+budget_remaining_c2_2016,
+budget_remaining_c2_2015_postdiscount,
+budget_remaining_c2_2016_postdiscount,
+.9 * c2_budget as c2_budget_haircut,
+.9 * c2_budget_postdiscount as c2_budget_postdiscount_haircuit,
+.9 * budget_remaining_c2_2015 as budget_remaining_c2_2015_haircut,
+.9 * budget_remaining_c2_2016 as budget_remaining_c2_2016_haircut,
+.9 * budget_remaining_c2_2015_postdiscount as budget_remaining_c2_2015_postdiscount_haircut,
+.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut,
+case 
+  when (.9 * c2_budget) > (.9 * budget_remaining_c2_2015)
+    then true
+  else false
+end as received_c2_15,
+case 
+  when (.9 * budget_remaining_c2_2015) > (.9 * budget_remaining_c2_2016)
+    then true
+  else false
+end as received_c2_16,
+case
+  when (.9 * budget_remaining_c2_2015) = 0
+    then true
+  else false
+end as budget_used_c2_15,
+case
+  when (.9 * budget_remaining_c2_2016) = 0
+    then true
+  else false
+end as budget_used_c2_16
+
+from school_calc
+
+where filtering_number = 1
+
+order by budget_remaining_c2_2016_postdiscount desc
+
+)
+
+select district_esh_id as esh_id,
+sum(c2_budget) as c2_budget,
+sum(c2_budget_postdiscount) as c2_budget_postdiscount,
+sum(budget_remaining_c2_2015) as budget_remaining_c2_2015,
+sum(budget_remaining_c2_2016) as budget_remaining_c2_2016,
+sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
+sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
+sum(c2_budget_haircut) as c2_budget_haircut,
+sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
+sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
+sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
+sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
+sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
+case 
+  when sum(.9 * c2_budget) > sum(.9 * budget_remaining_c2_2015)
+    then true
+  else false
+end as received_c2_15,
+case 
+  when sum(.9 * budget_remaining_c2_2015) > sum(.9 * budget_remaining_c2_2016)
+    then true
+  else false
+end as received_c2_16,
+case
+  when sum(.9 * budget_remaining_c2_2015) = 0
+    then true
+  else false
+end as budget_used_c2_15,
+case
+  when sum(.9 * budget_remaining_c2_2016) = 0
+    then true
+  else false
+end as budget_used_c2_16
+
+from schools
+
+group by district_esh_id
 
 /*
 Author: Justine Schott
 Created On Date: 10/14/2016
-Last Modified Date: 4/13/2017 -- JS remove references to esh_id's in allocation tables
+Last Modified Date: 6/5/2017 JH - changed methodologoy to match 2017 wifi funding methodology. This takes the wifi cost allocated to each
+school, determines the discount rate, checks to see if the commitment status when denied or cancelled, and finally applies a 90% haircuit 
+to the funding remaining.
 Name of QAing Analyst(s): Jess Seok
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
 Methodology:
