@@ -7,8 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
-#args = commandArgs(trailingOnly=TRUE)
-#github_path <- args[1]
+args = commandArgs(trailingOnly=TRUE)
+github_path <- args[1]
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -22,9 +22,6 @@ library(rJava)
 library(RJDBC)
 library(dotenv)
 options(java.parameters = "-Xmx4g" )
-
-#REMEMBER TO REMOVE
-github_path='~/Documents/esh/ficher/'
 
 ## source environment variables
 source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
@@ -49,9 +46,11 @@ querydb <- function(query_name){
   return(data)
 }
 
-dd.2016 <- querydb("dd_2016.sql")
+dd.2016 <- querydb("sql/dd_2016.sql") 
 dd.2016 <- correct.dataset(dd.2016, sots.flag=0, services.flag=0)
-dta.477s <- querydb("form477s.sql")
+districts_schools=querydb("sql/district_lookup.sql")
+dta.477s <- querydb("sql/form477s.sql")
+dta.477s_fiber <- querydb("sql/form477s-fiber.sql")
 
 
 ## disconnect from database
@@ -61,4 +60,6 @@ dbDisconnect(con)
 ## write out the datasets
 
 write.csv(dd.2016, "../data/raw/deluxe_districts_2016.csv", row.names=F)
+write.csv(districts_schools, "../data/raw/districts_schools.csv", row.names=F)
 write.csv(dta.477s, "../data/raw/form_477s.csv", row.names=F)
+write.csv(dta.477s_fiber, "../data/raw/form_477s_fiber.csv", row.names=F)
