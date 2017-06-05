@@ -9,14 +9,13 @@
 rm(list=ls())
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("dplyr" ,"rgl", "plyr")
+packages.to.install <- c("dplyr" ,"rgl")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
   }
 }
 library(dplyr)
-library(plyr)
 library(rgl)
 
 ##districts_deluxe and manipulations
