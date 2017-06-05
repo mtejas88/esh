@@ -18,7 +18,7 @@ library(dotenv)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/ESH/ficher/'
+github_path <- '~/Documents/ESH/ficher/'
 
 
 options(java.parameters = "-Xmx4g" )
