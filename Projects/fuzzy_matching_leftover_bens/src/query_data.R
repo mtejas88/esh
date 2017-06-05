@@ -46,10 +46,10 @@ querydb <- function(query_name){
   return(data)
 }
 
-dd.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL", sep=""))
-dd.2016 <- correct.dataset(dd.2016, sots.flag=0, services.flag=0)
-dta.470 <- querydb(paste(github_path, "General_Resources/sql_scripts/Form470s.SQL", sep=""))
+nces <- querydb(paste(github_path, "General_Resources/sql_scripts/fy2014_fy2015_schools_membership.SQL", sep=""))
+nces.districts <- querydb(paste(github_path, "General_Resources/sql_scripts/fy2014_fy2015_districts_directories.SQL", sep=""))
 bens <- querydb(paste(github_path, "General_Resources/sql_scripts/Entity_Bens.SQL", sep=""))
+nces.to.entities.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_nces_entities.SQL", sep=""))
 
 ## disconnect from database
 dbDisconnect(con)
@@ -57,6 +57,7 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(dd.2016, "data/raw/deluxe_districts_2016.csv", row.names=F)
-write.csv(dta.470, "data/raw/form_470.csv", row.names=F)
+write.csv(nces, "data/raw/nces_schools_2014-15.csv", row.names=F)
+write.csv(nces.districts, "data/raw/nces_districts_2014-15.csv", row.names=F)
 write.csv(bens, "data/raw/bens.csv", row.names=F)
+write.csv(nces.to.entities.2017, "data/raw/2017_nces_to_entities.csv", row.names=F)

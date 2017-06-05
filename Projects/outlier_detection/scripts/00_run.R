@@ -8,11 +8,11 @@ rm(list = ls())
 lib <- c("dplyr")
 
 #this installs packages only if you don't have them
-for (i in 1:length(lib)){
-  if (!lib[i] %in% rownames(installed.packages())){
-    install.packages(lib[i])
-  }
-}
+#for (i in 1:length(lib)){
+#  if (!lib[i] %in% rownames(installed.packages())){
+#    install.packages(lib[i], repos="http://cran.us.r-project.org")
+#  }
+#}
 library(dplyr)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
@@ -104,5 +104,8 @@ system.time(for(i in 1:nrow(d_matrix)) {
   use_case_bw_per_student(d_16,d_17,d_matrix[i,1], d_matrix[i,2],with_16=0,n_17_at_time=1)
 })
 
+source("05_export_to_postgres.R")
+
+
 # export
-write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("../data/final/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
