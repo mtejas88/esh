@@ -392,23 +392,31 @@ when
 
 		   	END as needs_wifi,
 
-	c2.c2_budget_haircut as c2_prediscount_budget_15,
+	c2.c2_budget as c2_prediscount_budget_15,
 
-	c2.budget_remaining_c2_2015_haircut as c2_prediscount_remaining_15,
+	c2.budget_remaining_c2_2015 as c2_prediscount_remaining_15,
 
-	c2.budget_remaining_c2_2016_haircut as c2_prediscount_remaining_16,
+	c2.budget_remaining_c2_2016 as c2_prediscount_remaining_16,
 
-	c2.budget_remaining_c2_2015_postdiscount_haircut as c2_postdiscount_remaining_15,
+	c2.budget_remaining_c2_2017 as c2_prediscount_remaining_17,
 
-	c2.budget_remaining_c2_2016_postdiscount_haircut as c2_postdiscount_remaining_16,
+	c2.budget_remaining_c2_2015_postdiscount as c2_postdiscount_remaining_15,
+
+	c2.budget_remaining_c2_2016_postdiscount as c2_postdiscount_remaining_16,
+
+	c2.budget_remaining_c2_2017_postdiscount as c2_postdiscount_remaining_17,
 
 	c2.received_c2_15,
 
 	c2.received_c2_16,
 
+	c2.received_c2_17,
+
 	c2.budget_used_c2_15,
 
 	c2.budget_used_c2_16,
+
+	c2.budget_used_c2_17,
 
 	wan_lines_w_dirty,
 
@@ -437,7 +445,7 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 5/30/2017 -- JH updated wifi fields
+Last Modified Date: 6/5/2017 -- JH added 2017 wifi metrics and removed wifi haircut
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

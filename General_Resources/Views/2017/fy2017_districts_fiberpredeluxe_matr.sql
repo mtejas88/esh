@@ -477,17 +477,25 @@ select distinct
 
 	c2_prediscount_remaining_16,
 
+	c2_prediscount_remaining_17,
+
 	c2_postdiscount_remaining_15,
 
 	c2_postdiscount_remaining_16,
+
+	c2_postdiscount_remaining_17,
 
 	received_c2_15,
 
 	received_c2_16,
 
+	received_c2_17,
+
 	budget_used_c2_15,
 
 	budget_used_c2_16,
+
+	budget_used_c2_17,
 
 	fbts.fiber_target_status,
 
@@ -534,7 +542,7 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 5/30/2017 -- JH updated wifi fields
+Last Modified Date: 6/5/2017 -- JH added 2017 wifi fields
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:
