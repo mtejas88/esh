@@ -216,7 +216,6 @@ with school_calc as (
           on ros.line_item = li.frn_complete
           left join public.funding_requests_2016_and_later fr
           on ros.frn = fr.frn
-          and li.funding_year = 2016
           left join (
             select
               line_item,
