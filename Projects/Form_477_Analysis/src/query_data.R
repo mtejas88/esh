@@ -47,10 +47,14 @@ querydb <- function(query_name){
 }
 
 dd.2016 <- querydb("sql/dd_2016.sql") 
+dta.sr_sp <- querydb("sql/sr_2016.sql")
 dd.2016 <- correct.dataset(dd.2016, sots.flag=0, services.flag=0)
 districts_schools=querydb("sql/district_lookup.sql")
+#time warning for dta.477s
 dta.477s <- querydb("sql/form477s.sql")
 dta.477s_fiber <- querydb("sql/form477s-fiber.sql")
+#time warning for dta.477s_fiber_bg_ct
+dta.477s_fiber_bg_ct <- querydb("sql/form477s-fiber-bg-ct.sql")
 
 
 ## disconnect from database
@@ -60,6 +64,8 @@ dbDisconnect(con)
 ## write out the datasets
 
 write.csv(dd.2016, "../data/raw/deluxe_districts_2016.csv", row.names=F)
+write.csv(dta.sr_sp, "../data/raw/services_received_2016.csv", row.names=F)
 write.csv(districts_schools, "../data/raw/districts_schools.csv", row.names=F)
 write.csv(dta.477s, "../data/raw/form_477s.csv", row.names=F)
 write.csv(dta.477s_fiber, "../data/raw/form_477s_fiber.csv", row.names=F)
+write.csv(dta.477s_fiber_bg_ct, "../data/raw/form_477s_fiber_bg_ct.csv", row.names=F)

@@ -41,3 +41,43 @@ summary(districts_schools_blocks_final)
 ##**************************************************************************************************************************************************
 ## write out the interim datasets
 write.csv(districts_schools_blocks_final, "../data/interim/districts_schools_blocks_final.csv", row.names=F)
+
+##**************************************************************************************************************************************************
+## Follow-up 6/6 - need data at blockgroup and census tract level
+
+#create columns for block group and census tract
+districts_schools_blocks_final$blockgroup <- substr(districts_schools_blocks_final$blockcode, 1, 11)
+districts_schools_blocks_final$censustract <- substr(districts_schools_blocks_final$blockcode, 1, 10)
+#read in data
+dta.477s_fiber_bg_ct <- read.csv("../data/raw/form_477s_fiber_bg_ct.csv", colClasses=c("blockgroup"="character","censustract"="character"), as.is=T, header=T, stringsAsFactors=F)
+#summarize by blockgroup
+dta.477s_fiber_bg = dta.477s_fiber_bg_ct %>% select(blockgroup,nproviders) %>% group_by(blockgroup) %>% summarise (nproviders_bg = sum(nproviders))
+#summarize by censustract
+dta.477s_fiber_ct = dta.477s_fiber_bg_ct %>% select(censustract,nproviders) %>% group_by(censustract) %>% summarise (nproviders_ct = sum(nproviders))
+
+##### blockgroup
+## merge in service provider info for fiber-only providers
+districts_schools_blocks_bg <- merge(districts_schools_blocks_final, dta.477s_fiber_bg, by='blockgroup', all.x=T)
+str(districts_schools_blocks_bg)
+## for nproviders, replace nulls with 0
+districts_schools_blocks_bg$nproviders_bg[is.na(districts_schools_blocks_bg$nproviders_bg)] <- 0
+summary(districts_schools_blocks_bg)
+
+##### censustract
+## merge in service provider info for fiber-only providers
+districts_schools_blocks_ct <- merge(districts_schools_blocks_final, dta.477s_fiber_ct, by='censustract', all.x=T)
+str(districts_schools_blocks_ct)
+## for nproviders, replace nulls with 0
+districts_schools_blocks_ct$nproviders_ct[is.na(districts_schools_blocks_ct$nproviders_ct)] <- 0
+summary(districts_schools_blocks_ct)
+
+### merge so it's easier to summarize together
+districts_schools_blocks_bg_ct=merge(districts_schools_blocks_bg,districts_schools_blocks_ct[,c("esh_id","nproviders_ct")], by="esh_id", all.x=T)
+summary(districts_schools_blocks_bg_ct)
+#remove duplicate rows
+print(length(districts_schools_blocks_bg_ct$esh_id))
+print(dim(unique(districts_schools_blocks_bg_ct[,c("esh_id","district_esh_id")])))
+districts_schools_blocks_bg_ct=districts_schools_blocks_bg_ct[!duplicated(districts_schools_blocks_bg_ct),]
+##**************************************************************************************************************************************************
+## write out the interim datasets
+write.csv(districts_schools_blocks_bg_ct, "../data/interim/districts_schools_blocks_final_bg_ct.csv", row.names=F)
