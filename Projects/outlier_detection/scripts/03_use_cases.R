@@ -92,8 +92,6 @@ identify_outliers_loop <- function(o_16,output,significance_level,cost_column,un
 use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, line_item_purpose, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -104,6 +102,8 @@ use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, 
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+  data_17=as.data.frame(data_17)
+  data_17["year"]=2017
   output17 <- data_17 %>%
     filter(
       round(bandwidth_in_mbps,digits=1) %in% circuit_size,
@@ -151,8 +151,6 @@ return(distribution)
 use_case_total_bw <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -163,6 +161,8 @@ use_case_total_bw <- function (data, data_17, district_locale, size, with_16,n_1
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+  data_17["year"]=2017
+  data_17=as.data.frame(data_17)
   output17 <- data_17 %>%
     filter(
       locale %in% district_locale,
@@ -208,8 +208,6 @@ return(distribution)
 use_case_pct_bw <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -220,6 +218,8 @@ use_case_pct_bw <- function (data, data_17, district_locale, size, with_16,n_17_
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
     output17 <- data_17 %>%
       filter(
         locale %in% district_locale,
@@ -265,8 +265,6 @@ return(distribution)
 use_case_total_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -277,6 +275,8 @@ use_case_total_cost <- function (data, data_17, district_locale, size, with_16,n
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
     output17 <- data_17 %>%
       filter(
         locale %in% district_locale,
@@ -322,8 +322,6 @@ return(distribution)
 use_case_pct_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -334,6 +332,8 @@ use_case_pct_cost <- function (data, data_17, district_locale, size, with_16,n_1
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
     output17 <- data_17 %>%
       filter(
         locale %in% district_locale,
@@ -379,8 +379,6 @@ return(distribution)
 use_case_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -391,6 +389,8 @@ use_case_cost <- function (data, data_17, district_locale, size, with_16,n_17_at
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
     output17 <- data_17 %>%
       filter(
         locale %in% district_locale,
@@ -437,8 +437,6 @@ return(distribution)
 use_case_bw_per_student <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -449,6 +447,8 @@ use_case_bw_per_student <- function (data, data_17, district_locale, size, with_
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
     output17 <- data_17 %>%
       filter(
         locale %in% district_locale,
