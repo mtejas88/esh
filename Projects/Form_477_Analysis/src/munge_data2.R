@@ -46,14 +46,15 @@ write.csv(districts_schools_blocks_final, "../data/interim/districts_schools_blo
 ## Follow-up 6/6 - need data at blockgroup and census tract level
 
 #create columns for block group and census tract
-districts_schools_blocks_final$blockgroup <- substr(districts_schools_blocks_final$blockcode, 1, 11)
-districts_schools_blocks_final$censustract <- substr(districts_schools_blocks_final$blockcode, 1, 10)
+districts_schools_blocks_final$blockgroup <- substr(districts_schools_blocks_final$blockcode, 1, 12)
+districts_schools_blocks_final$censustract <- substr(districts_schools_blocks_final$blockcode, 1, 11)
 #read in data
-dta.477s_fiber_bg_ct <- read.csv("../data/raw/form_477s_fiber_bg_ct.csv", colClasses=c("blockgroup"="character","censustract"="character"), as.is=T, header=T, stringsAsFactors=F)
-#summarize by blockgroup
-dta.477s_fiber_bg = dta.477s_fiber_bg_ct %>% select(blockgroup,nproviders) %>% group_by(blockgroup) %>% summarise (nproviders_bg = sum(nproviders))
-#summarize by censustract
-dta.477s_fiber_ct = dta.477s_fiber_bg_ct %>% select(censustract,nproviders) %>% group_by(censustract) %>% summarise (nproviders_ct = sum(nproviders))
+  #blockgroup
+dta.477s_fiber_bg = read.csv("../data/raw/form_477s_fiber_bg.csv", colClasses=c("blockgroup"="character"), as.is=T, header=T, stringsAsFactors=F)
+names(dta.477s_fiber_bg) = c("blockgroup","nproviders_bg")
+  #censustract
+dta.477s_fiber_ct = read.csv("../data/raw/form_477s_fiber_ct.csv", colClasses=c("censustract"="character"), as.is=T, header=T, stringsAsFactors=F)
+names(dta.477s_fiber_ct) = c("censustract","nproviders_ct")
 
 ##### blockgroup
 ## merge in service provider info for fiber-only providers

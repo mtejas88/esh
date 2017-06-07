@@ -53,8 +53,9 @@ districts_schools=querydb("sql/district_lookup.sql")
 #time warning for dta.477s
 dta.477s <- querydb("sql/form477s.sql")
 dta.477s_fiber <- querydb("sql/form477s-fiber.sql")
-#time warning for dta.477s_fiber_bg_ct
-dta.477s_fiber_bg_ct <- querydb("sql/form477s-fiber-bg-ct.sql")
+#time warning for these below
+dta.477s_fiber_bg <- querydb("sql/form477s-fiber-bg.sql")
+dta.477s_fiber_ct <- querydb("sql/form477s-fiber-ct.sql")
 
 
 ## disconnect from database
@@ -68,4 +69,5 @@ write.csv(dta.sr_sp, "../data/raw/services_received_2016.csv", row.names=F)
 write.csv(districts_schools, "../data/raw/districts_schools.csv", row.names=F)
 write.csv(dta.477s, "../data/raw/form_477s.csv", row.names=F)
 write.csv(dta.477s_fiber, "../data/raw/form_477s_fiber.csv", row.names=F)
-write.csv(dta.477s_fiber_bg_ct, "../data/raw/form_477s_fiber_bg_ct.csv", row.names=F)
+write.csv(dta.477s_fiber_bg, "../data/raw/form_477s_fiber_bg.csv", row.names=F)
+write.csv(dta.477s_fiber_ct, "../data/raw/form_477s_fiber_ct.csv", row.names=F)

@@ -139,7 +139,7 @@ tgt_0sp=dd_blocks_sp %>% filter(fiber_target_status %in% c("Target"), nproviders
 #Join to revices_received service providers, export to csv
 dta.sr_sp <- read.csv("../data/raw/services_received_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 tgt_0sp_allsp <- merge(tgt_0sp,dta.sr_sp, by.x="district_esh_id", by.y="recipient_id")
-tgt_0sp_allsp <- tgt_0sp_allsp %>% group_by(service_provider_name) %>% summarise (ndistricts = n_distinct(district_esh_id)) %>% arrange(desc(ndistricts))
+tgt_0sp_allsp <- tgt_0sp_allsp %>% group_by(reporting_name) %>% summarise (ndistricts = n_distinct(district_esh_id)) %>% arrange(desc(ndistricts))
 
 write.csv(tgt_0sp_allsp, "../data/export/service_providers_targets_0on477.csv", row.names=F)
 
