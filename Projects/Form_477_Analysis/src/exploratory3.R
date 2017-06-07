@@ -5,10 +5,10 @@
 ##
 ## Follow-ups to address after Evan meeting:
 ##
-## Filtering for ONLY fiber service providers (TechCode='50'), and extend census blocks across all schools
+## Filtering for ONLY fiber service providers (TechCode='50') for the histograms, repeating at the 
+## blockgroup and census tract level, extend across all schools
+## Need to aggregate properly to count disinct providers within districts after extending to all schools
 ##
-## 1) Basic stats - # census blocks represented among districts AND schools in our universe, avg. # districts 
-## AND schools to a block, avg # fiber service providers in a block 
 ## 2) Distribution of # fiber service providers in a block by our fiber target status - in theory, most of the 
 ## fiber targets are in locations where there is only one or none fiber service providers 
 ## 3) At the national level, is the mean # fiber service providers in a block significantly different for Fiber 
@@ -29,19 +29,13 @@ library(dplyr)
 library(tidyr)
 
 ## read in data
-dd.2016 <- read.csv("../data/raw/deluxe_districts_2016.csv", as.is=T, header=T, stringsAsFactors=F)
-districts_schools_blocks_final <- read.csv("../data/interim/districts_schools_blocks_final.csv", as.is=T, header=T, stringsAsFactors=F,colClasses=c("blockcode"="character"))
+#read in dataset
+districts_schools_blocks_final_bg_ct <- read.csv("../data/interim/districts_schools_blocks_final_bg_ct3.csv", 
+                                                 as.is=T, header=T, stringsAsFactors=F)
+str(districts_schools_blocks_final_bg_ct)
 
-##**************************************************************************************************************************************************
-## basic stats
-
-## # census blocks represented among districts AND schools in our universe
-length(unique(districts_schools_blocks_final$blockcode)) #79,910
-## distribution of # districts and/or schools to a block
-by_block=districts_schools_blocks_final %>% group_by(blockcode) %>% summarise(count=n()) %>% as.data.frame()
-summary(by_block$count) #1.27
-## create final table grouped by district
-dd_blocks_sp = districts_schools_blocks_final %>% group_by(district_esh_id) %>% summarise (nproviders = sum(nproviders))
+## avg # fiber service providers in a block - stat that needs to change with new aggregation 
+summary(districts_schools_blocks_final_bg_ct$nproviders_bc) # 0.815
 ##**************************************************************************************************************************************************
 ## distribution of service providers by fiber target status (national level)
 
@@ -49,17 +43,15 @@ library(ggplot2)
 library(plyr)
 library(scales)
 
-#merge districts deluxe to get fiber_target_status
-dd_blocks_sp = merge(dd_blocks_sp,dd.2016[,c("esh_id","fiber_target_status")], by.x="district_esh_id", by.y="esh_id")
-dd_blocks_2tgts = dd_blocks_sp %>% filter(fiber_target_status %in% c("Target","Not Target"))
+dd_blocks_2tgts = districts_schools_blocks_final_bg_ct %>% filter(fiber_target_status %in% c("Target","Not Target"))
 #get means by Fiber Target/Not Fiber Target
-sdat <- ddply(dd_blocks_2tgts, "fiber_target_status", summarise, nprov.mean=mean(nproviders))
+sdat <- ddply(dd_blocks_2tgts, "fiber_target_status", summarise, nprov.mean=mean(nproviders_bc))
 #get means by all Fiber Target Status
-sdat_all <- ddply(dd_blocks_sp, "fiber_target_status", summarise, nprov.mean=mean(nproviders))
+sdat_all <- ddply(districts_schools_blocks_final_bg_ct, "fiber_target_status", summarise, nprov.mean=mean(nproviders_bc))
 
 ## generate figure for 'target' vs. 'not target'
 png("../figures/hist-2target-fiber-schools.png",width=580, height=410)
-ggplot(dd_blocks_2tgts, aes(x=nproviders, fill=..count..)) + geom_histogram(aes(y=..density..*.86,fill=..density..), binwidth=1, colour="black") +
+ggplot(dd_blocks_2tgts, aes(x=nproviders_bc, fill=..count..)) + geom_histogram(aes(y=..density..*.98,fill=..density..), binwidth=1, colour="black") +
   facet_grid(fiber_target_status ~ .) + labs(title="# Form 477 Fiber Service Providers in Census Block, by Fiber Target Status", x="Number of Fiber Providers in Census Block", y="% Districts") + 
   theme(legend.position="none", plot.title = element_text(hjust = 0.5)) +
   scale_x_continuous(limits=c(-0.5,6), breaks = seq(0, 6, by = 1)) + scale_y_continuous(labels=percent, breaks = seq(0, 0.7, by = 0.1)) +
@@ -72,97 +64,41 @@ detach("package:scales", unload=TRUE)
 detach("package:plyr", unload=TRUE) 
 
 ## get the % districts with 1 or less service providers for 'target' vs. 'not target'
-dd_blocks_2tgts %>% mutate(l1_providers=(nproviders==0)) %>% 
+dd_blocks_2tgts %>% mutate(l1_providers=(nproviders_bc==0)) %>% 
   group_by(fiber_target_status,l1_providers) %>%
   summarise (n = n()) %>%
   mutate(pct = n / sum(n))
-# Not_Target     TRUE  4646 0.4913283
-# Target         TRUE   924 0.6715116
-dd_blocks_2tgts %>% mutate(l1_providers=(nproviders==1)) %>% 
+# Not_Target     TRUE  4653 0.4913930
+# Target         TRUE   927 0.6717391
+dd_blocks_2tgts %>% mutate(l1_providers=(nproviders_bc==1)) %>% 
   group_by(fiber_target_status,l1_providers) %>%
   summarise (n = n()) %>%
   mutate(pct = n / sum(n))
-# Not_Target     TRUE   686 0.07254653
-# Target         TRUE    80 0.05813953
+# Not_Target     TRUE   2957 0.3122822
+# Target         TRUE   294 0.2130435
 ##**************************************************************************************************************************************************
 ## t-tests for number of service providers
 
 ## 'target' vs. 'not target'
-x = dd_blocks_sp %>% filter(fiber_target_status %in% c("Target"))  %>% select(nproviders)
-y = dd_blocks_sp %>% filter(fiber_target_status %in% c("Not Target"))  %>% select(nproviders)
+x = districts_schools_blocks_final_bg_ct %>% filter(fiber_target_status %in% c("Target"))  %>% select(nproviders_bc)
+y = districts_schools_blocks_final_bg_ct %>% filter(fiber_target_status %in% c("Not Target"))  %>% select(nproviders_bc)
 t.test(x,y, var.equal = FALSE, alternative = c("less")) #p-value < 2.2e-16,
 #mean of x mean of y 
-#1.683866  4.034898 
+#0.5014493 0.8534164 
 ## 'potential target' vs. 'not target' -- see the same trend as when looking at all providers - 'potential targets' have more for some reason
-x = dd_blocks_sp %>% filter(fiber_target_status %in% c("Potential Target"))  %>% select(nproviders)
-t.test(x,y, var.equal = FALSE) #p-value = 0.3539, 
+x = districts_schools_blocks_final_bg_ct %>% filter(fiber_target_status %in% c("Potential Target"))  %>% select(nproviders_bc)
+t.test(x,y, var.equal = FALSE) #p-value = 0.0002213, 
 #mean of x mean of y 
-#4.848406  4.034898  
-##**************************************************************************************************************************************************
-## research question follow ups 6/5 - note many of these were adhoc checked using Mode
+#0.9630607 0.8534164  
 
-# Let's review one example of a Not Target district with 0 service providers:
-# * determine what service provider that district uses
-# * determine if that service provider is close to the district / within the same census block grouping
-# * determine if that service provider serves within the school polygons
-
-#summarize by state, order by proportion of districts with 0 total service providers
-not_tgt_0sp=dd_blocks_sp %>% filter(fiber_target_status %in% c("Not Target"))
-not_tgt_0sp=merge(not_tgt_0sp,dd.2016[,c("esh_id","postal_cd")], by.x="district_esh_id", by.y="esh_id")
-not_tgt_0sp_bystate=not_tgt_0sp %>% 
-  mutate(zero_providers=(nproviders==0)) %>%
-  group_by(postal_cd,zero_providers) %>%
-  summarise (n = n()) %>%
-  mutate(pct = n / sum(n)) %>% 
-  filter(zero_providers==TRUE) %>% arrange(desc(pct))
-#ordered by just number of districts, not proportion with 0 providers
-View(not_tgt_0sp %>%
-  filter(nproviders==0) %>%
-  group_by(postal_cd) %>%
-  summarise (n = n()) %>%
-  mutate(pct = n / sum(n)) %>% arrange(desc(pct)))
-
-# Let's review one example of a Not Target district with 1 service providers:
-# * determine what service provider that district uses
-# * determine if that service provider is the one that that district is using
-not_tgt_1sp=dd_blocks_sp %>% filter(fiber_target_status %in% c("Not Target")) %>% filter(nproviders==1) 
-
-districts_schools_blocks_final %>% filter(district_esh_id==881447)
 ##**************************************************************************************************************************************************
 ## research question follow ups 6/6 
-
-## 1
-#Get target districts with 0 service providers
-tgt_0sp=dd_blocks_sp %>% filter(fiber_target_status %in% c("Target"), nproviders==0)
-tgt_0sp = merge(tgt_0sp,dd.2016[,c("esh_id","postal_cd")], by.x="district_esh_id", by.y="esh_id")
-#Join to revices_received service providers, export to csv
-dta.sr_sp <- read.csv("../data/raw/services_received_2016.csv", as.is=T, header=T, stringsAsFactors=F)
-tgt_0sp_allsp <- merge(tgt_0sp,dta.sr_sp, by.x="district_esh_id", by.y="recipient_id")
-#count the districts and get list of states
-tgt_0sp_allsp <- tgt_0sp_allsp %>% group_by(reporting_name) %>% 
-  summarise (ndistricts = n_distinct(district_esh_id),
-             states=paste(postal_cd, collapse=", ")) %>%
-  arrange(desc(ndistricts))
-tgt_0sp_allsp$states=sapply(tgt_0sp_allsp$states,function(x) {unique(unlist(strsplit(x, split=", ")))})
-#export
-tgt_0sp_allsp$states <- vapply(tgt_0sp_allsp$states, paste, collapse = ", ", character(1L))
-write.csv(tgt_0sp_allsp, "../data/export/service_providers_targets_0on477.csv", row.names=F)
 
 ## 2
 #run analysis at block group and tract level -- only necessary to share target/not target % with 0 SPs, % with 1 SPs
 
-#read in dataset
-districts_schools_blocks_final_bg_ct <- read.csv("../data/interim/districts_schools_blocks_final_bg_ct.csv", 
-                                                 as.is=T, header=T, stringsAsFactors=F,
-                                                 colClasses=c("blockgroup"="character","blockcode"="character","censustract"="character"))
-str(districts_schools_blocks_final_bg_ct)
-#summarize by district
-dd_blocks_sp_bg_ct = districts_schools_blocks_final_bg_ct %>% group_by(district_esh_id) %>% 
-  summarise (nproviders_bc =sum(nproviders), nproviders_bg = sum(nproviders_bg),nproviders_ct = sum(nproviders_ct))
-#merge districts deluxe to get fiber_target_status
-dd_blocks_sp_bg_ct = merge(dd_blocks_sp_bg_ct,dd.2016[,c("esh_id","fiber_target_status")], by.x="district_esh_id", by.y="esh_id")
 #filter just to Target vs. Not Target
-dd_allblocks_2tgts = dd_blocks_sp_bg_ct %>% filter(fiber_target_status %in% c("Target","Not Target"))
+dd_allblocks_2tgts = districts_schools_blocks_final_bg_ct %>% filter(fiber_target_status %in% c("Target","Not Target"))
 
 ## get the % districts with 0, 1 fiber service providers for 'target' vs. 'not target'
 
