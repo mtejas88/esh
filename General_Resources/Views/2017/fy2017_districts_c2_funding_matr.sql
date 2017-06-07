@@ -137,12 +137,12 @@ with school_calc as (
                 end
             else .7
           end as c2_discount_rate
-          from public.fy2016_schools_demog_matr sd
+          from public.fy2017_schools_demog_matr sd
           left join public.entity_bens eb
           on sd.school_esh_id = eb.entity_id::varchar
           left join fy2016.entity_reports er
           on er.entity_number = eb.ben
-          left join public.fy2016_districts_deluxe_matr dd
+          left join public.fy2017_districts_deluxe_matr dd
           on sd.district_esh_id = dd.esh_id
           where dd.include_in_universe_of_districts_all_charters = true
         ) entities
@@ -436,10 +436,10 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 5/30/2017
-Last Modified Date: 6/5/2017 - added 2017 c2 calculation. changed funding to be based off of 153.47 per student with a min
-of 9412.80 per school. Also created a rounded 2017 budget remiaing (to nearest thousand, or hundred if less than 1000 remaining)
+Last Modified Date: 6/6/2017 - changed schools demog and dd to be 2017. kept entity reports at 2016
+because that is the most up to date table we have for entity reports.
 Name of QAing Analyst(s):
-Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget. Still need to add in 2017 line items
+Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
 Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
 that the C2 remaining budget does not always match USAC
 */
