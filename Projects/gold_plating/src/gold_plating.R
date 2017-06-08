@@ -97,3 +97,12 @@ districts_clean_high_bw$cost_category <- ifelse(districts_clean_high_bw$monthly_
                                                                '>$40'))),'<$1')
 
 table(districts_clean_high_bw$cost_category)
+
+round(nrow(districts_clean_high_bw)/nrow(districts_clean),2)
+gt.1 <- nrow(districts_clean_high_bw) - nrow(filter(districts_clean_high_bw, cost_category == '<$1'))
+round(gt.1/nrow(districts_clean),2)
+gt.4.5 <- gt.1 - nrow(filter(districts_clean_high_bw, cost_category == '$1-$4.50'))
+round(gt.4.5/nrow(districts_clean),2)
+gt.13.5 <- gt.4.5 - nrow(filter(districts_clean_high_bw, cost_category == '$4.50-$13.50'))
+round(gt.13.5/nrow(districts_clean),2)
+round(nrow(filter(districts_clean_high_bw, cost_category == '>$40'))/nrow(districts_clean),2)
