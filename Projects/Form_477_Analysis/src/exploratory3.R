@@ -36,6 +36,8 @@ str(districts_schools_blocks_final_bg_ct)
 
 ## avg # fiber service providers in a block - stat that needs to change with new aggregation 
 summary(districts_schools_blocks_final_bg_ct$nproviders_bc) # 0.815
+summary(districts_schools_blocks_final_bg_ct$nproviders_bg) # 1.662
+summary(districts_schools_blocks_final_bg_ct$nproviders_ct) # 2.232
 ##**************************************************************************************************************************************************
 ## distribution of service providers by fiber target status (national level)
 
@@ -145,13 +147,13 @@ theme_esh <- function(){
   )
 }
 
-png("../figures/hist-2target-fiber-dlevels.png",width=650, height=450)
+png("../figures/hist-2target-fiber-dlevels.png",width=500, height=450)
 ggplot(dd_allblocks_2tgts_dsum, aes(x = factor(dlevel,levels=c("census block","blockgroup","census tract")), 
                                     y = pct, fill = factor(zeroproviders), label =paste(round(pct*100),"%"))) +
   geom_bar(stat="identity")  + facet_grid(fiber_target_status ~ .) + 
   scale_y_continuous(labels=percent) + 
   geom_text(size = 3.7, position = position_stack(vjust = 0.5)) +
-  labs(x="Analysis Level", y="% Districts") + guides(fill=guide_legend(title="# Fiber Service Providers")) +
+  labs(x="Analysis Level", y="% Districts") + guides(fill=guide_legend(title="# Fiber Service \nProviders")) +
   scale_fill_manual(values=c('#f09222' ,'#f5bc74', '#f8ddbb'))+
   theme_esh()
 dev.off()
