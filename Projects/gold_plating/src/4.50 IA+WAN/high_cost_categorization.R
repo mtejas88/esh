@@ -9,7 +9,7 @@
 rm(list=ls())
 
 ## set working directory
-#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("dplyr")
@@ -43,3 +43,7 @@ nrow(dist_rural)/nrow(high_cost)
 #overlap
 overlap <- inner_join(dist_low_bids[,1], dist_rural, by = c("esh_id" = "esh_id"))
 nrow(overlap)/nrow(high_cost)
+
+#summary calcs
+(nrow(dist_rural)+nrow(dist_low_bids)-nrow(overlap))/nrow(districts)
+(nrow(high_cost)-(nrow(dist_rural)+nrow(dist_low_bids)-nrow(overlap)))/nrow(districts)

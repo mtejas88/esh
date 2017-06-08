@@ -132,3 +132,6 @@ write.csv(summarize(bws,
           average_students = mean(num_students, na.rm = T),
           districts = n()), 
           "data/interim/districts_clean_bws_summary.csv")
+
+write.csv(districts_clean,
+          "data/interim/districts_clean_bws.csv")
