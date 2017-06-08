@@ -106,3 +106,15 @@ round(gt.4.5/nrow(districts_clean),2)
 gt.13.5 <- gt.4.5 - nrow(filter(districts_clean_high_bw, cost_category == '$4.50-$13.50'))
 round(gt.13.5/nrow(districts_clean),2)
 round(nrow(filter(districts_clean_high_bw, cost_category == '>$40'))/nrow(districts_clean),2)
+
+##histogram of all cost/student 
+p.all <- ggplot(districts_clean, aes(log(monthly_cost_per_student)))
+#breakpoints
+ntile_95 <- quantile(districts_clean$monthly_cost_per_student, .95) 
+p.all + geom_histogram(binwidth=.05)+
+  scale_x_continuous(breaks=c(-4,0,log(ntile_95), 4), 
+                     labels=c(round(exp(-4),2), 1,round(ntile_95,2),round(exp(4),0)))+
+  ylab("Districts")+
+  xlab("IA $/student")+ 
+  geom_vline(xintercept = log(ntile_95), color = '#CB2027', linetype="dashed", size = 1)
+
