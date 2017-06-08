@@ -32,7 +32,6 @@ temp as (
 select
   lil.recipient_id,
   bandwidth_in_mbps,
-  num_internet_lines,
   unnest(lil.line_items) as line_item_id
 
 from
@@ -53,7 +52,12 @@ select
             when sr.monthly_circuit_cost_recurring is null or sr.monthly_circuit_cost_recurring = 0
               then line_item_total_monthly_cost / line_item_total_num_lines::numeric
             else sr.monthly_circuit_cost_recurring
-          end ) as avg_cost_per_circuit
+          end ) as avg_cost_per_circuit,
+  percentile_cont (0.3) within group (order by case  
+                                                when sr.monthly_circuit_cost_recurring is null or sr.monthly_circuit_cost_recurring = 0
+                                                  then line_item_total_monthly_cost / line_item_total_num_lines::numeric
+                                                else sr.monthly_circuit_cost_recurring
+                                              end ) as thirtieth_percentile
 
 
 from 
@@ -66,6 +70,7 @@ and bandwidth_in_mbps > 100
 and recipient_exclude_from_ia_analysis = false
 and recipient_postal_cd != 'AK'
 and connect_category ilike '%Fiber%'
+and line_item_total_monthly_cost > 0
 
 group by 
   bandwidth_in_mbps
@@ -77,8 +82,8 @@ order by
 
 select 
   temp.recipient_id,
-  d.locale,
   temp.bandwidth_in_mbps,
+  dd.locale,
   case  
     when sr.monthly_circuit_cost_recurring is null or sr.monthly_circuit_cost_recurring = 0
       then line_item_total_monthly_cost / line_item_total_num_lines::numeric
@@ -86,7 +91,8 @@ select
   end as cost_per_circuit,
   sr.quantity_of_line_items_received_by_district as num_internet_lines,
   n.median_cost_per_circuit,
-  n.avg_cost_per_circuit
+  n.avg_cost_per_circuit,
+  n.thirtieth_percentile
 
 from temp
 
@@ -97,8 +103,8 @@ and temp.recipient_id = sr.recipient_id
 left join national n
 on sr.bandwidth_in_mbps = n.bandwidth_in_mbps
 
-left join public.fy2016_districts_deluxe_matr d
-on sr.recipient_id = d.esh_id
+left join public.fy2017_districts_deluxe_matr dd
+on sr.recipient_id = dd.esh_id
 
 order by
   temp.recipient_id
