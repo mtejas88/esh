@@ -1,11 +1,45 @@
 with dropped_apps as (
   select
-    bi16.billed_entity_number, bi16.application_number,
-    bi16.applicant_type, bi16.category_one_discount_rate, bi16.urban_rural_status
-  from fy2016.basic_informations bi16
-  left join fy2017.basic_informations bi17
-  on bi16.billed_entity_number = bi17.billed_entity_number
-  where bi17.billed_entity_number is null
+    bi15."BEN" as billed_entity_number,
+    bi15."Application Number" as application_number,
+    bi15."App Type" as applicant_type,
+    case
+      when dc.category_one_discount_rate is null
+        then frki.category_one_discount_rate
+      else dc.category_one_discount_rate
+    end as category_one_discount_rate,
+    case
+      when dc.urban_rural_status = 'Y'
+        then 'Urban'
+      when dc.urban_rural_status = 'N' or dc.urban_rural_status is null
+        then 'Rural'
+      else 'Urban;Rural'
+    end as urban_rural_status
+  from public.fy2015_basic_information_and_certifications bi15
+  left join (
+  	select "Application Number",
+  			avg(case
+	  				when "FRN Service Type" ilike '%voice%'
+	  					then "Discount"::numeric + 20
+	  				when "FRN Service Type" ilike '%internal%' and "Discount"::numeric = 85
+	  					then 90
+	  				else "Discount"::numeric
+	  			end) as category_one_discount_rate
+  	from public.fy2015_funding_request_key_informations
+  	group by 1
+  ) frki
+  on bi15."Application Number" = frki."Application Number"
+  left join (
+  	select "BEN",
+  			array_to_string(array_agg(distinct "Urban or Rural Mod"),';') as urban_rural_status,
+  			avg("Cat 1 Disc Rate"::numeric) as category_one_discount_rate
+  	from public.fy2015_discount_calculations
+  	group by 1
+  ) dc
+  on bi15."BEN" = dc."BEN"
+  left join fy2016.basic_informations bi16
+  on bi15."BEN" = bi16.billed_entity_number
+  where bi16.billed_entity_number is null and bi15."BEN" is not null
  ),
 
 dropped_types as (
@@ -16,23 +50,23 @@ dropped_types as (
 		da.category_one_discount_rate,
 		da.urban_rural_status,
 		sum(case
-				when frns.service_type ilike '%internal%'
+				when frki."FRN Service Type" ilike '%internal%'
 					then 1
 				else 0
 			end) as c2_app,
 		sum(case
-				when frns.service_type ilike '%internet%'
+				when frki."FRN Service Type" ilike '%internet%'
 					then 1
 				else 0
 			end) as internet_frns,
 		sum(case
-				when frns.service_type ilike '%voice%'
+				when frki."FRN Service Type" ilike '%voice%'
 					then 1
 				else 0
 			end) as voice_frns
 	from dropped_apps da
-	left join fy2016.frns
-	on da.application_number = frns.application_number
+	left join public.fy2015_funding_request_key_informations frki
+	on da.application_number = frki."Application Number"
 	group by 1,2,3,4,5
 ),
 
@@ -95,9 +129,14 @@ dropped_app_recipients as (
 			else 'internet only'
 		end as category,
 		dac.*,
-		ros.ben as recipient_ben
+		ros."BEN" as recipient_ben
 	from dropped_app_categories dac
-	left join fy2016.recipients_of_services ros
+	left join (
+		select ae.*, bi."BEN" as applicant_ben
+		from public.fy2015_item21_allocations_by_entities ae
+		left join public.fy2015_basic_information_and_certifications bi
+		on ae."Application Number" = bi."Application Number"
+	) ros
 	on dac.billed_entity_number = ros.applicant_ben
 )
 
@@ -105,15 +144,15 @@ select
 	category,
 	count(distinct billed_entity_number) as num_applicants,
 	count(distinct 	case
-						when applicant_type ilike '%library%'
+						when applicant_type = 'LIBRARY'
 							then billed_entity_number
 					end) as num_library_applicants,
 	count(distinct 	case
-						when applicant_type ilike '%school%'
+						when applicant_type = 'SCHOOL' or applicant_type = 'DISTRICT'
 							then billed_entity_number
 					end) as num_instructional_applicants,
 	count(distinct 	case
-						when applicant_type = 'Consortium'
+						when applicant_type = 'SLC CONSORTIUM' or applicant_type = 'STATEWIDE'
 							then billed_entity_number
 					end) as num_consortium_applicants,
 	count(distinct 	case
