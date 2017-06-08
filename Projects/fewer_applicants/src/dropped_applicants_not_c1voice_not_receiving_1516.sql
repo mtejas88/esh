@@ -173,57 +173,26 @@ added_1617 as (
 
 select
 	dar.category,
+	case
+		when applicant_type ilike '%library%'
+			then 'library'
+		else 'instructional'
+	end as applicant_type,
+	case
+		when category_one_discount_rate <= 50
+			then '<= 50'
+		when category_one_discount_rate <= 70
+			then '50-70'
+		else '70+'
+	end as category_one_discount_rate,
+	urban_rural_status,
 	count(distinct dar.billed_entity_number) as num_applicants,
-	count(distinct 	case
-						when applicant_type = 'LIBRARY'
-							then dar.billed_entity_number
-					end) as num_library_applicants,
-	count(distinct 	case
-						when applicant_type = 'SCHOOL' or applicant_type = 'DISTRICT'
-							then dar.billed_entity_number
-					end) as num_instructional_applicants,
-	count(distinct 	case
-						when applicant_type = 'SLC CONSORTIUM' or applicant_type = 'STATEWIDE'
-							then dar.billed_entity_number
-					end) as num_consortium_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate <= 50
-							then dar.billed_entity_number
-					end) as dr_50_or_less_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate > 50 and category_one_discount_rate <= 70
-							then dar.billed_entity_number
-					end) as dr_50_to_70_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate > 70
-							then dar.billed_entity_number
-					end) as dr_gt_70_applicants,
-	count(distinct 	case
-						when  urban_rural_status = 'Urban'
-							then dar.billed_entity_number
-					end) as urban_applicants,
-	count(distinct 	case
-						when  urban_rural_status = 'Rural'
-							then dar.billed_entity_number
-					end) as rural_applicants,
 	count(*) as num_recipients,
-	sum(case
-			when ros.recipient_ben is null
-				then 1
-			else 0
-		end) as num_recipients_dropped,
 	sum(case
           when number_of_students > 13300
             then 13300
           else number_of_students
-        end) as num_students,
-	sum(case
-			when ros.recipient_ben is null and number_of_students > 13300
-            	then 13300
-			when ros.recipient_ben is null
-				then number_of_students
-			else 0
-		end) as num_students_dropped
+        end) as num_students
 
 from dropped_app_recipients dar
 left join (
@@ -242,5 +211,7 @@ on dar.recipient_ben = dc.child_entity_ben
 left join added_1617
 on dar.billed_entity_number = added_1617.billed_entity_number
 where added_1617 is null
-group by 1
+and ros.recipient_ben is null
+and dar.category != 'c2 or voice only'
+group by 1,2,3,4
 order by 1
