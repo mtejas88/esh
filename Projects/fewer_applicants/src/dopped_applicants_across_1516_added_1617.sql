@@ -119,27 +119,6 @@ dropped_app_categories as (
 	group by 1
 ),
 
-dropped_app_recipients as (
-	select distinct
-		case
-			when c2_app+voice_only > 0 and internet_only+internet_and_voice=0
-				then 'c2 or voice only'
-			when c2_app+voice_only+internet_and_voice > 0
-				then 'partially c2 or voice'
-			else 'internet only'
-		end as category,
-		dac.*,
-		ros."BEN" as recipient_ben
-	from dropped_app_categories dac
-	left join (
-		select ae.*, bi."BEN" as applicant_ben
-		from public.fy2015_item21_allocations_by_entities ae
-		left join public.fy2015_basic_information_and_certifications bi
-		on ae."Application Number" = bi."Application Number"
-	) ros
-	on dac.billed_entity_number = ros.applicant_ben
-),
-
 added_1617 as (
 	select
 	  case
@@ -172,55 +151,9 @@ added_1617 as (
 )
 
 select
-	dar.category,
-	count(distinct dar.billed_entity_number) as num_applicants,
-	count(distinct 	case
-						when applicant_type = 'LIBRARY'
-							then dar.billed_entity_number
-					end) as num_library_applicants,
-	count(distinct 	case
-						when applicant_type = 'SCHOOL' or applicant_type = 'DISTRICT'
-							then dar.billed_entity_number
-					end) as num_instructional_applicants,
-	count(distinct 	case
-						when applicant_type = 'SLC CONSORTIUM' or applicant_type = 'STATEWIDE'
-							then dar.billed_entity_number
-					end) as num_consortium_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate <= 50
-							then dar.billed_entity_number
-					end) as dr_50_or_less_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate > 50 and category_one_discount_rate <= 70
-							then dar.billed_entity_number
-					end) as dr_50_to_70_applicants,
-	count(distinct 	case
-						when  category_one_discount_rate > 70
-							then dar.billed_entity_number
-					end) as dr_gt_70_applicants,
-	count(distinct 	case
-						when  urban_rural_status = 'Urban'
-							then dar.billed_entity_number
-					end) as urban_applicants,
-	count(distinct 	case
-						when  urban_rural_status = 'Rural'
-							then dar.billed_entity_number
-					end) as rural_applicants,
-	count(*) as num_recipients,
-	sum(case
-			when ros.recipient_ben is null
-				then 1
-			else 0
-		end) as num_recipients_dropped
-
-from dropped_app_recipients dar
-left join (
-	select distinct ben as recipient_ben
-	from fy2017.recipients_of_services
-) ros
-on dar.recipient_ben = ros.recipient_ben
-left join added_1617
-on dar.billed_entity_number = added_1617.billed_entity_number
-where added_1617 is null
+	a.billed_entity_number is not null as dropped_2016_added_2017,
+	count(*)
+from dropped_app_categories dac
+left join added_1617 a
+on dac.billed_entity_number = a.billed_entity_number
 group by 1
-order by 1
