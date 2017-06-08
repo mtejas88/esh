@@ -76,3 +76,14 @@ districts.meeting.afford <- aggregate(dd.2017.afford.sub$counter, by=list(dd.201
 schools.meeting.afford <- aggregate(dd.2017.afford.sub$num_schools, by=list(dd.2017.afford.sub$postal_cd), FUN=sum, na.rm=T)
 students.meeting.afford <- aggregate(dd.2017.afford.sub$num_students, by=list(dd.2017.afford.sub$postal_cd), FUN=sum, na.rm=T)
 
+
+##*********************************************************************************************************
+## DEPLOY TOOL
+
+options(repos=c(CRAN="https://cran.rstudio.com"))
+rsconnect::setAccountInfo(name='educationsuperhighway',
+                            token='0199629F81C4DEC2466F106048613D4E',
+                            secret='AZuGIeV6axGnzmBI1GQ6hFLdHN0ojUaA+U/wi8YT')
+rsconnect::deployDoc("tool/2017_State_Metrics_Dashboard.Rmd")
+
+
