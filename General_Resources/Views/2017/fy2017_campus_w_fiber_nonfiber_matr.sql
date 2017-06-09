@@ -4,13 +4,13 @@ case when (ds.campus_id = 'Unknown' or ds.campus_id is null) then ds.address els
 --counting non fiber circuits to specific campus
 count(distinct  case
                   when not(c.connect_category ilike '%Fiber%')
-                    then c.id end) as campus_nonfiber_lines_w_dirty,
+                    then ec.circuit_id end) as campus_nonfiber_lines_w_dirty,
 
 --counting clean non fiber circuits to specific campus
 count(distinct  case
                   when not(c.connect_category ilike '%Fiber%')
                   and c.num_open_flags = 0
-                    then c.id end) as campus_nonfiber_lines,
+                    then ec.circuit_id end) as campus_nonfiber_lines,
 
 --counting correctly allocated non fiber circuits to specific campus
 count(distinct  case
@@ -19,7 +19,7 @@ count(distinct  case
                   and ( num_lines::numeric >= alloc.recipients or --num lines >= num recipients
                       num_lines::numeric >= alloc.alloc or --num lines >= sum of the allocations
                       num_lines::numeric >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-                    then c.id
+                    then ec.circuit_id
                 end) as campus_nonfiber_lines_alloc_w_dirty,
 
 --counting clean correctly allocated non fiber circuits to specific campus
@@ -30,17 +30,17 @@ count(distinct  case
                   and ( num_lines::numeric >= alloc.recipients or --num lines >= num recipients
                       num_lines::numeric >= alloc.alloc or --num lines >= sum of the allocations
                       num_lines::numeric >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-                    then c.id
+                    then ec.circuit_id
                 end) as campus_nonfiber_lines_alloc,
 
 --counting fiber circuits to specific campus
 count(distinct  case when c.connect_category ilike '%Fiber%'
-							      then c.id end) as campus_fiber_lines_w_dirty,
+							      then ec.circuit_id end) as campus_fiber_lines_w_dirty,
 
 --counting clean fiber circuits to specific campus
 count(distinct  case when c.connect_category ilike '%Fiber%'
                      and c.num_open_flags = 0
-							      then c.id end) as campus_fiber_lines,
+							      then ec.circuit_id end) as campus_fiber_lines,
 
 --counting number of correctly allocated fiber circuits to specific campus
 count(distinct 	case
@@ -49,7 +49,7 @@ count(distinct 	case
 									and ( num_lines::numeric >= alloc.recipients or --num lines >= num recipients
                       num_lines::numeric >= alloc.alloc or --num lines >= sum of the allocations
                       num_lines::numeric >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-										then c.id
+										then ec.circuit_id
 								end) as campus_fiber_lines_alloc_w_dirty,
 
 --counting number of clean correctly allocated fiber circuits to specific campus
@@ -60,7 +60,7 @@ count(distinct 	case
 									and ( num_lines::numeric >= alloc.recipients or --num lines >= num recipients
                       num_lines::numeric >= alloc.alloc or --num lines >= sum of the allocations
                       num_lines::numeric >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-										then c.id
+										then ec.circuit_id
 								end) as campus_fiber_lines_alloc
 
 from public.fy2017_districts_predeluxe_matr d
@@ -74,8 +74,8 @@ on dl.esh_id = eb.entity_id::varchar
 join public.fy2017_schools_demog_matr ds -- used join so wouldn't have district BENs
 on dl.esh_id::varchar = ds.school_esh_id::varchar
 
-left join public.fy2017_esh_allocations_v dwd
-on dwd.applicant_ben = eb.ben
+left join public.esh_entity_ben_circuits  ec
+on ec.ben = eb.ben
 
 left join (
   select *
@@ -87,7 +87,7 @@ left join (
 		     'video_conferencing' = any(c.open_flag_labels) or
 		     'exclude' = any(c.open_flag_labels))
 ) c
-on dwd.line_item_id = c.line_item_id
+on ec.circuit_id = c.id
 
 left join public.fy2017_esh_line_items_v li
 on c.line_item_id = li.id
@@ -113,22 +113,19 @@ left join (
 on c.line_item_id = alloc.line_item_id
 
 where include_in_universe_of_districts_all_charters
-
+and c.funding_year = 2017
+and li.funding_year = 2017
 
 group by 1,2
 
 order by 1, 2
 
 /*
-Modified by: Saaim Aslam
-Modified Date: 6/9/2017
-Name of QAing Analyst:
-Purpose: The table public.esh_entity_ben_circuits has 12MM+ records and creating MG endpoint creation of this
-view ran for several hours without any success. Eliminating dependency on that table and making use if "ID" field from
-public.esh_circuits which is same as "circuit_id" column from public.esh_entity_ben_circuits
-
-Original Author: Jeremy Holtzman
+Author: Jeremy Holtzman
 Created On Date: 4/27/2017
+Last Modified Date: 6/9/207
+Modified by: Saaim Aslam
+Modification: Adding funding year filter
 Name of QAing Analyst(s):
 Purpose: To make a campus table that captures what specific services are allocated to the campus
 Methodology: Uses the fy2017_schools_demog_matr to identify all campuses in all districts, and then joins
