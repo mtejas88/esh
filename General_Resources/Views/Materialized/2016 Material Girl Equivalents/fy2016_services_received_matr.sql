@@ -50,6 +50,7 @@ select base.*,
 FROM (
           SELECT
             li.id AS line_item_id,
+            eli.id AS irt_line_item_id,
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
@@ -122,6 +123,8 @@ FROM (
           FROM public.fy2016_lines_to_district_by_line_item_matr lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
+          LEFT OUTER JOIN public.esh_line_items eli 
+          on eli.base_line_item_id = lid.line_item_id
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
