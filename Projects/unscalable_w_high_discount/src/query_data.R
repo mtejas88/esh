@@ -1,14 +1,11 @@
 ## =========================================
 ##
 ## QUERY DATA FROM THE DB
-## Takes 10-15 minutes since we need to export large Form 477 data
+##
 ## =========================================
 
 ## Clearing memory
 rm(list=ls())
-
-#args = commandArgs(trailingOnly=TRUE)
-#github_path <- args[1]
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -23,15 +20,10 @@ library(RJDBC)
 library(dotenv)
 options(java.parameters = "-Xmx4g" )
 
-#REMEMBER TO REMOVE
-github_path='~/Documents/esh/ficher/'
-
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
-## source function to correct dataset
-source(paste(github_path, "General_Resources/common_functions/correct_dataset.R", sep=""))
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
@@ -49,10 +41,7 @@ querydb <- function(query_name){
   return(data)
 }
 
-dd.2016 <- querydb("dd_2016.sql")
-dd.2016 <- correct.dataset(dd.2016, sots.flag=0, services.flag=0)
-dta.477s <- querydb("form477s.sql")
-
+unscalable.dd <- querydb("src/unscalable_discount.SQL")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -60,5 +49,4 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(dd.2016, "../data/raw/deluxe_districts_2016.csv", row.names=F)
-write.csv(dta.477s, "../data/raw/form_477s.csv", row.names=F)
+write.csv(unscalable.dd, "data/raw/unscalable_districts.csv", row.names=F)

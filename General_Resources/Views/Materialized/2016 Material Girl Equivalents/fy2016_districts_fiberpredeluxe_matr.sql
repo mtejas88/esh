@@ -18,6 +18,7 @@ select distinct
 	num_other_staff,
 	frl_percent,
 	discount_rate_c1,
+	discount_rate_c1_matrix,
 	discount_rate_c2,
 	address,
 	city,
@@ -265,7 +266,7 @@ on dpd.esh_id = dspa.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
+Last Modified Date: 5/26/2017 - added adjusted c1 discount rate
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

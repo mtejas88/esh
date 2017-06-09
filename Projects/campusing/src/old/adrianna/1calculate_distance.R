@@ -5,7 +5,7 @@
 ## Uses NCES latitude and longitude data to calculate distance between schools
 ##
 ## Written by Adrianna Boghozian (AJB), based off of previous work by Carson Forter (CF)
-## (old scripts by CF located in ../code/old/)
+## (old scripts by CF located in /src/old/)
 ##
 ## Time Warning: will take ~ 25 min to run the entire script
 ##
@@ -14,29 +14,27 @@
 ## Clearing memory
 rm(list=ls())
 
-setwd("~/Google Drive/Colocation/code/")
-
-#install.packages("geosphere")
-#install.packages("caTools")
-#install.packages("ggmap")
-#install.packages("dplyr")
-#install.packages("data.table")
+## load packages (if not already in the environment)
+packages.to.install <- c("geosphere", "caTools", "ggmap", "dplyr", "gRbase")
+for (i in 1:length(packages.to.install)){
+  if (!packages.to.install[i] %in% rownames(installed.packages())){
+    install.packages(packages.to.install[i])
+  }
+}
 library(geosphere)
 library(caTools)
 library(ggmap)
 library(dplyr)
-library(data.table) ## for the fread command
+library(gRbase) ## for combn function
 
 ### the following dependencies may be necessary, install as follows:
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("graph")
 #biocLite("BiocGenerics")
 #biocLite("RBGL")
-#install.packages("gRbase")
-library(gRbase) ## for combn function
 
 ## set date (for file naming)
-date <- "TEST"
+date <- Sys.Date()
 
 ##*********************************************************************************************************
 ## READ IN FILES

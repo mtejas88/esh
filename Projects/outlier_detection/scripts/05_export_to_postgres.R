@@ -12,7 +12,7 @@ setwd(wd)
 library(rJava)
 library(RJDBC)
 library(DBI)
-source("scripts/sql_script_builder.R")
+
 ## read in functions
 func.dir <- "functions/"
 func.list <- list.files(func.dir)
@@ -20,8 +20,17 @@ for (file in func.list[grepl('.R', func.list)]){
   source(paste(func.dir, file, sep=''))
 }
 source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
+source("sql_script_builder.R")
 
 
+
+## retrieve date (in order to accurately timestamp files)
+date <- Sys.time()
+weekday <- weekdays(date)
+date <- gsub("PST", "", date)
+date <- gsub(" ", "_", date)
+date <- gsub(":", ".", date)
+## QUERY THE DB -- SQL
 
 ## load PostgreSQL Driver
 pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
@@ -29,7 +38,7 @@ pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/pos
 ## connect to the database
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 
-## DB FUNCTIONS
+## query function
 querydb <- function(query_name) {
   query <- readChar(query_name, file.info(query_name)$size)
   data <- dbGetQuery(con, query)
@@ -92,6 +101,7 @@ insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
 
 print("Determining New Use Cases")
 new_use_case_detail_script <- find_new_cases("outlier_use_case_details")
+print(new_use_case_detail_script)
 
 print("Writing new use cases sql file")
 queryName <- paste0("../sql/retrieve_new_use_case_details_", Sys.Date(), ".SQL")
@@ -119,7 +129,7 @@ if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
   close(fileConn)
   
 }else{
-  print("No new use cases")
+  print("No new use case details")
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),error=function(e) e)
@@ -171,6 +181,9 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
     fileConn<-file(paste0("../sql/update_outliers_", Sys.Date(), ".SQL"))
     writeLines(dml_script_outliers_for_update, fileConn)
     close(fileConn)
+  
+    insert_error <- tryCatch(dbExecute(con,dml_script_outliers_for_update),error=function(e) e)
+
   }else{
     print("No updates")
   }

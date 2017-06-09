@@ -21,6 +21,17 @@ select base.*,
         THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_total_monthly_cost
       ELSE NULL
     END AS line_item_district_monthly_cost_total,
+    CASE
+      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
+            then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_one_time_cost
+      WHEN consortium_shared=true OR purpose = 'Backbone'
+        then null
+      WHEN base.line_item_total_num_lines = 'Unknown'
+        THEN null
+      when base.line_item_total_num_lines::numeric > 0
+        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_one_time_cost
+      ELSE NULL
+    END AS line_item_district_one_time_cost,
     case
       when line_item_total_num_lines = 'Unknown'
         then null
@@ -39,6 +50,7 @@ select base.*,
 FROM (
           SELECT
             li.id AS line_item_id,
+            eli.id AS irt_line_item_id,
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
@@ -111,6 +123,8 @@ FROM (
           FROM public.fy2016_lines_to_district_by_line_item_matr lid
           LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
+          LEFT OUTER JOIN public.esh_line_items eli 
+          on eli.base_line_item_id = lid.line_item_id
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
@@ -146,7 +160,7 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       4/13/2017 - JS remove references to applicant_id from line_items
+Last Modified Date:       6/7/2017 - JH added district line item one time cost
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:

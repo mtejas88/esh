@@ -12,10 +12,14 @@ if(table_name == "outlier_use_case_details"){
       outlier_use_case_params hstore,
       outlier_test_case_params hstore);
   insert into temp_outlier_use_case_detail_candidates values "
-  script_values <- paste("('",master_output$outlier_use_case_name,"','",master_output$outlier_use_case_parameters,"','",master_output$outlier_test_parameters,"'),",sep="",collapse="\n")
+
+
+  script_values <- paste("('",(master_output$outlier_use_case_name),"','",master_output$outlier_use_case_parameters,"','",master_output$outlier_test_parameters,"'),",sep="",collapse="\n")
+
   script <- paste0(script,substr(script_values,1,nchar(script_values)-1),";")
 
-  
+  print("Script Created")
+  print(script)
 }else if(table_name == "outliers"){
     
   script <- 
@@ -55,12 +59,30 @@ if(table_name =='outlier_use_case_details'){
   	outlier_use_case_details oucd,
     outlier_use_cases ouc
   where
-  	not (temp_cand.use_case_name = oucd.use_case_name and
+	not 
+		(temp_cand.use_case_name = oucd.use_case_name and
   	temp_cand.outlier_use_case_params = oucd.outlier_use_case_params and
-  	temp_cand.outlier_test_case_params =oucd.outlier_test_case_params) and
+		temp_cand.outlier_test_case_params =oucd.outlier_test_case_params
+		)				
+union
+select distinct
+    ouc.outlier_use_case_id,
+    temp_cand.*
+  from
+        temp_outlier_use_case_detail_candidates temp_cand,
+        outlier_use_cases ouc
+  where
+
+    	(not exists 
+                  (select 
+                    1
+                  from 
+                    outlier_use_case_details oucd2
+                  where 
+                    temp_cand.use_case_name = oucd2.use_case_name)) and
     ouc.outlier_use_case_name = temp_cand.use_case_name;"  
+}else if(table_name =='outliers'){       
     
-  }else if(table_name =='outliers'){      
     script <- 
     "SELECT
       o.outlier_id,
@@ -112,6 +134,7 @@ if(table_name =='outlier_use_case_details'){
     
   } 
   
+return(script)  
 }
 
 
@@ -125,7 +148,7 @@ if(table_name =='outlier_use_case_details'){
 
 dml_builder <- function(values,script_type,postgres_table){
 
-
+print(values)
   syntax_stitcher <- function(script_content,script_begin,script_end){
     ##declare script variable 
     script <- c()  
@@ -199,7 +222,10 @@ dml_builder <- function(values,script_type,postgres_table){
                                                     updated_values$r,",",
                                                     updated_values$lambda,",",
                                                     "current_timestamp)"))
+      
+      
     }
+    
     final_script <- syntax_stitcher(script_content,script_begin,script_end)
     
   }else if(script_type == 'update'){
@@ -208,11 +234,15 @@ dml_builder <- function(values,script_type,postgres_table){
       ## Script Beginning            
       script_begin <- paste0("update outliers set end_dt = ","current_timestamp where outlier_id in (")
 
+      
       ## Script Ending            
       script_end <- ");"
-      
+     print("Length of values is")
+print(length(values)) 
       ## Script Content    
       for(i in 1:length(values)){
+      print(i)
+     print(unique(values[i]))
         if (i==1){
           script <- paste0(script_begin,values[i],",")
         }else if (i==length(values)) {
@@ -224,11 +254,11 @@ dml_builder <- function(values,script_type,postgres_table){
       }
   
       
+      
       }
     final_script <- script
     }   
 
-  
   return(final_script)
   
 }

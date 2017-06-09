@@ -1,0 +1,5 @@
+select distinct
+recipient_id, reporting_name
+
+from public.fy2016_services_received_matr
+where recipient_include_in_universe_of_districts='true'

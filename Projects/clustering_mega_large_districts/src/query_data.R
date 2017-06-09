@@ -24,7 +24,7 @@ library(dotenv)
 options(java.parameters = "-Xmx4g" )
 
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## source function to correct dataset
