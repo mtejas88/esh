@@ -241,6 +241,6 @@ left join (
 on dar.recipient_ben = dc.child_entity_ben
 left join added_1617
 on dar.billed_entity_number = added_1617.billed_entity_number
-where added_1617 is null
+where added_1617.billed_entity_number is null
 group by 1
 order by 1
