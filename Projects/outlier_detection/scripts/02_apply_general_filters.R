@@ -31,8 +31,8 @@ logical <- c("exclude_from_ia_analysis", "exclude_from_ia_cost_analysis", "exclu
 
 d_16_all[, logical] <- sapply(d_16_all[, logical], function(x) ifelse(x == "t", TRUE, 
                                                                       ifelse(x =="f", FALSE, x)))
-d_17_all[, logical] <- sapply(d_17_all[, logical], function(x) ifelse(x == "true", TRUE,
-                                                                     ifelse(x == "false", FALSE, x)))
+d_17_all[, logical] <- sapply(d_17_all[, logical], function(x) ifelse(x == "t", TRUE,
+                                                                     ifelse(x == "f", FALSE, x)))
 d_16 <- d_16_all %>%
           filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE,

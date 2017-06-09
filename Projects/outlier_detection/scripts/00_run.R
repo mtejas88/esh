@@ -111,3 +111,6 @@ system.time(for(i in 1:nrow(d_matrix)) {
 write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
 write.csv(li_distributions,"../data/export/li_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
 write.csv(ucd,"../data/export/district_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
+
+# load into postgres
+source("05_export_to_postgres.R")

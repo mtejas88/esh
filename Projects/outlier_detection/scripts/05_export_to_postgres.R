@@ -7,6 +7,9 @@
 wd <- setwd(".") 
 setwd(wd)
 
+#this is my github path. DONT FORGET TO COMMENT OUT
+github_path <- '~/Documents/ESH/ficher/'
+
 
 ## read in libraries
 library(rJava)
@@ -19,7 +22,10 @@ func.list <- list.files(func.dir)
 for (file in func.list[grepl('.R', func.list)]){
   source(paste(func.dir, file, sep=''))
 }
-source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
+
+source(paste(github_path, "General_Resources/common_functions/source_env_Staging.R", sep=""))
+source_env_Staging("~/.env")
+
 source("sql_script_builder.R")
 
 
@@ -33,10 +39,10 @@ date <- gsub(":", ".", date)
 ## QUERY THE DB -- SQL
 
 ## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
+pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
 
 ## connect to the database
-con <- dbConnect(pgsql, url=url, user=user, password=password)
+con <- dbConnect(pgsql, url=s_url, user=s_user, password=s_password)
 
 ## query function
 querydb <- function(query_name) {
@@ -202,7 +208,7 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
-
+table=dbGetQuery(con,"select*from outliers")
 
 # disconnect from database  
 dbDisconnect(con)
