@@ -141,9 +141,9 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
   on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
 
   where bw_rank = 1
-  
-  and recipient_sp_bw_total.bw_total > 0 
-  
+
+  and recipient_sp_bw_total.bw_total > 0
+
   /*adding bw_total > 0 as the new staging db Rose has more 2017 data and a lot of rows have bw_total that are 0,
 this prevents the creation of the materialized view due to division error of 0*/
 

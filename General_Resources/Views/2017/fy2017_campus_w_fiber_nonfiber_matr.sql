@@ -113,7 +113,8 @@ left join (
 on c.line_item_id = alloc.line_item_id
 
 where include_in_universe_of_districts_all_charters
-
+and c.funding_year = 2017
+and li.funding_year = 2017
 
 group by 1,2
 
@@ -122,7 +123,9 @@ order by 1, 2
 /*
 Author: Jeremy Holtzman
 Created On Date: 4/27/2017
-Last Modified Date:
+Last Modified Date: 6/9/207
+Modified by: Saaim Aslam
+Modification: Adding funding year filter
 Name of QAing Analyst(s):
 Purpose: To make a campus table that captures what specific services are allocated to the campus
 Methodology: Uses the fy2017_schools_demog_matr to identify all campuses in all districts, and then joins
@@ -131,6 +134,5 @@ are defined by:
 1. num lines >= num recips
 2. num lines >= num campuses + other recips
 3. num lines >= sum allocations
-
 Dependencies: [public.fy2017_districts_predeluxe_matr, public.fy2017_district_lookup_matr, public.fy2017_schools_demog_matr, public.fy2017_schools_demog_matr, public.esh_entity_ben_circuits, public.fy2017_esh_circuits_v, public.fy2017_esh_allocations_v, public.fy2017_esh_line_items_v, ]
 */
