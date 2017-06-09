@@ -17,6 +17,8 @@ and recipient_exclude_from_ia_analysis = false
 and recipient_postal_cd != 'AK'
 and connect_category ilike '%Fiber%'
 and line_item_total_monthly_cost > 0
+and not('special_construction_tag' = any(open_tags))
+
 
 group by
   recipient_id,
@@ -71,6 +73,7 @@ and recipient_exclude_from_ia_analysis = false
 and recipient_postal_cd != 'AK'
 and connect_category ilike '%Fiber%'
 and line_item_total_monthly_cost > 0
+and not('special_construction_tag' = any(open_tags))
 
 group by 
   bandwidth_in_mbps
@@ -103,7 +106,7 @@ and temp.recipient_id = sr.recipient_id
 left join national n
 on sr.bandwidth_in_mbps = n.bandwidth_in_mbps
 
-left join public.fy2017_districts_deluxe_matr dd
+left join public.fy2016_districts_deluxe_matr dd
 on sr.recipient_id = dd.esh_id
 
 order by
