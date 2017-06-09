@@ -8,6 +8,7 @@ source_env <- function(path){
 
   load_dot_env(path)
   
+  ## ONYX
   ## assign google drive path if available
   if (Sys.getenv("GOOGLE_DRIVE") != ""){
     assign("google_drive_path", Sys.getenv("GOOGLE_DRIVE"), envir=.GlobalEnv)
@@ -37,5 +38,22 @@ source_env <- function(path){
   if (Sys.getenv("PASSWORD") != ""){
     assign("password", Sys.getenv("PASSWORD"), envir=.GlobalEnv)
   }
+  
+  ## Pristine 2016
+  ## assign url for DB if available
+  if (Sys.getenv("URL_PRIS2016") != ""){
+    assign("url_pris2016", Sys.getenv("URL_PRIS2016"), envir=.GlobalEnv)
+  }
+  
+  ## assign username for DB if available
+  if (Sys.getenv("USER_PRIS2016") != ""){
+    assign("user_pris2016", Sys.getenv("USER_PRIS2016"), envir=.GlobalEnv)
+  }
+  
+  ## assign password for DB if available
+  if (Sys.getenv("PASSWORD_PRIS2016") != ""){
+    assign("password_pris2016", Sys.getenv("PASSWORD_PRIS2016"), envir=.GlobalEnv)
+  }
+ 
 }
 
