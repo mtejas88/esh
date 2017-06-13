@@ -19,9 +19,10 @@ select
     temp_outlier_use_case_detail_candidates temp_cand,
     outlier_use_cases ouc
     where
+    
     (not exists 
     (select 
-    1
+    *
     from 
     outlier_use_case_details oucd2
     where 

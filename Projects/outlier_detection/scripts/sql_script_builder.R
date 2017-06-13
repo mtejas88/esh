@@ -1,3 +1,4 @@
+
 load_candidate_details <- function(master_output,table_name){
   
   script <-c()
@@ -12,8 +13,8 @@ load_candidate_details <- function(master_output,table_name){
     outlier_test_case_params hstore);
     insert into temp_outlier_use_case_detail_candidates values "
     
-    
-    script_values <- paste("('",(master_output$outlier_use_case_name),"','",master_output$outlier_use_case_parameters,"','",master_output$outlier_test_parameters,"'),",sep="",collapse="\n")
+    master_output_uc=unique(master_output[,c("outlier_use_case_name","outlier_use_case_parameters","outlier_test_parameters")])
+    script_values <- paste("('",(master_output_uc$outlier_use_case_name),"','",master_output_uc$outlier_use_case_parameters,"','",master_output_uc$outlier_test_parameters,"'),",sep="",collapse="\n")
     
     script <- paste0(script,substr(script_values,1,nchar(script_values)-1),";")
     
@@ -31,6 +32,7 @@ load_candidate_details <- function(master_output,table_name){
     value varchar(255) NOT NULL,
     R  decimal NOT NULL,
     lambda decimal NOT NULL);
+    
     insert into temp_outlier_candidates values "
     script_values <- paste("('",master_output$outlier_use_case_name,"','",
                            master_output$outlier_use_case_parameters,"','",
@@ -49,35 +51,27 @@ load_candidate_details <- function(master_output,table_name){
 find_new_cases <- function(table_name){
   if(table_name =='outlier_use_case_details'){      
     script <- 
-      "select 
-    ouc.outlier_use_case_id,
-    temp_cand.* 
-    from 
-    temp_outlier_use_case_detail_candidates temp_cand,
-    outlier_use_case_details oucd,
-    outlier_use_cases ouc
-    where
-    not 
-    (temp_cand.use_case_name = oucd.use_case_name and
-    temp_cand.outlier_use_case_params = oucd.outlier_use_case_params and
-    temp_cand.outlier_test_case_params =oucd.outlier_test_case_params
-    )				
-    union
-    select distinct
-    ouc.outlier_use_case_id,
-    temp_cand.*
-    from
-    temp_outlier_use_case_detail_candidates temp_cand,
-    outlier_use_cases ouc
-    where
-    (not exists 
-    (select 
-    1
-    from 
-    outlier_use_case_details oucd2
-    where 
-    temp_cand.use_case_name = oucd2.use_case_name)) and
-    ouc.outlier_use_case_name = temp_cand.use_case_name;"  
+      "select distinct
+      ouc.outlier_use_case_id,
+      temp_cand.*
+      from
+      temp_outlier_use_case_detail_candidates temp_cand
+      inner join outlier_use_cases ouc
+      on temp_cand.use_case_name = ouc.outlier_use_case_name 
+      where
+      not exists
+      (select
+      1
+      from
+      outlier_use_case_details oucd
+      inner join outlier_use_cases ouc
+      on oucd.use_case_name = ouc.outlier_use_case_name 
+      where
+      temp_cand.use_case_name = oucd.use_case_name and
+      temp_cand.outlier_use_case_params = oucd.outlier_use_case_params and
+      temp_cand.outlier_test_case_params =oucd.outlier_test_case_params
+      );
+      "  
   }else if(table_name =='outliers'){       
     
     script <- 
@@ -151,10 +145,9 @@ dml_builder <- function(values,script_type,postgres_table){
     script <- c()  
     
     if (nrow(script_content)<=1){
-      script <- paste0(script_begin,script_content[i,],script_end)
+      script <- paste0(script_begin,script_content[1,],script_end)
     }else{
       for(i in 1:nrow(script_content)){
-        print(i)
         if (i==1){
           script <- paste0(script_begin,script_content[i,],",\n")
         }else if (i==nrow(script_content)) {
@@ -213,14 +206,12 @@ dml_builder <- function(values,script_type,postgres_table){
       
       ## Script Content    
       updated_values <- values[which(values$outlier_action !="ignore"),]
-      
       script_content <- data.frame("content"=paste0("(",updated_values$outlier_use_case_detail_id,",'",
                                                     updated_values$ref_id,"','",
                                                     updated_values$value,"',",
                                                     updated_values$r,",",
                                                     updated_values$lambda,",",
                                                     "current_timestamp)"))
-      
       
     }
     
@@ -237,13 +228,11 @@ dml_builder <- function(values,script_type,postgres_table){
       script_end <- ");"
       print("Length of values is")
       print(length(values)) 
+      script=script_begin
       ## Script Content    
       for(i in 1:length(values)){
-        print(i)
         print(unique(values[i]))
-        if (i==1){
-          script <- paste0(script_begin,values[i],",")
-        }else if (i==length(values)) {
+        if (i==length(values)) {
           script <- paste0(script,values[i],script_end)
         } else {
           script <- paste0(script,values[i],",")
@@ -256,8 +245,6 @@ dml_builder <- function(values,script_type,postgres_table){
     }
     final_script <- script
   }   
-  
   return(final_script)
   
 }
-

@@ -37,12 +37,12 @@ d_16 <- d_16_all %>%
           filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE,
                  postal_cd != 'AK') %>%
-          select(esh_id,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
+          select(esh_id,postal_cd,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
 d_17 <- d_17_all %>%
-          filter(#exclude_from_ia_analysis == FALSE,
+          filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE,
                  postal_cd != 'AK') %>%
-          select(esh_id,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
+          select(esh_id,postal_cd,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
 
 
 # Munge Services Received
@@ -96,6 +96,8 @@ s_17=s_17_all %>%
     monthly_cost_per_circuit = line_item_recurring_elig_cost / line_item_total_num_lines,
     monthly_cost_per_mbps = monthly_cost_per_circuit / bandwidth_in_mbps
   )
+
+#s_17=munge_sr(s_17_all)
 
 # export intermediate data
 write.csv(d_16, "../data/intermediate/d16_custom_filters.csv", row.names = FALSE)

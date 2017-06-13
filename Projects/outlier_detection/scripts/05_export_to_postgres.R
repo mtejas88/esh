@@ -139,7 +139,7 @@ if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),error=function(e) e)
-
+dml_script_outlier_use_case_details=NULL
 
 ## Look for outliers to upsert
 print("Loading use case detail candidates")
@@ -147,7 +147,6 @@ load_script <- load_candidate_details(master_output,"outliers")
 
 print("Writing Script to file")
 scriptName <- paste0("../sql/create_temp_outlier_", Sys.Date(), ".SQL")
-scriptName <- paste0("create_temp_outlier_", Sys.Date(), ".SQL")
 
 fileConn<-file(scriptName)
 writeLines(load_script, fileConn, sep = "\n")
@@ -189,12 +188,12 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
     close(fileConn)
   
     insert_error <- tryCatch(dbExecute(con,dml_script_outliers_for_update),error=function(e) e)
-
+    dml_script_outliers_for_update=NULL
   }else{
     print("No updates")
   }
 
-    print("Inserting new outliers")  
+  print("Inserting new outliers")  
   dml_script_outliers <- dml_builder(new_outliers,"insert","outliers" )
   print("Running the following command")
   print(dml_script_outliers)
@@ -208,7 +207,14 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
-table=dbGetQuery(con,"select*from outliers")
+dml_script_outliers=NULL
+# con <- dbConnect(pgsql, url=s_url, user=s_user, password=s_password)
+# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outliers where outlier_use_case_detail_id in (8458)"),error=function(e) e)
+# table=dbGetQuery(con,"select*from outliers")
+# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outlier_use_case_details where outlier_use_case_detail_id in (8458)"),error=function(e) e)
+# oucd=dbGetQuery(con,"select*from outlier_use_case_details")
+# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outlier_use_cases"),error=function(e) e)
+# ouc=dbGetQuery(con,"select*from outlier_use_cases")
 
 # disconnect from database  
 dbDisconnect(con)
