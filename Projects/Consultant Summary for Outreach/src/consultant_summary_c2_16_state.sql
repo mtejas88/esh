@@ -31,7 +31,7 @@ where d.include_in_universe_of_districts
 
 recipient_summaries as (
 
-select postal_cd,
+select 
 consultant_names,
 consultant_num,
 count(distinct esh_id) as num_districts_served,
@@ -40,11 +40,12 @@ sum(num_students) as num_students_served
 
 from consultants_to_districts
 
-group by 1, 2, 3
+group by 1, 2
 
 )
 
-select r.*, 
+select li.applicant_postal_cd as postal_cd,
+r.*,
 count(distinct c.application_number) as num_applications,
 round(sum(li.total_cost)::numeric,2) as total_funding
 
