@@ -7,6 +7,9 @@
 wd <- setwd(".") 
 setwd(wd)
 
+#this is my github path. DONT FORGET TO COMMENT OUT
+github_path <- '~/Documents/ESH/ficher/'
+
 
 ## read in libraries
 library(rJava)
@@ -19,7 +22,10 @@ func.list <- list.files(func.dir)
 for (file in func.list[grepl('.R', func.list)]){
   source(paste(func.dir, file, sep=''))
 }
-source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
+
+source(paste(github_path, "General_Resources/common_functions/source_env_Staging.R", sep=""))
+source_env_Staging("~/.env")
+
 source("sql_script_builder.R")
 
 
@@ -33,10 +39,10 @@ date <- gsub(":", ".", date)
 ## QUERY THE DB -- SQL
 
 ## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
+pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
 
 ## connect to the database
-con <- dbConnect(pgsql, url=url, user=user, password=password)
+con <- dbConnect(pgsql, url=s_url, user=s_user, password=s_password)
 
 ## query function
 querydb <- function(query_name) {
@@ -133,7 +139,7 @@ if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),error=function(e) e)
-
+dml_script_outlier_use_case_details=NULL
 
 ## Look for outliers to upsert
 print("Loading use case detail candidates")
@@ -141,7 +147,6 @@ load_script <- load_candidate_details(master_output,"outliers")
 
 print("Writing Script to file")
 scriptName <- paste0("../sql/create_temp_outlier_", Sys.Date(), ".SQL")
-scriptName <- paste0("create_temp_outlier_", Sys.Date(), ".SQL")
 
 fileConn<-file(scriptName)
 writeLines(load_script, fileConn, sep = "\n")
@@ -183,12 +188,12 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
     close(fileConn)
   
     insert_error <- tryCatch(dbExecute(con,dml_script_outliers_for_update),error=function(e) e)
-
+    dml_script_outliers_for_update=NULL
   }else{
     print("No updates")
   }
 
-    print("Inserting new outliers")  
+  print("Inserting new outliers")  
   dml_script_outliers <- dml_builder(new_outliers,"insert","outliers" )
   print("Running the following command")
   print(dml_script_outliers)
@@ -202,7 +207,25 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
 }
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
+dml_script_outliers=NULL
 
+print("Deleting outliers that no longer exist in master_output")
+del_script <- delete_no_longer_outliers()
+
+print("Writing Script to file")
+scriptName <- paste0("../sql/delete_no_longer_outliers", Sys.Date(), ".SQL")
+fileConn<-file(scriptName)
+writeLines(del_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running Delete Script")
+deteterror=tryCatch(dbSendUpdate(con,del_script),error=function(e) e)
+
+# con <- dbConnect(pgsql, url=s_url, user=s_user, password=s_password)
+# table=dbGetQuery(con,"select*from outliers")
+# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outliers"),error=function(e) e)
+# oucd=dbGetQuery(con,"select*from outlier_use_case_details")
+# ouc=dbGetQuery(con,"select*from outlier_use_cases")
 
 # disconnect from database  
 dbDisconnect(con)
