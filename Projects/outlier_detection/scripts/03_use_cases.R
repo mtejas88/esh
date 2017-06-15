@@ -205,7 +205,7 @@ use_case_district <- function (data, data_17, metric, district_locale, size, sta
           district_size %in% size) %>% 
         filter_(paste('!is.na(', column, ')'))
       } else {
-          output17 <- data %>%
+          output17 <- data_17 %>%
             filter(
               locale %in% district_locale,
               district_size %in% size) %>% 

@@ -93,7 +93,7 @@ uc12=use_case_li(s_16,s_17,'Cost per Circuit', c(1.5), c("T-1"), c("WAN"),with_1
 
 li_distributions=rbind(uc1,uc2,uc3,uc4,uc5,uc6,uc7,uc8,uc9,uc10,uc11,uc12)
 ###
-# run district use cases (2-7), at national AND state level
+# run district use cases at national AND state level
 # TIME WARNING!!
 ###
 ucd=NULL
@@ -110,19 +110,23 @@ system.time(for(i in 1:nrow(d_matrix)) {
 })
 
 #Remove from National if outlier shows up in National AND State for the same use case
-uniques=ucd %>% filter(outlier_unique_id %in% 
-                 (ucd %>% group_by(outlier_unique_id,outlier_use_case_name) %>% 
-                    summarise(count=n()) %>% filter(count==1)))
-doubles=ucd %>% filter(outlier_unique_id %in% 
-                         (ucd %>% group_by(outlier_unique_id,outlier_use_case_name) %>% 
-                            summarise(count=n()) %>% filter(count>1)),
-                       state != 'National')
-ucd=rbind(uniques,doubles)
+  #for master output
+df1=master_output %>% filter(outlier_use_case_name != 'Cost per Circuit') %>% group_by(outlier_unique_id,outlier_use_case_name) %>% summarise(count=n()) %>% filter(count==1)
+dfg1=master_output %>% filter(outlier_use_case_name != 'Cost per Circuit') %>% group_by(outlier_unique_id,outlier_use_case_name) %>% summarise(count=n()) %>% filter(count>1)
+uniques=master_output[(master_output$outlier_unique_id %in% df1$outlier_unique_id),]
+doubles=master_output[(master_output$outlier_unique_id %in% dfg1$outlier_unique_id) & !grepl('National',master_output$outlier_use_case_parameters) ,]
+master_output=unique(rbind(master_output[master_output$outlier_use_case_name=='Cost per Circuit',],uniques,doubles))
+  #for tableau
+df1=ucd %>% filter(outlier_flag==1) %>% group_by(outlier_unique_id,outlier_use_case_name) %>% summarise(count=n()) %>% filter(count==1)
+dfg1=ucd %>% filter(outlier_flag==1) %>% group_by(outlier_unique_id,outlier_use_case_name) %>% summarise(count=n()) %>% filter(count>1)
+uniques=ucd[(ucd$outlier_unique_id %in% df1$outlier_unique_id) & ucd$outlier_flag==1,]
+doubles=ucd[(ucd$outlier_unique_id %in% dfg1$outlier_unique_id) & ucd$state!='National' & ucd$outlier_flag==1,]
+ucd=unique(rbind(ucd[ucd$outlier_flag==0,],uniques,doubles))
 
 # export
-write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = TRUE)
-write.csv(li_distributions,"../data/export/li_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
-write.csv(ucd,"../data/export/district_tableau_output_2017-06-01.csv", row.names = FALSE, append = TRUE)
+write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = FALSE)
+write.csv(li_distributions,"../data/export/li_tableau_output_2017-06-01.csv", row.names = FALSE, append = FALSE)
+write.csv(ucd,"../data/export/district_tableau_output_2017-06-01.csv", row.names = FALSE, append = FALSE)
 
 # load into postgres
 source("05_export_to_postgres.R")

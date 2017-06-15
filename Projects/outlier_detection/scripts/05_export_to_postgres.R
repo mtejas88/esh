@@ -208,12 +208,23 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
 
 insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
 dml_script_outliers=NULL
+
+print("Deleting outliers that no longer exist in master_output")
+del_script <- delete_no_longer_outliers()
+
+print("Writing Script to file")
+scriptName <- paste0("../sql/delete_no_longer_outliers", Sys.Date(), ".SQL")
+fileConn<-file(scriptName)
+writeLines(del_script, fileConn, sep = "\n")
+close(fileConn)
+
+print("Running Delete Script")
+deteterror=tryCatch(dbSendUpdate(con,del_script),error=function(e) e)
+
 # con <- dbConnect(pgsql, url=s_url, user=s_user, password=s_password)
-# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outliers where outlier_use_case_detail_id in (8458)"),error=function(e) e)
 # table=dbGetQuery(con,"select*from outliers")
-# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outlier_use_case_details where outlier_use_case_detail_id in (8458)"),error=function(e) e)
+# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outliers"),error=function(e) e)
 # oucd=dbGetQuery(con,"select*from outlier_use_case_details")
-# delete_error <- tryCatch(dbSendUpdate(con,"DELETE FROM outlier_use_cases"),error=function(e) e)
 # ouc=dbGetQuery(con,"select*from outlier_use_cases")
 
 # disconnect from database  
