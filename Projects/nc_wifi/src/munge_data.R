@@ -208,6 +208,9 @@ cmtd <- group_by(cmtd, discount_bin) %>%
 colnames(cmtd) <- c('discount_bin', 'Pre_discount', 'Requested', 'Committed', 'Pending')
 cmtd <- gather(cmtd, status, dollars, Pre_discount,Requested,Committed,Pending)
 
+cmtd_dollars <- filter(cmtd, status == 'Committed')
+cmtd_dollars <- sum(cmtd_dollars$dollars)
+
 png('figures/cat2_dollars.png', width = 750, height = 500)
 ggplot(cmtd, aes(discount_bin, dollars)) + 
   geom_point(aes(color = status), size = 5) + 
