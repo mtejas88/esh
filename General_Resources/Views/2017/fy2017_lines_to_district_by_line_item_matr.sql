@@ -1,51 +1,16 @@
-with li_lookup as (
-
-  select 
-    dl.district_esh_id,
-    a.line_item_id,
-    li.num_lines::numeric,
-    sum(  case 
-            when a.num_lines_to_allocate is null 
-              then 0
-            else a.num_lines_to_allocate
-          end
-        )::numeric as sum_lines_to_allocate
-  
-  
-  from 
-    public.esh_allocations a
-  
-  join public.esh_line_items li
-  on a.line_item_id = li.id
-  
-  left join entity_bens eb
-  on a.recipient_ben = eb.ben
-  
-  join fy2017_district_lookup_matr dl
-  on eb.entity_id::varchar = dl.esh_id
-  
-  where 
-    li.funding_year = 2017
-    and li.broadband = true
-  
-  group by 
-    dl.district_esh_id,
-    a.line_item_id,
-    li.num_lines
-  
-)
-
-select 
-  district_esh_id,
-  line_item_id,
-  case
-    when num_lines > sum_lines_to_allocate
-      then sum_lines_to_allocate
-    else num_lines
-  end as allocation_lines
-  
-from 
-  li_lookup
+select dl.district_esh_id,
+         c.line_item_id,
+         count(distinct circuit_id) as allocation_lines
+from public.esh_entity_ben_circuits ec
+join public.esh_circuits c
+on ec.circuit_id = c.id
+left join entity_bens eb
+on ec.ben = eb.ben
+join fy2017_district_lookup_matr dl
+on eb.entity_id::varchar = dl.esh_id
+where funding_year = 2017 --public.esh_circuits to be filtered by funding year
+group by  district_esh_id,
+          line_item_id
 
 
 
@@ -56,7 +21,7 @@ Author:                       Justine Schott
 
 Created On Date:              06/16/2016
 
-Last Modified Date: 		  6/13/2017 - JH updated methodology to use allocations to count lines received by district
+Last Modified Date: 		  08/26/2016
 
 Name of QAing Analyst(s):
 
@@ -66,6 +31,8 @@ Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
-Methodology: Using allocations table (instead of esh_entity_ben_circuits) to count lines
-received by district
+Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
+usage of public.esh_entity_ben_circuits and
+public.esh_circuits and filtering the funding year with 2017
+
 */
