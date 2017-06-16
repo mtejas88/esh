@@ -56,6 +56,8 @@ with li_lookup as (
     and li.backbone_conditions_met = false
     and li.consortium_shared = false
     and li.num_lines != -1
+    and c.campus_id is not null
+    and c.campus_id != ''
     and (not('canceled' = any(f.open_flag_labels) or
              'video_conferencing' = any(f.open_flag_labels) or
              'exclude' = any(f.open_flag_labels)) 
@@ -205,6 +207,8 @@ temp as (
     on eb.entity_id::varchar = c.school_esh_id
 
   	where li.broadband = true
+    and c.campus_id is not null
+    and c.campus_id != ''
   	group by line_item_id
   ) alloc
   on ac.line_item_id = alloc.line_item_id
@@ -233,9 +237,6 @@ select
 from
   temp
 
-where campus_id is not null
-and campus_id != ''
-
 group by
   district_esh_id,
   campus_id
@@ -243,7 +244,7 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 4/27/2017
-Last Modified Date: 6/15/2017 - changed how to remove null campuses
+Last Modified Date: 6/14/2017 - removed null campuses or campusus = ''
 
 Name of QAing Analyst(s):
 Purpose: To make a campus table that captures what specific services are allocated to the campus
