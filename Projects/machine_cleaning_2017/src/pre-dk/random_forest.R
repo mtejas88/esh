@@ -61,7 +61,7 @@ pdf("figures/variable_importance.pdf", height=12, width=14)
 varImpPlot(rforrest, pch=16, color=rgb(0,0,0,0.7), main="Variable Rank")
 dev.off()
 
-rforrest
+summary(rforrest)
 
 save.image(file="rf_connect_category_ntree_1001.RData")
 

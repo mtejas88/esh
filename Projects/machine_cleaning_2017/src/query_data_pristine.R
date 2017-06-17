@@ -33,12 +33,6 @@ source(paste(github_path, "General_Resources/common_functions/correct_dataset.R"
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
 
-## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
-
-## connect to the database
-con <- dbConnect(pgsql, url=url_pris2016, user=user_pris2016, password=password_pris2016)
-
 ## query function
 querydb <- function(query_name){
   query <- readChar(query_name, file.info(query_name)$size)
@@ -46,16 +40,22 @@ querydb <- function(query_name){
   return(data)
 }
 
+## load PostgreSQL Driver
+pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
+
+## connect to the database
+con <- dbConnect(pgsql, url=url_pris2016, user=user_pris2016, password=password_pris2016)
+
 ## raw line item data (as it comes in from USAC)
-frn.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
+#frn.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frn_line_items.SQL", sep=""))
 #frn.line.items.2016 <- correct.dataset(frn.line.items.2016, sots.flag=0, services.flag=0)
 frn.meta.data.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_frns.SQL", sep=""))
 #frn.meta.data.2016 <- correct.dataset(frn.meta.data.2016, sots.flag=0, services.flag=0)
-
 ## pristine line item data
 line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
 #line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
-
+## esh line item ids
+#esh.line.items <- querydb(paste(github_path, "General_Resources/sql_scripts/esh_line_items.SQL", sep=""))
 ## service provider data (for reporting name)
 sp.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_service_providers.SQL", sep=""))
 sp.2016 <- unique(sp.2016[,c('name', 'reporting_name')])
@@ -64,6 +64,7 @@ sp.2016 <- sp.2016[!is.na(sp.2016$reporting_name),]
 
 ## disconnect from database
 dbDisconnect(con)
+
 
 ## connect to the database
 con <- dbConnect(pgsql, url=url, user=user, password=password)
@@ -75,6 +76,19 @@ clean.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scrip
 ## disconnect from database
 dbDisconnect(con)
 
+## connect to the database
+con <- dbConnect(pgsql, url=url_pris2017, user=user_pris2017, password=password_pris2017)
+
+## raw line item data (as it comes in from USAC)
+frn.meta.data.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_frns.SQL", sep=""))
+## pristine line item data
+line.items.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_items.SQL", sep=""))
+## flags
+flags.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_item_flags.SQL", sep=""))
+
+## disconnect from database
+dbDisconnect(con)
+
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
@@ -82,3 +96,7 @@ write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
 write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
 write.csv(sp.2016, "data/raw/service_providers_2016.csv", row.names=F)
 write.csv(clean.line.items.2016, "data/raw/clean_line_items_2016.csv", row.names=F)
+
+write.csv(frn.meta.data.2017, "data/raw/frn_meta_data_2017.csv", row.names=F)
+write.csv(line.items.2017, "data/raw/line_items_2017.csv", row.names=F)
+write.csv(flags.2017, "data/raw/flags_2017.csv", row.names=F)

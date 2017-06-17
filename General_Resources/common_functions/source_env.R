@@ -55,5 +55,21 @@ source_env <- function(path){
     assign("password_pris2016", Sys.getenv("PASSWORD_PRIS2016"), envir=.GlobalEnv)
   }
  
+  ## Pristine 2017
+  ## assign url for DB if available
+  if (Sys.getenv("URL_PRIS2017") != ""){
+    assign("url_pris2017", Sys.getenv("URL_PRIS2017"), envir=.GlobalEnv)
+  }
+  
+  ## assign username for DB if available
+  if (Sys.getenv("USER_PRIS2017") != ""){
+    assign("user_pris2017", Sys.getenv("USER_PRIS2017"), envir=.GlobalEnv)
+  }
+  
+  ## assign password for DB if available
+  if (Sys.getenv("PASSWORD_PRIS2017") != ""){
+    assign("password_pris2017", Sys.getenv("PASSWORD_PRIS2017"), envir=.GlobalEnv)
+  }
+  
 }
 
