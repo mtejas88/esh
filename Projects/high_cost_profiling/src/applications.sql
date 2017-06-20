@@ -1,16 +1,11 @@
 select 
   bi.application_number,
-  total_funding_year_commitment_amount_request::numeric,
-  case
-    when total_funding_year_commitment_amount_request::numeric > 25000
-      then 0
-    else 1
-  end as high_cost_indicator,
   case
     when c.application_number is null
       then 0
     else 1
   end as consultant_indicator,
+  total_funding_year_commitment_amount_request::numeric,
   count(distinct  case
                     when fiber_sub_type = 'Special Construction'
                       then bi.application_number
