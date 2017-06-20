@@ -43,6 +43,7 @@ date <- gsub(":", ".", date)
 ## load PostgreSQL Driver
 pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
 
+## Connect to current DB
 ## connect to the database
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 
@@ -62,6 +63,12 @@ dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
 
 ## disconnect from database
 dbDisconnect(con)
+
+
+## Connect to 2016 Frozen DB
+## connect to the database
+con <- dbConnect(pgsql, url=url, user=user, password=password)
+
 
 ##**************************************************************************************************************************************************
 ## write out the datasets

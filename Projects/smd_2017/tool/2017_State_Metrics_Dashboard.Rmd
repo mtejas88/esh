@@ -2,8 +2,8 @@
 title: "2017 State Metrics Dashboard"
 
 resource_files:
-- data/2016_districts_deluxe.csv
-- data/2017_districts_deluxe.csv
+- data/2016_deluxe_districts.csv
+- data/2017_deluxe_districts.csv
 - data/2016_state_aggregation.csv
 - data/2017_state_aggregation.csv
 #- data/current15_districts_click_through.csv
@@ -30,7 +30,7 @@ vertical_layout: scroll
 ### ----------- Importing relevant libraries ----------- ###
 library(flexdashboard) # need to run compile this tool
 library(shiny) # need for render functions
-library(dplyr) # most of the code is written using dplyr functions ( e.g. %>% filter(), %>% summarise(), %>% select() )
+library(dplyr) # most of the code is written using dplyr functions (e.g. %>% filter(), %>% summarise(), %>% select())
 library(highcharter) # need for highchart() vizes (eg. bar charts, box plots, scatter plots)
 library(rsconnect) # need for supporting R markdown 
 library(ggplot2) # for ggplot vizes (i.e. square colored box with status suchc as: 36 fiber targets) 
@@ -46,8 +46,8 @@ library(htmltools) # need for html use in code (I think)
 ## pulled as subset for clean
 #sots.districts.2016 <- read.csv("data/2016-state-of-the-states-districts.csv", as.is=T, header=T, stringsAsFactors=F)
 ## contains clean and dirty data
-dd.2016 <- read.csv("data/2016-districts-deluxe.csv", as.is=T, header=T, stringsAsFactors=F)
-dd.2017 <- read.csv("data/2017-districts-deluxe.csv", as.is=T, header=T, stringsAsFactors=F)
+dd.2016 <- read.csv("data/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd.2017 <- read.csv("data/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## state metrics spreadsheet
 #state_metrics <- read.csv("data/master_metrics.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -75,7 +75,7 @@ state.agg.2017 <- read.csv("data/2017_state_aggregation.csv", as.is=T, header=T,
 colors <- suppressWarnings(read.csv("data/tool_colors.csv", as.is=T, header=T, stringsAsFactors=F))
 
 ## date info
-date <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
+#date <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## make sure to include districts in universe for 2017
 dd.2017 <- dd.2017[dd.2017$include_in_universe_of_districts == TRUE,]
@@ -178,7 +178,8 @@ Row
 ### Select State 
 ```{r input}
 state.agg.2017$postal_cd <- as.character(state.agg.2017$postal_cd)
-selectInput('state', label = "", choices=unique(state.agg.2017$postal_cd), selected = "ALL")
+#selectInput('state', label = "", choices=unique(state.agg.2017$postal_cd), selected = "ALL")
+selectInput('state', label = "", choices=unique(state.agg.2017$postal_cd), selected = "AL")
 
 #output$downloadData <- downloadHandler(
 #  filename = function() {"data/snapshots.csv"},
