@@ -32,7 +32,7 @@ join (
   and window_status = 'In Window'
 ) bi
 on frns.application_number = bi.application_number
-join fy2017.recipients_of_services ros
+left join fy2017.recipients_of_services ros
 on frns.application_number = ros.application_number
 left join fy2017.consultants c
 on frns.application_number = c.application_number
