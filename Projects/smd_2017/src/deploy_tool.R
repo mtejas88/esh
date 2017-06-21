@@ -1,6 +1,6 @@
 ## =========================================
 ##
-## QUERY DATA FROM THE DB
+## DEPLOY 2017 STATE METRICS TOOL
 ##
 ## =========================================
 
@@ -36,8 +36,10 @@ apply_state_names <- function(dta){
 
 state_2017 <- read.csv("tool/data/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016 <- read.csv("tool/data/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2016_froz <- read.csv("tool/data/2016_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2017 <- read.csv("tool/data/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016 <- read.csv("tool/data/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2016_froz <- read.csv("tool/data/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## format data
@@ -45,11 +47,10 @@ dd_2016 <- read.csv("tool/data/2016_deluxe_districts.csv", as.is=T, header=T, st
 ## add state name to state aggregation
 state_2016 <- apply_state_names(state_2016)
 state_2017 <- apply_state_names(state_2017)
+#state_2016_froz <- apply_state_names(state_2016_froz)
 
-
-
-
-
+##**************************************************************************************************************************************************
+## create subsets
 
 
 

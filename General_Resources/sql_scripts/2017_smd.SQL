@@ -31,10 +31,14 @@ sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND (dd_2017.needs_
 
 
 /* UPGRADES */
+-- Upgraded
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' THEN 1 ELSE 0 END) as districts_upgraded,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' THEN dd_2017.num_schools ELSE 0 END) as schools_upgraded,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' THEN dd_2017.num_students ELSE 0 END) as students_upgraded,
-
+-- Upgraded and Now Meeting Goals
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' AND dd_2017.meeting_2014_goal_no_oversub = 't' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN 1 ELSE 0 END) as districts_upgraded_meeting_goals,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' AND dd_2017.meeting_2014_goal_no_oversub = 't' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_upgraded_meeting_goals,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.upgrade_indicator = 't' AND dd_2017.meeting_2014_goal_no_oversub = 't' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN dd_2017.num_students ELSE 0 END) as students_upgraded_meeting_goals,
 
 /* CONNECTIVITY */
 -- Meeting 2014 Goals
@@ -45,9 +49,13 @@ sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.meeting_2018_goal_no_oversub = 't' THEN 1 ELSE 0 END) as districts_meeting_2018_bw_goal,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.meeting_2018_goal_no_oversub = 't' THEN dd_2017.num_schools ELSE 0 END) as schools_meeting_2018_bw_goal,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.meeting_2018_goal_no_oversub = 't' THEN dd_2017.num_students ELSE 0 END) as students_meeting_2018_bw_goal,
-
 -- Total IA BW (kbps)
 round(sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' THEN dd_2017.ia_bw_mbps_total::numeric ELSE 0 END), 0) as ia_bw_mbps_total,
+-- BW Targets
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.bw_target_status = 'Target' THEN 1 ELSE 0 END) as clean_district_bw_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.bw_target_status = 'Potential Target' THEN 1 ELSE 0 END) as clean_district_bw_potential_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.bw_target_status = 'Target' THEN 1 ELSE 0 END) as district_bw_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.bw_target_status = 'Potential Target' THEN 1 ELSE 0 END) as district_bw_potential_targets,
 
 
 /* AFFORDABILITY */
@@ -74,7 +82,16 @@ sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.exclude_from_current_fiber_analysis = 'f' THEN dd_2017.current_known_scalable_campuses ELSE 0 END) as current_known_scalable_campuses_group_C,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.exclude_from_current_fiber_analysis = 'f' THEN dd_2017.current_assumed_scalable_campuses ELSE 0 END) as current_assumed_scalable_campuses_group_C,
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.exclude_from_current_fiber_analysis = 'f' THEN dd_2017.num_campuses ELSE 0 END) as total_num_campuses_group_C,
-
+-- Fiber Targets - Campuses
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.fiber_target_status = 'Target' THEN dd_2017.num_campuses ELSE 0 END) as clean_campus_fiber_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.fiber_target_status = 'Potential Target' THEN dd_2017.num_campuses ELSE 0 END) as clean_campus_fiber_potential_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.fiber_target_status = 'Target' THEN dd_2017.num_campuses ELSE 0 END) as campus_fiber_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.fiber_target_status = 'Potential Target' THEN dd_2017.num_campuses ELSE 0 END) as campus_fiber_potential_targets,
+-- Fiber Targets - Districts
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.fiber_target_status = 'Target' THEN 1 ELSE 0 END) as clean_district_fiber_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.exclude_from_ia_analysis = 'f' AND dd_2017.fiber_target_status = 'Potential Target' THEN 1 ELSE 0 END) as clean_district_fiber_potential_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.fiber_target_status = 'Target' THEN 1 ELSE 0 END) as district_fiber_targets,
+sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.fiber_target_status = 'Potential Target' THEN 1 ELSE 0 END) as district_fiber_potential_targets,
 
 /* WIFI */
 sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' AND dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi,

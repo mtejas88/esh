@@ -1,577 +1,76 @@
-Deep Dive SotS15 {.hidden data-orientation=rows}
-=====================================================================
-  Row 
----------------------------------------------------------------------
-  ### 
-  ```{r}
-renderValueBox({
-  valueBox(state_name_caps)
-})
-```
 
-### SotS 2016 Districts
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$sots15_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$sots15_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = '#009296')
-})
-```
+## click-though data
+#districts.16.click.through <- read.csv("data/current16_districts_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+#districts.17.click.through <- read.csv("data/current17_districts_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+#conn.click.through <- read.csv("data/connectivity_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+#fiber.click.through <- read.csv("data/fiber_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+#affordability.click.through <- read.csv("data/affordability_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 
-### SotS 2016 Schools
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$sots15_schools_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$sots15_schools_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
-})
-```
+## fiber targets list
+#conn.targets <- read.csv("data/connectivity_targets.csv", as.is=T, header=T, stringsAsFactors=F)
+#fiber.targets <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFactors=F)
 
-### SotS 2016 Students
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$sots15_students_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$sots15_students_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
-})
-```
+## list of districts that upgraded
+#districts_upgraded <- read.csv("data/districts_upgraded.csv", as.is=T, header=T, stringsAsFactors=F)
 
-Row {data-height=350}
----------------------------------------------------------------------
-  ### SotS 2016 Clean Status {.no-title} 
-  ```{r}
-renderHighchart({
-  
-  highchart() %>% 
-    hc_chart(
-      type = "solidgauge",
-      backgroundColor = "white",
-      marginTop = 50
-    ) %>% 
-    hc_title(
-      text = "SotS 2016 Clean Status",
-      style = list(
-        fontSize = "24px"
-      )
-    ) %>% 
-    hc_tooltip(
-      borderWidth = 0,
-      backgroundColor = 'none',
-      shadow = FALSE,
-      style = list(
-        fontSize = '16px'
-      ),
-      pointFormat = '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}%</span>',
-      positioner = JS("function (labelWidth, labelHeight) {
-                      return {
-                      x: 200 - labelWidth / 2,
-                      y: 180
-                      };
-}")
-    ) %>% 
-    hc_pane(
-      startAngle = 0,
-      endAngle = 360,
-      background = list(
-        list(
-          outerRadius = '112%',
-          innerRadius = '88%',
-          backgroundColor = JS("Highcharts.Color('#009296').setOpacity(0.1).get()"),
-          borderWidth =  0
-        ),
-        list(
-          outerRadius = '87%',
-          innerRadius = '63%',
-          backgroundColor = JS("Highcharts.Color('#F26B21').setOpacity(0.1).get()"),
-          borderWidth = 0
-        ),
-        list(
-          outerRadius = '62%',
-          innerRadius =  '38%',
-          backgroundColor = JS("Highcharts.Color('#FDB913').setOpacity(0.1).get()"),
-          borderWidth = 0
-        )
-      )
-    ) %>% 
-    hc_yAxis(
-      min = 0,
-      max = 100,
-      lineWidth = 0,
-      tickPositions = list()
-    ) %>% 
-    hc_plotOptions(
-      solidgauge = list(
-        borderWidth = '34px',
-        dataLabels = list(
-          enabled = FALSE
-        ),
-        linecap = 'round',
-        stickyTracking = FALSE
-      )
-    ) %>% 
-    hc_add_series(
-      name = "Districts",
-      borderColor = JS("Highcharts.Color('#009296').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#009296').get()"),
-        radius = "100%",
-        innerRadius = "100%",
-        y = sm_sub()$sots15_districts_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Schools",
-      borderColor = JS("Highcharts.Color('#F26B21').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#F26B21').get()"),
-        radius = "75%",
-        innerRadius = "75%",
-        y = sm_sub()$sots15_schools_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Students",
-      borderColor = JS("Highcharts.Color('#FDB913').get()"), 
-      data = list(list(
-        color = JS("Highcharts.Color('#FDB913').get()"),
-        radius = "50%",
-        innerRadius = "50%",
-        y = sm_sub()$sots15_students_sample_perc
-      ))
-    )
-  })
-```
+## snapshot data
+#snapshots <- read.csv("data/snapshots.csv", as.is=T, header=T, stringsAsFactors=F)
 
-### Empty Chart {.no-title}
-```{r}
-#library("viridisLite")
-
-#data(unemployment)
-#data(uscountygeojson)
-#data(usgeojson)
-#dclass <- data_frame(from = seq(0, 10, by = 2),
-#                     to = c(seq(2, 10, by = 2), 50),
-#                     color = substring(viridis(length(from), option = "C"), 0, 7))
-#dclass <- list.parse3(dclass)
-#highchart(type = "map") %>% 
-#  hc_add_series_map(uscountygeojson, unemployment, value = "value", joinBy = "code",
-#                    lineWidth = 0.5, color = hex_to_rgba("#000000", 0.75)) %>% 
-#  hc_add_series(data = uscountygeojson, type = "mapline",
-#                lineWidth = 2, color = hex_to_rgba("#000000", 0.75)) %>% 
-#  hc_colorAxis(dataClasses = dclass)
-
-
-
-#x <- ts(1:10, frequency = 4, start = c(1959, 2)) # 2nd Quarter of 1959
-# print( ts(1:10, frequency = 7, start = c(12, 2)), calendar = TRUE)
-# print.ts(.)
-## Using July 1954 as start date:
-#gnp <- ts(cumsum(1 + round(rnorm(100), 2)),
-#          start = c(1954, 7), frequency = 12)
-#highchart(type = "stock")
-```
-
-
-Deep Dive Current15 {.hidden data-orientation=rows}
-=====================================================================
-  Row 
----------------------------------------------------------------------
-  ### 
-  ```{r}
-renderValueBox({
-  valueBox(state_name_caps)
-})
-```
-
-### Current 2016 Districts
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current15_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current15_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = '#009296')
-})
-```
-
-### Current 2016 Schools
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current15_schools_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current15_schools_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
-})
-```
-
-### Current 2016 Students
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current15_students_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current15_students_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
-})
-```
-
-Row
----------------------------------------------------------------------
-  ### Current 2016 Districts With No Data
-  ```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current15_num_non_filers, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current15_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, " / ", val2, "   ", "(", round((sm_sub()$current15_num_non_filers/sm_sub()$current15_districts_pop)*100, 0), "%)", sep=''), color = '#e20800')
-})
-```
-
-
-Row {data-height = 350}
----------------------------------------------------------------------
-  ### Current 2016 Clean Status {.no-title} 
-  ```{r}
-renderHighchart({
-  
-  highchart() %>% 
-    hc_chart(
-      type = "solidgauge",
-      backgroundColor = "white",
-      marginTop = 50
-    ) %>% 
-    hc_title(
-      text = "Current 2016 Clean Status",
-      style = list(
-        fontSize = "24px"
-      )
-    ) %>% 
-    hc_tooltip(
-      borderWidth = 0,
-      backgroundColor = 'none',
-      shadow = FALSE,
-      style = list(
-        fontSize = '16px'
-      ),
-      pointFormat = '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}%</span>',
-      positioner = JS("function (labelWidth, labelHeight) {
-                      return {
-                      x: 200 - labelWidth / 2,
-                      y: 180
-                      };
-}")
-    ) %>% 
-    hc_pane(
-      startAngle = 0,
-      endAngle = 360,
-      background = list(
-        list(
-          outerRadius = '112%',
-          innerRadius = '88%',
-          backgroundColor = JS("Highcharts.Color('#009296').setOpacity(0.1).get()"),
-          borderWidth =  0
-        ),
-        list(
-          outerRadius = '87%',
-          innerRadius = '63%',
-          backgroundColor = JS("Highcharts.Color('#F26B21').setOpacity(0.1).get()"),
-          borderWidth = 0
-        ),
-        list(
-          outerRadius = '62%',
-          innerRadius =  '38%',
-          backgroundColor = JS("Highcharts.Color('#FDB913').setOpacity(0.1).get()"),
-          borderWidth = 0
-        )
-      )
-    ) %>% 
-    hc_yAxis(
-      min = 0,
-      max = 100,
-      lineWidth = 0,
-      tickPositions = list()
-    ) %>% 
-    hc_plotOptions(
-      solidgauge = list(
-        borderWidth = '34px',
-        dataLabels = list(
-          enabled = FALSE
-        ),
-        linecap = 'round',
-        stickyTracking = FALSE
-      )
-    ) %>% 
-    hc_add_series(
-      name = "Districts",
-      borderColor = JS("Highcharts.Color('#009296').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#009296').get()"),
-        radius = "100%",
-        innerRadius = "100%",
-        y = sm_sub()$current15_districts_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Schools",
-      borderColor = JS("Highcharts.Color('#F26B21').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#F26B21').get()"),
-        radius = "75%",
-        innerRadius = "75%",
-        y = sm_sub()$current15_schools_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Students",
-      borderColor = JS("Highcharts.Color('#FDB913').get()"), 
-      data = list(list(
-        color = JS("Highcharts.Color('#FDB913').get()"),
-        radius = "50%",
-        innerRadius = "50%",
-        y = sm_sub()$current15_students_sample_perc
-      ))
-    )
-  })
-```
-
-### Empty Chart {.no-title}
-```{r}
-x <- ts(1:10, frequency = 4, start = c(1959, 2)) # 2nd Quarter of 1959
-# print( ts(1:10, frequency = 7, start = c(12, 2)), calendar = TRUE)
-# print.ts(.)
-## Using July 1954 as start date:
-gnp <- ts(cumsum(1 + round(rnorm(100), 2)),
-          start = c(1954, 7), frequency = 12)
-highchart(type = "stock")
-```
-
-Row
----------------------------------------------------------------------
-  ```{r}
-output$downloadData_15_districts <- downloadHandler(filename = function() { paste('current15_districts.csv') },
-                                                    content = function(file) { write.csv(cl_15_districts(), file, row.names=F) })
-downloadLink("downloadData_15_districts", label = "Download Table")
-
-renderDataTable({
-  datatable(cl_15_districts(), rownames = FALSE, escape = FALSE, options = list(paging = TRUE, searching = TRUE, scrollX=TRUE, fixed=TRUE))
-})
-```
+## date info
+#date <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
 
 
 
 
-Deep Dive Current16 {.hidden data-orientation=rows}
-=====================================================================
-  Row 
----------------------------------------------------------------------
-  ### 
-  ```{r}
-renderValueBox({
-  ## state lookup
-  state_lookup <- data.frame(cbind(name = c('All', state_metrics$state_name)), code=c('.', state_metrics$postal_cd), stringsAsFactors = F)
-  state_lookup$name_caps <- toupper(state_lookup$name)
-  ## making this global so we can use it in other sections as well
-  state_name_caps <- state_lookup$name_caps[state_lookup$code == sm_sub()$postal_cd]
-  valueBox(state_name_caps)
-})
-```
+#sots16_dd <- reactive({sots.districts.2016 %>% filter(postal_cd %in% input$state)})
+#current16_dd <- reactive({current16_districts %>% filter(exclude_from_ia_analysis == FALSE & postal_cd %in% input$state)})
+#current16_dd_all <- reactive({dd.2017 %>% filter(postal_cd %in% input$state)})
 
-### Current 2016 IA Districts
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = '#009296')
-})
-```
+## districts deluxe by connectivity status
+## current '16: districts deluxe IA subset
+#current16_dd_ia <- reactive({current16_districts_ia %>% filter(postal_cd %in% input$state)})
+## current '16: districts deluxe WAN subset
+#current16_dd_wan <- reactive({current16_districts_wan %>% filter(postal_cd %in% input$state)})
+## current '16: districts deluxe IA cost subset
+#current16_dd_ia_cost <- reactive({current16_districts_ia_cost %>% filter(postal_cd %in% input$state)})
+## current '16: districts deluxe WAN cost subset
+#current16_dd_wan_cost <- reactive({current16_districts_wan_cost %>% filter(postal_cd %in% input$state)})
+## current '16: districts deluxe fiber subset
+#current16_dd_fiber <- reactive({current16_districts_fiber %>% filter(postal_cd %in% input$state)})
 
-### Current 2016 IA Schools
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_schools_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_schools_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
-})
-```
+## districts deluxe by meeting goals
+## sots '16: districts meeting goals
+#sots16_mg <- reactive({sots16_dd() %>% filter(meeting_2014_goal_no_oversub == TRUE)})
+## current '16: districts meeting goals
+#c16_mg <- reactive({current16_dd() %>% filter(meeting_2014_goal_no_oversub == TRUE)})
+## current '16: districts IA meeting goals
+#c16_ia_mg <- reactive({current16_dd_ia() %>% filter(meeting_2014_goal_no_oversub == TRUE)})
+## current '16: districts IA NOT meeting goals
+#c16_ia_nmg <- reactive ({current16_dd_ia() %>% filter(meeting_2014_goal_no_oversub == FALSE)})
 
-### Current 2016 IA Students
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_students_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_students_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
-})
-```
+## districts upgraded table 
+#districts_up <- reactive({districts_upgraded %>% filter(postal_cd %in% input$state)})
 
 
-Row
----------------------------------------------------------------------
-  ### Current 2016 Districts with No Data
-  ```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_num_non_filers, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, " / ", val2, "   ", "(", round((sm_sub()$current16_num_non_filers/sm_sub()$current16_districts_pop)*100, 0), "%)", sep=''), color = '#e20800')
-})
-```
+## target lists
+#tl_sub <- reactive({target_list %>% filter(postal_cd %in% input$state)})
+#tl_conn_sub <- reactive({conn.targets %>% filter(postal_cd %in% input$state)})
+#tl_fiber_sub <- reactive({fiber.targets %>% filter(postal_cd %in% input$state)})
 
-### Current 2016 WAN Districts
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_districts_sample_wan, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_districts_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = '#009296')
-})
-```
+## click-though data
+#cl_16_districts <- reactive({ districts.16.click.through %>% filter(postal_cd %in% input$state) })
+#cl_16_districts <- reactive({ districts.16.click.through %>% filter(postal_cd %in% input$state) })
+#cl_conn_sub <- reactive({ conn.click.through %>% filter(postal_cd %in% input$state) })
+#cl_fiber_sub <- reactive({ fiber.click.through %>% filter(postal_cd %in% input$state) })
+#cl_affordability_sub <- reactive({ affordability.click.through %>% filter(postal_cd %in% input$state) })
 
-### Current 2016 WAN Schools
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_schools_sample_wan, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_schools_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
-})
-```
-
-### Current 2016 WAN Students
-```{r}
-renderValueBox({
-  val1 <- format(sm_sub()$current16_students_sample_wan, big.mark = ",", nsmall = 0, scientific = FALSE)
-  val2 <- format(sm_sub()$current16_students_pop, big.mark = ",", nsmall = 0, scientific = FALSE)
-  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
-})
-```
-
-Row {data-height = 350}
----------------------------------------------------------------------
-  ### Current 2016 Clean Status {.no-title}
-  ```{r}
-renderHighchart({
-  
-  highchart() %>% 
-    hc_chart(
-      type = "solidgauge",
-      backgroundColor = "white",
-      marginTop = 50
-    ) %>% 
-    hc_title(
-      text = "Current 2016 Clean Status (IA)",
-      style = list(
-        fontSize = "24px"
-      )
-    ) %>% 
-    hc_tooltip(
-      borderWidth = 0,
-      backgroundColor = 'none',
-      shadow = FALSE,
-      style = list(
-        fontSize = '16px'
-      ),
-      pointFormat = '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}%</span>',
-      positioner = JS("function (labelWidth, labelHeight) {
-                      return {
-                      x: 200 - labelWidth / 2,
-                      y: 180
-                      };
-}")
-    ) %>% 
-    hc_pane(
-      startAngle = 0,
-      endAngle = 360,
-      background = list(
-        list(
-          outerRadius = '112%',
-          innerRadius = '88%',
-          backgroundColor = JS("Highcharts.Color('#009296').setOpacity(0.1).get()"),
-          borderWidth =  0
-        ),
-        list(
-          outerRadius = '87%',
-          innerRadius = '63%',
-          backgroundColor = JS("Highcharts.Color('#F26B21').setOpacity(0.1).get()"),
-          borderWidth = 0
-        ),
-        list(
-          outerRadius = '62%',
-          innerRadius =  '38%',
-          backgroundColor = JS("Highcharts.Color('#FDB913').setOpacity(0.1).get()"),
-          borderWidth = 0
-        )
-      )
-    ) %>% 
-    hc_yAxis(
-      min = 0,
-      max = 100,
-      lineWidth = 0,
-      tickPositions = list()
-    ) %>% 
-    hc_plotOptions(
-      solidgauge = list(
-        borderWidth = '34px',
-        dataLabels = list(
-          enabled = FALSE
-        ),
-        linecap = 'round',
-        stickyTracking = FALSE
-      )
-    ) %>% 
-    hc_add_series(
-      name = "Districts",
-      borderColor = JS("Highcharts.Color('#009296').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#009296').get()"),
-        radius = "100%",
-        innerRadius = "100%",
-        y = sm_sub()$current16_districts_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Schools",
-      borderColor = JS("Highcharts.Color('#F26B21').get()"),
-      data = list(list(
-        color = JS("Highcharts.Color('#F26B21').get()"),
-        radius = "75%",
-        innerRadius = "75%",
-        y = sm_sub()$current16_schools_sample_perc
-      ))
-    ) %>% 
-    hc_add_series(
-      name = "Students",
-      borderColor = JS("Highcharts.Color('#FDB913').get()"), 
-      data = list(list(
-        color = JS("Highcharts.Color('#FDB913').get()"),
-        radius = "50%",
-        innerRadius = "50%",
-        y = sm_sub()$current16_students_sample_perc
-      ))
-    )
-  })
-```
-
-### Empty Chart {.no-title}
-```{r}
-x <- ts(1:10, frequency = 4, start = c(1959, 2)) # 2nd Quarter of 1959
-# print( ts(1:10, frequency = 7, start = c(12, 2)), calendar = TRUE)
-# print.ts(.)
-## Using July 1954 as start date:
-gnp <- ts(cumsum(1 + round(rnorm(100), 2)),
-          start = c(1954, 7), frequency = 12)
-highchart(type = "stock")
-```
-
-Row
----------------------------------------------------------------------
-  ```{r}
-
-output$downloadData_16_districts <- downloadHandler(filename = function() { paste('current16_districts.csv') },
-                                                    content = function(file) { write.csv(cl_16_districts(), file, row.names=F) })
-downloadLink("downloadData_16_districts", label = "Download Table")
-
-renderDataTable({
-  datatable(cl_16_districts(), rownames = FALSE, escape = FALSE, options = list(paging = TRUE, searching = TRUE, scrollX=TRUE, fixed=TRUE))
-})
-```
 
 
 Deep Dive Upgrades {.hidden data-orientation=rows}
 ===========================================================================
-  Row
+Row
 ---------------------------------------------------------------------
-  ```{r}
+```{r}
 
 #output$downloadData_upgrades <- downloadHandler(
 #  filename = function() { paste('upgrades_deep_dive.csv') },

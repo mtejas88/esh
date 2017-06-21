@@ -37,5 +37,22 @@ source_env <- function(path){
   if (Sys.getenv("PASSWORD") != ""){
     assign("password", Sys.getenv("PASSWORD"), envir=.GlobalEnv)
   }
+  
+  ## Frozen 2016
+  ## assign url for DB if available
+  if (Sys.getenv("URL_PINK") != ""){
+    assign("url_pink", Sys.getenv("URL_PINK"), envir=.GlobalEnv)
+  }
+  
+  ## assign username for DB if available
+  if (Sys.getenv("USER_PINK") != ""){
+    assign("user_pink", Sys.getenv("USER_PINK"), envir=.GlobalEnv)
+  }
+  
+  ## assign password for DB if available
+  if (Sys.getenv("PASSWORD_PINK") != ""){
+    assign("password_pink", Sys.getenv("PASSWORD_PINK"), envir=.GlobalEnv)
+  }
+ 
 }
 

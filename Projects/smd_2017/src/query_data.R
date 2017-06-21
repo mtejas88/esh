@@ -67,8 +67,14 @@ dbDisconnect(con)
 
 ## Connect to 2016 Frozen DB
 ## connect to the database
-con <- dbConnect(pgsql, url=url, user=user, password=password)
+#con <- dbConnect(pgsql, url=url_pink, user=user_pink, password=password_pink)
 
+#smd_2016_froz <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_smd.SQL", sep=""))
+#dd_2016_froz <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL", sep=""))
+#dd_2016_froz <- correct.dataset(dd_2016_froz, sots.flag=0, services.flag=0)
+
+## disconnect from database
+#dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
 ## write out the datasets
@@ -82,7 +88,9 @@ if (weekday == 'Monday'){
 }
 
 ## write out generically
-write.csv(smd_2017, paste("tool/data/2017_state_aggregation.csv", sep=""), row.names=F)
-write.csv(smd_2016, paste("tool/data/2016_state_aggregation.csv", sep=""), row.names=F)
-write.csv(dd_2017, paste("tool/data/2017_deluxe_districts.csv", sep=""), row.names=F)
-write.csv(dd_2016, paste("tool/data/2016_deluxe_districts.csv", sep=""), row.names=F)
+write.csv(smd_2017, "tool/data/2017_state_aggregation.csv", row.names=F)
+write.csv(smd_2016, "tool/data/2016_state_aggregation.csv", row.names=F)
+#write.csv(smd_2016_froz, "tool/data/2016_frozen_state_aggregation.csv", row.names=F)
+write.csv(dd_2017, "tool/data/2017_deluxe_districts.csv", row.names=F)
+write.csv(dd_2016, "tool/data/2016_deluxe_districts.csv", row.names=F)
+#write.csv(dd_2016_froz, "tool/data/2016_frozen_deluxe_districts.csv", row.names=F)
