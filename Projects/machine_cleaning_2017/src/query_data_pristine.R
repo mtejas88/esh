@@ -56,11 +56,12 @@ line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/201
 #line.items.2016 <- correct.dataset(line.items.2016, sots.flag=0, services.flag=0)
 ## esh line item ids
 #esh.line.items <- querydb(paste(github_path, "General_Resources/sql_scripts/esh_line_items.SQL", sep=""))
+
 ## service provider data (for reporting name)
 sp.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_service_providers.SQL", sep=""))
 sp.2016 <- unique(sp.2016[,c('name', 'reporting_name')])
 names(sp.2016)[names(sp.2016) == 'name'] <- 'service_provider_name'
-sp.2016 <- sp.2016[!is.na(sp.2016$reporting_name),]
+#sp.2016 <- sp.2016[!is.na(sp.2016$reporting_name),]
 
 ## disconnect from database
 dbDisconnect(con)

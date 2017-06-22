@@ -58,6 +58,9 @@ full_mg <- merge(mg_raw, clean.line.items.2016[,c('cl_frn_complete', 'cl_connect
 ## subset to only the line items that were cleaned
 full_mg <- full_mg[which(full_mg$cl_exclude == "f"),]
 
+full_mg <- merge(full_mg, sp.2016, by='service_provider_name', all.x=T)
+table(is.na(full_mg$reporting_name))
+
 ##**************************************************************************************************************************************************
 ## COMPARE COLUMNS THAT WERE CHANGED
 
