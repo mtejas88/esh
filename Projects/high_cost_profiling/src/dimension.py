@@ -10,10 +10,19 @@ import numpy as np
 ## data prep
 applications = pd.read_csv('data/raw/applications.csv')
 applications['discount_category'] = np.floor(applications['category_one_discount_rate']/10)*10
+applications['below_median_funding_request'] = np.where(applications['total_funding_year_commitment_amount_request']<9484.8,True,False)
 consultant_applications = applications.loc[applications['consultant_indicator'] == True]
 
 ##all consultant apps
 print(consultant_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+##dimension low cost
+lc = consultant_applications.groupby('below_median_funding_request')
+print(lc.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+##dimension service category
+cat = consultant_applications.groupby('category_of_service')
+print(cat.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
 
 ##dimension service category
 cat = consultant_applications.groupby('category_of_service')
