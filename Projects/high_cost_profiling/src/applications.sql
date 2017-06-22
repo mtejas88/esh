@@ -31,4 +31,4 @@ left join fy2017.recipients_of_services ros
 on frns.application_number = ros.application_number
 left join fy2017.consultants c
 on frns.application_number = c.application_number
-group by 1,2,3,4,9,10,11,12,13
+group by 1,2,3,8,9,10,11,12
