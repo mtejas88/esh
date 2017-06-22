@@ -137,6 +137,7 @@ FROM (
           LEFT OUTER JOIN fy2016.districts d
           ON dd.esh_id::numeric = d.esh_id
           WHERE li.broadband
+          AND eli.funding_year = 2016
 ) base
 left join (
           select  ldli.line_item_id,
