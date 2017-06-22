@@ -3,6 +3,7 @@ rm(list=ls())
 
 ## read in data
 setwd("~/GitHub/ficher/Projects/nassd")
+## remove when not testing
 #dd_union <- read.csv("data/dd_union.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## load packages (if not already in the environment) 
@@ -19,76 +20,76 @@ library(dotenv)
 library(dplyr)
 library(secr)
 
-#data <- dd_union[which(dd_union$year == 2016),]
-#data$metric <- data$meeting_2014_goal_no_oversub
-#data_sub <- data[which(data$metric >= 0),]
+## ---- 1. FUNCTION: METRIC_OVERALL ----
+## PURPOSE: to calculate what percent and extrapolated number of districts, campuses, schools, and students are in the different metric groups
+## NOTE: the breakdown at the campus, school, and student level might not always be relevant or "accurate" depending on methodology
 
-
-metric_overall <- function(data,data_sub){
+metric_overall <- function(population,sample){
 
   # Population
   
-  population_district <- length(data$esh_id)
-  population_campuses <- sum(data$num_campuses)
-  population_schools <- sum(data$num_schools)
-  population_students <- sum(data$num_students)
+  population_district <- length(population$esh_id)
+  population_campuses <- sum(population$num_campuses)
+  population_schools <- sum(population$num_schools)
+  population_students <- sum(population$num_students)
   
   pop_df <- data_frame(population_district,population_campuses,population_schools,population_students)
   
   # Subset to Metric
   
-  A <- aggregate(esh_id ~ metric, data = data_sub, FUN = length)
+  A <- aggregate(esh_id ~ metric, data = sample, FUN = length)
   colnames(A)[2] <- "districts"
-  B <- aggregate(num_campuses ~ metric, data = data_sub, FUN = sum)
+  B <- aggregate(num_campuses ~ metric, data = sample, FUN = sum)
   colnames(B)[2] <- "campuses"
-  C <- aggregate(num_schools ~ metric, data = data_sub, FUN = sum)
+  C <- aggregate(num_schools ~ metric, data = sample, FUN = sum)
   colnames(C)[2] <- "schools"
-  D <- aggregate(num_students ~ metric, data = data_sub, FUN = sum)
+  D <- aggregate(num_students ~ metric, data = sample, FUN = sum)
   colnames(D)[2] <- "students"
   
-  metric_df <- merge(A,B)
-  metric_df <- merge(metric_df,C)
-  metric_df <- merge(metric_df,D)
+  output <- merge(A,B)
+  output <- merge(output,C)
+  output <- merge(output,D)
   
   # Sum the subset to get sample totals
   
-  metric_df$sample_districts <- sum(metric_df$districts)
-  metric_df$sample_campuses <- sum(metric_df$campuses)
-  metric_df$sample_schools <- sum(metric_df$schools)
-  metric_df$sample_students <- sum(metric_df$students)
+  output$sample_districts <- sum(output$districts)
+  output$sample_campuses <- sum(output$campuses)
+  output$sample_schools <- sum(output$schools)
+  output$sample_students <- sum(output$students)
   
   # Merge in population data
-  metric_df <- merge(metric_df,pop_df)
+  output <- merge(output,pop_df)
   
   # Calculate percents
-  metric_df$percent_districts <- (metric_df$districts/metric_df$sample_districts)
-  metric_df$percent_campuses <- (metric_df$campuses/metric_df$sample_campuses)
-  metric_df$percent_schools <- (metric_df$schools/metric_df$sample_schools)
-  metric_df$percent_students <- (metric_df$students/metric_df$sample_students)
+  output$percent_districts <- (output$districts/output$sample_districts)
+  output$percent_campuses <- (output$campuses/output$sample_campuses)
+  output$percent_schools <- (output$schools/output$sample_schools)
+  output$percent_students <- (output$students/output$sample_students)
   
   # Extrapolate
-  metric_df$extrap_districts <- metric_df$percent_districts*metric_df$population_district
-  metric_df$extrap_campuses <- metric_df$percent_campuses*metric_df$population_campuses
-  metric_df$extrap_schools <- metric_df$percent_schools*metric_df$population_schools
-  metric_df$extrap_students <- metric_df$percent_students*metric_df$population_students
+  output$extrap_districts <- output$percent_districts*output$population_district
+  output$extrap_campuses <- output$percent_campuses*output$population_campuses
+  output$extrap_schools <- output$percent_schools*output$population_schools
+  output$extrap_students <- output$percent_students*output$population_students
   
-  #rm(population_district,population_campuses,population_schools,population_students,pop_df,A,B,C,D)
-  print(metric_df)
+  print(output)
 }
 
+## ---- 2. FUNCTION: METRIC_GROUP ----
+## PURPOSE: same as metric_overall but subsets to the group column defined in the data, like locale or fiber target status
+## NOTE: the breakdown at the campus, school, and student level might not always be relevant or "accurate" depending on methodology
 
-
-metric_group <- function(data,data_sub){
+metric_group <- function(population,sample){
   
   #Population within each group
   
-  A <- aggregate(esh_id ~ group, data = data, FUN = length)
+  A <- aggregate(esh_id ~ group, data = population, FUN = length)
   colnames(A)[2] <- "population_districts"
-  B <- aggregate(num_campuses ~ group, data = data, FUN = sum)
+  B <- aggregate(num_campuses ~ group, data = population, FUN = sum)
   colnames(B)[2] <- "population_campuses"
-  C <- aggregate(num_schools ~ group, data = data, FUN = sum)
+  C <- aggregate(num_schools ~ group, data = population, FUN = sum)
   colnames(C)[2] <- "population_schools"
-  D <- aggregate(num_students ~ group, data = data, FUN = sum)
+  D <- aggregate(num_students ~ group, data = population, FUN = sum)
   colnames(D)[2] <- "population_students"
   
   pop_df <- merge(A,B)
@@ -97,27 +98,27 @@ metric_group <- function(data,data_sub){
   
   # Subset to Metric x Group
   
-  A <- aggregate(esh_id ~ group + metric, data = data_sub, FUN = length)
+  A <- aggregate(esh_id ~ group + metric, data = sample, FUN = length)
   colnames(A)[3] <- "districts"
-  B <- aggregate(num_campuses ~ group + metric, data = data_sub, FUN = sum)
+  B <- aggregate(num_campuses ~ group + metric, data = sample, FUN = sum)
   colnames(B)[3] <- "campuses"
-  C <- aggregate(num_schools ~ group + metric, data = data_sub, FUN = sum)
+  C <- aggregate(num_schools ~ group + metric, data = sample, FUN = sum)
   colnames(C)[3] <- "schools"
-  D <- aggregate(num_students ~ group + metric, data = data_sub, FUN = sum)
+  D <- aggregate(num_students ~ group + metric, data = sample, FUN = sum)
   colnames(D)[3] <- "students"
   
-  group_metric_df <- merge(A,B)
-  group_metric_df <- merge(group_metric_df,C)
-  group_metric_df <- merge(group_metric_df,D)
+  output <- merge(A,B)
+  output <- merge(output,C)
+  output <- merge(output,D)
   
   # Sum the subset to get sample totals
-  A <- aggregate(districts ~ group, data = group_metric_df, FUN = sum)
+  A <- aggregate(districts ~ group, data = output, FUN = sum)
   colnames(A)[2] <- "sample_districts"
-  B <- aggregate(campuses ~ group, data = group_metric_df, FUN = sum)
+  B <- aggregate(campuses ~ group, data = output, FUN = sum)
   colnames(B)[2] <- "sample_campuses"
-  C <- aggregate(schools ~ group, data = group_metric_df, FUN = sum)
+  C <- aggregate(schools ~ group, data = output, FUN = sum)
   colnames(C)[2] <- "sample_schools"
-  D <- aggregate(students ~ group, data = group_metric_df, FUN = sum)
+  D <- aggregate(students ~ group, data = output, FUN = sum)
   colnames(D)[2] <- "sample_students"
   
   sample_df <- merge(A,B)
@@ -125,28 +126,191 @@ metric_group <- function(data,data_sub){
   sample_df <- merge(sample_df,D)
   
   ## merge in sample
-  group_metric_df <- merge(group_metric_df,sample_df)
+  output <- merge(output,sample_df)
   
   ## merge in population
-  group_metric_df <- merge(group_metric_df,pop_df)
+  output <- merge(output,pop_df)
   
   ## Calculate percents
-  group_metric_df$percent_districts <- (group_metric_df$districts/group_metric_df$sample_districts)
-  group_metric_df$percent_campuses <- (group_metric_df$campuses/group_metric_df$sample_campuses)
-  group_metric_df$percent_schools <- (group_metric_df$schools/group_metric_df$sample_schools)
-  group_metric_df$percent_students <- (group_metric_df$students/group_metric_df$sample_students)
+  output$percent_districts <- (output$districts/output$sample_districts)
+  output$percent_campuses <- (output$campuses/output$sample_campuses)
+  output$percent_schools <- (output$schools/output$sample_schools)
+  output$percent_students <- (output$students/output$sample_students)
   
   ## Extrapolate
-  group_metric_df$extrap_districts <- group_metric_df$percent_districts*group_metric_df$population_district
-  group_metric_df$extrap_campuses <- group_metric_df$percent_campuses*group_metric_df$population_campuses
-  group_metric_df$extrap_schools <- group_metric_df$percent_schools*group_metric_df$population_schools
-  group_metric_df$extrap_students <- group_metric_df$percent_students*group_metric_df$population_students
+  output$extrap_districts <- output$percent_districts*output$population_district
+  output$extrap_campuses <- output$percent_campuses*output$population_campuses
+  output$extrap_schools <- output$percent_schools*output$population_schools
+  output$extrap_students <- output$percent_students*output$population_students
   
-  #rm(A,B,C,D,pop_df,sample_df)  
-  print(group_metric_df)
+  print(output)
 }
 
+## ---- 3. FUNCTION: METRIC_OVERALL_MEDIAN ----
+## PURPOSE: to calculate what median of a field overall, while also giving context with population and sample numbers
+##
+
+
+metric_overall_median <- function(population,sample){
   
+  # Population
+  
+  population_district <- length(population$esh_id)
+  population_campuses <- sum(population$num_campuses)
+  population_schools <- sum(population$num_schools)
+  population_students <- sum(population$num_students)
+  
+  pop_df <- data_frame(population_district,population_campuses,population_schools,population_students)
+  
+  # Sample
+  
+  sample_district <- length(sample$esh_id)
+  sample_campuses <- sum(sample$num_campuses)
+  sample_schools <- sum(sample$num_schools)
+  sample_students <- sum(sample$num_students)
+  
+  sample_df <- data_frame(sample_district,sample_campuses,sample_schools,sample_students)
+  
+  # Calculate Median
+  
+  median_metric <- median(sample$metric)
+  
+  output <- merge(median_metric,sample_df)
+  output <- merge(output,pop_df)
+  
+  print(output)
+} 
+
+## ---- 4. FUNCTION: METRIC_GROUP_MEDIAN ----
+## PURPOSE: to calculate what median of a field across specificed groups, while also giving context with population and sample numbers
+##
+
+metric_group_median <- function(population,sample){
+  
+  #Population within each group
+  
+  A <- aggregate(esh_id ~ group, data = population, FUN = length)
+  colnames(A)[2] <- "population_districts"
+  B <- aggregate(num_campuses ~ group, data = population, FUN = sum)
+  colnames(B)[2] <- "population_campuses"
+  C <- aggregate(num_schools ~ group, data = population, FUN = sum)
+  colnames(C)[2] <- "population_schools"
+  D <- aggregate(num_students ~ group, data = population, FUN = sum)
+  colnames(D)[2] <- "population_students"
+  
+  pop_df <- merge(A,B)
+  pop_df <- merge(pop_df,C)
+  pop_df <- merge(pop_df,D)
+  
+  #Sample within each group
+  A <- aggregate(esh_id ~ group, data = sample, FUN = length)
+  colnames(A)[2] <- "sample_districts"
+  B <- aggregate(num_campuses ~ group, data = sample, FUN = sum)
+  colnames(B)[2] <- "sample_campuses"
+  C <- aggregate(num_schools ~ group, data = sample, FUN = sum)
+  colnames(C)[2] <- "sample_schools"
+  D <- aggregate(num_students ~ group, data = sample, FUN = sum)
+  colnames(D)[2] <- "sample_students"
+  
+  sample_df <- merge(A,B)
+  sample_df <- merge(sample_df,C)
+  sample_df <- merge(sample_df,D)
+  
+  # Median of metric within group 
+  
+  output <- aggregate(metric ~ group, data = sample, FUN = median)
+
+  # Merge
+  output <- merge(output,sample_df)
+  output <- merge(output,pop_df)
+  
+  print(output)
+}
+
+## ---- 5. FUNCTION: METRIC_OVERALL_WEIGHTED_AVERAGE ----
+## PURPOSE: to calculate weighted average of metric overall, while also giving context with population and sample numbers
+##
+
+metric_overall_weighted_average <- function(population,sample){
+
+  # Population
+  
+  population_district <- length(population$esh_id)
+  population_campuses <- sum(population$num_campuses)
+  population_schools <- sum(population$num_schools)
+  population_students <- sum(population$num_students)
+  
+  pop_df <- data_frame(population_district,population_campuses,population_schools,population_students)
+  
+  # Sample
+  
+  sample_district <- length(sample$esh_id)
+  sample_campuses <- sum(sample$num_campuses)
+  sample_schools <- sum(sample$num_schools)
+  sample_students <- sum(sample$num_students)
+  
+  sample_df <- data_frame(sample_district,sample_campuses,sample_schools,sample_students)
+  
+  # Calculate Median
+  
+  weighted_average_metric <- sum(sample$metric_numer)/sum(sample$metric_denom)
+  
+  output <- merge(weighted_average_metric,sample_df)
+  output  <- merge(output,pop_df)
+  
+  print(output)
+} 
 
 
+## ---- 6. FUNCTION: METRIC_GROUP_WEIGHTED_AVERAGE ----
+## PURPOSE: to calculate what median of a field across specificed groups, while also giving context with population and sample numbers
+##
 
+metric_group_weighted_average <- function(population,sample){
+  
+  #Population within each group
+  
+  A <- aggregate(esh_id ~ group, data = population, FUN = length)
+  colnames(A)[2] <- "population_districts"
+  B <- aggregate(num_campuses ~ group, data = population, FUN = sum)
+  colnames(B)[2] <- "population_campuses"
+  C <- aggregate(num_schools ~ group, data = population, FUN = sum)
+  colnames(C)[2] <- "population_schools"
+  D <- aggregate(num_students ~ group, data = population, FUN = sum)
+  colnames(D)[2] <- "population_students"
+  
+  pop_df <- merge(A,B)
+  pop_df <- merge(pop_df,C)
+  pop_df <- merge(pop_df,D)
+  
+  #Sample within each group
+  A <- aggregate(esh_id ~ group, data = sample, FUN = length)
+  colnames(A)[2] <- "sample_districts"
+  B <- aggregate(num_campuses ~ group, data = sample, FUN = sum)
+  colnames(B)[2] <- "sample_campuses"
+  C <- aggregate(num_schools ~ group, data = sample, FUN = sum)
+  colnames(C)[2] <- "sample_schools"
+  D <- aggregate(num_students ~ group, data = sample, FUN = sum)
+  colnames(D)[2] <- "sample_students"
+  
+  sample_df <- merge(A,B)
+  sample_df <- merge(sample_df,C)
+  sample_df <- merge(sample_df,D)
+  
+  # Sum of metric numerator (in weighted average calculation) within group 
+  metric_group_numer <- aggregate(metric_numer ~ group, data = sample, FUN = sum)
+  
+  # Sum of metric denominator (in weighted average calculation) within group
+  metric_group_denom <- aggregate(metric_denom ~ group, data = sample, FUN = sum)
+  output <- merge(metric_group_numer,metric_group_denom)
+  
+  output$metric_weighted_average <- output$metric_numer/output$metric_denom
+  
+  # Merge
+  output <- merge(output,sample_df)
+  output <- merge(output,pop_df)
+  
+  output <- within(output,rm(metric_numer,metric_denom))
+  
+  print(output)
+}
