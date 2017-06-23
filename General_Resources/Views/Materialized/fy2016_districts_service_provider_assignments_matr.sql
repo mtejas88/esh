@@ -1,5 +1,6 @@
 select  recipient_sp_bw_rank.recipient_id as esh_id, 
 reporting_name, 
+recipient_sp_bw_rank.purpose_list as purpose,
 recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
 recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
 
@@ -22,7 +23,8 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
                     when purpose = 'Upstream'
                       then bandwidth_in_mbps * quantity_of_line_items_received_by_district
                     else 0
-                  end) as upstream_bandwidth
+                  end) as upstream_bandwidth,
+              array_agg(distinct purpose order by purpose) as purpose_list
       from public.fy2016_services_received_matr sr
       left join public.fy2016_districts_predeluxe_matr dd
       on sr.recipient_id = dd.esh_id

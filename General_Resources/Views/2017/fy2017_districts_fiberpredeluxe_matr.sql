@@ -517,7 +517,14 @@ select distinct
 
 	ia_monthly_funding_total,
 
-	dspa.reporting_name as service_provider_assignment
+	dspa.reporting_name as service_provider_assignment,
+
+	dspa.purpose as primary_sp_purpose,
+
+	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
+
 
 
 
