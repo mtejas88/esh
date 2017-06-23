@@ -253,7 +253,10 @@ select distinct
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
 	ia_monthly_funding_total,
-	dspa.reporting_name as service_provider_assignment
+	dspa.reporting_name as service_provider_assignment,
+	dspa.purpose as primary_sp_purpose,
+	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts

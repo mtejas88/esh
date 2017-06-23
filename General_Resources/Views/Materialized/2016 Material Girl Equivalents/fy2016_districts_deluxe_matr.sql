@@ -148,7 +148,10 @@ select distinct
 	ia_monthly_cost_district_applied,
 	ia_monthly_cost_other_applied,
 	ia_monthly_funding_total,
-	service_provider_assignment
+	service_provider_assignment,
+	primary_sp_purpose,
+	primary_sp_bandwidth,
+	primary_sp_percent_of_bandwidth
 
 from fy2016_districts_fiberpredeluxe_matr dfpd
 left join state_level_extrap sle
