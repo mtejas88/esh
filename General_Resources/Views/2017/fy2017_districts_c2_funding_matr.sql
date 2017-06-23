@@ -373,7 +373,6 @@ select
   sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
   sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
   sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
-  sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut_rounded,
   sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
   sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
   sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
