@@ -339,8 +339,26 @@ dd_17 <- dd_union[which(dd_union$year == 2017),]
 ## 4. WI-FI 
       
     ## 4. A. TOP LEFT/TITLE METRICS 
+      filter <- dd_union[which(dd_union$year == 2017),]
       
-      ## -      
+      sufficient_wifi <- length(filter[which(filter$needs_wifi==0),"esh_id"])
+      wifi_survey <- length(filter[which(filter$needs_wifi>=0),"esh_id"])
+      budget_threshold <- .25
+      districts_above_threshold <- length(filter[which(filter$percent_c2_budget_remaining>=budget_threshold & filter$percent_c2_budget_remaining<=1),"esh_id"])
+      districts_funding_sample <- length(filter[which(filter$percent_c2_budget_remaining>=0 & filter$percent_c2_budget_remaining<=1),"esh_id"])
+      districts_need_wifi_have_money <- length(filter[which(filter$percent_c2_budget_remaining>=0 & filter$percent_c2_budget_remaining<=1 & filter$needs_wifi==1),"esh_id"])
+      
+      ## - Percent Need Wi-fi
+      sufficient_wifi/wifi_survey
+      
+      ## - Funding remaining
+      sum(filter$c2_prediscount_remaining,na.rm=TRUE)
+      
+      ## - Districts with at least [budget_threshold] % remaining
+      districts_above_threshold/districts_funding_sample
+      
+      ## - School districts that report insufficient wi-fi and have money left ## Note: this is not extrapolated and probably should be 
+      districts_need_wifi_have_money
         
     ## 4. B. GRAPHS
       
@@ -356,13 +374,55 @@ dd_17 <- dd_union[which(dd_union$year == 2017),]
     ## 4. D. PERCENT FUNDING REMAINING (exclude Nulls & No Datas & Extrapolate)
       filter <- dd_union[which(dd_union$year == 2017),]
       budget_threshold <- .25
-      filter_s <- filter[which(filter$percent_c2_budget_remaining >=0) 
+    
+      for (i in 1:nrow(filter)){
+        if(is.na(filter$percent_c2_budget_remaining[i]) == TRUE){
+          filter$budget_group[i] <- NA
+        } else if (filter$percent_c2_budget_remaining[i]==0){
+          filter$budget_group[i] <- "0%"
+        } else if (filter$percent_c2_budget_remaining[i]==1){
+          filter$budget_group[i] <- "100%"
+        } else if (filter$percent_c2_budget_remaining[i]< budget_threshold & filter$percent_c2_budget_remaining[i]>0){
+          filter$budget_group[i] <- "< budget threshold"
+        } else if (filter$percent_c2_budget_remaining[i]>= budget_threshold & filter$percent_c2_budget_remaining[i]<1){
+          filter$budget_group[i] <- ">= budget threshold"
+        } else {
+          filter$budget_group[i] <- "error"
+        }
+      }
+      
+      filter$metric <- filter$budget_group
+      filter_s <- filter[which(filter$percent_c2_budget_remaining >=0 & filter$percent_c2_budget_remaining <=1),] 
       
       wifi_d <- metric_overall(filter,filter_s)
       
     ## 4. E. WI-FI NEED x PERCENT FUNDING REMAINING
-      ## copy what is above
+      filter <- dd_union[which(dd_union$year == 2017),]
+      budget_threshold <- .25
       
+      for (i in 1:nrow(filter)){
+        if(is.na(filter$percent_c2_budget_remaining[i]) == TRUE){
+          filter$budget_group[i] <- NA
+        } else if (filter$percent_c2_budget_remaining[i]==0){
+          filter$budget_group[i] <- "0%"
+        } else if (filter$percent_c2_budget_remaining[i]==1){
+          filter$budget_group[i] <- "100%"
+        } else if (filter$percent_c2_budget_remaining[i]< budget_threshold & filter$percent_c2_budget_remaining[i]>0){
+          filter$budget_group[i] <- "< budget threshold"
+        } else if (filter$percent_c2_budget_remaining[i]>= budget_threshold & filter$percent_c2_budget_remaining[i]<1){
+          filter$budget_group[i] <- ">= budget threshold"
+        } else {
+          filter$budget_group[i] <- "error"
+        }
+      }
       
+      filter$metric <- filter$budget_group
+      filter$group <- filter$needs_wifi
+      filter_s <- filter[which(filter$percent_c2_budget_remaining >=0 & filter$percent_c2_budget_remaining <=1 & filter$needs_wifi >=0),] 
+      
+      wifi_d <- metric_group(filter,filter_s)
+      ## since I removed nulls/NAs from both Needs Wi-fi & Percent Budget remaining the extrapolation isn't quite right. 
+      ## the sum of population_districts for the two groups won't equal 13,117
+
       
       
