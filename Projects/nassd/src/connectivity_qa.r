@@ -245,7 +245,6 @@ dd_17 <- dd_union[which(dd_union$year == 2017),]
         
     ## 3. B. GRAPH 
         
-        
         dd_all$group <- dd_all$year
         dd_all$metric <- dd_all$ia_monthly_cost_per_mbps
         dd_all_s <- dd_all[which(dd_all$metric >= 0),]
@@ -319,7 +318,6 @@ dd_17 <- dd_union[which(dd_union$year == 2017),]
       
       ## - Affordability by Group (Locale)
       affordability_f2
-      
         
     ## 3. G. DISTRICT IA $/STUDENT WEIGHTED AVERAGE
       filter <- dd_union[which(dd_union$year == 2017),]
@@ -347,22 +345,23 @@ dd_17 <- dd_union[which(dd_union$year == 2017),]
     ## 4. B. GRAPHS
       
     ## 4. C. WI-FI NEED - SOTS METHODOLOGY (exclude Nulls & No Datas & Extrapolate)
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric <- dd_16$needs_wifi
-      dd_16_a <- dd_16[which(dd_16$metric >= 0),]      
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric <- filter$needs_wifi
+      filter_s <- filter[which(filter$metric >= 0),]      
       
-      wifi_c <- metric_overall(dd_16,dd_16_a)
+      wifi_c <- metric_overall(filter,filter_s)
       
       ## Note the school and student numbers should match what is in the dashboard but both are using a methodology we will likely not use
       
-    ## 4. D. PERCENT FUNDING REMAINING
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      budget_threshold  
+    ## 4. D. PERCENT FUNDING REMAINING (exclude Nulls & No Datas & Extrapolate)
+      filter <- dd_union[which(dd_union$year == 2017),]
+      budget_threshold <- .25
+      filter_s <- filter[which(filter$percent_c2_budget_remaining >=0) 
       
-      dd_16$metric <- dd_16$percent_c2_budget_remaining
-      dd_16_a <- dd_16[which(dd_16$metric >= 0),]   
+      wifi_d <- metric_overall(filter,filter_s)
       
     ## 4. E. WI-FI NEED x PERCENT FUNDING REMAINING
+      ## copy what is above
       
       
       
