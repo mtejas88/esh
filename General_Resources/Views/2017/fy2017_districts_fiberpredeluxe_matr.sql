@@ -41,6 +41,8 @@ select distinct
 
 	discount_rate_c1,
 
+	discount_rate_c1_matrix,
+
 	discount_rate_c2,
 
 	address,
@@ -549,7 +551,7 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi fields
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

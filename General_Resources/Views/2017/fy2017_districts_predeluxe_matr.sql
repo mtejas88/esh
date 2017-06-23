@@ -38,6 +38,8 @@ select distinct
 
 	discount_rate_c1::numeric/100 as discount_rate_c1,
 
+	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
+
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
 	--c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, using funding c2 discount columns in the code logic below
@@ -445,7 +447,7 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi metrics and removed wifi haircut
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
