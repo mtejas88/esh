@@ -65,7 +65,7 @@ Author:                       Justine Schott
 
 Created On Date:              06/16/2016
 
-Last Modified Date: 		  6/13/2017 - JH updated methodology to remove cases when num_lines = -1 or the sum_allocations = 0.
+Last Modified Date: 		  6/13/2017 - JH changed methodology to remove cases when num_lines = -1 or the sum_allocations = 0.
 This is how the old circuits to EBC query worked.
 
 Name of QAing Analyst(s):

@@ -538,7 +538,7 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 3/21/2017 -- update MT smush to smush by both address AND city, not just address
+Last Modified Date: 3/21/2017 --  MT smush to smush by both address AND city, not just address
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
