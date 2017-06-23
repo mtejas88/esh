@@ -147,7 +147,10 @@ case
   then 1
   else 0
 end as exclude_from_ia_analysis,
-null as exclude_from_ia_cost_analysis,
+case when f.exclude_from_analysis = false /* there isn't a 2015 equivalent so duplicating regular exclude from analysis*/
+  then 1
+  else 0
+end as exclude_from_ia_cost_analysis,
 
 -- BW 
 case
@@ -200,9 +203,9 @@ case
   else f.monthly_ia_cost_per_mbps::numeric
 end as ia_monthly_cost_per_mbps,
 case 
-  when f.exclude_from_analysis = false
-  then f.total_ia_bw_mbps::numeric 
-  else null
+  when f.exclude_from_analysis = true or f.monthly_ia_cost_per_mbps = 'Insufficient data' or f.monthly_ia_cost_per_mbps = 'Infinity'
+  then null 
+  else f.total_ia_bw_mbps::numeric 
 end as ia_bw_mbps_total_efc, 
 case 
   when f.exclude_from_analysis = false
@@ -395,7 +398,6 @@ case
   then null 
   else dd.ia_monthly_cost_per_mbps
 end as ia_monthly_cost_per_mbps,
-
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null 
@@ -625,7 +627,7 @@ case
 end as ia_monthly_cost_per_mbps,
 
 case
-  when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
+  when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true 
   then null 
   else dd.ia_bw_mbps_total -- will specifically be used to calculated Weighted Average $/Mbps
 end as ia_bw_mbps_total_efc, 

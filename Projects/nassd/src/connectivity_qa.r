@@ -49,14 +49,23 @@ library(secr)
 #dd_mn_15_sub <- dd_mn_16[which(dd_mn_16$meeting_2014_goal_no_oversub >= 0),]
 
 
+
+## Creating general subsets
+
+dd_all <- dd_union
+dd_15 <- dd_union[which(dd_union$year == 2015),]
+dd_16 <- dd_union[which(dd_union$year == 2016),]
+dd_17 <- dd_union[which(dd_union$year == 2017),]
+
+
 ## 1. CONNECTIVITY 
 
   ## 1. A. TOP LEFT/TITLE METRICS
-      dd_17 <- dd_union[which(dd_union$year == 2017),]
-      dd_17$metric <- dd_17$meeting_2014_goal_no_oversub
-      dd_17_a <- dd_17[which(dd_17$metric>=0),]
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric <- filter$meeting_2014_goal_no_oversub
+      filter_s <- filter[which(filter$metric>=0),]
     
-      connectivity_a <- metric_overall(dd_17,dd_17_a)
+      connectivity_a <- metric_overall(filter,filter_s)
     
     ## - Total students meeting minimum connectivity goal of 100 kbps per student
     connectivity_a[2,"extrap_students"]
@@ -66,44 +75,52 @@ library(secr)
     connectivity_a[2,"percent_districts"]
   
   ## 1. B. GRAPH
-      dd_union_a <- dd_union
-      dd_union_a$metric <- dd_union_a$meeting_2014_goal_no_oversub
-      dd_union_a$group <- dd_union_a$year
-      dd_union_a_s <- dd_union_a[which(dd_union_a$metric >= 1),]
-    
-      connectivity_b1 <- metric_group(dd_union_a,dd_union_a_s)
+      dd_all$group <- dd_all$year
+      dd_all$metric <- dd_all$meeting_2014_goal_no_oversub
+      dd_all_s <- dd_all[which(dd_all$metric >= 0),]
+      
+      connectivity_b1 <- metric_group(dd_all,dd_all_s)
     
     ## - All of the SotS numbers are hard coded in/copied from previous reports
-    ## - Current 2015
-    connectivity_b1[which(connectivity_b1$group == "2015" & connectivity_b1$metric == 1),"percent_districts"]
-    ## - Current 2016
-    connectivity_b1[which(connectivity_b1$group == "2016" & connectivity_b1$metric == 1),"percent_districts"]
-    ## - Current 2017
-    connectivity_b1[which(connectivity_b1$group == "2017" & connectivity_b1$metric == 1),"percent_districts"]
+    ## -  Current 2015, Current 2016, Current 2017
+    connectivity_b1[which(connectivity_b1$metric == 1),c("group","percent_districts","extrap_districts","population_districts","sample_districts")]
     
   ## 1. C. MEETING 100 KBPS/STUDENT GOAL
-      dd_17 <- dd_union[which(dd_union$year == 2017),]
-      dd_17$metric <- dd_17$meeting_2014_goal_no_oversub
-      dd_17$group <- dd_17$locale
-      dd_17_a <- dd_17[which(dd_17$metric>=0),]
+    
+      filter1 <- dd_all
+      filter1$metric <- filter1$meeting_2014_goal_no_oversub
+      filter1$group <- filter1$year
+      filter1_s <- filter1[which(filter1$metric>=0),]
       
-      connectivity_c1 <- metric_overall(dd_17,dd_17_a)  
-      connectivity_c2 <- metric_group(dd_17,dd_17_a)
+      filter2 <- dd_union[which(dd_union$year == 2017),]
+      filter2$metric <- filter2$meeting_2014_goal_no_oversub
+      filter2$group <- filter2$locale
+      fitler2_s <- filter2[which(filter2$metric>=0),]
+      
+      
+      connectivity_c1 <- metric_group(filter1,filter1_s)  
+      connectivity_c2 <- metric_group(filter2,fitler2_s)
     
     ## - 100 kbps Goal Meeting Status Overall
     connectivity_c1[which(connectivity_c1$metric == 1),]
     
-    ## - 100 kbps Goal Meeting Status by Group (Locale) 
-    connectivity_c1[which(connectivity_c1$metric == 1),]
+    ## - 100 kbps Goal Meeting Status by Group 
+    connectivity_c2[which(connectivity_c2$metric == 1),]
   
   ## 1. D. MEETING 1 MBPS/STUDENT GOAL
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric <- dd_16$meeting_2018_goal_oversub
-      dd_16$group <- dd_16$district_size  
-      dd_16_a <- dd_16[which(dd_16$metric>=0),]
-      
-      connectivity_d1 <- metric_overall(dd_16,dd_16_a)
-      connectivity_d2 <- metric_group(dd_16,dd_16_a)
+    filter1 <- dd_all
+    filter1$metric <- filter1$meeting_2018_goal_oversub
+    filter1$group <- filter1$year
+    filter1_s <- filter1[which(filter1$metric>=0),]
+    
+    filter2 <- dd_union[which(dd_union$year == 2017),]
+    filter2$metric <- filter2$meeting_2018_goal_oversub
+    filter2$group <- filter2$discount_rate_c1
+    fitler2_s <- filter2[which(filter2$metric>=0),]
+    
+    
+    connectivity_d1 <- metric_group(filter1,filter1_s)  
+    connectivity_d2 <- metric_group(filter2,fitler2_s)
     
     ## - 1 Mbps Goal Meeting Status Overall 
     connectivity_d1[which(connectivity_d1$metric == 1),]
@@ -111,168 +128,175 @@ library(secr)
     ## - 1 Mbps Goal Meeting Status by Group (district size)
     connectivity_d2[which(connectivity_d2$metric == 1),]
   
-  ## 1. E. MEETING 1 MBPS/STUDENT GOAL
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric <- dd_16$upgraded_to_meet_2014_goal
-      dd_16$group <- dd_16$locale
-      dd_16_a <- dd_16[which(dd_16$metric >=0),]    
-    
-      connectivity_e1 <- metric_overall(dd_16,dd_16_a)
-      connectivity_e2 <- metric_group(dd_16,dd_16_a)    
+  ## 1. E. UPGRADED TO MEET 100 KBPS/STUDENT GOAL
+      filter1 <- dd_all[which(dd_all$year == 2016 | dd_all$year == 2017),]
+      filter1$metric <- filter1$upgraded_to_meet_2014_goal
+      filter1$group <- filter1$year
+      filter1_s <- filter1[which(filter1$metric>=0),]
+      
+      filter2 <- dd_union[which(dd_union$year == 2017),]
+      filter2$metric <- filter2$upgraded_to_meet_2014_goal
+      filter2$group <- filter2$district_size
+      fitler2_s <- filter2[which(filter2$metric>=0),]
+      
+      connectivity_e1 <- metric_group(filter1,filter1_s)  
+      connectivity_e2 <- metric_group(filter2,fitler2_s)
   
       ## - Upgraded to meet the 100 kbps Goal Overall 
-      connectivity_d1[which(connectivity_d1$metric == 1),]
+      connectivity_e1[which(connectivity_e1$metric == 1),]
       
       ## - Upgraded to meet the 100 kbps Goal by Group (locale)
-      connectivity_d2[which(connectivity_d2$metric == 1),]  
+      connectivity_e2[which(connectivity_e2$metric == 1),] 
 
 ## 2. FIBER 
       
   ## 2. A. TOP LEFT/TITLE METRICS
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
+      filter <- dd_union[which(dd_union$year == 2017),]
+      
+      total_campuses <- sum(filter$num_campuses,na.rm = TRUE)
+      total_unscalable_campuses <- sum(filter$unscalable_campuses,na.rm = TRUE)
+      total_fiber_campuses <- total_campuses - total_unscalable_campuses
       
       ## - Schools that do not have fiber connections - percent
-      (sum(dd_16$num_campuses) - sum(dd_16$unscalable_campuses))/sum(dd_16$num_campuses)
+      total_fiber_campuses/total_campuses
       
       ## - Schools that do not have fiber - #
-      sum(dd_16$unscalable_campuses)
+      total_unscalable_campuses
       
   ## 2. B. GRAPHS
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_17 <- dd_union[which(dd_union$year == 2017),]
+  
+          total_campuses_16 <- sum(dd_16$num_campuses,na.rm = TRUE)
+          total_unscalable_campuses_16 <- sum(dd_16$unscalable_campuses,na.rm = TRUE)
+          total_fiber_campuses_16 <- total_campuses_16 - total_unscalable_campuses_16
+        
+          total_campuses_17 <- sum(dd_17$num_campuses,na.rm = TRUE)
+          total_unscalable_campuses_17 <- sum(dd_17$unscalable_campuses,na.rm = TRUE)
+          total_fiber_campuses_17 <- total_campuses_17 - total_unscalable_campuses_17
       
-      ## - All of the SotS numbers are hard coded in/copied from previous reports
-      
-      ## - Schools that do not have fiber connects - percent
+      ## - Schools on fiber %
+      ## - Sots hard coded in/copied from report
       ## - Current 2016
-      (sum(dd_16$num_campuses) - sum(dd_16$unscalable_campuses))/sum(dd_16$num_campuses)
+      total_fiber_campuses_16/total_campuses_16
       ## - Current 2017
-      ## COME BACK LATER, CAN'T GET TO WORK 
-      #(sum(dd_17$num_campuses) - sum(dd_17$unscalable_campuses))/sum(dd_17$num_campuses)
+      total_fiber_campuses_17/total_campuses_17
       
       ## - Schools that do not have fiber connects - #
+      ## - Sots hard coded in/copied from report    
       ## - Current 2016
-      sum(dd_16$unscalable_campuses)
+      total_unscalable_campuses_16
+     
       ## - Current 2017
-      ## COME BACK LATER, CAN'T GET TO WORK 
-      sum(dd_17$unscalable_campuses)
+      total_unscalable_campuses_17
       
   ## 2. C. FIBER TARGET V NOT TARGET
-        dd_16 <- dd_union[which(dd_union$year == 2016),]
-        dd_16$metric <- dd_16$fiber_target_status
-        dd_16$group <- dd_16$locale
-        dd_16_a <- dd_16[which(dd_16$metric == "Target"|dd_16$metric == "Not Target"),]      
-      
-        fiber_a1 <- metric_overall(dd_16,dd_16_a)
-        fiber_a2 <- metric_group(dd_16,dd_16_a)
+        filter <- dd_union[which(dd_union$year == 2017),]
+        filter$metric <- filter$fiber_target_status
+        filter$group <- filter$locale
+        filter_s <- filter[which(filter$metric=="Target"|filter$metric=="Not Target"),]
         
-      ## - % Fiber Overall
-        fiber_a1[,c("metric","percent_districts","extrap_districts")] 
       
-      ## - % Fiber By Group (locale)
-        fiber_a2[,c("group","metric","percent_districts","extrap_districts")]
+        fiber_c1 <- metric_overall(filter,filter_s)
+        fiber_c2 <- metric_group(filter,filter_s)
+        
+      ## - Overall
+        fiber_c1
+      
+      ## - By Group
+        fiber_c2
       
   ## 2. D. UNSCALABLE CAMPUSES
-        dd_17 <- dd_union[which(dd_union$year == 2017),]
-        dd_16 <- dd_union[which(dd_union$year == 2016),]
+        filter <- dd_union[which(dd_union$year == 2017),]
+        filter$group <- filter$fiber_target_status
         
-        dd_17_total_unscalable <- sum(dd_17$unscalable_campuses, na.rm=TRUE)
-        dd_16_total_unscalable <- sum(dd_16$unscalable_campuses)
-  
-        dd_17_total_campuses <- sum(dd_17$num_campuses)
-        dd_16_total_campuses <- sum(dd_16$num_campuses)
+        filter_total_unscalable_campuses <- sum(filter$unscalable_campuses,na.rm = TRUE)
         
-        A <- aggregate(unscalable_campuses ~ locale, data = dd_17, FUN = sum)
-        B <- aggregate(num_campuses ~ locale, data = dd_17, FUN = sum)
-        unscalable_group_17 <- merge(A,B)
-        unscalable_group_17$percent_total_unscalable <- unscalable_group$unscalable_campuses/dd_17_total_unscalable
-        unscalable_group_17$percent_of_campuses <- unscalable_group$unscalable_campuses/unscalable_group$num_campuses
+        A <- aggregate(unscalable_campuses ~ group, data = filter, FUN = sum)
+        B <- aggregate(num_campuses ~ group, data = filter, FUN = sum)
+        C <- aggregate(esh_id ~ group, data = filter, FUN = length)
         
-        A <- aggregate(unscalable_campuses ~ locale, data = dd_16, FUN = sum)
-        B <- aggregate(num_campuses ~ locale, data = dd_16, FUN = sum)
-        unscalable_group_16 <- merge(A,B)
-        unscalable_group_16$percent_total_unscalable <- unscalable_group$unscalable_campuses/dd_16_total_unscalable
-        unscalable_group_16$percent_of_campuses <- unscalable_group$unscalable_campuses/unscalable_group$num_campuses
+        fiber_d2 <- merge(A,B)
+        fiber_d2 <- merge(fiber_d2,C)
+        fiber_d2$percent_total_unscalable <- fiber_d2$unscalable_campuses/fiber_d2$num_campuses
+        fiber_d2$percent_of_campuses <- fiber_d2$unscalable_campuses/filter_total_unscalable_campuses
         
-      ## - Unscalable Campuses by Group (locale)
-        ## - 2016 
-        unscalable_group_16
-        
-        ## - 2017
-        unscalable_group_17
+      ## - Unscalable Campuses by Group
+        fiber_d2
         
         
 ## 3.AFFORDABILITY 
         
-    ## 3. A. TOP LEFT/TITLE METRICS 
+    ## 3. A. TOP LEFT/TITLE METRICS
         
       ## - Students that would have the bandwidth they need if their districts received national benchmark pricing
       
-      ## - Median cost per Mbps
+         ##requires several steps in calculations, saving for later
+    
+      ## - Median cost per Mbps 
+        
+        filter <- dd_union[which(dd_union$year == 2017 & dd_union$ia_monthly_cost_per_mbps>0),]
+        affordability_a1 <- median(filter$ia_monthly_cost_per_mbps)
         
       ## - Percent districts meeting Knapsack
+        filter <- dd_union[which(dd_union$year == 2017),]
+        a <- length(filter[which(filter$meeting_knapsack==1),"esh_id"])
+        b <- length(filter[which(filter$meeting_knapsack>=0),"esh_id"])
+        
+        affordability_a2 <- a/b
         
     ## 3. B. GRAPH 
         
-      dd_union_a <- dd_union
-      dd_union_a$metric <- dd_union_a$ia_monthly_cost_per_mbps
-      dd_union_a$group <- dd_union_a$year
-      dd_union_a_s <- dd_union_a[which(dd_union_a$metric > 0),]
-    
-      affordability_b <-metric_group_median(dd_union_a,dd_union_a_s)
+        
+        dd_all$group <- dd_all$year
+        dd_all$metric <- dd_all$ia_monthly_cost_per_mbps
+        dd_all_s <- dd_all[which(dd_all$metric >= 0),]
+        
+        affordability_b1 <- metric_group_median(dd_all,dd_all_s)
               
       ## - Sots numbers are hard coded in/copied from last year
-        
-      ## - Current 2015
-      affordability_b[1,c("group","metric")]
-      
-      ## - Current 2016
-      affordability_b[2,c("group","metric")]
-      
-      ## - Current 2017
-      affordability_b[3,c("group","metric")]
+      ## - Current 2015, 2016, 2017
+        affordability_b1
         
     ## 3. C. MEETING KNAPSACK
 
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric <- dd_16$meeting_knapsack
-      dd_16$group <- dd_16$locale
-      dd_16_a <- dd_16[which(dd_16$metric >= 0),]      
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric <- filter$meeting_knapsack
+      filter$group <- filter$locale
+      filter_a <- filter[which(filter$metric >= 0),]      
       
-      affordability_c1 <- metric_overall(dd_16,dd_16_a)
-      affordability_c2 <- metric_group(dd_16,dd_16_a)
+      affordability_c1 <- metric_overall(filter,filter_a)
+      affordability_c2 <- metric_group(filter,filter_a)
             
       ## - Affordabilty Overall
-      affordability_c1[which(affordability_c1$metric == 1),]
+      affordability_c1[which(affordability_c1$metric == 1),c("percent_districts","extrap_districts")]
 
       ## - Affordability by Group (Locale)
       affordability_c2[which(affordability_c2$metric == 1),]
       
     ## 3. D. $/MBPS MEDIAN
       
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric <- dd_16$ia_monthly_cost_per_mbps
-      dd_16$group <- dd_16$locale
-      dd_16_a <- dd_16[which(dd_16$metric >= 0),]  
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric <- filter$ia_monthly_cost_per_mbps
+      filter$group <- filter$locale
+      filter_a <- filter[which(filter$metric >= 0),]  
 
-      affordability_d1 <- metric_overall_median(dd_16,dd_16_a)
-      affordability_d2 <- metric_group_median(dd_16,dd_16_a)
+      affordability_d1 <- metric_overall_median(filter,filter_a)
+      affordability_d2 <- metric_group_median(filter,filter_a)
       
       ## - Affordabilty Overall
       affordability_d1
       
-      ## - Affordability by Group (Locale)
+      ## - Affordability by Group 
       affordability_d2
       
     ## 3. E. $/MBPS WEIGHTED AVERAGE
-      dd_16 <- dd_union[which(dd_union$year == 2016),]
-      dd_16$metric_numer <- dd_16$ia_monthly_cost_total
-      dd_16$metric_denom <- dd_16$ia_bw_mbps_total_efc
-      dd_16$group <- dd_16$locale
-      dd_16_a <- dd_16[which(dd_16$metric_numer > 0 & dd_16$metric_denom > 0 ),]  
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric_numer <- filter$ia_monthly_cost_total
+      filter$metric_denom <- filter$ia_bw_mbps_total_efc
+      filter$group <- filter$locale
+      filter_a <- filter[which(filter$exclude_from_ia_analysis==1 & filter$exclude_from_ia_cost_analysis==1),]  
       
-      affordability_e1 <- metric_overall_weighted_average(dd_16,dd_16_a)
-      affordability_e2 <- metric_group_weighted_average(dd_16,dd_16_a)
+      affordability_e1 <- metric_overall_weighted_average(filter,filter_a)
+      affordability_e2 <- metric_group_weighted_average(filter,filter_a)
       
       ## - Affordabilty Overall
       affordability_e1
@@ -281,12 +305,37 @@ library(secr)
       affordability_e2
         
     ## 3. F. IA $/STUDENT WEIGHTED AVERAGE
-    
-      #come back to when i can actually use dashboard  
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric_numer <- filter$ia_monthly_cost_total
+      filter$metric_denom <- filter$num_students
+      filter$group <- filter$locale
+      filter_a <- filter[which(filter$exclude_from_ia_analysis==1 & filter$exclude_from_ia_cost_analysis==1),] 
+      
+      affordability_f1 <- metric_overall_weighted_average(filter,filter_a)
+      affordability_f2 <- metric_group_weighted_average(filter,filter_a)
+      
+      ## - Affordabilty Overall
+      affordability_f1
+      
+      ## - Affordability by Group (Locale)
+      affordability_f2
+      
         
     ## 3. G. DISTRICT IA $/STUDENT WEIGHTED AVERAGE
+      filter <- dd_union[which(dd_union$year == 2017),]
+      filter$metric_numer <- filter$ia_monthly_district_total
+      filter$metric_denom <- filter$num_students
+      filter$group <- filter$locale
+      filter_a <- filter[which(filter$exclude_from_ia_analysis==1 & filter$exclude_from_ia_cost_analysis==1 & filter$ia_monthly_district_total >= 0),] 
       
-      #come back to when i can actually use dashboard 
+      affordability_g1 <- metric_overall_weighted_average(filter,filter_a)
+      affordability_g2 <- metric_group_weighted_average(filter,filter_a)
+      
+      ## - Affordabilty Overall
+      affordability_g1
+      
+      ## - Affordability by Group (Locale)
+      affordability_g2
         
 
 ## 4. WI-FI 
