@@ -17,7 +17,7 @@ library(dplyr)
 
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/ESH/ficher/'
+github_path <- '~/sat_r_programs/R_database_access/'
 
 # initiate export data table
 export_data <- c()
@@ -26,7 +26,7 @@ export_data <- c()
 # note that the credentials are pointed to the live ONYX database as of 1/17/2017
 # check regularly to see that credentials are accurate since they may change periodically
 # raw mode data is saved in the data/mode folder with the data pull date added to the suffix
-source('01_get_tables.R')
+source("~/sat_r_programs/outlier_detection/scripts/01_get_tables.R")
 
 # let's apply general filters
 # this stage is about getting the data fit for analysis in a very general sense.
