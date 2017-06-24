@@ -1,6 +1,6 @@
 with dd_2015 as 
 (select esh_id, total_ia_bw_mbps,
-case when monthly_ia_cost_per_mbps='Insufficient data' then null else monthly_ia_cost_per_mbps end as monthly_ia_cost_per_mbps
+case when (monthly_ia_cost_per_mbps = 'Insufficient data' or monthly_ia_cost_per_mbps = 'Infinity') then null else monthly_ia_cost_per_mbps end as monthly_ia_cost_per_mbps
 from public.fy2015_districts_deluxe_m),
 dd_2016 as (select*from public.fy2016_districts_deluxe_matr)
 

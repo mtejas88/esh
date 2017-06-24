@@ -1,0 +1,3 @@
+insert into outlier_use_case_details (outlier_use_case_id,use_case_name,outlier_use_case_params,outlier_test_case_params,create_dt)
+      values(3,'Change in Total Monthly Cost','"district_size"=>"Small", "district_state"=>"National", "district_locale"=>"Rural"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"change_in_cost_tot", "significance_level"=>"0.05"',current_timestamp),
+(3,'Change in Total Monthly Cost','"district_size"=>"Small", "district_state"=>"CA", "district_locale"=>"Rural"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"change_in_cost_tot", "significance_level"=>"0.05"',current_timestamp);

@@ -128,15 +128,20 @@ find_new_cases <- function(table_name){
   return(script)  
 }
 
-delete_no_longer_outliers <- function(){
+update_no_longer_outliers <- function(){
     script <- 
-    "delete from outliers 
-    where ref_id not in(
-    (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
-    from outliers out join outlier_use_case_details oucd on out.outlier_use_case_detail_id=oucd.outlier_use_case_detail_id) a
-    join
-    (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
-    from temp_outlier_candidates) b on a.ref_id=b.ref_id and a.type=b.type
+    "with outlier_a as (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
+    from outliers out join outlier_use_case_details oucd on out.outlier_use_case_detail_id=oucd.outlier_use_case_detail_id),
+    
+    outlier_b as (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
+    from temp_outlier_candidates)
+
+    update outliers set end_dt = current_timestamp 
+    where ref_id in(
+    select outlier_a.ref_id from outlier_a
+    left join
+    outlier_b on outlier_a.ref_id=outlier_b.ref_id and outlier_a.type=outlier_b.type
+    where outlier_b.ref_id is null
     );
     "
     return(script)  
@@ -167,9 +172,17 @@ dml_builder <- function(values,script_type,postgres_table){
     return(script) 
   }
   
-  
-  
-  
+  syntax_stitcher_tableau <- function(script_begin,script_content){
+    final_script_df=rbind(script_begin,script_content)
+    end=data.frame("content"=sub('),', ');', final_script_df[nrow(final_script_df),]) )
+    final_script_df=rbind(as.data.frame(final_script_df[(1:nrow(final_script_df) - 1),,drop=FALSE]),end)
+    final_script_df[, 1] <- as.character(final_script_df[, 1])
+    final_script=as.character(unlist(final_script_df, use.names=FALSE))
+    final_script=noquote(final_script)
+    final_script=paste(final_script,collapse=" ") 
+    return(final_script)
+  }  
+
   if(script_type == 'insert'){
     
     ## New Use Cases      
@@ -251,14 +264,16 @@ dml_builder <- function(values,script_type,postgres_table){
     
     if (postgres_table == 'outlier_use_cases' | postgres_table=='outlier_use_case_details' | postgres_table=='outliers'){
     final_script <- syntax_stitcher(script_content,script_begin,script_end)}
-    else{
-      final_script_df=rbind(script_begin,script_content)
-      end=data.frame("content"=sub('),', ');', final_script_df[nrow(final_script_df),]) )
-      final_script_df=rbind(as.data.frame(final_script_df[(1:nrow(final_script_df) - 1),,drop=FALSE]),end)
-      final_script_df[, 1] <- as.character(final_script_df[, 1])
-      final_script=as.character(unlist(final_script_df, use.names=FALSE))
-      final_script=noquote(final_script)
-      final_script=paste(final_script,collapse=" ") 
+    else if(postgres_table == 'tableau_line_item'){
+      final_script=syntax_stitcher_tableau(script_begin,script_content)
+    }else{ #districts table is too big to handle all inserts at once so split up
+      n <- 1000
+      x <- seq_along(script_content[,1])
+      d1 <- split(script_content, ceiling(x/n))
+      final_script_list <- list()
+      for(i in 1:length(d1)){
+        final_script_list[[i]]=syntax_stitcher_tableau(script_begin,d1[[i]])
+        }
     }
   }else if(script_type == 'update'){
     if(postgres_table == 'outliers'){ 
@@ -287,13 +302,17 @@ dml_builder <- function(values,script_type,postgres_table){
       
     }else if(postgres_table == 'tableau_district'){
       ## Script                                                                                                                                     
-      script <-paste0("update outlier_district_report_data set end_dt = ","current_timestamp where create_dt < current_timestamp;")  
+      script <-paste0("delete from outlier_district_report_data where create_dt < current_timestamp;")  
     }else if(postgres_table == 'tableau_line_item'){
       ## Script                                                                                                                                     
-      script <-paste0("update outlier_line_item_report_data set end_dt = ","current_timestamp where create_dt < current_timestamp;")
+      script <-paste0("delete from outlier_line_item_report_data where create_dt < current_timestamp;")
     }
     final_script <- script
   }   
-  return(final_script)
+  if(script_type == 'insert' & postgres_table == 'tableau_district'){
+    return(final_script_list)
+  }else{
+    return(final_script)
+  }
   
 }

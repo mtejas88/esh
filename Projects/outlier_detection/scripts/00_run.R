@@ -26,7 +26,7 @@ export_data <- c()
 # note that the credentials are pointed to the live ONYX database as of 1/17/2017
 # check regularly to see that credentials are accurate since they may change periodically
 # raw mode data is saved in the data/mode folder with the data pull date added to the suffix
-source("~/sat_r_programs/outlier_detection/scripts/01_get_tables.R")
+source("01_get_tables.R")
 
 # let's apply general filters
 # this stage is about getting the data fit for analysis in a very general sense.
@@ -125,8 +125,7 @@ ucd=unique(rbind(ucd[ucd$outlier_flag==0,],uniques,doubles))
 
 # export
 write.csv(master_output, paste0("../data/export/master_output_", Sys.Date(), ".csv"), row.names = FALSE, append = FALSE)
-write.csv(li_distributions,"../data/export/li_tableau_output_2017-06-01.csv", row.names = FALSE, append = FALSE)
-write.csv(ucd,"../data/export/district_tableau_output_2017-06-01.csv", row.names = FALSE, append = FALSE)
 
 # load into postgres
 source("05_export_to_postgres.R")
+

@@ -14,21 +14,18 @@ library(rJava)
 library(RJDBC)
 library(dotenv)
 
+options(java.parameters = "-Xmx4g" )
+
 # set up workding directory -- it is currently set up to the folder which contains all scripts
 #this is my github path. DONT FORGET TO COMMENT OUT
 github_path <- '~/sat_r_programs/R_database_access/'
 
-
-options(java.parameters = "-Xmx4g" )
-
 ## source environment variables
 source(paste(github_path, "source_env.R", sep=""))
 source_env("~/.env")
-#source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
-
 
 ## load PostgreSQL Driver
 pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "postgresql-9.4.1212.jre7.jar", sep=""), "`")
