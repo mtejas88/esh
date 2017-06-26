@@ -12,10 +12,16 @@ import matplotlib.pyplot as plt
 applications = pd.read_csv('data/interim/applications.csv')
 applications['discount_category'] = np.floor(applications['category_one_discount_rate']/10)*10
 lowcost_applications = applications.loc[applications['lowcost_indicator'] == True]
+lowcost_applications_1_rec = lowcost_applications.loc[lowcost_applications['num_recipients'] == 1]
+lowcost_applications_1_serv = lowcost_applications.loc[lowcost_applications['num_service_types'] == 1]
 
 ##all low cost apps
 lowcost = lowcost_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
 print(lowcost_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+lowcost_1_rec = lowcost_applications_1_rec.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
+lowcost_1_serv = lowcost_applications_1_serv.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
+
 
 ##dimension service category
 cat = lowcost_applications.groupby('category_of_service')
@@ -94,10 +100,11 @@ width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
 plt.suptitle('Breakdown of \nLow Cost Applications', fontsize = 18)
+plt.xlabel('Special Construction Indicator')
 plt.xticks(x, axis_label)
 plt.ylabel('% of low cost applications')
 plt.ylim(0,1)
-plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(9, y.application_number[0] - .1), xytext=(.9, y.application_number[0] - .1), color = "grey")
+plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0] - .1), xytext=(.9, y.application_number[0] - .1), color = "grey")
 plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1] + .01), xytext=(1.9, y.application_number[1]+ .01), color = "grey")
 plt.show()
 plt.savefig("figures/lowcost_apps_by_special_construction.png")
@@ -114,6 +121,7 @@ width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
 plt.suptitle('Breakdown of \nLow Cost Applications', fontsize = 18)
+plt.xlabel('Consultant Indicator')
 plt.xticks(x, axis_label)
 plt.ylabel('% of low cost applications')
 plt.ylim(0,1)
@@ -170,10 +178,10 @@ print(rec.agg({'application_number': lambda x: x.count(),  'total_funding_year_c
 
 #plot diffs
 y = rec.agg({'application_number': lambda x: x.count()/lowcost['application_number']})
-x = range(1, len(y[1:21])+1)
+x = range(1, len(y[1:26])+1)
 width = 1/1.5
 
-plt.bar(x, y.application_number[1:21], width, color=["#FDB913"], align = 'center')
+plt.bar(x, y.application_number[1:26], width, color=["#FDB913"], align = 'center')
 plt.suptitle('Breakdown of \nLow Cost Applications', fontsize = 18)
 plt.xticks(x, x)
 plt.xlabel('# of recipients')
@@ -184,6 +192,28 @@ plt.ylim(0,1)
 #plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
 plt.show()
 plt.savefig("figures/lowcost_apps_by_recipients.png")
+
+##dimension 1 recipient type
+app_rec_1 = lowcost_applications_1_rec.groupby('applicant_type')
+print(app_rec_1.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+#plot diffs
+y = app_rec_1.agg({'application_number': lambda x: x.count()/lowcost_1_rec['application_number']})
+x = range(1, len(y)+1)
+axis_label = y.index
+width = 1/1.5
+
+plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
+plt.suptitle('Breakdown of \nLow Cost Applications 1 Recipient', fontsize = 18)
+plt.xticks(x, axis_label)
+plt.xlabel('Applicant type')
+plt.ylabel('% of low cost applications w 1 recipient')
+plt.ylim(0,1)
+#plt.get_figlabels
+#plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
+#plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
+plt.show()
+plt.savefig("figures/lowcost_apps_1_rec_by_app_type.png")
 
 ##dimension service types
 st = lowcost_applications.groupby('num_service_types')

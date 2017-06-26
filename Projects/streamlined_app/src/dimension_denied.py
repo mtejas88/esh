@@ -13,11 +13,17 @@ applications = pd.read_csv('data/interim/applications.csv')
 applications['discount_category'] = np.floor(applications['category_one_discount_rate']/10)*10
 denied_applications = applications.loc[applications['denied_frns'] > 0]
 denied_applications  = denied_applications.loc[applications['lowcost_indicator'] == True]
+denied_applications_1_rec = denied_applications.loc[denied_applications['num_recipients'] == 1]
+denied_applications_1_serv = denied_applications.loc[denied_applications['num_service_types'] == 1]
+
 
 
 ##all denied apps
 denied = denied_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
 print(denied_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+denied_1_rec = denied_applications_1_rec.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
+denied_1_serv = denied_applications_1_serv.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
 
 ##dimension service category
 cat = denied_applications.groupby('category_of_service')
@@ -188,6 +194,28 @@ plt.ylim(0,1)
 plt.show()
 plt.savefig("figures/denied_apps_by_recipients.png")
 
+##dimension 1 recipient type
+app_rec_1 = denied_applications_1_rec.groupby('applicant_type')
+print(app_rec_1.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+#plot diffs
+y = app_rec_1.agg({'application_number': lambda x: x.count()/denied_1_rec['application_number']})
+x = range(1, len(y)+1)
+axis_label = y.index
+width = 1/1.5
+
+plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
+plt.suptitle('Breakdown of \nLow Cost Denied Applications 1 Recipient', fontsize = 18)
+plt.xticks(x, axis_label)
+plt.xlabel('Applicant type')
+plt.ylabel('% of low cost denied applications w 1 recipient')
+plt.ylim(0,1)
+#plt.get_figlabels
+#plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
+#plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
+plt.show()
+plt.savefig("figures/denied_apps_1_rec_by_app_type.png")
+
 ##dimension service types
 st = denied_applications.groupby('num_service_types')
 print(st.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
@@ -209,3 +237,25 @@ plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.applicati
 plt.annotate(str(round(y.application_number[3],2)*100)+'%', xy=(2.9, y.application_number[3] + .01), xytext=(2.9, y.application_number[3] + .01), color = "grey")
 plt.show()
 plt.savefig("figures/denied_apps_by_services.png")
+
+##dimension 1 service type
+app_serv_1 = denied_applications_1_serv.groupby('category_of_service')
+print(app_serv_1.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
+
+#plot diffs
+y = app_serv_1.agg({'application_number': lambda x: x.count()/denied_1_serv['application_number']})
+x = range(1, len(y)+1)
+axis_label = y.index
+width = 1/1.5
+
+plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
+plt.suptitle('Breakdown of \nLow Cost Denied Applications 1 Service Type', fontsize = 18)
+plt.xticks(x, axis_label)
+plt.xlabel('Category of Service')
+plt.ylabel('% of low cost denied applications w 1 service type')
+plt.ylim(0,1)
+#plt.get_figlabels
+#plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
+#plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
+plt.show()
+plt.savefig("figures/denied_apps_1_rec_by_service_type.png")
