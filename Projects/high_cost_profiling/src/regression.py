@@ -125,6 +125,17 @@ X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
+##regression for high funding request per student
+feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate']
+
+X = applications[feature_cols]
+y = applications.cost_per_student
+
+# regression model
+X = sm.add_constant(X)
+est = sm.OLS(y, X.astype(float)).fit()
+print(est.summary())
+
 ##regression on funding requested for only consultant indicator
 feature_cols = ['consultant_indicator']
 
