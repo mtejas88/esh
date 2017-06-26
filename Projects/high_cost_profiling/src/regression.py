@@ -17,23 +17,11 @@ applications = pd.read_csv('data/raw/applications.csv')
 
 applications['cost_per_student'] = applications['total_funding_year_commitment_amount_request'] / applications['fulltime_enrollment']
 
-##regression for consultant indicator
-# modeling prep
 applicant_type_dummies = pd.get_dummies(applications.applicant_type, prefix='applicant_type')
 applications = pd.concat([applications, applicant_type_dummies], axis=1)
 
 locale_dummies = pd.get_dummies(applications.urban_rural_status, prefix='locale')
 applications = pd.concat([applications, locale_dummies], axis=1)
-
-feature_cols = ['total_funding_year_commitment_amount_request', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate', 'fulltime_enrollment']
-
-X = applications[feature_cols]
-y = applications.consultant_indicator
-
-# regression model
-X = sm.add_constant(X)
-est = sm.OLS(y, X.astype(float)).fit()
-print(est.summary())
 
 ##plot requested per student
 #calculate median requested/student
@@ -114,43 +102,45 @@ plt.annotate(str(sum_multiple)+"x", xy=(1.5, (sum_true - sum_false)/2 + sum_fals
 plt.show()
 plt.savefig("figures/sum_requested_by_consultant_usage.png")
 
-##regression for high funding request
+##regression for log funding request
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate', 'fulltime_enrollment']
 
 X = applications[feature_cols]
-y = applications.total_funding_year_commitment_amount_request
+y = np.log10(applications.total_funding_year_commitment_amount_request)
 
 # regression model
 X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-##regression for high funding request per student
+##regression for log funding request per student
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate']
 
 X = applications[feature_cols]
-y = applications.cost_per_student
+y = np.log10(applications.cost_per_student)
 
 # regression model
 X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-##regression on funding requested for only consultant indicator
+##regression on log funding requested for only consultant indicator
 feature_cols = ['consultant_indicator']
 
 X = applications[feature_cols]
-y = applications.total_funding_year_commitment_amount_request
+y = np.log10(applications.total_funding_year_commitment_amount_request)
 
 # regression model
 X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-## t test on funding requested by consultant indicator
-ttest = scipy.stats.ttest_ind(data_true, data_false, equal_var=False)
+## t test on log funding requested by consultant indicator
+data_true_log = np.log10(data_true)
+data_false_log = np.log10(data_false)
+ttest = scipy.stats.ttest_ind(data_true_log, data_false_log, equal_var=False)
 
-print("Fail to reject null hypothesis; applications that use consultants have similar funding requests as applications that don't. P-value: {}".format(round(ttest.pvalue,2)))
+print("Accept null hypothesis; applications that use consultants have different funding requests as applications that don't. P-value: {}".format(ttest.pvalue))
 
 ##plot consultant indicator by funding requested
 xd = applications.total_funding_year_commitment_amount_request
