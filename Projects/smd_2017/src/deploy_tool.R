@@ -88,8 +88,8 @@ current17.click.through <- dd_2017[,c("esh_id", "postal_cd", "name", "locale", "
 current17.click.through$no_data <- ifelse(current17.click.through$lines_w_dirty == 0, TRUE, FALSE)
 current17.click.through$lines_w_dirty <- NULL
 ## add in IRT links
-current17.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", current17.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/districts/", current17.click.through$esh_id, "</a>", sep='')
+current17.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "'>",
+                                                    "http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "</a>", sep='')
 ## order dataset
 current17.click.through <- current17.click.through[order(current17.click.through$postal_cd),]
 
@@ -100,8 +100,8 @@ sots16.click.through <- dd_2016_froz[,c("esh_id", "postal_cd", "name", "locale",
 sots16.click.through$no_data <- ifelse(sots16.click.through$lines_w_dirty == 0, TRUE, FALSE)
 sots16.click.through$lines_w_dirty <- NULL
 ## add in IRT links
-sots16.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", sots16.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/districts/", sots16.click.through$esh_id, "</a>", sep='')
+sots16.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "'>",
+                                                    "http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "</a>", sep='')
 ## order dataset
 sots16.click.through <- sots16.click.through[order(sots16.click.through$postal_cd),]
 
@@ -158,8 +158,8 @@ names(connectivity.click.through)[names(connectivity.click.through) %in% cols.to
 connectivity.click.through[grepl("ia_bandwidth_per_student_kbps", names(connectivity.click.through))] <- round(connectivity.click.through[grepl("ia_bandwidth_per_student_kbps", names(connectivity.click.through))], 0)
 connectivity.click.through[grepl("ia_bw_mbps_total", names(connectivity.click.through))] <- round(connectivity.click.through[grepl("ia_bw_mbps_total", names(connectivity.click.through))], 0)
 ## add in IRT links
-connectivity.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", connectivity.click.through$esh_id, "'>",
-                                             "http://irt.educationsuperhighway.org/districts/", connectivity.click.through$esh_id, "</a>", sep='')
+connectivity.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", connectivity.click.through$esh_id, "'>",
+                                             "http://irt.educationsuperhighway.org/entities/districts/", connectivity.click.through$esh_id, "</a>", sep='')
 ## order the dataset by not meeting goals in 2016 to meeting goals in 2017
 connectivity.click.through <- connectivity.click.through[order(connectivity.click.through$meeting_2014_goal_no_oversub_2016,
                                                                rev(connectivity.click.through$meeting_2014_goal_no_oversub_2017), decreasing=F),]
@@ -186,8 +186,8 @@ names(fiber.click.through)[names(fiber.click.through) %in% cols.to.merge.each.ye
 ## order the dataset
 fiber.click.through <- fiber.click.through[order(fiber.click.through$current_assumed_unscalable_campuses, decreasing=T),]
 ## add in IRT links
-fiber.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", fiber.click.through$esh_id, "'>",
-                                      "http://irt.educationsuperhighway.org/districts/", fiber.click.through$esh_id, "</a>", sep='')
+fiber.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "'>",
+                                      "http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "</a>", sep='')
 
 
 ## AFFORDABILITY (Click-Through)
@@ -213,8 +213,8 @@ affordability.click.through[grepl("ia_monthly_cost_total", names(affordability.c
 ## order the dataset
 affordability.click.through <- affordability.click.through[order(affordability.click.through$ia_monthly_cost_per_mbps_2016, decreasing=T),]
 ## add in IRT links
-affordability.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", affordability.click.through$esh_id, "'>",
-                                              "http://irt.educationsuperhighway.org/districts/", affordability.click.through$esh_id, "</a>", sep='')
+affordability.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "'>",
+                                              "http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "</a>", sep='')
 
 
 ## CONNECTIVITY (Targets)
@@ -242,8 +242,8 @@ connectivity.targets[grepl("ia_monthly_cost_total", names(connectivity.targets))
 ## order the dataset
 connectivity.targets <- connectivity.targets[order(connectivity.targets$bw_target_status, decreasing=T),]
 ## add in IRT links
-connectivity.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", connectivity.targets$esh_id, "'>",
-                                       "http://irt.educationsuperhighway.org/districts/", connectivity.targets$esh_id, "</a>", sep='')
+connectivity.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", connectivity.targets$esh_id, "'>",
+                                       "http://irt.educationsuperhighway.org/entities/districts/", connectivity.targets$esh_id, "</a>", sep='')
 
 
 ## FIBER (Targets)
@@ -281,8 +281,8 @@ fiber.targets[grepl("current_assumed_unscalable", names(fiber.targets))] <- roun
 ## order the dataset
 fiber.targets <- fiber.targets[order(fiber.targets$current_assumed_unscalable_campuses, decreasing=T),]
 ## add in IRT links
-fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/districts/", fiber.targets$esh_id, "'>",
-                                       "http://irt.educationsuperhighway.org/districts/", fiber.targets$esh_id, "</a>", sep='')
+fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "'>",
+                                       "http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "</a>", sep='')
 
 
 

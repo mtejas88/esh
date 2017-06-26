@@ -209,8 +209,7 @@ sum(CASE WHEN dd_2017.include_in_universe_of_districts = 't' THEN dd_2017.c2_pre
 FROM public.fy2017_districts_deluxe_matr as dd_2017
 left join public.fy2016_districts_deluxe_matr as dd_2016 on dd_2016.esh_id = dd_2017.esh_id
 -- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI, DC)
--- also take out states at the school-level (RI, HI, DE)
-WHERE dd_2017.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC', 'RI', 'HI', 'DE')
+WHERE dd_2017.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC')
 GROUP BY 1
 
 ORDER BY postal_cd
