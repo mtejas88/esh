@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import scipy
 import statsmodels.api as sm
+import pylab as pl
 
 ## data prep
 #import
@@ -111,7 +112,7 @@ plt.annotate("$"+str(sum_true), xy=(.9, sum_true + .01), xytext=(.9, sum_true + 
 plt.annotate("$"+str(sum_false), xy=(1.9, sum_false + .01), xytext=(1.9, sum_false + .01), color = "grey")
 plt.annotate(str(sum_multiple)+"x", xy=(1.5, (sum_true - sum_false)/2 + sum_false), xytext=(1.5, (sum_true - sum_false)/2 + sum_false), color = 'red', size = 20)
 plt.show()
-plt.savefig("figures/requested_by_consultant_usage.png")
+plt.savefig("figures/sum_requested_by_consultant_usage.png")
 
 ##regression for high funding request
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate', 'fulltime_enrollment']
@@ -123,3 +124,50 @@ y = applications.total_funding_year_commitment_amount_request
 X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
+
+##regression on funding requested for only consultant indicator
+feature_cols = ['consultant_indicator']
+
+X = applications[feature_cols]
+y = applications.total_funding_year_commitment_amount_request
+
+# regression model
+X = sm.add_constant(X)
+est = sm.OLS(y, X.astype(float)).fit()
+print(est.summary())
+
+## t test on funding requested by consultant indicator
+ttest = scipy.stats.ttest_ind(data_true, data_false, equal_var=False)
+
+print("Fail to reject null hypothesis; applications that use consultants have similar funding requests as applications that don't. P-value: {}".format(round(ttest.pvalue,2)))
+
+##plot consultant indicator by funding requested
+xd = applications.total_funding_year_commitment_amount_request
+yd = applications.consultant_indicator
+plt.scatter(xd, yd, color = 'grey', marker='o')
+plt.scatter(median_true, 1, color = '#FDB913', marker='o')
+plt.scatter(median_false, 0, color = '#FDB913', marker='o')
+plt.xscale('log')
+plt.suptitle('Funding requests ($B)', fontsize = 18)
+plt.ylabel('Indicator of consultant usage')
+plt.show()
+plt.savefig("figures/dotplot_requested_by_consultant_usage.png")
+
+##plot funding requested, consultant indicator true
+pl.hist(data_true, bins=np.logspace(np.log10(1),np.log10(100000000),50), facecolor='#FDB913')
+pl.suptitle('Funding requests for \nconsultant applications', fontsize = 18)
+pl.axvline(x=median_true)
+pl.gca().set_xscale("log")
+pl.xlabel('Funding Requested')
+pl.show()
+pl.savefig("figures/histogram_requested_by_consultants.png")
+
+##plot funding requested, consultant indicator false
+pl.hist(data_false, bins=np.logspace(np.log10(1),np.log10(100000000),50), facecolor='#F09221')
+pl.suptitle('Funding requests for \nnon-consultant applications', fontsize = 18)
+pl.axvline(x=median_false)
+pl.gca().set_xscale("log")
+pl.xlabel('Funding Requested')
+pl.show()
+pl.savefig("figures/histogram_requested_by_nonconsultants.png")
+
