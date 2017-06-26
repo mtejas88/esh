@@ -197,8 +197,7 @@ sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.needs_w
 FROM public.fy2016_districts_deluxe_matr as dd_2016
 left join public.fy2015_districts_deluxe_m as dd_2015 on dd_2015.esh_id::char = dd_2016.esh_id
 -- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI, DC)
--- also take out states at the school-level (RI, HI, DE)
-WHERE dd_2016.postal_cd NOT IN ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DC', 'RI', 'HI', 'DE')
+WHERE dd_2016.postal_cd NOT IN ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DC')
 GROUP BY 1
 ORDER BY postal_cd
 
