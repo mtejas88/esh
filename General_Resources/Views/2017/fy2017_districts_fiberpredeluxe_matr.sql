@@ -469,7 +469,7 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi, 
+	needs_wifi,
 
 	c2_prediscount_budget_15,
 
@@ -519,7 +519,7 @@ select distinct
 
 	dspa.reporting_name as service_provider_assignment,
 
-	dspa.purpose as primary_sp_purpose,
+	dspa.primary_sp_purpose as primary_sp_purpose,
 
 	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
 
