@@ -197,7 +197,7 @@ width = 1/1.5
 plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
 plt.suptitle('Breakdown of \nLow Cost Applications', fontsize = 18)
 plt.xticks(x, x)
-plt.xlabel('# of recipients')
+plt.xlabel('# of service types')
 plt.ylabel('% of low cost applications')
 plt.ylim(0,1)
 #plt.get_figlabels
