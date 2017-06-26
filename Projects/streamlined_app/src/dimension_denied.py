@@ -12,30 +12,12 @@ import matplotlib.pyplot as plt
 applications = pd.read_csv('data/interim/applications.csv')
 applications['discount_category'] = np.floor(applications['category_one_discount_rate']/10)*10
 denied_applications = applications.loc[applications['denied_frns'] > 0]
+denied_applications  = denied_applications.loc[applications['lowcost_indicator'] == True]
+
 
 ##all denied apps
 denied = denied_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
 print(denied_applications.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
-
-##dimension lowcost
-low = denied_applications.groupby('lowcost_indicator')
-print(low.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'}))
-
-#plot diffs
-y = low.agg({'application_number': lambda x: x.count()/denied['application_number']})
-x = range(1, len(y)+1)
-axis_label = y.index
-width = 1/1.5
-
-plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
-plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
-plt.ylim(0,1)
-plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0] + .01), xytext=(.9, y.application_number[0] + .01), color = "grey")
-plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1] + .01), xytext=(1.9, y.application_number[1]+ .01), color = "grey")
-plt.show()
-plt.savefig("figures/denied_apps_by_lowcost.png")
 
 ##dimension service category
 cat = denied_applications.groupby('category_of_service')
@@ -48,9 +30,9 @@ axis_label = ['Cat 1', 'Cat 2']
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
 plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
@@ -71,9 +53,9 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 #plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
 #plt.annotate(str(round(y.application_number[2],2)*100)+'%', xy=(1.9, y.application_number[2] + .01), xytext=(1.9, y.application_number[2] + .01), color = "grey")
@@ -91,9 +73,9 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 #plt.get_figlabels
 #plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
@@ -112,12 +94,13 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
+plt.xlabel('Special Construction Indicator')
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
-plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0] + .01), xytext=(.9, y.application_number[0] + .01), color = "grey")
-plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1] + .01), xytext=(1.9, y.application_number[1]+ .01), color = "grey")
+plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0]-.01), xytext=(.9, y.application_number[0]-.01), color = "grey")
+plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1]), xytext=(1.9, y.application_number[1]), color = "grey")
 plt.show()
 plt.savefig("figures/denied_apps_by_special_construction.png")
 
@@ -132,9 +115,10 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
+plt.xlabel('Consultant Indicator')
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0] + .01), xytext=(.9, y.application_number[0]  + .01), color = "grey")
 plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1] + .01), xytext=(1.9, y.application_number[1]+ .01), color = "grey")
@@ -152,9 +136,9 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913","#F09221"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, axis_label)
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 plt.annotate(str(round(y.application_number[0],2)*100)+'%', xy=(.9, y.application_number[0] + .01), xytext=(.9, y.application_number[0]  + .01), color = "grey")
 plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(1.9, y.application_number[1] + .01), xytext=(1.9, y.application_number[1]+ .01), color = "grey")
@@ -172,10 +156,10 @@ axis_label = y.index
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, axis_label)
 plt.xlabel('# of SPINs')
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 #plt.get_figlabels
 #plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
@@ -189,14 +173,14 @@ print(rec.agg({'application_number': lambda x: x.count(),  'total_funding_year_c
 
 #plot diffs
 y = rec.agg({'application_number': lambda x: x.count()/denied['application_number']})
-x = range(1, len(y[1:21])+1)
+x = range(1, len(y)+1)
 width = 1/1.5
 
-plt.bar(x, y.application_number[1:21], width, color=["#FDB913"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, x)
 plt.xlabel('# of recipients')
-plt.ylabel('% of Denied Applications')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 #plt.get_figlabels
 #plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
@@ -214,10 +198,10 @@ x = range(1, len(y)+1)
 width = 1/1.5
 
 plt.bar(x, y.application_number, width, color=["#FDB913"], align = 'center')
-plt.suptitle('Breakdown of \nDenied Applications', fontsize = 18)
+plt.suptitle('Breakdown of \nDenied Low Cost Applications', fontsize = 18)
 plt.xticks(x, x)
-plt.xlabel('# of recipients')
-plt.ylabel('% of Denied Applications')
+plt.xlabel('# of service types')
+plt.ylabel('% of Denied Low Cost Applications')
 plt.ylim(0,1)
 #plt.get_figlabels
 plt.annotate(str(round(y.application_number[1],2)*100)+'%', xy=(.9, y.application_number[1] + .01), xytext=(.9, y.application_number[1]+ .01), color = "grey")
