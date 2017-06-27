@@ -7,6 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
+setwd("~/Documents/ESH-Code/ficher/Projects/machine_cleaning_2017/")
+
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -15,7 +17,9 @@ library(ggplot2)
 ## READ IN DATA
 
 line.items.2017 <- read.csv("data/raw/line_items_2017.csv", as.is=T, header=T, stringsAsFactors=F)
+cl.frns.2017 <- read.csv("data/raw/clean_frn_meta_data_2017.csv", as.is=T, header=T, stringsAsFactors=F)
 cl.line.items.2017 <- read.csv("data/raw/clean_line_items_2017.csv", as.is=T, header=T, stringsAsFactors=F)
+clean.flags.2017 <- read.csv("data/raw/clean_flags_2017.csv", as.is=T, header=T, stringsAsFactors=F)
 flags <- read.csv("data/raw/flags_2017.csv", as.is=T, header=T, stringsAsFactors=F)
 ## DK model predictions
 #predictions <- read.csv("src/dk_raw_model/model_data_versions/final_models/2017_predictions_June16_2017.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -99,10 +103,15 @@ for (i in 1:nrow(predictions)){
 #dev.off()
 
 ##**************************************************************************************************************************************************
-## compare with DQT
+## compare with DQT (QA)
 
+## first, states that have been confirmed by DQT: MA, TN, AL, AZ, KS, MD, NJ, FL, NH, CO, MO, TX, OR
+states.qa <- c('MA', 'TN', 'AL', 'AZ', 'KS', 'MD', 'NJ', 'FL', 'NH', 'CO', 'MO', 'TX', 'OR')
 
+## need to merge in FRN info to get postal_cd
+cl.line.items.2017 <- merge(cl.line.items.2017)
 
+#dqt.qa <- cl.line.items.2017[cl.line.items.2017$]
 
 
 

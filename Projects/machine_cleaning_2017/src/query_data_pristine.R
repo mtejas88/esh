@@ -7,6 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
+setwd("~/Documents/ESH-Code/ficher/Projects/machine_cleaning_2017/")
+
 args = commandArgs(trailingOnly=TRUE)
 github_path <- args[1]
 
@@ -63,8 +65,12 @@ dbDisconnect(con)
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 ## cleaned 2016 line item data
 cl.line.items.2016 <- querydb(paste(github_path, "General_Resources/sql_scripts/2016_line_items.SQL", sep=""))
+## raw line item data (as it comes in from USAC)
+cl.frn.meta.data.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_frns.SQL", sep=""))
 ## cleaned 2017 line item data
 cl.line.items.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_items.SQL", sep=""))
+## flags
+cl.flags.2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_item_flags.SQL", sep=""))
 ## disconnect from database
 dbDisconnect(con)
 
@@ -87,7 +93,9 @@ write.csv(frn.meta.data.2016, "data/raw/frn_meta_data_2016.csv", row.names=F)
 write.csv(line.items.2016, "data/raw/line_items_2016.csv", row.names=F)
 write.csv(sp.2016, "data/raw/service_providers_2016.csv", row.names=F)
 write.csv(cl.line.items.2016, "data/raw/clean_line_items_2016.csv", row.names=F)
+write.csv(cl.frn.meta.data.2017, "data/raw/clean_frn_meta_data_2017.csv", row.names=F)
 write.csv(cl.line.items.2017, "data/raw/clean_line_items_2017.csv", row.names=F)
+write.csv(cl.flags.2017, "data/raw/clean_flags_2017.csv", row.names=F)
 write.csv(frn.meta.data.2017, "data/raw/frn_meta_data_2017.csv", row.names=F)
 write.csv(line.items.2017, "data/raw/line_items_2017.csv", row.names=F)
 write.csv(flags.2017, "data/raw/flags_2017.csv", row.names=F)
