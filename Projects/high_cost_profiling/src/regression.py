@@ -106,7 +106,7 @@ plt.savefig("figures/sum_requested_by_consultant_usage.png")
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate', 'fulltime_enrollment']
 
 X = applications[feature_cols]
-y = np.log10(applications.total_funding_year_commitment_amount_request)
+y = applications.total_funding_year_commitment_amount_request
 
 # regression model
 X = sm.add_constant(X)
@@ -117,7 +117,7 @@ print(est.summary())
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate']
 
 X = applications[feature_cols]
-y = np.log10(applications.cost_per_student)
+y = applications.cost_per_student
 
 # regression model
 X = sm.add_constant(X)
@@ -128,16 +128,16 @@ print(est.summary())
 feature_cols = ['consultant_indicator']
 
 X = applications[feature_cols]
-y = np.log10(applications.total_funding_year_commitment_amount_request)
+y = applications.total_funding_year_commitment_amount_request
 
 # regression model
 X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-## t test on log funding requested by consultant indicator
-data_true_log = np.log10(data_true)
-data_false_log = np.log10(data_false)
+## t test on funding requested by consultant indicator
+data_true_log = data_true
+data_false_log = data_false
 ttest = scipy.stats.ttest_ind(data_true_log, data_false_log, equal_var=False)
 
 print("Accept null hypothesis; applications that use consultants have different funding requests as applications that don't. P-value: {}".format(ttest.pvalue))
