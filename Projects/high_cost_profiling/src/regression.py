@@ -154,7 +154,7 @@ plt.ylabel('Indicator of consultant usage')
 plt.show()
 plt.savefig("figures/dotplot_requested_by_consultant_usage.png")
 
-##plot funding requested, consultant indicator true
+##plot funding requested, consultant indicator true (log)
 pl.hist(data_true, bins=np.logspace(np.log10(1),np.log10(100000000),50), facecolor='#FDB913')
 pl.suptitle('Funding requests for \nconsultant applications', fontsize = 18)
 pl.axvline(x=median_true)
@@ -163,7 +163,7 @@ pl.xlabel('Funding Requested')
 pl.show()
 pl.savefig("figures/histogram_requested_by_consultants.png")
 
-##plot funding requested, consultant indicator false
+##plot funding requested, consultant indicator false (log)
 pl.hist(data_false, bins=np.logspace(np.log10(1),np.log10(100000000),50), facecolor='#F09221')
 pl.suptitle('Funding requests for \nnon-consultant applications', fontsize = 18)
 pl.axvline(x=median_false)
@@ -171,4 +171,33 @@ pl.gca().set_xscale("log")
 pl.xlabel('Funding Requested')
 pl.show()
 pl.savefig("figures/histogram_requested_by_nonconsultants.png")
+
+## testing for normality
+a = applications['total_funding_year_commitment_amount_request'].astype(float).values.tolist()
+print(scipy.stats.mstats.normaltest(a))
+print(scipy.stats.mstats.normaltest(data_true))
+print(scipy.stats.mstats.normaltest(data_false))
+
+
+
+##plot funding requested, consultant indicator true (no log)
+data_true_norm = data_true[abs(data_true - np.mean(data_true)) < 2 * np.std(data_true)]
+pl.hist(data_true_norm, bins=50, facecolor='#FDB913')
+pl.suptitle('Funding requests for \nconsultant applications', fontsize = 18)
+pl.axvline(x=median_true)
+pl.xlabel('Funding Requested')
+pl.show()
+pl.savefig("figures/histogram_requested_by_consultants_nolog.png")
+
+##plot funding requested, consultant indicator false (no log)
+data_false_norm = data_false[abs(data_false - np.mean(data_false)) < np.std(data_false)]
+pl.hist(data_false, bins=100, facecolor='#F09221')
+pl.suptitle('Funding requests for \nnon-consultant applications', fontsize = 18)
+pl.axvline(x=median_false)
+pl.xlabel('Funding Requested')
+pl.show()
+pl.savefig("figures/histogram_requested_by_nonconsultants_nolog.png")
+
+
+
 
