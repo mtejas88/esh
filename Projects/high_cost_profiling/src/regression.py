@@ -175,9 +175,7 @@ pl.savefig("figures/histogram_requested_by_nonconsultants.png")
 ## testing for normality
 a = applications['total_funding_year_commitment_amount_request'].astype(float).values.tolist()
 print(scipy.stats.mstats.normaltest(a))
-print(scipy.stats.mstats.normaltest(data_true))
-print(scipy.stats.mstats.normaltest(data_false))
-
+print(scipy.stats.mstats.normaltest(np.log10(a)))
 
 
 ##plot funding requested, consultant indicator true (no log)
