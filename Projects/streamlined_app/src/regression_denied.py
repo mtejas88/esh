@@ -48,6 +48,21 @@ X = sm.add_constant(X)
 est = sm.Logit(y, X.astype(float)).fit()
 print(est.summary())
 
+## regression linear model and plot -- NOT FINAL
+# regression model
+X = lowcost_applications.special_construction_indicator
+X = sm.add_constant(X)
+y = lowcost_applications.denied_indicator
+est_ols = sm.OLS(y, X.astype(float)).fit()
+est_log = sm.Logit(y, X.astype(float)).fit()
+
+fig, ax = plt.subplots(figsize=(8,6))
+ax.plot(X, est_ols.fittedvalues, 'r--.', label="OLS")
+ax.plot(X, est_log.fittedvalues, 'b-', label="Logistic")
+ax.plot(X, y, 'go', label="Logistic")
+plt.show()
+
+
 ##how many apps with worst case were denied funding
 wor = lowcost_applications.groupby(['no_consultant_indicator', 'special_construction_indicator', 'services_2p_indicator', 'applicant_type_School', 'locale_Urban', 'category_2'])
 print(wor.agg({'application_number': lambda x: x.count()}))
