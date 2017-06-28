@@ -23,6 +23,10 @@ applications = pd.concat([applications, applicant_type_dummies], axis=1)
 locale_dummies = pd.get_dummies(applications.urban_rural_status, prefix='locale')
 applications = pd.concat([applications, locale_dummies], axis=1)
 
+category_dummies = pd.get_dummies(applications.category_of_service, prefix='category')
+applications = pd.concat([applications, category_dummies], axis=1)
+
+
 ##plot requested per student
 #calculate median requested/student
 data_true = applications.loc[applications['consultant_indicator'] == True]
@@ -79,7 +83,6 @@ plt.annotate(str(median_multiple)+"x", xy=(1.5, (median_true - median_false)/2 +
 plt.show()
 plt.savefig("figures/median_requested_by_consultant_usage.png")
 
-
 ##plot sum requested
 #calculate sum requested
 sum_true = round(np.sum(data_true),-8)/1000000000
@@ -102,7 +105,12 @@ plt.annotate(str(sum_multiple)+"x", xy=(1.5, (sum_true - sum_false)/2 + sum_fals
 plt.show()
 plt.savefig("figures/sum_requested_by_consultant_usage.png")
 
-##regression for log funding request
+## testing for normality
+a = applications['total_funding_year_commitment_amount_request'].astype(float).values.tolist()
+print(scipy.stats.mstats.normaltest(a))
+print(scipy.stats.mstats.normaltest(np.log10(a)))
+
+##regression for funding request
 feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate', 'fulltime_enrollment']
 
 X = applications[feature_cols]
@@ -113,8 +121,10 @@ X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-##regression for log funding request per student
-feature_cols = ['consultant_indicator', 'special_construction_indicator', 'num_service_types', 'num_spins', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_Library', 'applicant_type_Library System', 'applicant_type_School', 'applicant_type_School District',  'category_of_service', 'locale_Urban', 'locale_Rural', 'category_one_discount_rate']
+##regression for funding request per student
+feature_cols = ['special_construction_indicator', 'num_recipients', 'applicant_type_Consortium', 'applicant_type_School', 'applicant_type_School District',  'locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'num_spins', 'category_1', 'num_service_types']
+
+insig_cols = ['applicant_type_Library', 'applicant_type_Library System']
 
 X = applications[feature_cols]
 y = applications.cost_per_student
@@ -124,7 +134,7 @@ X = sm.add_constant(X)
 est = sm.OLS(y, X.astype(float)).fit()
 print(est.summary())
 
-##regression on log funding requested for only consultant indicator
+##regression on funding requested for only consultant indicator
 feature_cols = ['consultant_indicator']
 
 X = applications[feature_cols]
@@ -141,6 +151,8 @@ data_false_log = data_false
 ttest = scipy.stats.ttest_ind(data_true_log, data_false_log, equal_var=False)
 
 print("Accept null hypothesis; applications that use consultants have different funding requests as applications that don't. P-value: {}".format(ttest.pvalue))
+
+
 
 ##plot consultant indicator by funding requested
 xd = applications.total_funding_year_commitment_amount_request
@@ -171,12 +183,6 @@ pl.gca().set_xscale("log")
 pl.xlabel('Funding Requested')
 pl.show()
 pl.savefig("figures/histogram_requested_by_nonconsultants.png")
-
-## testing for normality
-a = applications['total_funding_year_commitment_amount_request'].astype(float).values.tolist()
-print(scipy.stats.mstats.normaltest(a))
-print(scipy.stats.mstats.normaltest(np.log10(a)))
-
 
 ##plot funding requested, consultant indicator true (no log)
 data_true_norm = data_true[abs(data_true - np.mean(data_true)) < 2 * np.std(data_true)]
