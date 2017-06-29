@@ -1,3 +1,6 @@
+
+/*removing dependency on any endpoint view and utilizng crusher views instead*/
+
 with r_sr as (
         select 
         case
@@ -28,8 +31,8 @@ with r_sr as (
         end as line_item_district_mrc_unless_null,
         sr.*
 
-        from endpoint.fy2016_services_received sr
-        join endpoint.fy2016_districts_deluxe d
+        from public.fy2016_services_received_matr sr
+        join public.fy2016_districts_deluxe_matr d
         on d.esh_id = sr.recipient_id
         where sr.broadband = true
         and (sr.inclusion_status = 'clean_with_cost' or sr.inclusion_status = 'clean_no_cost') /* not sure if i should also include dirty line items? */
@@ -336,7 +339,7 @@ t_sr as (
 
         from r_sr
 
-        left join endpoint.fy2016_districts_deluxe dd
+        left join public.fy2016_districts_deluxe_matr  dd
         on r_sr.recipient_id = dd.esh_id
  
         where r_sr.recipient_exclude_from_ia_analysis = false /* not sure if should include any dirty districts? */
@@ -403,7 +406,7 @@ a as    (select m_sr.*,
 
 
         from m_sr
-        left join endpoint.fy2016_districts_deluxe d
+        left join public.fy2016_districts_deluxe_matr  d
         on d.esh_id = m_sr.recipient_id
 
         where m_sr.sn_ia_bw_mbps_total != 0),
@@ -726,7 +729,7 @@ tsn_sr as (select sn_sr.recipient_postal_cd,
 /*status of districts in state on state network vs. off state network, defined as district receiving any broadband services from state network applicant*/
 s_sn_status as    (with c as (select case 
                               when dd.esh_id not in (select sr.recipient_id as esh_id
-                                        from endpoint.fy2016_services_received sr
+                                        from public.fy2016_services_received_matr sr
                                         where (sr.applicant_id in (select taggable_id as applicant_id
                                               from fy2016.tags 
                                               where fy2016.tags.label = 'state')
@@ -735,7 +738,7 @@ s_sn_status as    (with c as (select case
                               else 'TRUE'
                             end as on_state_network,
                             dd.*
-                            from endpoint.fy2016_districts_deluxe dd
+                            from public.fy2016_districts_deluxe_matr dd
                             where dd.include_in_universe_of_districts = true
                             and dd.district_type = 'Traditional'
                             and dd.postal_cd in         ('AL',
@@ -788,7 +791,7 @@ s_clean as      (select
               then 1
               else 0
           end) as districts_in_state_meeting_2014_bw_goals_count
-          from endpoint.fy2016_districts_deluxe d
+          from public.fy2016_districts_deluxe_matr d
           where d.include_in_universe_of_districts = true
           and d.district_type = 'Traditional'
           and d.exclude_from_ia_analysis = false 
@@ -803,7 +806,7 @@ s_dirty as      (select
               then 1
               else 0
           end) as districts_in_state_meeting_2014_bw_goals_count
-          from endpoint.fy2016_districts_deluxe d
+          from public.fy2016_districts_deluxe_matr d
           where d.include_in_universe_of_districts = true
           and d.district_type = 'Traditional'
           group by d.postal_cd),
