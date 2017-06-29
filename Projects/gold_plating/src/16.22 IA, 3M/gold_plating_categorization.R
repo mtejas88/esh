@@ -9,22 +9,24 @@
 rm(list=ls())
 
 ## set working directory
-setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
+#setwd("C:/Users/Justine/Documents/GitHub/ficher/Projects/gold_plating/")
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("dplyr")
+packages.to.install <- c("dplyr", "ggplot2")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
   }
 }
 library(dplyr)
+library(ggplot2)
 
 ##imports
-districts <- read.csv("data/interim/districts_clean_cats.csv")
+districts <- read.csv("data/interim/districts_clean_cats_2.csv")
 frn_statuses <- read.csv("data/raw/frn_statuses.csv")
 negative_barriers <- read.csv("data/raw/negative_barriers.csv")
-
+# from https://github.com/educationsuperhighway/ficher/blob/master/Projects/redundant_circuits/src/redundant_ia.SQL
+redundant_ia <- read.csv("data/raw/redundant_ia.csv")
 
 #count gold plated districts that got denied funding
 gold_plating <- filter(districts, category == 'gold-plated')
@@ -45,6 +47,16 @@ dist_survey_ct <- summarize(dist_survey, count=n())
 dist_barriers <- (dist_survey_ct %>% filter(indicator == TRUE) %>% distinct(esh_id))
 nrow(dist_barriers)/nrow(gold_plating)
 
+#count gold plated districts that have redundant circuits
+gold_plating_redundant <- inner_join(gold_plating, redundant_ia, by = c("esh_id" = "recipient_id"))
+dist_survey <- group_by(gold_plating_redundant, esh_id)
+dist_survey_ct <- summarize(dist_survey, count=n())
+nrow(dist_survey_ct)/nrow(gold_plating)
+
+#count gold plated districts that have redundant circuits
+gold_plating_high_dr <- filter(gold_plating,discount_rate_c1>=.8)
+nrow(gold_plating_high_dr)/nrow(gold_plating)
+
 #overlap
-overlap <- inner_join(dist_barriers[,1], dist_denied[,1], by = c("esh_id" = "esh_id"))
+overlap <- inner_join(gold_plating_high_dr, dist_barriers[,1], by = c("esh_id" = "esh_id"))
 nrow(overlap)/nrow(gold_plating)

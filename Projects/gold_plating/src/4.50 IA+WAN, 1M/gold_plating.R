@@ -29,13 +29,13 @@ districts$wan_monthly_cost_total <- ifelse(districts$wan_monthly_cost_total > 0,
 districts$monthly_cost_total <- districts$ia_monthly_cost_total + districts$wan_monthly_cost_total
 
 districts$ia_bandwidth_per_student_kbps <- ifelse(districts$ia_bandwidth_per_student_kbps > 0, 
-                                                   districts$ia_bandwidth_per_student_kbps, 
-                                                   0)
+                                                  districts$ia_bandwidth_per_student_kbps, 
+                                                  0)
 districts$monthly_cost_per_student <- districts$monthly_cost_total / districts$num_students
 
 districts$include_in_universe_of_districts_all_charters <- ifelse(districts$include_in_universe_of_districts_all_charters== 'true', 
-                                                                   TRUE,
-                                                                   FALSE)
+                                                                  TRUE,
+                                                                  FALSE)
 districts$exclude_from_ia_cost_analysis <- ifelse (districts$exclude_from_ia_cost_analysis== 'true',
                                                    TRUE,
                                                    FALSE)
@@ -119,13 +119,13 @@ p2 + geom_point(aes(color = category, size = num_students)) +
 #summary
 categories <- group_by(districts_clean, category)
 write.csv(summarize(categories, 
-          sum_cost = sum(monthly_cost_total, na.rm = T),
-          average_cost = mean(monthly_cost_total, na.rm = T), 
-          average_cost_per_student = sum(monthly_cost_total, na.rm = T)/sum(num_students, na.rm = T), 
-          average_bandwidth = mean(ia_bw_mbps_total, na.rm = T), 
-          average_bw_per_student_kbps = sum(ia_bw_mbps_total, na.rm = T)/sum(num_students, na.rm = T)*1000, 
-          average_students = mean(num_students, na.rm = T),
-          districts = n()), 
+                    sum_cost = sum(monthly_cost_total, na.rm = T),
+                    average_cost = mean(monthly_cost_total, na.rm = T), 
+                    average_cost_per_student = sum(monthly_cost_total, na.rm = T)/sum(num_students, na.rm = T), 
+                    average_bandwidth = mean(ia_bw_mbps_total, na.rm = T), 
+                    average_bw_per_student_kbps = sum(ia_bw_mbps_total, na.rm = T)/sum(num_students, na.rm = T)*1000, 
+                    average_students = mean(num_students, na.rm = T),
+                    districts = n()), 
           "data/interim/districts_clean_cats_summary.csv")
 
 write.csv(districts_clean,
