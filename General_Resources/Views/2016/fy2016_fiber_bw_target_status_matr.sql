@@ -2,7 +2,7 @@ select 			si.esh_id,
 				si.postal_cd,
 			  	bi.exclude_from_analysis_2016 as exclude_from_ia_analysis,
 				si.exclude_from_wan_analysis,
-				ps.fiber_priority_status,
+				-- ps.fiber_priority_status, eliminating dependency on endpoint views 
 				si.stage_indicator as fiber_target_no_override,
 				bi.bw_indicator as bw_target_no_override,
 				-- Fiber Target DQT Manual Override tags accounted for here:
@@ -17,15 +17,15 @@ select 			si.esh_id,
 						 end as bw_target_status
 
 				from public.fy2016_stage_indicator_matr si
-				left join (
+				/*left join (
 					select esh_id,
 							case
 								when fiber_priority_status is null
 									then 'Priority 0'
 								else fiber_priority_status
-							end as fiber_priority_status
-					from endpoint.district_priority_status) ps
-				on si.esh_id = ps.esh_id::varchar
+							end as fiber_priority_status 
+					from endpoint.district_priority_status) 
+				on si.esh_id = ps.esh_id::varchar */ -- eliminating dependency on endpoint views 
 				left join public.fy2016_bw_indicator_matr bi
 				on si.esh_id = bi.esh_id
 				left join public.fy2016_districts_predeluxe_matr dd
