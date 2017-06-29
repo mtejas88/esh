@@ -35,7 +35,66 @@ sp_fiber as (
 
 
 select 
-	reporting_name, 
+	case
+		when reporting_name = 'Ace Telephone Assoc'
+			then 'Ace Telephone Co'
+		when reporting_name = 'Alpoha Enterprised'
+			then 'Alpha Enterprises'
+		when reporting_name = 'Cablevision'
+			then 'Altice USA'
+		when reporting_name = 'Araphaoe Tele Co'
+			then 'Arapahoe Tele Co'
+		when reporting_name = 'Alascom, Inc.'
+			then 'AT&T'
+		when reporting_name = 'Cable One, Inc'
+			then 'Cable One, Inc.'
+		when reporting_name in ('Charter', 'Charter Advanced Services (VT) LLC', 'Charter Cable')
+			then 'Charter'
+		when reporting_name = 'FairPoint'
+			then 'Fairpoint'
+		when reporting_name in ('Frontier', 'Frontier Communications Online and Long Distance, Inc.', 'Frontier North, Inc.')
+			then 'Frontier'
+		when reporting_name = 'Fusion Technologies, LLC'
+			then 'Fusion'
+		when reporting_name = 'GovNet'
+			then 'GovNET Inc.'
+		when reporting_name = 'Illimois Central'
+			then 'Illinois Central'
+		when reporting_name = 'MCC Telephony'
+			then 'Mediacom'
+		when reporting_name = 'OneNet USA'
+			then 'OneNet'
+		when reporting_name = 'Range'
+			then 'Range Tele'
+		when reporting_name in ('Ameilia Telephone Co', 'Asotin Tele', 'TDS Metrocom')
+			then 'TDS Telecom'
+		when reporting_name in ('Time Warner', 'Time Warner Cable Business LLC')
+			then 'Time Warner Cable'
+		when reporting_name = 'Valley Telcom'
+			then 'Valley Telecom'
+		else reporting_name
+	end as reporting_name, 
+	case
+		when reporting_name in (
+			'3 Rivers Tele Coop',	'Ace Telephone Assoc',	'Ace Telephone Co',	'Agate Mutual',	'Alaska Telephone Co',	'Alpine',
+			'Blackfoot',	'Blue Ridge',	'Calaveras',	'Consolidated Telco',	'Craw-Kan Tele',	'Custer Tele',
+			'Fidelity',	'Gila River',	'Golden Belt Tele',	'Golden West',	'Grand River',	'Green Hills', 'Hamilton Tele',
+			'Hinton Tele',	'Hood Canal',	'Hopi Telecommunications',	'Hutchinson Tele',	'InterBel Telephone',	'Interstate Telecomm',
+			'Mid-Rivers Tele',	'Midstate Comm',	'Mutual Telephone',	'NEMONT COMM',	'North Texas Tele',	'Northeast Nebraska Telephone Company',
+			'Pierce Telephone',	'Pinnacles Telephone',	'Pioneer Telephone',	'Range',	'Range Tele',	'Reservation Tele',
+			'Sierra Tel',	'Sioux Valley',	'Southern Montana',	'Table Top Tele',	'Taylor Tele Coop',	'Terril',
+			'Venture Comm Coop',	'Vermont Tele Co',	'W River Telecomm',	'Whidbey Tele Co',	'Woodhull Comm',	
+			'Ameilia Telephone Co',	'Andrew Tele Co',	'Araphaoe Tele Co',	'Arrowhead Comm Co',	'Asotin Tele',	'Baraga Tele Co',
+			'Dalton Tele',	'Dickey Rural',	'DRS Technical',	'Dubois Tele',	'Eagle Telephone System, Inc.',	'Fenton Coop',
+			'Hager Telecomm',	'Happy Valley',	'Harrisonville',	'Haviland',	'Heart of Iowa Communications Cooperative',	'Hiawatha Tele',
+			'Le-Ru Telephone',	'Leaco Rural',	'Lincoln Telephone Company, Inc.',	'LR Communications',	'Mabel Coop',	'Mercury',
+			'Northern Tele Coop',	'Northwest Comm',	'Oregon-Idaho Utilities, Inc.',	'Paul bunyan',	'Peoples Comm',	'Phillips County',
+			'River Valley',	'Riviera Tele',	'Royal Tele Co',	'S&T Tele Coop',	'Salina-Spavinaw',	'Santel Comm',
+			'Tri County',	'Triangle Tele',	'UTELCO, LLC',	'Valley Telcom',	'Valley Telecom',	'Van Buren Tele Co'
+		)
+			then true
+		else false
+	end as rural_telco,
 	count(distinct esh_id) as fiber_target_districts_served,
 	count(distinct 	case
 						when service = 'nonfiber'
@@ -77,5 +136,5 @@ from (
 		) sp_nonfib	
 	)
 ) sps_wanted
-group by 1
-order by 2,3,4,5 desc
+group by 1,2
+order by 3 desc,4 desc,5 desc,6 desc
