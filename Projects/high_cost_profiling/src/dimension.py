@@ -15,6 +15,7 @@ applications['below_median_funding_request'] = np.where(applications['total_fund
 applications['high_dr'] = np.where(applications['discount_category']>=80,True,False)
 applications['applicant_instructional'] = np.where(np.logical_or(np.logical_or(applications['applicant_type']=='School',applications['applicant_type']=='School District'),applications['applicant_type']=='Consortium'),True,False)
 consultant_applications = applications.loc[applications['consultant_indicator'] == True]
+non_consultant_applications = applications.loc[applications['consultant_indicator'] == False]
 
 
 
@@ -24,6 +25,12 @@ print(consultant_applications.agg({'application_number': lambda x: x.count(),  '
 all = consultant_applications.groupby(['category_of_service', 'high_dr', 'applicant_instructional', 'special_construction_indicator', '1_recipient_indicator'])
 csv = all.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
 csv.to_csv('data/interim/unions.csv')
+
+##non consultant apps
+non = non_consultant_applications.groupby(['category_of_service', 'high_dr', 'applicant_instructional', 'special_construction_indicator', '1_recipient_indicator'])
+csv = non.agg({'application_number': lambda x: x.count(),  'total_funding_year_commitment_amount_request':'sum'})
+csv.to_csv('data/interim/unions_nonconsultant.csv')
+
 
 ##dimension low cost
 lc = consultant_applications.groupby('below_median_funding_request')
