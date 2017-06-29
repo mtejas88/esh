@@ -24,7 +24,7 @@ flags <- read.csv("data/raw/flags_2017.csv", as.is=T, header=T, stringsAsFactors
 ## DK model predictions
 #predictions <- read.csv("src/dk_raw_model/model_data_versions/final_models/2017_predictions_June16_2017.csv", as.is=T, header=T, stringsAsFactors=F)
 ## ESH model predictions
-predictions <- read.csv("src/esh_pristine_model/model_data_versions/2017_predictions.csv", as.is=T, header=T, stringsAsFactors=F)
+predictions <- read.csv("src/esh_pristine_model/results/2017_predictions.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## FORMAT & MERGE DATA
