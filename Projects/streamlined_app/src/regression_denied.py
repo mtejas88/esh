@@ -22,6 +22,11 @@ lowcost_applications  = applications.loc[applications['frns'] == applications['f
 lowcost_applications  = lowcost_applications.loc[lowcost_applications['lowcost_indicator'] == True]
 
 lowcost_applications['denied_indicator'] = np.where(lowcost_applications['denied_frns'] > 0, 1, 0)
+
+lowcost_applications['1bids_indicator'] = np.where(lowcost_applications['num_frns_1_bids'] > 0, 1, 0)
+lowcost_applications['0bids_indicator'] = np.where(lowcost_applications['num_frns_0_bids'] > 0, 1, 0)
+lowcost_applications['prevyear_indicator'] = np.where(lowcost_applications['num_frns_from_previous_year'] > 0, 1, 0)
+lowcost_applications['mastercontract_indicator'] = np.where(lowcost_applications['num_frns_state_master_contract'] > 0, 1, 0)
 lowcost_applications['no_consultant_indicator'] = np.where(lowcost_applications['consultant_indicator'] == False, 1, 0)
 
 den = lowcost_applications.groupby('denied_indicator')
@@ -50,24 +55,24 @@ lowcost_applications_c2  = lowcost_applications.loc[lowcost_applications['catego
 #remove outliers
 mean_enroll = np.mean(lowcost_applications_c2['fulltime_enrollment'])
 std_enroll = np.std(lowcost_applications_c2['fulltime_enrollment'])
-lowcost_applications_c2 = lowcost_applications_c2.loc[abs(lowcost_applications_c2['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
-
 mean_recip = np.mean(lowcost_applications_c2['num_recipients'])
 std_recip = np.std(lowcost_applications_c2['num_recipients'])
+mean_req = np.mean(lowcost_applications_c2['total_funding_year_commitment_amount_request'])
+std_req = np.std(lowcost_applications_c2['total_funding_year_commitment_amount_request'])
+mean_spin = np.mean(lowcost_applications_c2['num_spins'])
+std_spin = np.std(lowcost_applications_c2['num_spins'])
+
+lowcost_applications_c2 = lowcost_applications_c2.loc[abs(lowcost_applications_c2['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
 lowcost_applications_c2 = lowcost_applications_c2.loc[abs(lowcost_applications_c2['num_recipients'] - mean_recip) < 3 * std_recip]
+#lowcost_applications_c2 = lowcost_applications_c2.loc[abs(lowcost_applications_c2['total_funding_year_commitment_amount_request'] - mean_req) < 3 * std_req]
+#lowcost_applications_c2 = lowcost_applications_c2.loc[abs(lowcost_applications_c2['num_spins'] - mean_spin) < 3 * std_spin]
 
 #define model inputs
 train, test = train_test_split(lowcost_applications_c2, train_size=0.75, random_state=1)
 
-feature_cols = ['no_consultant_indicator', 'applicant_type_School', 'fulltime_enrollment', 'num_recipients', 'maintenance_indicator', 'managedbb_indicator', 'connections_indicator']
+feature_cols = ['consultant_indicator', 'applicant_type_School',  'fulltime_enrollment', 'num_recipients', 'maintenance_indicator', 'managedbb_indicator', 'connections_indicator', '0bids_indicator', '1bids_indicator', 'prevyear_indicator', 'num_spins']
 
-insig_cols = ['locale_Rural', 'category_one_discount_rate', 'special_construction_indicator', 'applicant_type_School District', 'applicant_type_Consortium', 'applicant_type_Library', 'num_service_types']
-
-#2 std devs optimized
-#feature_cols = ['no_consultant_indicator', 'applicant_type_School', 'fulltime_enrollment', 'maintenance_indicator', 'connections_indicator']
-
-#insig_cols = ['locale_Rural', 'num_recipients', 'category_one_discount_rate', 'special_construction_indicator', 'applicant_type_School District', 'applicant_type_Consortium', 'applicant_type_Library', 'managedbb_indicator']
-
+insig_cols = ['locale_Rural', 'category_one_discount_rate', 'special_construction_indicator', 'applicant_type_School District', 'applicant_type_Consortium', 'applicant_type_Library', 'num_service_types', 'total_funding_year_commitment_amount_request', 'frns', 'mastercontract_indicator']
 
 X1 = train[feature_cols]
 y1 = train.denied_indicator
@@ -95,7 +100,7 @@ yhat_test = est1.predict(x_test)
 #plt.hist(yhat_test,50)
 #plt.show()
 
-yhat_test = [ 0 if y < 0.5 else 1 for y in yhat_test ]
+yhat_test = [ 0 if y < 0.35 else 1 for y in yhat_test ]
 
 print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
@@ -107,18 +112,22 @@ lowcost_applications_c1  = lowcost_applications.loc[lowcost_applications['catego
 #remove outliers
 mean_enroll = np.mean(lowcost_applications_c1['fulltime_enrollment'])
 std_enroll = np.std(lowcost_applications_c1['fulltime_enrollment'])
-lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
+mean_recip = np.mean(lowcost_applications_c1['num_recipients'])
+std_recip = np.std(lowcost_applications_c1['num_recipients'])
+mean_req = np.mean(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
+std_req = np.std(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
 
-#mean_recip = np.mean(lowcost_applications_c1['num_recipients'])
-#std_recip = np.std(lowcost_applications_c1['num_recipients'])
+lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
 #lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['num_recipients'] - mean_recip) < 3 * std_recip]
+#lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['total_funding_year_commitment_amount_request'] - mean_req) < 3 * std_req]
+
 
 #define model inputs
 train, test = train_test_split(lowcost_applications_c1, train_size=0.75, random_state=1)
 
-feature_cols = ['locale_Rural', 'special_construction_indicator', 'no_consultant_indicator', 'applicant_type_School', 'fulltime_enrollment', 'datatrans_indicator', 'applicant_type_School District','applicant_type_Consortium']
+feature_cols = ['locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'applicant_type_School', 'applicant_type_School District', 'applicant_type_Consortium', 'fulltime_enrollment', 'num_recipients', 'datatrans_indicator', 'voice_indicator', '0bids_indicator', '1bids_indicator', 'prevyear_indicator', 'mastercontract_indicator', 'num_spins']
 
-insig_cols = ['category_one_discount_rate', 'num_recipients', 'voice_indicator', 'num_service_types','applicant_type_Library']
+insig_cols = ['frns', 'special_construction_indicator', 'applicant_type_Library System', 'applicant_type_Library', 'num_service_types', 'total_funding_year_commitment_amount_request']
 
 X1 = train[feature_cols]
 y1 = train.denied_indicator
