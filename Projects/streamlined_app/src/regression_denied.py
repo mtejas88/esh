@@ -49,6 +49,63 @@ lowcost_applications['datatrans_indicator'] = np.where(lowcost_applications['ser
 
 lowcost_applications.to_csv('data/interim/lowcost_applications_contd.csv')
 
+##regression with test/train -- c1 only
+lowcost_applications_c1  = lowcost_applications.loc[lowcost_applications['category_1'] == True]
+
+#remove outliers
+mean_enroll = np.mean(lowcost_applications_c1['fulltime_enrollment'])
+std_enroll = np.std(lowcost_applications_c1['fulltime_enrollment'])
+mean_recip = np.mean(lowcost_applications_c1['num_recipients'])
+std_recip = np.std(lowcost_applications_c1['num_recipients'])
+mean_req = np.mean(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
+std_req = np.std(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
+
+lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
+#lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['num_recipients'] - mean_recip) < 3 * std_recip]
+#lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['total_funding_year_commitment_amount_request'] - mean_req) < 3 * std_req]
+
+
+#define model inputs
+train, test = train_test_split(lowcost_applications_c1, train_size=0.75, random_state=1)
+
+feature_cols = ['locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'applicant_type_School', 'applicant_type_School District', 'applicant_type_Consortium', 'fulltime_enrollment', 'num_recipients', 'datatrans_indicator', 'voice_indicator', '0bids_indicator', '1bids_indicator', 'prevyear_indicator', 'mastercontract_indicator', 'num_spins']
+
+insig_cols = ['frns', 'special_construction_indicator', 'applicant_type_Library System', 'applicant_type_Library', 'num_service_types', 'total_funding_year_commitment_amount_request']
+
+X1 = train[feature_cols]
+y1 = train.denied_indicator
+
+#run regression model on train set
+rus = RandomUnderSampler(random_state=1)
+X_res, y_res = rus.fit_sample(X1,y1)
+rows = X_res.shape[0]
+
+X_res =  pd.DataFrame(data=X_res, index=range(rows), columns=feature_cols)
+y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['denied_indicator'])
+
+X_res = sm.add_constant(X_res)
+
+est1 = sm.Logit(y_res, X_res.astype(float)).fit()
+print(est1.summary())
+
+#predict on test set
+x_test = test[feature_cols]
+x_test = sm.add_constant(x_test)
+
+y_test = test.denied_indicator
+
+yhat_test = est1.predict(x_test)
+plt.hist(yhat_test,50)
+plt.show()
+
+yhat_test = [ 0 if y < 0.5 else 1 for y in yhat_test ]
+
+print(confusion_matrix(y_test, yhat_test))
+print(classification_report(y_test, yhat_test,digits=3))
+
+
+
+
 ##regression with test/train -- c2 only
 lowcost_applications_c2  = lowcost_applications.loc[lowcost_applications['category_2'] == True]
 
@@ -106,62 +163,6 @@ print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
 
 
-##regression with test/train -- c1 only
-lowcost_applications_c1  = lowcost_applications.loc[lowcost_applications['category_1'] == True]
-
-#remove outliers
-mean_enroll = np.mean(lowcost_applications_c1['fulltime_enrollment'])
-std_enroll = np.std(lowcost_applications_c1['fulltime_enrollment'])
-mean_recip = np.mean(lowcost_applications_c1['num_recipients'])
-std_recip = np.std(lowcost_applications_c1['num_recipients'])
-mean_req = np.mean(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
-std_req = np.std(lowcost_applications_c1['total_funding_year_commitment_amount_request'])
-
-lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['fulltime_enrollment'] - mean_enroll) < 3 * std_enroll]
-#lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['num_recipients'] - mean_recip) < 3 * std_recip]
-#lowcost_applications_c1 = lowcost_applications_c1.loc[abs(lowcost_applications_c1['total_funding_year_commitment_amount_request'] - mean_req) < 3 * std_req]
-
-
-#define model inputs
-train, test = train_test_split(lowcost_applications_c1, train_size=0.75, random_state=1)
-
-feature_cols = ['locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'applicant_type_School', 'applicant_type_School District', 'applicant_type_Consortium', 'fulltime_enrollment', 'num_recipients', 'datatrans_indicator', 'voice_indicator', '0bids_indicator', '1bids_indicator', 'prevyear_indicator', 'mastercontract_indicator', 'num_spins']
-
-insig_cols = ['frns', 'special_construction_indicator', 'applicant_type_Library System', 'applicant_type_Library', 'num_service_types', 'total_funding_year_commitment_amount_request']
-
-X1 = train[feature_cols]
-y1 = train.denied_indicator
-
-#run regression model on train set
-rus = RandomUnderSampler(random_state=1)
-X_res, y_res = rus.fit_sample(X1,y1)
-rows = X_res.shape[0]
-
-X_res =  pd.DataFrame(data=X_res, index=range(rows), columns=feature_cols)
-y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['denied_indicator'])
-
-X_res = sm.add_constant(X_res)
-
-est1 = sm.Logit(y_res, X_res.astype(float)).fit()
-print(est1.summary())
-
-#predict on test set
-x_test = test[feature_cols]
-x_test = sm.add_constant(x_test)
-
-y_test = test.denied_indicator
-
-yhat_test = est1.predict(x_test)
-plt.hist(yhat_test,50)
-plt.show()
-
-yhat_test = [ 0 if y < 0.5 else 1 for y in yhat_test ]
-
-print(confusion_matrix(y_test, yhat_test))
-print(classification_report(y_test, yhat_test,digits=3))
-
-
-
 ##regression with test/train
 train, test = train_test_split(lowcost_applications, train_size=0.75, random_state=1)
 
@@ -195,6 +196,9 @@ yhat_test = [ 0 if y < 0.35 else 1 for y in yhat_test ]
 
 print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
+
+
+
 
 ##regression for low cost -- first regression for evan
 # modeling prep

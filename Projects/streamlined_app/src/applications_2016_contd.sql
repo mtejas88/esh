@@ -26,7 +26,10 @@
     frns_agg.num_frns_0_bids,
     frns_agg.num_frns_1_bids,
     frns_agg.num_frns_state_master_contract,
-    frns_agg.num_frns_from_previous_year
+    frns_agg.num_frns_from_previous_year,
+    fr_15_agg.funded_frns_15,
+    fr_15_agg.denied_frns_15,
+    fr_15_agg.frns_15
      
   from (
     select *
