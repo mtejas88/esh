@@ -11,6 +11,7 @@
     frns_agg.num_service_types,
     frns_agg.service_types,
     frns_agg.num_spins,
+    frns_agg.num_recipients,
     bi.applicant_type,
     bi.certified_timestamp,
     bi.category_of_service,
@@ -27,9 +28,14 @@
     frns_agg.num_frns_1_bids,
     frns_agg.num_frns_state_master_contract,
     frns_agg.num_frns_from_previous_year,
-    fr_15_agg.funded_frns_15,
-    fr_15_agg.denied_frns_15,
-    fr_15_agg.frns_15
+    fr_15_agg.funded_frns as funded_frns_15,
+    fr_15_agg.denied_frns as denied_frns_15,
+    fr_15_agg.frns as frns_15,
+    fli_agg.functions,
+    fli_agg.purposes,
+    fli_agg.line_items,
+    fli_agg.total_monthly_eligible_recurring_costs,
+    fli_agg.total_eligible_one_time_costs
      
   from (
     select *
@@ -77,6 +83,36 @@
   	group by 1
   ) frns_agg 
   on bi.application_number = frns_agg.application_number
+  join (
+  	select     
+  		application_number,
+  		array_to_string(array_agg(distinct 	case
+  												when function ilike '%fiber%'
+  													then 'Fiber'
+  												when purpose ilike '%wireless%'
+  													then 'Wireless'
+  												when purpose ilike '%copper%'
+  													then 'Copper'
+  											end),';') as functions,
+  		array_to_string(array_agg(distinct 	case
+  												when purpose ilike '%Internet access service with no circuit%'
+  													then 'ISP'
+  												when purpose ilike '%Internet access service that includes a connection%'
+  													then 'Internet'
+  												when purpose ilike '%where Internet access service is billed separately%'
+  													then 'Upstream'
+  												when purpose ilike '%Data Connection between two or more sites %'
+  													then 'WAN'
+  												when purpose ilike '%Backbone circuit%'
+  													then 'Backbone'
+  											end), ';') as purposes,
+  		count(*) as line_items,
+  		sum(total_monthly_eligible_recurring_costs::numeric) as total_monthly_eligible_recurring_costs,
+  		sum(total_eligible_one_time_costs::numeric) as total_eligible_one_time_costs  		
+  	from fy2016.frn_line_items
+  	group by 1
+  ) fli_agg 
+  on bi.application_number = fli_agg.application_number
   left join fy2016.consultants c
   on bi.application_number = c.application_number
   left join (

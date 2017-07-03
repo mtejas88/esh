@@ -28,25 +28,6 @@ applications['lowcost_indicator'] = np.where(applications['total_funding_year_co
 
 applications.to_csv('data/interim/applications.csv')
 
-## data prep - contd
-#import
-applications_2016 = pd.read_csv('data/raw/applications_2016_contd.csv')
-applications_2017 = pd.read_csv('data/raw/applications_2017.csv')
-
-applications_2016['funding_year'] = '2016'
-applications_2017['funding_year'] = '2017'
-
-applications_2017['funded_frns'] = ''
-applications_2017['denied_frns'] = ''
-applications_2017['frns'] = ''
-applications_2017['avg_wave_number'] = ''
-
-applications = pd.concat([applications_2017, applications_2016])
-applications['lowcost_indicator'] = np.where(applications['total_funding_year_commitment_amount_request'] < 25000, True, False)
-
-applications.to_csv('data/interim/applications_contd.csv')
-
-
 ##regression for low cost
 # modeling prep
 applicant_type_dummies = pd.get_dummies(applications.applicant_type, prefix='applicant_type')
