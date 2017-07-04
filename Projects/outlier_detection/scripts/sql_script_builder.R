@@ -128,7 +128,8 @@ find_new_cases <- function(table_name){
   return(script)  
 }
 
-update_no_longer_outliers <- function(){
+update_no_longer_outliers <- function(reason){
+if (reason == 'no longer found') {
     script <- 
     "with outlier_a as (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
     from outliers out join outlier_use_case_details oucd on out.outlier_use_case_detail_id=oucd.outlier_use_case_detail_id),
@@ -144,8 +145,107 @@ update_no_longer_outliers <- function(){
     where outlier_b.ref_id is null
     );
     "
-    return(script)  
+  }else if (reason=='matches 2016'){
+  script <-
+    "WITH dd_2015 AS 
+  (SELECT esh_id, total_ia_bw_mbps,
+  CASE WHEN (monthly_ia_cost_per_mbps = 'Insufficient data' OR monthly_ia_cost_per_mbps = 'Infinity') THEN NULL ELSE monthly_ia_cost_per_mbps END AS monthly_ia_cost_per_mbps, exclude_from_analysis
+  FROM public.fy2015_districts_deluxe_m),
+  dd_2016 AS (SELECT * FROM public.fy2016_districts_deluxe_matr),
+  
+  dd_2016_final as(
+  SELECT dd_2016.*,
+  CASE WHEN dd_2015.exclude_from_analysis = FALSE AND dd_2016.exclude_from_ia_analysis = FALSE 
+  THEN (dd_2016.ia_bw_mbps_total - dd_2015.total_ia_bw_mbps) END AS change_in_bw_tot,
+  
+  CASE WHEN dd_2015.exclude_from_analysis = FALSE AND dd_2016.exclude_from_ia_analysis = FALSE 
+  AND (dd_2015.total_ia_bw_mbps=0) AND (dd_2016.ia_bw_mbps_total > 0) THEN 1
+  WHEN dd_2015.exclude_from_analysis = FALSE AND dd_2016.exclude_from_ia_analysis = FALSE 
+  AND (dd_2015.total_ia_bw_mbps=0) AND (dd_2016.ia_bw_mbps_total = 0) THEN 0
+  WHEN dd_2015.exclude_from_analysis = FALSE AND dd_2016.exclude_from_ia_analysis = FALSE
+  THEN (dd_2016.ia_bw_mbps_total - dd_2015.total_ia_bw_mbps)/dd_2015.total_ia_bw_mbps END AS change_in_bw_pct,
+  
+  CASE WHEN dd_2015.exclude_from_analysis = FALSE AND
+  dd_2016.exclude_from_ia_analysis = FALSE AND dd_2016.exclude_from_ia_cost_analysis = FALSE 
+  AND (dd_2015.monthly_ia_cost_per_mbps IS NOT null) THEN
+  (dd_2016.ia_monthly_cost_per_mbps - dd_2015.monthly_ia_cost_per_mbps::float) 
+  END AS change_in_cost_tot,
+  
+  CASE WHEN dd_2015.exclude_from_analysis = FALSE AND
+  dd_2016.exclude_from_ia_analysis = FALSE AND dd_2016.exclude_from_ia_cost_analysis = FALSE 
+  AND (dd_2015.monthly_ia_cost_per_mbps::float=0) AND (dd_2016.ia_monthly_cost_per_mbps > 0) THEN 1
+  WHEN dd_2015.exclude_from_analysis = FALSE AND
+  dd_2016.exclude_from_ia_analysis = FALSE AND dd_2016.exclude_from_ia_cost_analysis = FALSE 
+  AND (dd_2015.monthly_ia_cost_per_mbps::float=0) AND (dd_2016.ia_monthly_cost_per_mbps = 0) THEN 0
+  WHEN dd_2015.exclude_from_analysis = FALSE AND
+  dd_2016.exclude_from_ia_analysis = FALSE AND dd_2016.exclude_from_ia_cost_analysis = FALSE 
+  AND (dd_2015.monthly_ia_cost_per_mbps IS NOT null) THEN
+  (dd_2016.ia_monthly_cost_per_mbps - dd_2015.monthly_ia_cost_per_mbps::float)/dd_2015.monthly_ia_cost_per_mbps::FLOAT 
+  END AS change_in_cost_pct
+  
+  FROM dd_2016 LEFT JOIN dd_2015 ON dd_2016.esh_id::integer=dd_2015.esh_id::integer),
+  
+  sr_2016 as(SELECT *
+  FROM public.fy2016_services_received_matr),
+  
+  final as(
+  SELECT a.ref_id, value, ucd.use_case_name,
+  CASE WHEN ucd.use_case_name = 'BW per Student' THEN ia_bandwidth_per_student_kbps
+  WHEN ucd.use_case_name = 'Monthly Cost per Mbps' THEN ia_monthly_cost_per_mbps
+  WHEN ucd.use_case_name = 'Change in Total BW' THEN change_in_bw_tot
+  WHEN ucd.use_case_name = '% Change in BW' THEN change_in_bw_pct
+  WHEN ucd.use_case_name = 'Change in Total Monthly Cost' THEN change_in_cost_tot
+  WHEN ucd.use_case_name = '% Change in Monthly Cost' THEN change_in_cost_pct
+  END AS value_2016,
+  ARRAY_AGG(label) AS tags
+  FROM public.outliers a 
+  JOIN outlier_use_case_details ucd ON a.outlier_use_case_detail_id=ucd.outlier_use_case_detail_id
+  JOIN dd_2016_final dd ON a.ref_id::NUMERIC=dd.esh_id::NUMERIC
+  LEFT JOIN (SELECT * FROM public.tags WHERE funding_year = 2016 AND taggable_type='District') t 
+  ON a.ref_id::NUMERIC = t.taggable_id::NUMERIC 
+  WHERE ucd.use_case_name != 'Cost per Circuit'
+  GROUP BY 1,2,3,4
+  UNION
+  SELECT a.ref_id, value, ucd.use_case_name,
+  sr.line_item_recurring_elig_cost::NUMERIC / sr.line_item_total_num_lines::NUMERIC AS value_2016,
+  NULL AS tags
+  FROM public.outliers a 
+  JOIN outlier_use_case_details ucd ON a.outlier_use_case_detail_id=ucd.outlier_use_case_detail_id
+  LEFT JOIN public.cross_year_line_item_matches cm
+  ON a.ref_id::NUMERIC=cm.new_id::NUMERIC
+  LEFT JOIN sr_2016 sr ON cm.old_id::NUMERIC=sr.line_item_id::NUMERIC
+  WHERE ucd.use_case_name = 'Cost per Circuit'),
+  
+  UPDATE public.outliers a
+  SET end_dt = CURRENT_TIMESTAMP 
+  FROM final f
+  WHERE a.ref_id = f.ref_id
+  AND a.value=f.value
+  AND f.value = f.value_2016;"
+  }else if (reason=='cost exclude'){
+    script <- 
+    "with sr_2016 as(SELECT *
+    FROM public.fy2016_services_received_matr),
+
+    change_cost_exclude AS(
+    SELECT ref_id, a.outlier_use_case_detail_id, ucd.use_case_name
+    FROM public.outliers a
+    JOIN outlier_use_case_details ucd ON a.outlier_use_case_detail_id=ucd.outlier_use_case_detail_id 
+    JOIN sr_2016 sr ON a.ref_id::NUMERIC=sr.recipient_id::NUMERIC
+    WHERE 
+    'exclude_for_cost_only_unknown' = ANY(open_tags) 
+    AND ucd.use_case_name ILIKE '%Change%'
+    AND ucd.use_case_name ILIKE '%Cost%')
+
+    UPDATE public.outliers a
+    SET end_dt = CURRENT_TIMESTAMP 
+    FROM change_cost_exclude c
+    WHERE a.ref_id = c.ref_id
+    AND a.outlier_use_case_detail_id=c.outlier_use_case_detail_id;
+    "
   }
+    return(script)  
+}
 
 dml_builder <- function(values,script_type,postgres_table){
   

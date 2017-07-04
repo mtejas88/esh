@@ -21,14 +21,14 @@ options(java.parameters = "-Xmx4g" )
 github_path <- '~/sat_r_programs/R_database_access/'
 
 ## source environment variables
-source(paste(github_path, "source_env.R", sep=""))
+source(paste('~/Documents/ESH/ficher/General_Resources/common_functions/', "source_env.R", sep=""))
 source_env("~/.env")
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
 
 ## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "postgresql-9.4.1212.jre7.jar", sep=""), "`")
+pgsql <- JDBC("org.postgresql.Driver", paste('~/Documents/ESH/ficher/General_Resources/postgres_driver/', "postgresql-9.4.1212.jre7.jar", sep=""), "`")
 #pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
 
 ## connect to the database
