@@ -316,6 +316,8 @@ select distinct
 
   	bw_target_status,
 
+  	wifi_target_status,
+
 	upgrade_indicator,
 
 	ia_monthly_cost_district_applied,
@@ -347,7 +349,7 @@ on sle.postal_cd = dfpd.postal_cd
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi fields
+Last Modified Date: 7/5/2017 -- JH added wifi target status
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
