@@ -97,7 +97,7 @@ with school_calc as (
               when number_of_full_time_students::numeric > 0 then
                 case
                   when user_entered_urban_rural_status = 'Urban' then
-                    case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .01 then .20
+                    case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .10 then .20
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .20 then .40
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .35 then .50
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .50 then .60
@@ -326,7 +326,7 @@ group by
 /*
 Author: Justine Schott
 Created On Date: 10/14/2016
-Last Modified Date: 6/23/2017 -- JH change to 2017 methodology
+Last Modified Date: 7/5/2017 -- JH updated adj discount
 Name of QAing Analyst(s): Jess Seok
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
 Methodology:
