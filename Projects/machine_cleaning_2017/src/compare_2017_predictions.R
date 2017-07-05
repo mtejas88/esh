@@ -252,4 +252,19 @@ dev.off()
 #        panel.grid.minor = element_blank(), axis.line = element_line(colour = rgb(0,0,0,0.7)))
 #dev.off()
 
+##**************************************************************************************************************************************************
+## Create Subset for ENG Staging
 
+raw.ids <- unique(line.items.2017$frn_complete[line.items.2017$broadband == 't'])
+
+## subset the cleaned line items
+to.merge <- unique(cl.line.items.2017[cl.line.items.2017$frn_complete %in% raw.ids, c('frn_complete', 'id', 'connect_type', 'function.', 'connect_category')])
+## merge in id, current connect category, current function, and current connect type
+eng <- merge(to.merge, predictions[predictions$frn_complete %in% raw.ids,], by='frn_complete', all.y=T)
+eng$pred <- NULL
+eng <- unique(eng)
+eng <- eng[!is.na(eng$id),]
+length(unique(eng$id))
+
+## write out the dataset
+write.csv(eng, "data/interim/eng_subset_for_staging.csv", row.names=F)
