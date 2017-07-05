@@ -31,6 +31,7 @@ round_three as (select a.*,
 
 select
 	dd.postal_cd,
+	sum(dd.num_campuses) as num_campuses,
 	sum(dd.total_current_unscalable_campuses) as num_unscalable_campuses,
 	sum(dd.total_current_unscalable_campuses)/sum(dd.num_campuses) as pct_unscalable_campuses,
 	case

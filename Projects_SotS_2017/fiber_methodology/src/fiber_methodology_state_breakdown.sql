@@ -1,5 +1,6 @@
 select
 	dd.postal_cd,
+	sum(dd.num_campuses) as num_campuses,
 	sum(dd.current_assumed_unscalable_campuses+dd.current_known_unscalable_campuses) as num_unscalable_campuses,
 	sum(dd.current_assumed_unscalable_campuses+dd.current_known_unscalable_campuses)/sum(dd.num_campuses) as pct_unscalable_campuses,
 	case
