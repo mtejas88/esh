@@ -20,7 +20,8 @@ select distinct
 	discount_rate_c1::numeric/100 as discount_rate_c1,
 	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
 	discount_rate_c2::numeric/100 as discount_rate_c2,
-	c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
+	--no longer using this field
+	--c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget,
 	address,
 	city,
 	zip,
@@ -212,7 +213,8 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 5/26/2017 - added adjusted c1 discount rate
+Last Modified Date: 7/6/2017 - JH the new c2 methodology does not have the 
+discount rate for the remaining budget
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
