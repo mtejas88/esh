@@ -62,11 +62,33 @@ cl_combined$qa.state <- ifelse(cl_combined$postal_cd %in% states.qa, TRUE, FALSE
 ## combined QA with predictions
 dqt.qa <- merge(cl_combined, predictions, by='frn_complete', all=T)
 
-## create a subset where the state has been QA'd and there are no open flags
-dqt.qa <- dqt.qa[which(dqt.qa$qa.state == TRUE & is.na(dqt.qa$num_open_flags)),]
-
 ## create an indicator if the connect_category matches the predicted category
 dqt.qa$match <- ifelse(dqt.qa$connect_category == dqt.qa$pred_connect_category, TRUE, FALSE)
+
+## save the larger dataset
+dqt.qa.all <- dqt.qa
+
+## look at proportion of cases that don't match in the population
+table(dqt.qa.all$match)
+
+## create a subset where the state has been QA'd and there are no open flags
+dqt.qa <- dqt.qa[which(dqt.qa$qa.state == TRUE & is.na(dqt.qa$num_open_flags)),]
+## look at proportion of cases that don't match in the QA subset
+table(dqt.qa$match)
+
+## create an indicator for difference between highest predicted value and and the second highest
+## and also max probability
+dqt.qa$difference_between_1st_2nd <-  NA
+for (i in 1:nrow(dqt.qa)){
+  order.pred <- c(dqt.qa[i,91], dqt.qa[i,92], dqt.qa[i,93], dqt.qa[i,94], dqt.qa[i,95],
+                  dqt.qa[i,96], dqt.qa[i,97], dqt.qa[i,98], dqt.qa[i,99], dqt.qa[i,100])
+  order.pred <- order.pred[order(order.pred, decreasing=T)]
+  dqt.qa$difference_between_1st_2nd[i] <- order.pred[1] - order.pred[2]
+  dqt.qa$max_prob[i] <- order.pred[1]
+}
+range(dqt.qa$difference_between_1st_2nd, na.rm=T)
+range(dqt.qa$max_prob, na.rm=T)
+
 
 ## calculate the porportion of falses for each probability bucket
 prob.buckets <- seq(0,1,by=0.10)
@@ -116,19 +138,6 @@ dqt.qa$prob.bucket <- ifelse(dqt.qa$difference_between_1st_2nd < prob.buckets[2]
 
 ##**************************************************************************************************************************************************
 ## Compare with DQT results
-
-## create an indicator for difference between highest predicted value and and the second highest
-## and also max probability
-dqt.qa$difference_between_1st_2nd <-  NA
-for (i in 1:nrow(dqt.qa)){
-  order.pred <- c(dqt.qa[i,91], dqt.qa[i,92], dqt.qa[i,93], dqt.qa[i,94], dqt.qa[i,95],
-                  dqt.qa[i,96], dqt.qa[i,97], dqt.qa[i,98], dqt.qa[i,99], dqt.qa[i,100])
-  order.pred <- order.pred[order(order.pred, decreasing=T)]
-  dqt.qa$difference_between_1st_2nd[i] <- order.pred[1] - order.pred[2]
-  dqt.qa$max_prob[i] <- order.pred[1]
-}
-range(dqt.qa$difference_between_1st_2nd, na.rm=T)
-range(dqt.qa$max_prob, na.rm=T)
 
 sub.true <- dqt.qa[which(dqt.qa$match == TRUE),]
 sub.false <- dqt.qa[which(dqt.qa$match == FALSE),]
@@ -212,14 +221,6 @@ points(x=false.prop$bucket, y=false.prop$false.proportion, cex=1/50*sqrt(false.p
 dev.off()
 
 
-
-#for (i in 1:max(false.prop$bucket)){
-#  sub <- dqt.qa[which(dqt.qa$prob.bucket == i),]
-#  assign(paste("sub",i, sep="."), sub)
-#}
-
-
-
 ##**************************************************************************************************************************************************
 ## create histogram of probabilities
 
@@ -255,16 +256,16 @@ dev.off()
 ##**************************************************************************************************************************************************
 ## Create Subset for ENG Staging
 
-raw.ids <- unique(line.items.2017$frn_complete[line.items.2017$broadband == 't'])
+#raw.ids <- unique(line.items.2017$frn_complete[line.items.2017$broadband == 't'])
 
 ## subset the cleaned line items
-to.merge <- unique(cl.line.items.2017[cl.line.items.2017$frn_complete %in% raw.ids, c('frn_complete', 'id', 'connect_type', 'function.', 'connect_category')])
+#to.merge <- unique(cl.line.items.2017[cl.line.items.2017$frn_complete %in% raw.ids, c('frn_complete', 'id', 'connect_type', 'function.', 'connect_category')])
 ## merge in id, current connect category, current function, and current connect type
-eng <- merge(to.merge, predictions[predictions$frn_complete %in% raw.ids,], by='frn_complete', all.y=T)
-eng$pred <- NULL
-eng <- unique(eng)
-eng <- eng[!is.na(eng$id),]
-length(unique(eng$id))
+#eng <- merge(to.merge, predictions[predictions$frn_complete %in% raw.ids,], by='frn_complete', all.y=T)
+#eng$pred <- NULL
+#eng <- unique(eng)
+#eng <- eng[!is.na(eng$id),]
+#length(unique(eng$id))
 
 ## write out the dataset
-write.csv(eng, "data/interim/eng_subset_for_staging.csv", row.names=F)
+#write.csv(eng, "data/interim/eng_subset_for_staging.csv", row.names=F)
