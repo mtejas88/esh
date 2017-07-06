@@ -98,6 +98,7 @@ left join public.fy2015_districts_deluxe_m as dd_2015 on dd_2015.esh_id::char = 
 -- also take out states at the school-level (RI, HI, DE)
 WHERE dd_2016.postal_cd NOT IN ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DC', 'RI', 'HI', 'DE')
 GROUP BY dd_2016.postal_cd
+AND dd_2016.district_type = 'Traditional'
 
 UNION
 --National Aggregation
@@ -198,6 +199,7 @@ FROM public.fy2016_districts_deluxe_matr as dd_2016
 left join public.fy2015_districts_deluxe_m as dd_2015 on dd_2015.esh_id::char = dd_2016.esh_id
 -- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI, DC)
 WHERE dd_2016.postal_cd NOT IN ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DC')
+AND dd_2016.district_type = 'Traditional'
 GROUP BY 1
 ORDER BY postal_cd
 
