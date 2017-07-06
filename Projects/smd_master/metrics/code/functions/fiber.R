@@ -62,7 +62,7 @@ fiber <- function(sots.2015, dd.2015, ds.2015, dd.2016, ds.2016, dta, states.wit
   
   ## 2016 current:
   ## New Fiber Metric:
-  ## num_unscalable_campuses == [#scalable(B & C) + (%scalable C)*(#campuses A)]
+  ## num_scalable_campuses == [#scalable(B & C) + (%scalable C)*(#campuses A)]
   dd.2016.B$counter <- dd.2016.B$current_known_scalable_campuses + dd.2016.B$current_assumed_scalable_campuses
   campuses.on.fiber.2016.B <- aggregate(dd.2016.B$counter, by=list(dd.2016.B$postal_cd), FUN=sum, na.rm=T)
   names(campuses.on.fiber.2016.B) <- c('postal_cd', 'current16_campuses_on_fiber.B')
