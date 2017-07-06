@@ -49,3 +49,4 @@ dbDisconnect(con)
 
 ## write out dataset
 write.csv(matches, "data/matches.csv", row.names = FALSE)
+

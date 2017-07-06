@@ -26,21 +26,20 @@ matches <- read.csv("data/matches.csv", as.is=T, header=T, stringsAsFactors=F)
 # removing above threshold discussed with Marques
 matches <- matches[which(matches$match_score >= 215),]
 
-## isolated perfect matches that are dirty
-#commenting out, some of them still need field updates   perf_matches_dirty <- matches[which(matches$match_score == 368 & matches$new_status == "dirty"),]
-
 ## update connect_type
 for (i in 1:nrow(matches)){
-  if (is.na(matches$updated_connect_type[i]) == FALSE){
+  if (matches$old_purpose[i] == "ISP"){
+    matches$mu_connect_type[i] <- NA 
+  } else if (is.na(matches$updated_connect_type[i])==FALSE){
     matches$mu_connect_type[i] <- matches$old_connect_type[i]
-  } else {
-    matches$mu_connect_type[i] <- NA
-  }
+  } else matches$mu_connect_type[i] <- NA
 }
 
 ## update function
 for (i in 1:nrow(matches)){
-  if (is.na(matches$updated_function[i]) == FALSE){
+  if (matches$old_purpose[i] == "ISP"){
+    matches$mu_function[i] <- NA
+  } else if (is.na(matches$updated_function[i]) == FALSE){
     matches$mu_function[i] <- matches$old_function[i]
   } else {
     matches$mu_function[i] <- NA
@@ -78,7 +77,15 @@ for (i in 1:nrow(matches)){
   }
 }
 
-## remove ones where we aren't doing any mass updates
-#matches <- 
+## add note for engineering to allocated to recipients
+for (i in 1:nrow(matches)){
+  if (is.na(matches$updated_num_lines[i]) == TRUE){
+    matches$mu_note[i] <- NA
+  } else if (matches$updated_num_lines[i]=="Unknown"){
+    matches$mu_note[i] <- "Allocate to recipients"
+  } else {
+    matches$mu_note[i] <- NA
+  }
+}
 
 write.csv(matches, "data/mass_update_matches.csv", row.names = FALSE)
