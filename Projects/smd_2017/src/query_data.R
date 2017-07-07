@@ -109,4 +109,3 @@ date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
 names(date.dta) <- 'date'
 date.dta$date <- strsplit(date, "_")[[1]][1]
 write.csv(date.dta, "data/raw/date.csv", row.names=F)
-

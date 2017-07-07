@@ -1,4 +1,5 @@
 SELECT dd_2017.postal_cd,
+
 --State Aggregation
 ----------------------
 
