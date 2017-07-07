@@ -61,6 +61,7 @@ select base.*,
 FROM (
           SELECT
             li.id AS line_item_id,
+            eli.id AS irt_line_item_id,
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
@@ -138,53 +139,36 @@ FROM (
             dd.exclude_from_wan_analysis AS recipient_exclude_from_wan_analysis,
             dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
             dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
-            case when
-            d.consortium_affiliation is null
-            then false
-            else true
-            end as recipient_consortium_member
-          --  d.consortium_member AS recipient_consortium_member commenting out the fy2016 districts column, utilizng district deluxe for consortium member
-
-          FROM public.fy2017_lines_to_district_by_line_item_matr lid
-          LEFT OUTER JOIN (select * from public.fy2017_esh_line_items_v
-            where funding_year = 2017) li
+            d.consortium_member AS recipient_consortium_member
+          FROM public.fy2016_lines_to_district_by_line_item_matr lid
+          LEFT OUTER JOIN fy2016.line_items li
           ON li.id = lid.line_item_id
+          LEFT OUTER JOIN public.esh_line_items eli 
+          on eli.base_line_item_id = lid.line_item_id
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
             select distinct name, reporting_name
-            from public.esh_service_providers
+            from fy2016.service_providers
           ) spc
           ON spc.name = li.service_provider_name
-          LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr dd
+          LEFT OUTER JOIN public.fy2016_districts_predeluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
-          left join public.fy2017_districts_aggregation_matr d
-
-
-          on dd.esh_id = d.district_esh_id
-
-          --left outer join public.fy2017_districts_deluxe_matr d
-          --on dd.esh_id = d.esh_id
-
-        /*LEFT OUTER JOIN fy2016.districts d
-          --LEFT OUTER JOIN fy2017_districts_deluxe_matr d
-          --ON dd.esh_id::numeric = d.esh_id
-          --WHERE li.broadband --commenting out fy2016 districts table and utilizing districts deluxe for consortum member
-          Dropping district deluxe join as it creates circular dependency and utiliing districts aggregation materialized view
-          for consortium_member field decipher
-*/
-		
+          LEFT OUTER JOIN fy2016.districts d
+          ON dd.esh_id::numeric = d.esh_id
+          WHERE li.broadband
+          AND eli.funding_year = 2016
 ) base
 left join (
           select  ldli.line_item_id,
                   sum(d.num_students::numeric) as num_students_served
 
-          from public.fy2017_lines_to_district_by_line_item_matr ldli
+          from public.fy2016_lines_to_district_by_line_item_matr ldli
 
-          left join public.fy2017_districts_demog_matr d
+          left join public.fy2016_districts_demog_matr d
           on ldli.district_esh_id = d.esh_id
 
-          left join public.fy2017_esh_line_items_v li
+          left join fy2016.line_items li
           on ldli.line_item_id = li.id
 
           where (li.consortium_shared=true
@@ -194,27 +178,11 @@ left join (
 ) district_info_by_li
 on base.line_item_id=district_info_by_li.line_item_id
 
-
-
-
-
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       6/23/2017 - JH added mrc unless null calculations
+Last Modified Date:        6/23/2017 - JH added mrc unless null calculations
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
-Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-might need to add below two additional attributes
---and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
---and sfdc.charter__c = false -- not charters
-
-Dependencies: [endpoint.fy2017_lines_to_district_by_line_item, fy2017.esh_line_items_v, public.entity_bens, endpoint.fy2017_districts_predeluxe, 
-salesforce.facilities__c, endpoint.fy2017_districts_demog, endpoint.fy2017_districts_aggregation, fy2017.esh_line_items_v]
 */

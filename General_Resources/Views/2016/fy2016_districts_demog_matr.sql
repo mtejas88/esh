@@ -1,5 +1,5 @@
 select  case
-          when eim.entity_id is null then 'Unknown'
+          when eim.entity_id is null then 'Unknown for 2015'
             else eim.entity_id::varchar
         end as esh_id,
         d."LEAID" as nces_cd,
@@ -9,33 +9,33 @@ select  case
           when "FIPST" = '59' then 'BIE'
           when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
                   (case
-                      when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end != 'VT' then "TYPE" in ('1', '2', '7')
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
                       else false
                     end )
                   --in RI and MA we also include 4's with majority type 1 schools.
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('RI', 'MA')
+                  or (d."LSTATE" in ('RI', 'MA')
                       and "TYPE" = '4'
                       and sc.school_type_1_count/sc.school_count::numeric >= .75 )
                   --in NY we also include 3's, in VT we only include 3's
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('VT', 'NY')
+                  or (d."LSTATE" in ('VT', 'NY')
                       and "TYPE" = '3') )
             then 'Traditional'
           else 'Other Agency'
         end as district_type,
-        d."LSTREET1" as address,
+        d."LSTREE" as address,
         d."LCITY" as city,
         d."LZIP" as zip,
         d."CONAME" as county,
-        case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end as postal_cd,
+        d."LSTATE" as postal_cd,
         d."LATCOD" as latitude,
         d."LONCOD" as longitude,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then case
+          when d."LSTATE" = 'VT' then case
                                         when sc_VT.student_count - sc_VT.student_pk_count is null
                                           then 0
                                         else sc_VT.student_count - sc_VT.student_pk_count
                                       end
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then case
+          when d."LSTATE" = 'MT' then case
                                         when sc_MT.student_count - sc_MT.student_pk_count is null
                                           then 0
                                         else sc_MT.student_count - sc_MT.student_pk_count
@@ -52,12 +52,12 @@ select  case
                   end
         end as num_students,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then case
+          when d."LSTATE" = 'VT' then case
                                         when sc_VT.school_count is null
                                           then 0
                                         else sc_VT.school_count
                                       end
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then case
+          when d."LSTATE" = 'MT' then case
                                         when sc_MT.school_count is null
                                           then 0
                                         else sc_MT.school_count
@@ -82,7 +82,7 @@ select  case
             else 'Unknown'
         end as locale,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then case
+          when d."LSTATE" = 'VT' then case
                                       when sc_VT.school_count=1 then 'Tiny'
                                       when sc_VT.school_count>1 and sc_VT.school_count<=5 then 'Small'
                                       when sc_VT.school_count>5 and sc_VT.school_count<=15 then 'Medium'
@@ -90,7 +90,7 @@ select  case
                                       when sc_VT.school_count>50 then 'Mega'
                                         else 'Unknown'
                                     end
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then case
+          when d."LSTATE" = 'MT' then case
                                       when sc_MT.school_count=1 then 'Tiny'
                                       when sc_MT.school_count>1 and sc_MT.school_count<=5 then 'Small'
                                       when sc_MT.school_count>5 and sc_MT.school_count<=15 then 'Medium'
@@ -119,30 +119,30 @@ select  case
         case
           when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
                   (case
-                      when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end != 'VT' then "TYPE" in ('1', '2', '7')
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
                       else false
                     end )
                   --in RI and MA we also include 4's with majority type 1 schools.
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('RI', 'MA')
+                  or (d."LSTATE" in ('RI', 'MA')
                       and "TYPE" = '4'
                       and sc.school_type_1_count/sc.school_count::numeric >= .75 )
                   --in NY we also include 3's, in VT we only include 3's
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('VT', 'NY')
+                  or (d."LSTATE" in ('VT', 'NY')
                       and "TYPE" = '3') )
-          and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
+          and d."LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
           and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
           and ( sc.student_count - sc.student_pk_count  >0
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
+                or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
+                or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
                 or (eim.entity_id = '946654' and sc_NY.student_count - sc_NY.student_pk_count  >0)
                 or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts
           and ( (sc.school_count) > 0
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' and (sc_MT.school_count)>0)
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
+                or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)
+                or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
                 or (eim.entity_id = '946654' and (sc_NY.school_count)>0)
           and "BOUND" != '2' --closed districts
             then  case
-                    when "TYPE" != '7' or case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'AZ'
+                    when "TYPE" != '7' or d."LSTATE" = 'AZ'
                       then true
                     else false
                   end
@@ -151,34 +151,34 @@ select  case
         case
           when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
                   (case
-                      when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end != 'VT' then "TYPE" in ('1', '2', '7')
+                      when d."LSTATE" != 'VT' then "TYPE" in ('1', '2', '7')
                       else false
                     end )
                   --in RI and MA we also include 4's with majority type 1 schools.
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('RI', 'MA')
+                  or (d."LSTATE" in ('RI', 'MA')
                       and "TYPE" = '4'
                       and sc.school_type_1_count/sc.school_count::numeric >= .75 )
                   --in NY we also include 3's, in VT we only include 3's
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('VT', 'NY')
+                  or (d."LSTATE" in ('VT', 'NY')
                       and "TYPE" = '3') )
-          and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
+          and d."LSTATE" not in ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DD') --don't want to include districts in territories
           and left("ULOCAL",1) in ('1', '2', '3', '4')      --want to include districts with known locales
           and ( sc.student_count - sc.student_pk_count  >0
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
+                or (d."LSTATE" = 'MT' and sc_MT.student_count - sc_MT.student_pk_count  >0)
+                or (d."LSTATE" = 'VT' and sc_VT.student_count - sc_VT.student_pk_count  >0) --want to include districts with at least 1 student,
                 or (eim.entity_id = '946654' and sc_NY.student_count - sc_NY.student_pk_count  >0)
                 or "FIPST" = '59' )                                                        --also, we want to include BIE's without student counts
           and ( (sc.school_count) > 0
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' and (sc_MT.school_count)>0)
-                or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
+                or (d."LSTATE" = 'MT' and (sc_MT.school_count)>0)
+                or (d."LSTATE" = 'VT' and (sc_VT.school_count)>0) ) --want to include districts with at least 1 school
                 or (eim.entity_id = '946654' and (sc_NY.school_count)>0)
           and "BOUND" != '2' --closed districts
             then  true
           else false
         end as include_in_universe_of_districts_all_charters,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then stf_VT.num_teachers
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then stf_MT.num_teachers
+          when d."LSTATE" = 'VT' then stf_VT.num_teachers
+          when d."LSTATE" = 'MT' then stf_MT.num_teachers
           when eim.entity_id = '946654' then stf_NY.num_teachers
             else  case when "KGTCH" < 0 then 0 else "KGTCH" end
                 + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
@@ -186,14 +186,14 @@ select  case
                 + case when "UGTCH" < 0 then 0 else "UGTCH" end
         end as num_teachers,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then stf_VT.num_aides
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then stf_MT.num_aides
+          when d."LSTATE" = 'VT' then stf_VT.num_aides
+          when d."LSTATE" = 'MT' then stf_MT.num_aides
           when eim.entity_id = '946654' then stf_NY.num_aides
             else  case when "AIDES" < 0 then 0 else "AIDES" end
         end as num_aides,
         case
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then stf_VT.num_other_staff
-          when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'MT' then stf_MT.num_other_staff
+          when d."LSTATE" = 'VT' then stf_VT.num_other_staff
+          when d."LSTATE" = 'MT' then stf_MT.num_other_staff
           when eim.entity_id = '946654' then stf_NY.num_other_staff
             else  case when "CORSUP" < 0 then 0 else "CORSUP" end
                 + case when "ELMGUI" < 0 then 0 else "ELMGUI" end
@@ -210,7 +210,7 @@ select  case
                 + case when "OTHSUP" < 0 then 0 else "OTHSUP" end
         end as num_other_staff
 
-from public.ag141a d
+from public.ag131a d
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
 on RPAD(d."LEAID",12,'0')=eim.nces_code
@@ -236,10 +236,10 @@ left join ( select  "LEAID",
                                 and "MEMBER"::numeric > 0 and "PK"::numeric > 0 then "PK"::numeric
                             else 0
                         end) as student_pk_count
-            from public.sc141a
+            from public.sc131a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc141a."NCESSCH" = eim.nces_code
+            on sc131a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
@@ -247,10 +247,9 @@ left join ( select  "LEAID",
                                 then 1
                             end) as closed_school_count,
                       count(*) as removed_school_count
-              from public.flags
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
@@ -280,22 +279,21 @@ left join ( select  "UNION",
                         end) as student_pk_count,
                     count(distinct  case
                                       when flaggable_id is null
-                                        then sc141a."LEAID"
+                                        then sc131a."LEAID"
                                     end) as district_count
-            from public.sc141a
+            from public.sc131a
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc141a."NCESSCH" = eim.nces_code
+            on sc131a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
                               when label = 'closed_school'
                                 then 1
                             end) as include_students
-              from public.flags
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
@@ -303,121 +301,119 @@ left join ( select  "UNION",
             group by  "UNION",
                       "LSTATE" ) sc_VT
 on d."UNION"=sc_VT."UNION"
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=sc_VT."LSTATE"
+and d."LSTATE"=sc_VT."LSTATE"
 
-left join ( select  ag141a."LSTREET1",
-                    ag141a."LCITY",
-                    ag141a."LSTATE",
+left join ( select  ag131a."LSTREE",
+                    ag131a."LCITY",
+                    ag131a."LSTATE",
                     sum(case
                             when flaggable_id is null
                               then 1
                             else 0
                           end) as school_count,
                     sum(case
-                            when flaggable_id is null and sc141a."TYPE" = '1'
+                            when flaggable_id is null and sc131a."TYPE" = '1'
                               then 1
                             else 0
                           end) as school_type_1_count,
                     sum(case
                           when (flaggable_id is null or include_students > 0)
-                                and sc141a."MEMBER"::numeric > 0 then sc141a."MEMBER"::numeric
+                                and sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
                           when  (flaggable_id is null or include_students > 0)
-                                and sc141a."MEMBER"::numeric > 0 and sc141a."PK"::numeric > 0 then sc141a."PK"::numeric
+                                and sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
                             else 0
                         end) as student_pk_count,
                     count(distinct  case
                                       when flaggable_id is null
-                                        then sc141a."LEAID"
+                                        then sc131a."LEAID"
                                     end) as district_count
-            from public.sc141a
-            left join ag141a
-            on sc141a."LEAID" = ag141a."LEAID"
+            from public.sc131a
+            left join ag131a
+            on sc131a."LEAID" = ag131a."LEAID"
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc141a."NCESSCH" = eim.nces_code
+            on sc131a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
                               when label = 'closed_school'
                                 then 1
                             end) as include_students
-              from public.flags
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where sc141a."LSTATE" = 'MT' --only smushing by district LSTREET1 for districts in MT
-            group by  ag141a."LSTREET1",
-                      ag141a."LCITY",
-                      ag141a."LSTATE" ) sc_MT
-on d."LSTREET1"=sc_MT."LSTREET1"
+            where sc131a."LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
+            group by  ag131a."LSTREE",
+                      ag131a."LCITY",
+                      ag131a."LSTATE" ) sc_MT
+on d."LSTREE"=sc_MT."LSTREE"
 and d."LCITY"=sc_MT."LCITY"
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=sc_MT."LSTATE"
+and d."LSTATE"=sc_MT."LSTATE"
 
 left join ( select  case
-                      when ag141a."NAME" ilike '%geographic%' or ag141a."LEAID" = '3620580'
+                      when ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
                         then true
                       else false
                     end as nyps_indicator,
-                    ag141a."LSTATE",
+                    ag131a."LSTATE",
                     sum(case
                             when flaggable_id is null
                               then 1
                             else 0
                           end) as school_count,
                     sum(case
-                            when flaggable_id is null and sc141a."TYPE" = '1'
+                            when flaggable_id is null and sc131a."TYPE" = '1'
                               then 1
                             else 0
                           end) as school_type_1_count,
                     sum(case
                           when (flaggable_id is null or include_students > 0)
-                                and sc141a."MEMBER"::numeric > 0 then sc141a."MEMBER"::numeric
+                                and sc131a."MEMBER"::numeric > 0 then sc131a."MEMBER"::numeric
                             else 0
                         end) as student_count,
                     sum(case
                           when  (flaggable_id is null or include_students > 0)
-                                and sc141a."MEMBER"::numeric > 0 and sc141a."PK"::numeric > 0 then sc141a."PK"::numeric
+                                and sc131a."MEMBER"::numeric > 0 and sc131a."PK"::numeric > 0 then sc131a."PK"::numeric
                             else 0
                         end) as student_pk_count,
                     count(distinct  case
                                       when flaggable_id is null
-                                        then sc141a."LEAID"
+                                        then sc131a."LEAID"
                                     end) as district_count
-            from public.sc141a
-            left join ag141a
-            on sc141a."LEAID" = ag141a."LEAID"
+            from public.sc131a
+            left join ag131a
+            on sc131a."LEAID" = ag131a."LEAID"
             left join ( select distinct entity_id, nces_code
                         from public.entity_nces_codes) eim
-            on sc141a."NCESSCH" = eim.nces_code
+            on sc131a."NCESSCH" = eim.nces_code
             left join (
               select  flaggable_id,
                       count(case
                               when label = 'closed_school'
                                 then 1
                             end) as include_students
-              from public.flags
+              from fy2016.flags
               where label in ('closed_school', 'non_school', 'charter_school')
               and status = 'open'
-  and funding_year = 2017 --adding funding year filter for public flags
               group by flaggable_id
             ) t
             on eim.entity_id = t.flaggable_id
-            where sc141a."LSTATE" = 'NY'
-            and (ag141a."NAME" ilike '%geographic%' or ag141a."LEAID" = '3620580')
+            where sc131a."LSTATE" = 'NY'
+            and (ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580')
             group by  case
-                        when ag141a."NAME" ilike '%geographic%' or ag141a."LEAID" = '3620580'
+                        when ag131a."NAME" ilike '%geographic%' or ag131a."LEAID" = '3620580'
                           then true
                         else false
                       end,
-                      ag141a."LSTATE" ) sc_NY
+                      ag131a."LSTATE" ) sc_NY
 on (eim.entity_id = '946654') = sc_NY.nyps_indicator
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=sc_NY."LSTATE"
+and d."LSTATE"=sc_NY."LSTATE"
 
 left join ( select  "UNION",
                     "LSTATE",
@@ -440,16 +436,16 @@ left join ( select  "UNION",
                         + case when "STUSUP" < 0 then 0 else "STUSUP" end
                         + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
 
-            from public.ag141a
+            from public.ag131a
             where "LSTATE" = 'VT' --only smushing by UNION for districts in VT
             group by  "UNION",
                       "LSTATE" ) stf_VT
 on d."UNION"=stf_VT."UNION"
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=stf_VT."LSTATE"
+and d."LSTATE"=stf_VT."LSTATE"
 
-left join ( select  ag141a."LSTREET1",
-                    ag141a."LCITY",
-                    ag141a."LSTATE",
+left join ( select  ag131a."LSTREE",
+                    ag131a."LCITY",
+                    ag131a."LSTATE",
                     sum(  case when "KGTCH" < 0 then 0 else "KGTCH" end
                         + case when "ELMTCH" < 0 then 0 else "ELMTCH" end
                         + case when "SECTCH" < 0 then 0 else "SECTCH" end
@@ -468,14 +464,14 @@ left join ( select  ag141a."LSTREET1",
                         + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
                         + case when "STUSUP" < 0 then 0 else "STUSUP" end
                         + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
-            from ag141a
-            where "LSTATE" = 'MT' --only smushing by district LSTREET1 for districts in MT
-            group by  "LSTREET1",
+            from ag131a
+            where "LSTATE" = 'MT' --only smushing by district LSTREE for districts in MT
+            group by  "LSTREE",
                       "LCITY",
                       "LSTATE" ) stf_MT
-on d."LSTREET1"=stf_MT."LSTREET1"
+on d."LSTREE"=stf_MT."LSTREE"
 and d."LCITY"=stf_MT."LCITY"
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=stf_MT."LSTATE"
+and d."LSTATE"=stf_MT."LSTATE"
 
 left join ( select  case
                       when "NAME" ilike '%geographic%' or "LEAID" = '3620580'
@@ -502,7 +498,7 @@ left join ( select  case
                         + case when "SCHSUP" < 0 then 0 else "SCHSUP" end
                         + case when "STUSUP" < 0 then 0 else "STUSUP" end
                         + case when "OTHSUP" < 0 then 0 else "OTHSUP" end)  as num_other_staff
-            from ag141a
+            from ag131a
             where "LSTATE" = 'NY'
             and ("NAME" ilike '%geographic%' or "LEAID" = '3620580')
             group by  case
@@ -512,7 +508,7 @@ left join ( select  case
                       end,
                       "LSTATE" ) stf_NY
 on (eim.entity_id = '946654') = sc_NY.nyps_indicator
-and case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end=sc_NY."LSTATE"
+and d."LSTATE"=sc_NY."LSTATE"
 
 where case --only include the HS district when smushing MT districts (exclude the ELEM)
         when sc_MT.district_count > 1
@@ -536,20 +532,15 @@ where case --only include the HS district when smushing MT districts (exclude th
                               '3027810','3028750','3028140','3028590')
         else true
       end
-and not(case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
-and not(case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'NY' and "NAME" ilike '%geographic%') --only include the 'geographic' districts in NYPS
+and not(d."LSTATE" = 'VT' and "TYPE" in ('1', '2')) --only include the TYPE 3 when smushing VT districts
+and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'geographic' districts in NYPS
 
-and eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */
 /*
 Author: Justine Schott
-Date: 6/20/2016
-Last Modified Date: 6/23 - JH - changed postal cd to reference STABR. only changes 11 district postal codes in our universe
+Incorporated On Date: 6/20/2016
+Last Modified Date: 3/21/2017 --  smush MT by both address AND city, not just address
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
-Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before
-metrics aggregation so school-district association can be applied. Excluded schools have flags to be removed from the population.
-
-Purpose: Refactoring tables for 2017 data
-Methodology: Using new tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
-Usage of public.flags & funding_year clause
+Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
+metrics aggregation so school-district association can be aligned. Excluded schools have flags to be removed from the population.
 */

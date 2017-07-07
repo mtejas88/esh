@@ -2,22 +2,10 @@ with school_calc as (
   select  *,
           budget_remaining_c2_2015*c2_discount_rate as budget_remaining_c2_2015_postdiscount,
           budget_remaining_c2_2016*c2_discount_rate as budget_remaining_c2_2016_postdiscount,
-          budget_remaining_c2_2017*c2_discount_rate as budget_remaining_c2_2017_postdiscount,
           row_number() over(
             partition by school_esh_id
             order by budget_remaining_c2_2016*c2_discount_rate asc
           ) as filtering_number
-  from(
-    select *,
-            case
-              when budget_remaining_c2_2016 < amount_c2_2017
-                then 0
-              else budget_remaining_c2_2016 - case
-                                                when amount_c2_2017 is null
-                                                  then 0
-                                                else amount_c2_2017
-                                              end
-            end as budget_remaining_c2_2017
 
     from (
       select  *,
@@ -54,8 +42,6 @@ with school_calc as (
                 amount_c2_2015_incl_not_funded,
                 amount_c2_2016,
                 amount_c2_2016_incl_denied,
-                amount_c2_2017,
-                amount_c2_2017_incl_denied,
                 case
                   when c2_budget < amount_c2_2015
                     then 0
@@ -111,7 +97,7 @@ with school_calc as (
               when number_of_full_time_students::numeric > 0 then
                 case
                   when user_entered_urban_rural_status = 'Urban' then
-                    case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .01 then .20
+                    case  when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .10 then .20
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .20 then .40
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .35 then .50
                           when number_of_nlsp_students::numeric/number_of_full_time_students::numeric < .50 then .60
@@ -137,12 +123,12 @@ with school_calc as (
                 end
             else .7
           end as c2_discount_rate
-          from public.fy2017_schools_demog_matr sd
+          from public.fy2016_schools_demog_matr sd
           left join public.entity_bens eb
           on sd.school_esh_id = eb.entity_id::varchar
           left join fy2016.entity_reports er
           on er.entity_number = eb.ben
-          left join public.fy2017_districts_demog_matr dd
+          left join public.fy2016_districts_demog_matr dd
           on sd.district_esh_id = dd.esh_id
           where dd.include_in_universe_of_districts_all_charters = true
         ) entities
@@ -238,56 +224,8 @@ with school_calc as (
           group by 1
         ) c2_allocations_2016
         on entities.ben = c2_allocations_2016.ben
-        left join (
-          select
-            ros.ben,
-            sum(case
-                  when frn_status not in ('Denied', 'Cancelled')
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (amount::numeric/a.alloc_cat_2_cost)*case
-                                                                when li.total_cost is null
-                                                                  then a.alloc_cat_2_cost
-                                                                else li.total_cost
-                                                              end
-                  else 0
-                end) as amount_c2_2017,
-            sum((amount::numeric/a.alloc_cat_2_cost)* case
-                                                        when li.total_cost is null
-                                                          then a.alloc_cat_2_cost
-                                                        else li.total_cost
-                                                      end) as amount_c2_2017_incl_denied
-          from fy2017.recipients_of_services ros
-          left join public.esh_line_items li
-          on ros.line_item = li.frn_complete
-          and li.funding_year = 2017
-          left join public.funding_requests_2016_and_later fr
-          on ros.frn = fr.frn
-          left join (
-            select
-              line_item,
-              sum(case
-                    when amount::numeric > 0
-                      then amount::numeric
-                    else 0
-                  end) as alloc_cat_2_cost
-              from fy2017.recipients_of_services ros
-              left join fy2017.basic_informations bi
-              on ros.application_number = bi.application_number
-              where bi.category_of_service::numeric = 2
-            group by 1
-          ) a
-          on a.line_item = li.frn_complete
-          left join fy2017.basic_informations bi
-          on ros.application_number = bi.application_number
-          where bi.category_of_service::numeric = 2
-          and alloc_cat_2_cost > 0
-          group by 1
-        ) c2_allocations_2017
-        on entities.ben = c2_allocations_2017.ben
       ) c2_budgeting
     ) c2_remaining_16
-  ) c2_remaining_17
 ),
 
 schools as (
@@ -307,18 +245,14 @@ c2_budget,
 c2_budget_postdiscount,
 budget_remaining_c2_2015,
 budget_remaining_c2_2016,
-budget_remaining_c2_2017,
 budget_remaining_c2_2015_postdiscount,
 budget_remaining_c2_2016_postdiscount,
-budget_remaining_c2_2017_postdiscount,
 .9 * c2_budget as c2_budget_haircut,
 .9 * c2_budget_postdiscount as c2_budget_postdiscount_haircuit,
 .9 * budget_remaining_c2_2015 as budget_remaining_c2_2015_haircut,
 .9 * budget_remaining_c2_2016 as budget_remaining_c2_2016_haircut,
-.9 * budget_remaining_c2_2017 as budget_remaining_c2_2017_haircut,
 .9 * budget_remaining_c2_2015_postdiscount as budget_remaining_c2_2015_postdiscount_haircut,
 .9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2017_postdiscount_haircut,
 case
   when (c2_budget) > (budget_remaining_c2_2015)
     then true
@@ -330,11 +264,6 @@ case
   else false
 end as received_c2_16,
 case
-  when (budget_remaining_c2_2016) > (budget_remaining_c2_2017)
-    then true
-  else false
-end as received_c2_17,
-case
   when (budget_remaining_c2_2015) = 0
     then true
   else false
@@ -343,12 +272,7 @@ case
   when (budget_remaining_c2_2016) = 0
     then true
   else false
-end as budget_used_c2_16,
-case
-  when (budget_remaining_c2_2017) = 0
-    then true
-  else false
-end as budget_used_c2_17
+end as budget_used_c2_16
 
 from school_calc
 
@@ -364,18 +288,14 @@ select
   sum(c2_budget_postdiscount) as c2_budget_postdiscount,
   sum(budget_remaining_c2_2015) as budget_remaining_c2_2015,
   sum(budget_remaining_c2_2016) as budget_remaining_c2_2016,
-  sum(budget_remaining_c2_2017) as budget_remaining_c2_2017,
   sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
   sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
-  sum(budget_remaining_c2_2017_postdiscount) as budget_remaining_c2_2017_postdiscount,
   sum(c2_budget_haircut) as c2_budget_haircut,
   sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
   sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
   sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
-  sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
   sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
   sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
-  sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
   case
     when sum(c2_budget) > sum(budget_remaining_c2_2015)
       then true
@@ -387,11 +307,6 @@ select
     else false
   end as received_c2_16,
   case
-    when sum(budget_remaining_c2_2016) > sum(budget_remaining_c2_2017)
-      then true
-    else false
-  end as received_c2_17,
-  case
     when sum(budget_remaining_c2_2015) = 0
       then true
     else false
@@ -400,12 +315,7 @@ select
     when sum(budget_remaining_c2_2016) = 0
       then true
     else false
-  end as budget_used_c2_16,
-  case
-    when sum(budget_remaining_c2_2017) = 0
-      then true
-    else false
-  end as budget_used_c2_17
+  end as budget_used_c2_16
 
 from
   schools
@@ -414,11 +324,10 @@ group by
   district_esh_id
 
 /*
-Author: Jeremy Holtzman
-Created On Date: 5/30/2017
-Last Modified Date: 6/23/2017 - JH got rid of rounded c2
-Name of QAing Analyst(s):
-Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
-Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
-that the C2 remaining budget does not always match USAC
+Author: Justine Schott
+Created On Date: 10/14/2016
+Last Modified Date: 7/5/2017 -- JH updated adj discount
+Name of QAing Analyst(s): Jess Seok
+Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget
+Methodology:
 */

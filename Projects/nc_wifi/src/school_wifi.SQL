@@ -288,9 +288,8 @@ with school_calc as (
       ) c2_budgeting
     ) c2_remaining_16
   ) c2_remaining_17
-),
+)
 
-schools as (
 
 select district_esh_id,
 school_esh_id,
@@ -353,72 +352,11 @@ end as budget_used_c2_17
 from school_calc
 
 where filtering_number = 1
-
-order by budget_remaining_c2_2016_postdiscount desc
-
+and district_esh_id in (
+  select esh_id
+  from public.fy2017_districts_deluxe_matr
+  where postal_cd = 'NC'
+  and include_in_universe_of_districts = true
 )
 
-select
-  district_esh_id as esh_id,
-  sum(c2_budget) as c2_budget,
-  sum(c2_budget_postdiscount) as c2_budget_postdiscount,
-  sum(budget_remaining_c2_2015) as budget_remaining_c2_2015,
-  sum(budget_remaining_c2_2016) as budget_remaining_c2_2016,
-  sum(budget_remaining_c2_2017) as budget_remaining_c2_2017,
-  sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
-  sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
-  sum(budget_remaining_c2_2017_postdiscount) as budget_remaining_c2_2017_postdiscount,
-  sum(c2_budget_haircut) as c2_budget_haircut,
-  sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
-  sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
-  sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
-  sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
-  sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
-  sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
-  sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
-  case
-    when sum(c2_budget) > sum(budget_remaining_c2_2015)
-      then true
-    else false
-  end as received_c2_15,
-  case
-    when sum(budget_remaining_c2_2015) > sum(budget_remaining_c2_2016)
-      then true
-    else false
-  end as received_c2_16,
-  case
-    when sum(budget_remaining_c2_2016) > sum(budget_remaining_c2_2017)
-      then true
-    else false
-  end as received_c2_17,
-  case
-    when sum(budget_remaining_c2_2015) = 0
-      then true
-    else false
-  end as budget_used_c2_15,
-  case
-    when sum(budget_remaining_c2_2016) = 0
-      then true
-    else false
-  end as budget_used_c2_16,
-  case
-    when sum(budget_remaining_c2_2017) = 0
-      then true
-    else false
-  end as budget_used_c2_17
-
-from
-  schools
-
-group by
-  district_esh_id
-
-/*
-Author: Jeremy Holtzman
-Created On Date: 5/30/2017
-Last Modified Date: 6/23/2017 - JH got rid of rounded c2
-Name of QAing Analyst(s):
-Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
-Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
-that the C2 remaining budget does not always match USAC
-*/
+order by budget_remaining_c2_2016_postdiscount desc

@@ -7,10 +7,11 @@
 ## Clearing memory
 rm(list=ls())
 
-setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
+setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv")
+packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv","knitr","rmarkdown","DBI")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
@@ -25,6 +26,9 @@ library(ggplot2) # for ggplot vizes (i.e. square colored box with status suchc a
 library(DT) # need for datatables
 library(htmltools) # need for html use in code (I think)
 library(dotenv)
+library(knitr)
+library(rmarkdown)
+library(DBI)
 
 apply_state_names <- function(dta){
   ## add state name to state aggregation
@@ -42,7 +46,7 @@ source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## option to deploy the tool
-deploy <- 1
+deploy <- 0
 
 ##**************************************************************************************************************************************************
 ## READ DATA
@@ -121,7 +125,7 @@ overlap.ids <- dd_2017_cl$esh_id[which(dd_2017_cl$esh_id %in% dd_2016_cl$esh_id)
 
 ## 2017
 upgrades.click.through <- dd_2017_cl[dd_2017_cl$esh_id %in% overlap.ids, c('esh_id', 'name', 'postal_cd', 'locale',
-                                                               'district_size', 'upgrade_indicator', cols.to.merge.each.year)]
+                                                               'district_size', 'upgrade_indicator', 'outlier_status', cols.to.merge.each.year)]
 names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -145,7 +149,7 @@ cols.to.merge.each.year <- c('ia_bandwidth_per_student_kbps', 'meeting_2014_goal
                              'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date')
 ## 2017
 connectivity.click.through <- dd_2017[,c('esh_id', 'postal_cd', 'name', 'locale', 'district_size', 'num_schools',
-                                         'num_students', cols.to.merge.each.year, 'bw_target_status', names(dd_2017)[grepl('exclude', names(dd_2017))])]
+                                         'num_students', 'outlier_status', cols.to.merge.each.year, 'bw_target_status', names(dd_2017)[grepl('exclude', names(dd_2017))])]
 names(connectivity.click.through)[names(connectivity.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(connectivity.click.through)[names(connectivity.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -197,7 +201,7 @@ cols.to.merge.each.year <- c('ia_monthly_cost_per_mbps', 'ia_bw_mbps_total', 'ia
 ## 2017
 affordability.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size',
                                            'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
-                                           'num_internet_upstream_lines', 'num_students', cols.to.merge.each.year)]
+                                           'num_internet_upstream_lines', 'num_students', 'outlier_status', cols.to.merge.each.year)]
 names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -223,7 +227,7 @@ cols.to.merge.each.year <- c('bundled_and_dedicated_isp_sp', 'most_recent_ia_con
 ## 2017
 connectivity.targets <- dd_2017[which(dd_2017$bw_target_status == 'Target' | dd_2017$bw_target_status == 'Potential Target'),]
 connectivity.targets <- connectivity.targets[,c('esh_id', 'postal_cd', 'name', 'locale', 'district_size', 'num_schools',
-                                                cols.to.merge.each.year, 'num_students', 'ia_bandwidth_per_student_kbps',
+                                                cols.to.merge.each.year, 'num_students', 'outlier_status', 'ia_bandwidth_per_student_kbps',
                                                 'ia_bw_mbps_total', 'ia_monthly_cost_total', 'bw_target_status',
                                                 names(connectivity.targets)[grepl('exclude', names(connectivity.targets))])]
 names(connectivity.targets)[names(connectivity.targets) %in% cols.to.merge.each.year] <- 
