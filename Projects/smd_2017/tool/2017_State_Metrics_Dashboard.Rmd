@@ -534,7 +534,7 @@ Row
 ---------------------------------------------------------------------
 ### 
 ```{r}
-renderValueBox({valueBox(state_name_caps)})
+renderValueBox(valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" ")))
 ```
 
 ### SotS 2015 Districts
@@ -618,7 +618,7 @@ Row
 ---------------------------------------------------------------------
 ### 
 ```{r}
-renderValueBox({valueBox(state_name_caps)})
+renderValueBox(valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" ")))
 ```
 
 ### SotS 2016 Districts
@@ -701,7 +701,7 @@ Row
 ---------------------------------------------------------------------
 ### 
 ```{r}
-renderValueBox({valueBox(state_name_caps)})
+renderValueBox(valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" ")))
 ```
 
 ### Current 2017 Districts
@@ -807,9 +807,7 @@ Row
 ---------------------------------------------------------------------
 ### 
 ```{r}
-renderValueBox({
-  valueBox(state_name_caps)
-})
+renderValueBox(valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" ")))
 ```
 
 ### Current 2017 Districts Meeting Goal
@@ -887,9 +885,7 @@ Row
 ---------------------------------------------------------------------
 ### 
 ```{r}
-renderValueBox({
-  valueBox(state_name_caps)
-})
+renderValueBox(valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" ")))
 ```
 
 ### Current 2017 Districts Meeting Goal
