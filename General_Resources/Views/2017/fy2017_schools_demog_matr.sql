@@ -291,8 +291,8 @@ where d.esh_id = '946654'
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Modified Date: 5/24/2017
-Name of Modifier: Jeremy - updated the campus id from salesforce. also removed closed, non, and charter schools using salesforce
+Modified Date: 7/7/2017
+Name of Modifier: Jeremy - updated demogs to be from salesforce
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise

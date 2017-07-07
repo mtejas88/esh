@@ -453,7 +453,7 @@ and d."LEAID" is not null
 /*
 Author: Justine Schott
 Date: 6/20/2016
-Last Modified Date: 6/23 - JH - changed postal cd to reference STABR. only changes 11 district postal codes in our universe
+Last Modified Date: 7/7 -Jeremy - updated demogs to be from salesforce
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before
