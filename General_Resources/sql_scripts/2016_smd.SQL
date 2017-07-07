@@ -97,8 +97,9 @@ left join public.fy2015_districts_deluxe_m as dd_2015 on dd_2015.esh_id::char = 
 -- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI, DC)
 -- also take out states at the school-level (RI, HI, DE)
 WHERE dd_2016.postal_cd NOT IN ('AE', 'AP', 'AS', 'GU', 'MP', 'PR', 'VI', 'DC', 'RI', 'HI', 'DE')
-GROUP BY dd_2016.postal_cd
 AND dd_2016.district_type = 'Traditional'
+GROUP BY dd_2016.postal_cd
+
 
 UNION
 --National Aggregation
@@ -204,3 +205,4 @@ GROUP BY 1
 ORDER BY postal_cd
 
 /* This query generates the state-level and National aggregation of most of the metrics for the State Metric Dashboard for 2016. */
+

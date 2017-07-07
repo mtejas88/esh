@@ -8,9 +8,10 @@
 rm(list=ls())
 
 #setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
+setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv")
+packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv","knitr","rmarkdown","DBI")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
@@ -25,6 +26,9 @@ library(ggplot2) # for ggplot vizes (i.e. square colored box with status suchc a
 library(DT) # need for datatables
 library(htmltools) # need for html use in code (I think)
 library(dotenv)
+library(knitr)
+library(rmarkdown)
+library(DBI)
 
 apply_state_names <- function(dta){
   ## add state name to state aggregation
@@ -42,7 +46,7 @@ source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## option to deploy the tool
-deploy <- 1
+deploy <- 0
 
 ##**************************************************************************************************************************************************
 ## READ DATA
