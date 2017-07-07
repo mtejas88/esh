@@ -1,0 +1,1 @@
+https://github.com/educationsuperhighway/ficher/blob/profiling_high_cost/Projects/high_cost_profiling/src/applications.sql
