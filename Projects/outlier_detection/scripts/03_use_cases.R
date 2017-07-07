@@ -18,6 +18,8 @@ source("04_identify_outliers.R")
 ##    -for line items: cost per circuit [at various combinations of bandwidth, connect category and purpose]
 ##    -for districts: change in total bandwidth (total and %), change in monthly cost per mbps (total and %), 
 ##    monthly cost per mbps, bandwidth per student [at all combinations district size and locale]
+##    3.1) For all of the metrics and use cases described above (starting with districts, 6/12/17), we are doing 
+##    them at the national level AND the state level
 ## ===========================================================================================================
 
 
@@ -85,15 +87,13 @@ identify_outliers_loop <- function(o_16,output,significance_level,cost_column,un
 }  
 
 ###
-# use case #1 
-# identify cost outliers on line item-level data
+# use case type #1 
+# identify outliers on line item-level data
 ###
 
-use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, line_item_purpose, with_16,n_17_at_time) {
+use_case_li <- function (data, data_17, metric, circuit_size, technology, line_item_purpose, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
   #filter for 2016 data use cases
   output16 <- data %>%
     filter(
@@ -104,6 +104,8 @@ use_case_cost_per_mbps_li <- function (data, data_17, circuit_size, technology, 
   o_16=nrow(output16)
   #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
   if (dim(data_17)[1] > 1) {
+  data_17=as.data.frame(data_17)
+  data_17["year"]=2017
   output17 <- data_17 %>%
     filter(
       round(bandwidth_in_mbps,digits=1) %in% circuit_size,
@@ -121,11 +123,17 @@ str3 <- paste0("\"purpose\" => \"", line_item_purpose, "\"")
 
 use_case_parameters <- paste(str1, str2, str3, sep = ", ")
 output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"monthly_cost_per_circuit", "line_item_id","Cost per Circuit",with_16,n_17_at_time)
+
+#define the column based on input metric - will modify this as new use cases come up
+if (metric=="Cost per Circuit"){
+  column='monthly_cost_per_circuit'
+}
+
+outputlist=identify_outliers_loop(o_16,output,0.05,column, "line_item_id",metric,with_16,n_17_at_time)
 
 #combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("line_item_id","monthly_cost_per_circuit")]
-distribution[,"metric"]="Cost per Circuit"
+distribution=outputlist$base_2016[,c("line_item_id",column)]
+distribution[,"metric"]=metric
 names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
 distribution[,"outlier_flag"]=0
 
@@ -144,345 +152,96 @@ return(distribution)
 }
 
 ###
-# use case #2
-# identify change in total bandwidth outliers based on district-level data
+# use case type #2
+# identify outliers based on district-level data, state and national level
 ###
 
-use_case_total_bw <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
+use_case_district <- function (data, data_17, metric, district_locale, size, state, with_16,n_17_at_time) {
   #column that flags the year in both the 2016 and 2017 data
   data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
+  
+  #define the column based on input metric - will modify this as new use cases come up
+  if (metric=="Change in Total BW"){
+    column='change_in_bw_tot'
+  } else if (metric=="% Change in BW") {
+    column='change_in_bw_pct'
+  } else if (metric=="Change in Total Monthly Cost") {
+    column='change_in_cost_tot'
+  } else if (metric=="% Change in Monthly Cost") {
+  column='change_in_cost_pct'
+  } else if (metric=="Monthly Cost per Mbps") {
+    column='ia_monthly_cost_per_mbps'
+  } else if (metric=="BW per Student") {
+    column='ia_bandwidth_per_student_kbps'
+  }
+
   #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(change_in_bw_tot)
-    )
-  o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-  output17 <- data_17 %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(change_in_bw_tot)
-    )
-  #combine filtered outputs
-  output=rbind(output16,output17) }
-    else {
-    output=output16  
+  if (state!='National') {
+    output16 <- data %>%
+      filter(
+        postal_cd %in% state,
+        locale %in% district_locale,
+        district_size %in% size)  %>% 
+    filter_(paste('!is.na(', column, ')'))
+    } else {
+    output16 <- data %>%
+      filter(
+        locale %in% district_locale,
+        district_size %in% size) %>% 
+      filter_(paste('!is.na(', column, ')'))
     }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"change_in_bw_tot", "esh_id","Change in Total BW",with_16,n_17_at_time)  
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","change_in_bw_tot")]
-distribution[,"metric"]="Change in Total BW"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
-return(distribution)
-}
-
-###
-# use case #3
-# identify % change in bandwidth outliers based on district-level data
-###
-
-use_case_pct_bw <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
-  #column that flags the year in both the 2016 and 2017 data
-  data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
-  #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(change_in_bw_pct)
-    )
   o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-    output17 <- data_17 %>%
-      filter(
-        locale %in% district_locale,
-        district_size %in% size,
-        !is.na(change_in_bw_pct)
-      )
+  #sample size check
+  if (o_16 >= 25) {
+    #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
+    if (dim(data_17)[1] > 1) {
+    data_17=as.data.frame(data_17)
+    data_17["year"]=2017
+    if (state!='National') {
+      output17 <- data_17 %>%
+        filter(
+          postal_cd %in% state,
+          locale %in% district_locale,
+          district_size %in% size) %>% 
+        filter_(paste('!is.na(', column, ')'))
+      } else {
+          output17 <- data_17 %>%
+            filter(
+              locale %in% district_locale,
+              district_size %in% size) %>% 
+            filter_(paste('!is.na(', column, ')'))
+        }
     #combine filtered outputs
     output=rbind(output16,output17) }
-  else {
-    output=output16  
+      else {
+      output=output16  
+      }
+    str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
+    str2 <- paste0("\"district_size\" => \"", size,"\"")
+    str3 <- paste0("\"district_state\" => \"", state,"\"")
+    
+    use_case_parameters <- paste(str1, str2, str3, sep = ",")
+    output <- cbind(use_case_parameters, output)
+    outputlist=identify_outliers_loop(o_16,output,0.05,column, "esh_id",metric,with_16,n_17_at_time)  
+    #combine 2016 "normal data" distribution and 2017 outliers in order to visualize
+    distribution=outputlist$base_2016[,c("esh_id",column)]
+    distribution[,"metric"]=metric
+    names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
+    distribution[,"outlier_flag"]=0
+    
+    outliers_2017=as.data.frame(outputlist$outliers_2017)
+    if (nrow(outliers_2017) > 0) {
+    outliers_2017[,"outlier_flag"]=1
+    distribution=rbind(distribution,outliers_2017)
+    }
+    
+    #add in separate columns for the parameters 
+    distribution[,"locale"]=district_locale
+    distribution[,"district_size"]=size
+    distribution[,"state"]=state
+    distribution[,"id"]=c(1:nrow(distribution))
+  } else {
+    distribution=NULL
   }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"change_in_bw_pct", "esh_id","% Change in BW",with_16,n_17_at_time)  
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","change_in_bw_pct")]
-distribution[,"metric"]="% Change in BW"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
 return(distribution)
 }
-
-###
-# use case #4
-# identify change in total monthly cost outliers based on district-level data
-###
-
-use_case_total_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
-  #column that flags the year in both the 2016 and 2017 data
-  data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
-  #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(change_in_cost_tot)
-    )
-  o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-    output17 <- data_17 %>%
-      filter(
-        locale %in% district_locale,
-        district_size %in% size,
-        !is.na(change_in_cost_tot)
-      )
-    #combine filtered outputs
-    output=rbind(output16,output17) }
-  else {
-    output=output16  
-  }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"change_in_cost_tot", "esh_id","Change in Total Monthly Cost",with_16,n_17_at_time)  
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","change_in_cost_tot")]
-distribution[,"metric"]="Change in Total Monthly Cost"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
-return(distribution)
-}
-
-###
-# use case #5
-# identify % change in monthly cost outliers based on district-level data
-###
-
-use_case_pct_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
-  #column that flags the year in both the 2016 and 2017 data
-  data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
-  #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(change_in_cost_pct)
-    )
-  o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-    output17 <- data_17 %>%
-      filter(
-        locale %in% district_locale,
-        district_size %in% size,
-        !is.na(change_in_cost_pct)
-      )
-    #combine filtered outputs
-    output=rbind(output16,output17) }
-  else {
-    output=output16  
-  }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"change_in_cost_pct", "esh_id","% Change in Monthly Cost",with_16,n_17_at_time)  
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","change_in_cost_pct")]
-distribution[,"metric"]="% Change in Monthly Cost"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
-return(distribution)
-}
-
-###
-# use case #6
-# identify monthly cost outliers based on district-level data
-###
-
-use_case_cost <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
-  #column that flags the year in both the 2016 and 2017 data
-  data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
-  #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(ia_monthly_cost_per_mbps)
-    )
-  o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-    output17 <- data_17 %>%
-      filter(
-        locale %in% district_locale,
-        district_size %in% size,
-        !is.na(ia_monthly_cost_per_mbps)
-      )
-    #combine filtered outputs
-    output=rbind(output16,output17) }
-  else {
-    output=output16  
-  }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"ia_monthly_cost_per_mbps", "esh_id","Monthly Cost per Mbps",with_16,n_17_at_time) 
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","ia_monthly_cost_per_mbps")]
-distribution[,"metric"]="Monthly Cost per Mbps"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
-return(distribution)
-
-}
-
-###
-# use case #7
-# identify bandwidth per student outliers based on district-level data
-###
-
-use_case_bw_per_student <- function (data, data_17, district_locale, size, with_16,n_17_at_time) {
-  #column that flags the year in both the 2016 and 2017 data
-  data["year"]=2016
-  data_17["year"]=2017
-  data_17=as.data.frame(data_17)
-  #filter for 2016 data use cases
-  output16 <- data %>%
-    filter(
-      locale %in% district_locale,
-      district_size %in% size,
-      !is.na(ia_bandwidth_per_student_kbps)
-    )
-  o_16=nrow(output16)
-  #filter for 2017 data use cases - have to separately because they need to be stacked in order to construct the loop
-  if (dim(data_17)[1] > 1) {
-    output17 <- data_17 %>%
-      filter(
-        locale %in% district_locale,
-        district_size %in% size,
-        !is.na(ia_bandwidth_per_student_kbps)
-      )
-    #combine filtered outputs
-    output=rbind(output16,output17) }
-  else {
-    output=output16  
-  }
-str1 <- paste0("\"district_locale\" => \"", district_locale,"\"")
-str2 <- paste0("\"district_size\" => \"", size,"\"")
-
-use_case_parameters <- paste(str1, str2, sep = ",")
-output <- cbind(use_case_parameters, output)
-outputlist=identify_outliers_loop(o_16,output,0.05,"ia_bandwidth_per_student_kbps", "esh_id","BW per Student",with_16,n_17_at_time)  
-#combine 2016 "normal data" distribution and 2017 outliers in order to visualize
-distribution=outputlist$base_2016[,c("esh_id","ia_bandwidth_per_student_kbps")]
-distribution[,"metric"]="BW per Student"
-names(distribution)=c("outlier_unique_id", "outlier_value","outlier_use_case_name")
-distribution[,"outlier_flag"]=0
-
-outliers_2017=as.data.frame(outputlist$outliers_2017)
-if (nrow(outliers_2017) > 0) {
-  outliers_2017[,"outlier_flag"]=1
-  distribution=rbind(distribution,outliers_2017)
-}
-
-#add in separate columns for the parameters 
-distribution[,"locale"]=district_locale
-distribution[,"district_size"]=size
-distribution[,"id"]=c(1:nrow(distribution))
-
-return(distribution)
-}
-

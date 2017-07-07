@@ -55,6 +55,8 @@ select distinct
 
 	discount_rate_c1,
 
+	discount_rate_c1_matrix,
+
 	discount_rate_c2,
 
 	address,
@@ -324,7 +326,13 @@ select distinct
 
 	ia_monthly_funding_total,
 
-	service_provider_assignment
+	service_provider_assignment,
+
+	primary_sp_purpose,
+
+	primary_sp_bandwidth,
+
+	primary_sp_percent_of_bandwidth
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
 
@@ -341,7 +349,7 @@ on sle.postal_cd = dfpd.postal_cd
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi fields
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:

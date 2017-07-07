@@ -137,12 +137,12 @@ with school_calc as (
                 end
             else .7
           end as c2_discount_rate
-          from public.fy2016_schools_demog_matr sd
+          from public.fy2017_schools_demog_matr sd
           left join public.entity_bens eb
           on sd.school_esh_id = eb.entity_id::varchar
           left join fy2016.entity_reports er
           on er.entity_number = eb.ben
-          left join public.fy2016_districts_deluxe_matr dd
+          left join public.fy2017_districts_demog_matr dd
           on sd.district_esh_id = dd.esh_id
           where dd.include_in_universe_of_districts_all_charters = true
         ) entities
@@ -365,37 +365,17 @@ select
   sum(budget_remaining_c2_2015) as budget_remaining_c2_2015,
   sum(budget_remaining_c2_2016) as budget_remaining_c2_2016,
   sum(budget_remaining_c2_2017) as budget_remaining_c2_2017,
-  case
-    when sum(budget_remaining_c2_2017) >= 1000
-      then floor(sum(budget_remaining_c2_2017) / 1000) * 1000
-    else floor(sum(budget_remaining_c2_2017) / 100) * 100
-  end as budget_remaining_c2_2017_rounded,
   sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
   sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
   sum(budget_remaining_c2_2017_postdiscount) as budget_remaining_c2_2017_postdiscount,
-  case
-    when sum(budget_remaining_c2_2017_postdiscount) >= 1000
-      then floor(sum(budget_remaining_c2_2017_postdiscount) / 1000) * 1000
-    else floor(sum(budget_remaining_c2_2017_postdiscount) / 100) * 100
-  end as budget_remaining_c2_2017_postdiscount_rounded,
   sum(c2_budget_haircut) as c2_budget_haircut,
   sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
   sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
   sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
   sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
-  case
-    when sum(budget_remaining_c2_2017_haircut) >= 1000
-      then floor(sum(budget_remaining_c2_2017_haircut) / 1000) * 1000
-    else floor(sum(budget_remaining_c2_2017_haircut) / 100) * 100
-  end as budget_remaining_c2_2017_haircut_rounded,
   sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
   sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
   sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
-  case
-    when sum(budget_remaining_c2_2017_postdiscount_haircut) >= 1000
-      then floor(sum(budget_remaining_c2_2017_postdiscount_haircut) / 1000) * 1000
-    else floor(sum(budget_remaining_c2_2017_postdiscount_haircut) / 100) * 100
-  end as budget_remaining_c2_2017_postdiscount_haircut_rounded,
   case
     when sum(c2_budget) > sum(budget_remaining_c2_2015)
       then true
@@ -436,10 +416,9 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 5/30/2017
-Last Modified Date: 6/5/2017 - added 2017 c2 calculation. changed funding to be based off of 153.47 per student with a min
-of 9412.80 per school. Also created a rounded 2017 budget remiaing (to nearest thousand, or hundred if less than 1000 remaining)
+Last Modified Date: 6/23/2017 - JH got rid of rounded c2
 Name of QAing Analyst(s):
-Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget. Still need to add in 2017 line items
+Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
 Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
 that the C2 remaining budget does not always match USAC
 */

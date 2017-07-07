@@ -19,4 +19,5 @@ from public.fy2017_esh_line_items_v li
 /*select sr.*, district_type 
 from public.fy2017_services_received_matr sr
 left join public.fy2017_districts_deluxe_matr dd
-on sr.recipient_id=dd.esh_id*/
+on sr.recipient_id=dd.esh_id
+where district_type='Traditional'*/

@@ -41,6 +41,8 @@ select distinct
 
 	discount_rate_c1,
 
+	discount_rate_c1_matrix,
+
 	discount_rate_c2,
 
 	address,
@@ -469,7 +471,7 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi, 
+	needs_wifi,
 
 	c2_prediscount_budget_15,
 
@@ -517,7 +519,14 @@ select distinct
 
 	ia_monthly_funding_total,
 
-	dspa.reporting_name as service_provider_assignment
+	dspa.reporting_name as service_provider_assignment,
+
+	dspa.primary_sp_purpose as primary_sp_purpose,
+
+	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
+
 
 
 
@@ -542,7 +551,7 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi fields
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:
