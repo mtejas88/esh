@@ -3,23 +3,14 @@ select  case
             else eim.entity_id::varchar
         end as esh_id,
         d."LEAID" as nces_cd,
-        d."NAME" as name,
+        a.name as name,
         case
-          when "TYPE" = '7' then 'Charter'
-          when "FIPST" = '59' then 'BIE'
-          when ( --all states except VT include districts of type 1,2 (traditional), or 7 (charter).
-                  (case
-                      when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end != 'VT' then "TYPE" in ('1', '2', '7')
-                      else false
-                    end )
-                  --in RI and MA we also include 4's with majority type 1 schools.
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('RI', 'MA')
-                      and "TYPE" = '4'
-                      and sc.school_type_1_count/sc.school_count::numeric >= .75 )
-                  --in NY we also include 3's, in VT we only include 3's
-                  or (case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end in ('VT', 'NY')
-                      and "TYPE" = '3') )
+          when a.type in ('Public')
             then 'Traditional'
+          when a.type = 'Charter'
+            then 'Charter'
+          when a.type in ('Bureau of Indian Education' ,'Tribal')
+            then 'BIE'
           else 'Other Agency'
         end as district_type,
         d."LSTREET1" as address,
@@ -74,12 +65,12 @@ select  case
                   end
         end as num_schools,
         "ULOCAL" as ulocal,
-        case
-          when left("ULOCAL",1) = '1' then 'Urban'
-          when left("ULOCAL",1) = '2' then 'Suburban'
-          when left("ULOCAL",1) = '3' then 'Town'
-          when left("ULOCAL",1) = '4' then 'Rural'
-            else 'Unknown'
+        case 
+          when a.locale__c is null
+            then 'Unknown'
+          when a.locale__c = 'Small Town'
+            then 'Town'
+          else a.locale__c
         end as locale,
         case
           when case when d."STABR" = 'BI' then d."LSTATE" else d."STABR" end = 'VT' then case
@@ -210,9 +201,13 @@ select  case
                 + case when "OTHSUP" < 0 then 0 else "OTHSUP" end
         end as num_other_staff
 
-from public.ag141a d
+from salesforce.account a
+
 left join ( select distinct entity_id, nces_code
             from public.entity_nces_codes) eim
+on a.esh_id__c = eim.entity_id::varchar
+
+left join public.ag141a d
 on RPAD(d."LEAID",12,'0')=eim.nces_code
 
 left join ( select  "LEAID",
