@@ -1,3 +1,6 @@
+--district fiberpredeluxe
+
+
 select distinct
 
 	dpd.esh_id,
@@ -36,9 +39,11 @@ select distinct
 
 	frl_percent,
 
-	discount_rate_c1, 
+	discount_rate_c1,
 
-	discount_rate_c2, 
+	discount_rate_c1_matrix,
+
+	discount_rate_c2,
 
 	address,
 
@@ -466,25 +471,33 @@ select distinct
 
   	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	--needs_wifi,  /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	needs_wifi,
 
-	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_budget_15,
 
-	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_remaining_15,
 
-	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_remaining_16,
 
-	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_prediscount_remaining_17,
 
-	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_postdiscount_remaining_15,
 
-	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_postdiscount_remaining_16,
 
-	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2_postdiscount_remaining_17,
 
-	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	received_c2_15,
 
-	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	received_c2_16,
+
+	received_c2_17,
+
+	budget_used_c2_15,
+
+	budget_used_c2_16,
+
+	budget_used_c2_17,
 
 	fbts.fiber_target_status,
 
@@ -506,7 +519,14 @@ select distinct
 
 	ia_monthly_funding_total,
 
-	dspa.reporting_name as service_provider_assignment
+	dspa.reporting_name as service_provider_assignment,
+
+	dspa.primary_sp_purpose as primary_sp_purpose,
+
+	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
+
 
 
 
@@ -529,24 +549,10 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 
 
 /*
-
 Author: Justine Schott
-
 Created On Date: 8/15/2016
-
-Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
-
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
-
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
-
 Methodology:
-
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Commenting out certain columns as they are all sourced from `fy2016_districts_c2_funding_matr` which is not within the scope for this view to update. Justine will be incorporating those in the fy2017_districts_c2_funding_matr view.
-Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
-
 */

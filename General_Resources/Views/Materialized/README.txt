@@ -1,1 +1,0 @@
-If a view is materialized, it must be refreshed in crusher before pulling data.

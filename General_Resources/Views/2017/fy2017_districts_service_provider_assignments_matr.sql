@@ -2,12 +2,11 @@ select  recipient_sp_bw_rank.recipient_id as esh_id,
 
 reporting_name,
 
+recipient_sp_bw_rank.purpose_list as primary_sp_purpose,
+
 recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
 
 recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
-
-
-
 
   from (
 
@@ -47,7 +46,9 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                     else 0
 
-                  end) as upstream_bandwidth
+                  end) as upstream_bandwidth,
+                
+              array_agg(distinct purpose order by purpose) as purpose_list
 
       from public.fy2017_services_received_matr sr
 
@@ -141,6 +142,11 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
   on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
 
   where bw_rank = 1
+  
+  and recipient_sp_bw_total.bw_total > 0
+
+  /*adding bw_total > 0 as the new staging db Rose has more 2017 data and a lot of rows have bw_total that are 0,
+this prevents the creation of the materialized view due to division error of 0*/
 
   and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
 

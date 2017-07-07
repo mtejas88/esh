@@ -1,0 +1,7 @@
+select
+
+esh_id,
+exclude_from_analysis,
+meeting_2014_goal_no_oversub
+
+from public.fy2015_districts_deluxe_m

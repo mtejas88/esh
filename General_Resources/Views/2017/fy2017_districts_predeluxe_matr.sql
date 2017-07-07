@@ -38,9 +38,11 @@ select distinct
 
 	discount_rate_c1::numeric/100 as discount_rate_c1,
 
+	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
+
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
-	--c2_discount_rate_for_remaining_budget as discount_rate_c2_for_remaining_budget, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	--c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, using funding c2 discount columns in the code logic below
 
 	address,
 
@@ -57,38 +59,33 @@ select distinct
 	longitude,
 
 	case
-	
-	when
-	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
-	(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
-	and (array_to_string(flag_array,',') ilike '%dirty_wan%')
 
-		/*when  	(flag_array is null or
+	    when
+	    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
+	    (flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
+	    (flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%'
+	    and array_to_string(flag_array,',') ilike '%dirty_wan%')
+	    or flag_array is null  -- adding flag arrray null logic
+	    /*              (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags
+	            and ia_bandwidth_per_student_kbps > 0
+	            then false
+	        else true
+	    end as exclude_from_ia_analysis,
 
-				    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags 
 
-            and ia_bandwidth_per_student_kbps > 0
-
-			then false
-
-		else true
-
-	end as exclude_from_ia_analysis,
 
 	case
 
-	when 
+	when
 
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
 	(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
+	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%')
 	and (array_to_string(flag_array,',') ilike '%dirty_wan%')
-
+ or flag_array is null  -- adding flag arrray null logic
 
 		/*when 	(flag_array is null or
-
-				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags 
+				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags
 
 				and ia_no_cost_lines = 0
 
@@ -139,12 +136,12 @@ select distinct
 when
 			(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
 			(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-			(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%') 
+			(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%')
 			and (array_to_string(flag_array,',') ilike '%dirty_wan%')
-
-				/*flag_count = 1 and array_to_string(flag_array,',') 
+     or flag_array is null  -- adding flag arrray null logic
+				/*flag_count = 1 and array_to_string(flag_array,',')
 				ilike '%missing_wan%')-- commenting out due to new flag logic (see above)*/
-				
+
 			then 'dirty'
 
 		when 'outreach_confirmed' = any(tag_array)
@@ -389,31 +386,39 @@ when
 
   	ia_monthly_cost_no_backbone,
 
-	--CASE 	WHEN wifi.count_wifi_needed > 0 THEN true /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	CASE 	WHEN wifi.count_wifi_needed > 0 THEN true
 
-   	--		WHEN wifi.count_wifi_needed = 0 THEN false
+   			WHEN wifi.count_wifi_needed = 0 THEN false
 
-    --    	ELSE null
+        	ELSE null
 
-	--	   	END as needs_wifi,
+		   	END as needs_wifi,
 
-	--c2_prediscount_budget_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.c2_budget as c2_prediscount_budget_15,
 
-	--c2_prediscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2015 as c2_prediscount_remaining_15,
 
-	--c2_prediscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2016 as c2_prediscount_remaining_16,
 
-	--c2_postdiscount_remaining_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2017 as c2_prediscount_remaining_17,
 
-	--c2_postdiscount_remaining_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2015_postdiscount as c2_postdiscount_remaining_15,
 
-	--received_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2016_postdiscount as c2_postdiscount_remaining_16,
 
-	--received_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.budget_remaining_c2_2017_postdiscount as c2_postdiscount_remaining_17,
 
-	--budget_used_c2_15, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.received_c2_15,
 
-	--budget_used_c2_16, /* JAMIE-TEMP-EDIT until c2 matr view is ready */
+	c2.received_c2_16,
+
+	c2.received_c2_17,
+
+	c2.budget_used_c2_15,
+
+	c2.budget_used_c2_16,
+
+	c2.budget_used_c2_17,
 
 	wan_lines_w_dirty,
 
@@ -430,34 +435,20 @@ from public.fy2017_districts_metrics_matr dm
 
 left join public.fy2017_wifi_connectivity_informations_matr wifi
 
-on dm.esh_id::varchar = wifi.parent_entity_id::varchar 
+on dm.esh_id::varchar = wifi.parent_entity_id::varchar
 
-/*left join public.fy2017_districts_c2_funding_matr c2
-
-on dm.esh_id = c2.esh_id::varchar*/ -- commenting out as c2 funding view is not ready
+left join public.fy2017_districts_c2_funding_matr c2
+on dm.esh_id = c2.esh_id::varchar
 
 left join fy2016.legislative_district_infos ldi /* JAMIE: we currently only have this mapping for 2016 */
 on ldi.esh_id::varchar = dm.esh_id
 
 
 /*
-
 Author: Justine Schott
-
 Created On Date: 12/1/2016
-
-Last Modified Date: 3/17/2017 -- include_in_universe_of_districts_all_charters, remove bw_upgrade_indicator
-
+Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
 Name of QAing Analyst(s):
-
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
-
 Methodology:
-
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-
 */

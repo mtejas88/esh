@@ -1,10 +1,15 @@
-# clear the console
-cat("\014")
 
+## =========================================
+##
+## QUERY DATA FROM THE DB
+##
+## =========================================
+
+## Clearing memory
 rm(list=ls())
 
-args = commandArgs(trailingOnly=TRUE)
-github_path <- args[1]
+#args = commandArgs(trailingOnly=TRUE)
+#github_path <- args[1]
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -17,17 +22,12 @@ library(DBI)
 library(rJava)
 library(RJDBC)
 library(dotenv)
-
-#this is my github path. DONT FORGET TO COMMENT OUT
-#github_path <- '~/Documents/Analysis/ficher/'
-setwd(paste(github_path, 'Projects/Consultant Summary for Outreach', sep=''))
-
-
 options(java.parameters = "-Xmx4g" )
 
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
+
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
@@ -48,6 +48,10 @@ querydb <- function(query_name){
 
 state <- querydb('src/consultant_summary_by_state.sql')
 national <- querydb('src/consultant_summary_national.sql')
+c2_16 <- querydb('src/consultant_summary_c2_16.sql')
+c2_17 <- querydb('src/consultant_summary_c2_17.sql')
+c2_16_state <- querydb('src/consultant_summary_c2_16_state.sql')
+c2_17_state <- querydb('src/consultant_summary_c2_17_state.sql')
 
 ## disconnect from database
 dbDisconnect(con)
@@ -56,3 +60,7 @@ dbDisconnect(con)
 
 write.csv(state, 'data/consultant_summary_by_state.csv', row.names = FALSE)
 write.csv(national, 'data/consultant_summary_national.csv', row.names = FALSE)
+write.csv(c2_16, 'data/consultant_summary_c2_16.csv', row.names = FALSE)
+write.csv(c2_17, 'data/consultant_summary_c2_17.csv', row.names = FALSE)
+write.csv(c2_16_state, 'data/consultant_summary_c2_16_state.csv', row.names = FALSE)
+write.csv(c2_17_state, 'data/consultant_summary_c2_17_state.csv', row.names = FALSE)
