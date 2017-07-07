@@ -153,7 +153,7 @@ prop.table(table(dqt.qa$pred_connect_category))
 ## plot difference metric when false
 #hist(sub.false$difference_between_1st_2nd)
 
-pdf("figures/density_plot_prob_diff_metric.pdf", height=5, width=5)
+pdf("figures/density_plot_prob_diff_metric.pdf", height=5, width=7)
 ## plot line for false
 h <- hist(sub.false$difference_between_1st_2nd, breaks=seq(0,1,0.1), plot=FALSE)
 plot(x=h$mids, y=h$density, type="l", col=rgb(1,0,0,0.8),
@@ -191,7 +191,7 @@ dev.off()
 #sub.true.no.isp <- dqt.qa[which(dqt.qa$match == TRUE & dqt.qa$pred_connect_category != 'ISP Only'),]
 sub.false.no.isp <- dqt.qa[which(dqt.qa$match == FALSE & dqt.qa$pred_connect_category != 'ISP Only'),]
 table(sub.false.no.isp$prob.bucket)
-pdf("figures/density_plot_prob_diff_metric_no_isp.pdf", height=5, width=5)
+pdf("figures/density_plot_prob_diff_metric_no_isp.pdf", height=5, width=7)
 ## plot line for false
 h <- hist(sub.false.no.isp$difference_between_1st_2nd, breaks=seq(0,1,0.1), plot=FALSE)
 plot(x=h$mids, y=h$density, type="l", col=rgb(1,0,0,0.8), ylim=c(0,5),
