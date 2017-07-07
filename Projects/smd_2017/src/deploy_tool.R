@@ -7,7 +7,7 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
+setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv")
