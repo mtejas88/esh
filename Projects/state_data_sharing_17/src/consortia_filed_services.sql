@@ -1,6 +1,6 @@
 select d.esh_id,
 upper(d.name) as district_name,
-d.city,
+initcap(d.city) as city,
 li.frn_complete,
 d.discount_rate_c1*100 as erate_discount,
 case  when sr.purpose = 'WAN' then 'District WAN'
@@ -27,6 +27,7 @@ sr.reporting_name as service_provider_name,
 
 case  when  'unknown_conn_type'=any(open_flag_labels) OR
             'product_bandwidth'=any(open_flag_labels) OR 
+            'forced_bandwidth'=any(open_flag_labels) OR
             sr.connect_category ='Uncategorized'
       then 'Yes'
       else 'No'
@@ -41,7 +42,8 @@ case  when  'not_isp'=any(open_flag_labels) OR
             end as "suspected_incorrect_purpose",
 
 case  when 'flipped_speed'=any(open_flag_labels) OR
-            'product_bandwidth'=any(open_flag_labels)
+            'product_bandwidth'=any(open_flag_labels) OR
+            'forced_bandwidth'=any(open_flag_labels)
             then 'Yes'
             else 'No'
             end as "suspected_incorrect_bandwidth",
@@ -52,7 +54,8 @@ case  when 'unknown_quantity'=any(open_flag_labels)
             end as "suspected_incorrect_quantity",
             
 case  when  'exclude_for_cost_only_unknown' = any(li.open_tag_labels) OR
-            'exclude_for_cost_only_restricted' = any(li.open_tag_labels)
+            'exclude_for_cost_only_restricted' = any(li.open_tag_labels) OR
+            'outlier_cost_per_circuit' = any(li.open_tag_labels)
             then 'Yes'
             else 'No'
             end as "suspected_incorrect_cost",
