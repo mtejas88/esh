@@ -8,7 +8,7 @@
 rm(list=ls())
 
 #setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-setwd("~/Documents/R_Work/ficher/Projects/smd_2017/")
+setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 #args = commandArgs(trailingOnly=TRUE)
 #github_path <- args[1]
@@ -63,6 +63,10 @@ dd_2017 <- querydb("../../General_Resources/sql_scripts/2017_deluxe_districts.SQ
 dd_2017 <- correct.dataset(dd_2017, sots.flag=0, services.flag=0)
 dd_2016 <- querydb("../../General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL")
 dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
+## Outlier Flags
+resolved_outliers <- querydb("../../General_Resources/sql_scripts/resolved_outliers_smd.SQL")
+## Merge outliers
+dd_2017 <- merge(x = dd_2017, y = resolved_outliers, by = "esh_id", all.x = TRUE)
 ## disconnect from database
 dbDisconnect(con)
 
