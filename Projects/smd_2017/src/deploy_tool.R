@@ -87,25 +87,25 @@ dd_2016_froz <- combine.sp(dd_2016_froz)
 ##-------------------------------
 ## 2017
 current17.click.through <- dd_2017[,c("esh_id", "postal_cd", "name", "locale", "district_size", "district_type",
-                                                "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip",
-                                                "lines_w_dirty", names(dd_2017)[grepl("exclude", names(dd_2017))])]
+                                      "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip",
+                                      "lines_w_dirty", names(dd_2017)[grepl("exclude", names(dd_2017))])]
 current17.click.through$no_data <- ifelse(current17.click.through$lines_w_dirty == 0, TRUE, FALSE)
 current17.click.through$lines_w_dirty <- NULL
 ## add in IRT links
 current17.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "</a>", sep='')
+                                          "http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "</a>", sep='')
 ## order dataset
 current17.click.through <- current17.click.through[order(current17.click.through$postal_cd),]
 
 ## 2016
 sots16.click.through <- dd_2016_froz[,c("esh_id", "postal_cd", "name", "locale", "district_size", "district_type",
-                                                "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip", "lines_w_dirty",
-                                                names(dd_2016_froz)[grepl("exclude", names(dd_2016_froz))])]
+                                        "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip", "lines_w_dirty",
+                                        names(dd_2016_froz)[grepl("exclude", names(dd_2016_froz))])]
 sots16.click.through$no_data <- ifelse(sots16.click.through$lines_w_dirty == 0, TRUE, FALSE)
 sots16.click.through$lines_w_dirty <- NULL
 ## add in IRT links
 sots16.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "</a>", sep='')
+                                       "http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "</a>", sep='')
 ## order dataset
 sots16.click.through <- sots16.click.through[order(sots16.click.through$postal_cd),]
 
@@ -125,7 +125,7 @@ overlap.ids <- dd_2017_cl$esh_id[which(dd_2017_cl$esh_id %in% dd_2016_cl$esh_id)
 
 ## 2017
 upgrades.click.through <- dd_2017_cl[dd_2017_cl$esh_id %in% overlap.ids, c('esh_id', 'name', 'postal_cd', 'locale',
-                                                               'district_size', 'upgrade_indicator', 'outlier_status', cols.to.merge.each.year)]
+                                                                           'district_size', 'upgrade_indicator', 'outlier_status', cols.to.merge.each.year)]
 names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -200,8 +200,8 @@ cols.to.merge.each.year <- c('ia_monthly_cost_per_mbps', 'ia_bw_mbps_total', 'ia
                              'meeting_knapsack_affordability_target')
 ## 2017
 affordability.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size',
-                                           'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
-                                           'num_internet_upstream_lines', 'num_students', 'outlier_status', cols.to.merge.each.year)]
+                                          'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
+                                          'num_internet_upstream_lines', 'num_students', 'outlier_status', cols.to.merge.each.year)]
 names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -220,6 +220,16 @@ affordability.click.through <- affordability.click.through[order(affordability.c
 affordability.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "'>",
                                               "http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "</a>", sep='')
 
+## WIFI (Click-Through)
+##-------------------------------
+wifi.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size', 'num_students',
+                                 'needs_wifi','c2_prediscount_remaining_17','c2_prediscount_remaining_16','c2_prediscount_remaining_15')]
+## order the dataset
+wifi.click.through <- wifi.click.through[order(wifi.click.through$needs_wifi, decreasing=T),]
+
+## add in IRT links
+wifi.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", wifi.click.through$esh_id, "'>",
+                                     "http://irt.educationsuperhighway.org/entities/districts/", wifi.click.through$esh_id, "</a>", sep='')
 
 ## CONNECTIVITY (Targets)
 ##-------------------------------
@@ -263,12 +273,12 @@ dd_2017$num_circuits <- dd_2017$non_fiber_lines + dd_2017$fiber_wan_lines + dd_2
 dd_2017$total_unknown_campuses <- dd_2017$current_assumed_scalable_campuses + dd_2017$current_assumed_unscalable_campuses
 fiber.targets <- dd_2017[which(dd_2017$fiber_target_status == 'Target' | dd_2017$fiber_target_status == 'Potential Target'),]
 fiber.targets <- fiber.targets[,c('esh_id', 'postal_cd', 'name', 'locale', 'district_size',
-                                                'num_students', 'num_campuses', 'num_circuits',
-                                                cols.to.merge.each.year, 'ia_bandwidth_per_student_kbps', 'ia_bw_mbps_total',
-                                                'current_known_scalable_campuses', 'current_assumed_scalable_campuses',
-                                                'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses', 'total_unknown_campuses',
-                                                'fiber_target_status', 'no_data',
-                                                names(fiber.targets)[grepl('exclude', names(fiber.targets))])]
+                                  'num_students', 'num_campuses', 'num_circuits',
+                                  cols.to.merge.each.year, 'ia_bandwidth_per_student_kbps', 'ia_bw_mbps_total',
+                                  'current_known_scalable_campuses', 'current_assumed_scalable_campuses',
+                                  'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses', 'total_unknown_campuses',
+                                  'fiber_target_status', 'no_data',
+                                  names(fiber.targets)[grepl('exclude', names(fiber.targets))])]
 names(fiber.targets)[names(fiber.targets) %in% cols.to.merge.each.year] <- 
   paste(names(fiber.targets)[names(fiber.targets) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -286,7 +296,7 @@ fiber.targets[grepl("current_assumed_unscalable", names(fiber.targets))] <- roun
 fiber.targets <- fiber.targets[order(fiber.targets$current_assumed_unscalable_campuses, decreasing=T),]
 ## add in IRT links
 fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "'>",
-                                       "http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "</a>", sep='')
+                                "http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "</a>", sep='')
 
 
 
