@@ -26,8 +26,9 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries
 
-# In[2]:
+# In[1]:
 
+import sys
 import os
 import psycopg2
 import pandas as pd
@@ -435,6 +436,16 @@ raw_clean_mg.to_csv('model_data_versions/changecount_June16_17.csv', encoding='u
 
 
 # -------
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_EDA_B_Raw_Clean_Compare_dk.ipynb', 'ESH_EDA_B_Raw_Clean_Compare_dk.py', main)
+
 
 # # END
 

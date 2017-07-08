@@ -30,8 +30,10 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries
 
-# In[2]:
+# In[1]:
 
+import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -132,12 +134,12 @@ def run_cv_on_model(base_model,xdata,ydata,classes, binary=False):
 
 # In[5]:
 
-#validation_set = md.sample(8000).to_csv('model_data_versions/esh_validation_sample_June16_2017.csv',index=False)
+#validation_set = md.sample(8000).to_csv('data/esh_validation_sample_June16_2017.csv',index=False)
 
 
 # In[6]:
 
-validation_set = pd.read_csv('model_data_versions/esh_validation_sample.csv')
+validation_set = pd.read_csv('data/esh_validation_sample.csv')
 
 
 # In[7]:
@@ -149,7 +151,7 @@ validation_set.cl_connect_category.value_counts()
 
 # In[8]:
 
-data_path = 'model_data_versions/model_data_output_June16_2017.csv'
+data_path = 'data/model_data_output_June16_2017.csv'
 
 
 # In[9]:
@@ -281,7 +283,7 @@ current_time = (time.strftime('%h_%d_%y_t%H_%M'))
 
 data_readme = """Final Run Before June 19th Presentation"""
 m1_summary = build_df_multiclas_results(model_search,data_path,data_readme)
-m1_summary.to_pickle('model_data_versions/modA_MCC_model_'+current_time)
+m1_summary.to_pickle('model_versions/modA_MCC_model_'+current_time)
 m1_summary
 
 
@@ -339,7 +341,7 @@ for k in binary_model_search:
 
 data_readme = """Final Binary Lit Fiber Model before June 19th Presentation"""
 m3_summary = build_df_binary_results(binary_model_search,data_path,data_readme)
-m3_summary.to_pickle('model_data_versions/modA_BLF_model_'+current_time)
+m3_summary.to_pickle('model_versions/modA_BLF_model_'+current_time)
 m3_summary
 
 
@@ -724,7 +726,7 @@ confusion_matrix_from_df(df_confusion_matrix(bin_VLD_review.y, bin_VLD_review.y_
 predict_probabilites = pd.DataFrame(binaryLF_Predict_Model.predict_proba(X))
 predict_probabilites.columns = ['false','plf']
 predict_probabilites.index = md['id']
-predict_probabilites.reset_index().to_csv('model_data_versions/June16_lit_fiber_probabilities.csv',index=False)
+predict_probabilites.reset_index().to_csv('data/June16_lit_fiber_probabilities.csv',index=False)
 
 
 # **Export the Validation Set Probabilities**
@@ -734,7 +736,7 @@ predict_probabilites.reset_index().to_csv('model_data_versions/June16_lit_fiber_
 vld_predict_probabilites = pd.DataFrame(binaryLF_Predict_Model.predict_proba(vld_X))
 vld_predict_probabilites.columns = ['false','plf']
 vld_predict_probabilites.index = validation_set['id']
-vld_predict_probabilites.reset_index().to_csv('model_data_versions/June16_validation_set_lit_fiber_probabilities.csv'                                              ,index=False)
+vld_predict_probabilites.reset_index().to_csv('data/June16_validation_set_lit_fiber_probabilities.csv'                                              ,index=False)
 
 
 # -------
@@ -756,19 +758,19 @@ from sklearn.externals import joblib
 
 # In[48]:
 
-joblib.dump(MCC_Predict_Model, 'model_data_versions/final_models/general_multiclass.pkl') 
+joblib.dump(MCC_Predict_Model, 'model_versions/final_models/general_multiclass.pkl') 
 
 
 # In[49]:
 
-joblib.dump(binaryLF_Predict_Model, 'model_data_versions/final_models/lit_fiber_binary_classifier.pkl')
+joblib.dump(binaryLF_Predict_Model, 'model_versions/final_models/lit_fiber_binary_classifier.pkl')
 
 
 # ### Export the Class Encoder Too
 
 # In[50]:
 
-joblib.dump(le, 'model_data_versions/final_models/classes_encoder.pkl')
+joblib.dump(le, 'model_versions/final_models/classes_encoder.pkl')
 
 
 # **Export the X Data Columns to a List**
@@ -776,10 +778,20 @@ joblib.dump(le, 'model_data_versions/final_models/classes_encoder.pkl')
 
 # In[51]:
 
-with open('model_data_versions/final_models/modA_column_order.pkl', 'wb') as f:
+with open('model_versions/final_models/modA_column_order.pkl', 'wb') as f:
     pickle.dump(list(X.columns), f)
 
 
 # --------------
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Modeling_A_Primary_Modeling_dk.ipynb', 'ESH_Modeling_A_Primary_Modeling_dk.py', main)
+
 
 # # End 

@@ -33,6 +33,7 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 # In[1]:
 
 import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -138,19 +139,19 @@ visualize_tree()
 
 # In[5]:
 
-data_path = 'model_data_versions/model_data_output_pristine.csv'
+data_path = 'data/model_data_output_pristine.csv'
 md = pd.read_csv(data_path)
 
 
 # In[6]:
 
 ## if the ids match, try to recreate the validation set with those existing ids
-#validation_set = md.sample(8000).to_csv('model_data_versions/esh_validation_sample.csv',index=False,float_format='%.7f')
+#validation_set = md.sample(8000).to_csv('data/esh_validation_sample.csv',index=False,float_format='%.7f')
 
 
 # In[7]:
 
-validation_set = pd.read_csv('model_data_versions/esh_validation_sample.csv')
+validation_set = pd.read_csv('data/esh_validation_sample.csv')
 
 
 # In[8]:
@@ -282,9 +283,9 @@ current_time = (time.strftime('%h_%d_%y_t%H_%M'))
 
 # ### MCC - Print and Export Model Summary
 
-# In[5]:
+# In[2]:
 
-model_search[][]
+#model_search[][]
 
 
 # In[16]:
@@ -294,7 +295,7 @@ model_search[][]
 
 data_readme = """June 21, 2017 Run"""
 m1_summary = build_df_multiclas_results(model_search,data_path,data_readme)
-m1_summary.to_pickle('results/modA_MCC_model_'+current_time)
+m1_summary.to_pickle('model_versions/final_models/modA_MCC_model_'+current_time)
 m1_summary
 
 
@@ -352,7 +353,7 @@ for k in binary_model_search:
 
 data_readme = """June 21, 2017 Binary Lit Fiber Model"""
 m3_summary = build_df_binary_results(binary_model_search,data_path,data_readme)
-m3_summary.to_pickle('results/modA_BLF_model_'+current_time)
+m3_summary.to_pickle('model_versions/final_models/modA_BLF_model_'+current_time)
 m3_summary
 
 
@@ -743,7 +744,7 @@ confusion_matrix_from_df(df_confusion_matrix(bin_VLD_review.y, bin_VLD_review.y_
 predict_probabilites = pd.DataFrame(binaryLF_Predict_Model.predict_proba(X))
 predict_probabilites.columns = ['false','plf']
 predict_probabilites.index = md['frn_complete']
-predict_probabilites.reset_index().to_csv('model_data_versions/June21_lit_fiber_probabilities.csv',index=False,float_format='%.7f')
+predict_probabilites.reset_index().to_csv('data/June21_lit_fiber_probabilities.csv',index=False,float_format='%.7f')
 
 
 # **Export the Validation Set Probabilities**
@@ -801,9 +802,9 @@ with open('final_models/modA_column_order.pkl', 'wb') as f:
 
 # --------------
 
-# 
+# **Convert this notebook to a python file**
 
-# In[ ]:
+# In[6]:
 
 sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
 import __main__ as main

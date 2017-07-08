@@ -34,8 +34,9 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries and Data 
 
-# In[2]:
+# In[1]:
 
+import sys
 import os
 import psycopg2
 import pandas as pd
@@ -490,7 +491,7 @@ model_columns = model_data.columns.tolist()
 model_columns.remove('has_na_fill')
 model_columns.remove('cl_connect_category')
 
-with open('model_data_versions/modeling_columns.pkl','w') as f:
+with open('model_versions/modeling_columns.pkl','w') as f:
     pickle.dump(model_columns,f)
 
 len(model_columns)
@@ -716,7 +717,7 @@ final_model_data = model_data_wdummies.copy(deep=True)
 
 # In[57]:
 
-with open('model_data_versions/final_modeling_columns.pkl','w') as f:
+with open('model_versions/final_modeling_columns.pkl','w') as f:
     pickle.dump(final_model_data.columns.tolist(),f)
 
 
@@ -733,10 +734,20 @@ print 'After we Drop NA', final_model_data.shape
 
 # In[59]:
 
-final_model_data.to_csv('model_data_versions/model_data_output_June16_2017.csv',index=False)
+final_model_data.to_csv('data/model_data_output_June16_2017.csv', index=False)
 
 
 # --------------
+
+# **Convert this notebook to a python file**
+
+# In[3]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Featurizer_A_Main_2016_Data_dk.ipynb', 'ESH_Featurizer_A_Main_2016_Data_dk.py', main)
+
 
 # # End 
 

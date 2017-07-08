@@ -540,7 +540,7 @@ raw_clean_mg.to_csv('../../data/interim/changecount_June12_17.csv', encoding='ut
 
 # **Convert this notebook to a python file**
 
-# In[5]:
+# In[7]:
 
 sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
 import __main__ as main

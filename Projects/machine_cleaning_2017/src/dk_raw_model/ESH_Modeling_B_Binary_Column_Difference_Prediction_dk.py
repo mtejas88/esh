@@ -27,8 +27,10 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries
 
-# In[13]:
+# In[1]:
 
+import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -144,14 +146,15 @@ changes[diffcols].sum()
 
 # In[19]:
 
-validation_set = pd.read_csv('local_data/esh_validation_sample.csv')
+#validation_set = pd.read_csv('local_data/esh_validation_sample.csv')
+validation_set = pd.read_csv('data/esh_validation_sample.csv')
 
 
 # **Load Model Data **
 
 # In[20]:
 
-data_path = 'model_data_versions/model_data_output_DK_handoff.csv'
+data_path = 'data/model_data_output_DK_handoff.csv'
 md = pd.read_csv(data_path)
 
 ## Segment the Validation Set and 
@@ -170,7 +173,7 @@ print X.shape
 
 # In[9]:
 
-with open('final_models/modA_column_order.pkl', 'rb') as f:
+with open('model_versions/final_models/modA_column_order.pkl', 'rb') as f:
     modA_col_order = pickle.load(f)
 
 
@@ -318,6 +321,16 @@ joblib.load('final_models/col_diff_models/diff_function_model.pkl').score(vld_X,
 
 
 # ---------
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Modeling_B_Binary_Column_Difference_Prediction_dk.ipynb', 'ESH_Modeling_B_Binary_Column_Difference_Prediction_dk.py', main)
+
 
 # # End
 

@@ -28,8 +28,9 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries and Data 
 
-# In[2]:
+# In[1]:
 
+import sys
 import os
 import psycopg2
 import pandas as pd
@@ -279,7 +280,7 @@ s1.sort_values('col')
 
 # In[19]:
 
-modeling_columns = pickle.load(open('model_data_versions/modeling_columns.pkl', 'rb'))
+modeling_columns = pickle.load(open('model_versions/modeling_columns.pkl', 'rb'))
 
 
 # In[20]:
@@ -400,7 +401,7 @@ s
 
 # In[30]:
 
-modeldata2016 = pd.read_csv('model_data_versions/model_data_output_June16_2017.csv')
+modeldata2016 = pd.read_csv('data/model_data_output_June16_2017.csv')
 
 
 # In[31]:
@@ -636,7 +637,7 @@ s1s
 
 # In[53]:
 
-final_modeling_columns = pickle.load(open('model_data_versions/final_modeling_columns.pkl', 'rb'))
+final_modeling_columns = pickle.load(open('model_versions/final_modeling_columns.pkl', 'rb'))
 
 
 # In[54]:
@@ -714,7 +715,7 @@ final_model_data.shape
 
 # In[62]:
 
-final_model_data.to_csv('model_data_versions/featurized_2017_data.csv',index=False)
+final_model_data.to_csv('data/featurized_2017_data.csv', index=False)
 
 
 # --------------
@@ -725,7 +726,7 @@ final_model_data.to_csv('model_data_versions/featurized_2017_data.csv',index=Fal
 
 # In[63]:
 
-data2016 = pd.read_csv('model_data_versions/model_data_output_June16_2017.csv')
+data2016 = pd.read_csv('data/model_data_output_June16_2017.csv')
 
 
 # In[64]:
@@ -763,6 +764,16 @@ print 1 == True
 
 
 # ----
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Featurizer_B_Future_Data_dk.ipynb', 'ESH_Featurizer_B_Future_Data_dk.py', main)
+
 
 # # End
 

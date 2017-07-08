@@ -34,8 +34,9 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries and Data 
 
-# In[2]:
+# In[1]:
 
+import sys
 import os
 import psycopg2
 import pandas as pd
@@ -588,7 +589,7 @@ model_columns.remove('applicant_postal_cd')
 model_columns.remove('application_type')
 model_columns.remove('num_recipients')
 
-with open('model_data_versions/modeling_columns.pkl','w') as f:
+with open('model_versions/modeling_columns.pkl','w') as f:
     pickle.dump(model_columns,f)
 
 len(model_columns)
@@ -840,7 +841,7 @@ final_model_data.columns.tolist()
 
 # In[65]:
 
-with open('model_data_versions/final_modeling_columns.pkl','w') as f:
+with open('model_versions/final_modeling_columns.pkl','w') as f:
     pickle.dump(final_model_data.columns.tolist(),f)
 
 
@@ -857,10 +858,20 @@ print 'After we Drop NA', final_model_data.shape
 
 # In[67]:
 
-final_model_data.to_csv('model_data_versions/model_data_output_pristine.csv',index=False,float_format='%.3f')
+final_model_data.to_csv('data/model_data_output_pristine.csv', index=False, float_format='%.3f')
 
 
 # --------------
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Featurizer_A_Main_2016_Data.ipynb', 'ESH_Featurizer_A_Main_2016_Data.py', main)
+
 
 # # End 
 

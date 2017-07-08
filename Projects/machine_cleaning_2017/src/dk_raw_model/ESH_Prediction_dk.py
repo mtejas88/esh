@@ -26,8 +26,10 @@ get_ipython().run_cell_magic(u'javascript', u'', u"$.getScript('https://kmahelon
 
 # # Import Libraries
 
-# In[2]:
+# In[1]:
 
+import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -71,7 +73,7 @@ from modeling_helpers import *
 
 # In[4]:
 
-class_encoder = joblib.load('model_data_versions/final_models/classes_encoder.pkl')
+class_encoder = joblib.load('model_versions/final_models/classes_encoder.pkl')
 
 
 # In[5]:
@@ -323,5 +325,15 @@ pd.DataFrame(modC_composite_model.predict_proba(composite_md),columns=class_enco
 
 
 # -----
+
+# **Convert this notebook to a python file**
+
+# In[2]:
+
+sys.path.append(os.path.abspath('/Users/adriannaesh/Documents/ESH-Code/ficher/General_Resources/common_functions/'))
+import __main__ as main
+import ipynb_convert
+ipynb_convert.executeConvertNotebook('ESH_Prediction_dk.ipynb', 'ESH_Prediction_dk.py', main)
+
 
 # # End
