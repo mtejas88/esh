@@ -222,9 +222,13 @@ null as knapsack_meeting_2014_goal_no_oversub,
 null as knapsack_meeting_2018_goal_oversub,
 
 -- UPGRADE
-null as upgraded_to_meet_2014_goal
+null as upgraded_to_meet_2014_goal,
 
 -- SWITCHER
+
+-- SERVICE PROVIDER
+null as service_provider_assignment
+
 
 from f
 join public.states s
@@ -441,10 +445,12 @@ case
   when dd.meeting_2014_goal_no_oversub = true and d.meeting_2014_goal_no_oversub = false 
   then 1
   else 0
-end as upgraded_to_meet_2014_goal
+end as upgraded_to_meet_2014_goal,
 
 -- SWITCHER
 
+-- SERVICE PROVIDER
+dd.service_provider_assignment
 
 from public.fy2016_districts_deluxe_matr dd
 left join public.fy2015_districts_deluxe_m d
@@ -669,9 +675,12 @@ case
   when dd.meeting_2014_goal_no_oversub = true and d.meeting_2014_goal_no_oversub = false 
   then 1
   else 0
-end as upgraded_to_meet_2014_goal
+end as upgraded_to_meet_2014_goal,
 
 -- SWITCHER
+
+-- SERVICE PROVIDER
+dd.service_provider_assignment
 
 from public.fy2017_districts_deluxe_matr dd
 left join public.fy2016_districts_deluxe_matr d
