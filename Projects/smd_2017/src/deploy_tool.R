@@ -211,7 +211,7 @@ fiber.click.through <- merge(fiber.click.through, dd_2016[,c('esh_id', cols.to.m
 names(fiber.click.through)[names(fiber.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(fiber.click.through)[names(fiber.click.through) %in% cols.to.merge.each.year], "2016", sep="_")
 ## order the dataset
-fiber.click.through <- fiber.click.through[order(fiber.click.through$current_assumed_unscalable_campuses, decreasing=T),]
+fiber.click.through <- fiber.click.through[order(fiber.click.through$current_assumed_unscalable_campuses_2017, decreasing=T),]
 ## add in IRT links
 fiber.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "'>",
                                       "http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "</a>", sep='')
@@ -261,8 +261,8 @@ affordability.click.through <- affordability.click.through[c('postal_cd', 'esh_i
 
 ## WIFI (Click-Through)
 ##-------------------------------
-wifi.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size', 'num_students',
-                                 'needs_wifi','c2_prediscount_remaining_17','c2_prediscount_remaining_16','irt_link')]
+wifi.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size','num_students','needs_wifi','c2_prediscount_remaining_17','c2_prediscount_remaining_16')]
+#wifi.click.through <- select(dd_2017, postal_cd, esh_id, name, locale, district_size,num_students,needs_wifi,c2_prediscount_remaining_17,c2_prediscount_remaining_16,irt_link)
 ## order the dataset
 wifi.click.through <- wifi.click.through[order(wifi.click.through$needs_wifi, decreasing=T),]
 
