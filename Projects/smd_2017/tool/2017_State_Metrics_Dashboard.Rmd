@@ -13,6 +13,7 @@ resource_files:
 - data/sots16_click_through.csv
 - data/connectivity_targets.csv
 - data/fiber_targets.csv
+- data/wifi_click_through.csv
 #- data/snapshots.csv
 - data/tool_colors.csv
 - data/date.csv
