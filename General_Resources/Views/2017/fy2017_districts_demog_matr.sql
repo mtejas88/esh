@@ -64,8 +64,7 @@ select  case
         end as district_size,
         d."UNION" as union_code,
         sf.include_in_universe_of_districts,
-        --DO WE NEED THIS? I DON'T THINK THIS FIELD SHOULD EXIST
-        sf.include_in_universe_of_districts as include_in_universe_of_districts_all_charters,
+        sf.include_in_universe_of_districts_all_charters as include_in_universe_of_districts_all_charters,
         case
           when a.billingstatecode = 'VT' then stf_VT.num_teachers
           when a.billingstatecode = 'MT' then stf_MT.num_teachers
@@ -118,9 +117,17 @@ left join (
       when count(f.esh_id__c) > 0
        and sum(f.num_students__c) > 0
        and count(distinct f.campus__c) > 0
+       and (a.type != 'Charter' or a.billingstatecode = 'AZ')
         then true
       else false
-    end as include_in_universe_of_districts
+    end as include_in_universe_of_districts,
+    case
+      when count(f.esh_id__c) > 0
+       and sum(f.num_students__c) > 0
+       and count(distinct f.campus__c) > 0
+        then true
+      else false
+    end as include_in_universe_of_districts_all_charters
 
   from salesforce.account a
 
@@ -135,8 +142,11 @@ left join (
   --exclude charter schools within traditional districts
   and (f.charter__c = false or a.type = 'Charter')
 
+
   group by 
-    a.esh_id__c
+    a.esh_id__c,
+    a.type,
+    a.billingstatecode
 ) sf
 on a.esh_id__c = sf.district_esh_id
 
