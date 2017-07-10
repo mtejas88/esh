@@ -2,7 +2,7 @@ select d.esh_id,
 upper(d.name) as district_name,
 initcap(d.city) as city,
 li.frn_complete,
-d.discount_rate_c1*100 as erate_discount,
+d.discount_rate_c1_matrix*100 as erate_discount,
 case  when sr.purpose = 'WAN' then 'District WAN'
       when sr.purpose = 'Upstream' then 'Transport to ISP'
       else sr.purpose end as purpose_of_service,
