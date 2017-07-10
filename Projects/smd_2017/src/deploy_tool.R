@@ -361,6 +361,7 @@ write.csv(upgrades.click.through, "tool/data/upgrades_click_through.csv", row.na
 write.csv(connectivity.click.through, "tool/data/connectivity_click_through.csv", row.names=F)
 write.csv(fiber.click.through, "tool/data/fiber_click_through.csv", row.names=F)
 write.csv(affordability.click.through, "tool/data/affordability_click_through.csv", row.names=F)
+write.csv(wifi.click.through, "tool/data/wifi_click_through.csv", row.names=F)
 ## targets
 write.csv(connectivity.targets, "tool/data/connectivity_targets.csv", row.names=F)
 write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
