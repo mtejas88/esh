@@ -87,25 +87,25 @@ dd_2016_froz <- combine.sp(dd_2016_froz)
 ##-------------------------------
 ## 2017
 current17.click.through <- dd_2017[,c("esh_id", "postal_cd", "name", "locale", "district_size", "district_type",
-                                                "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip",
-                                                "lines_w_dirty", names(dd_2017)[grepl("exclude", names(dd_2017))])]
+                                      "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip",
+                                      "lines_w_dirty", names(dd_2017)[grepl("exclude", names(dd_2017))])]
 current17.click.through$no_data <- ifelse(current17.click.through$lines_w_dirty == 0, TRUE, FALSE)
 current17.click.through$lines_w_dirty <- NULL
 ## add in IRT links
 current17.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "</a>", sep='')
+                                          "http://irt.educationsuperhighway.org/entities/districts/", current17.click.through$esh_id, "</a>", sep='')
 ## order dataset
 current17.click.through <- current17.click.through[order(current17.click.through$postal_cd),]
 
 ## 2016
 sots16.click.through <- dd_2016_froz[,c("esh_id", "postal_cd", "name", "locale", "district_size", "district_type",
-                                                "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip", "lines_w_dirty",
-                                                names(dd_2016_froz)[grepl("exclude", names(dd_2016_froz))])]
+                                        "num_schools", "num_campuses", "num_students", "frl_percent", "address", "city", "zip", "lines_w_dirty",
+                                        names(dd_2016_froz)[grepl("exclude", names(dd_2016_froz))])]
 sots16.click.through$no_data <- ifelse(sots16.click.through$lines_w_dirty == 0, TRUE, FALSE)
 sots16.click.through$lines_w_dirty <- NULL
 ## add in IRT links
 sots16.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "'>",
-                                                    "http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "</a>", sep='')
+                                       "http://irt.educationsuperhighway.org/entities/districts/", sots16.click.through$esh_id, "</a>", sep='')
 ## order dataset
 sots16.click.through <- sots16.click.through[order(sots16.click.through$postal_cd),]
 
@@ -125,7 +125,7 @@ overlap.ids <- dd_2017_cl$esh_id[which(dd_2017_cl$esh_id %in% dd_2016_cl$esh_id)
 
 ## 2017
 upgrades.click.through <- dd_2017_cl[dd_2017_cl$esh_id %in% overlap.ids, c('esh_id', 'name', 'postal_cd', 'locale',
-                                                               'district_size', 'upgrade_indicator', 'outlier_status', cols.to.merge.each.year)]
+                                                                           'district_size', 'upgrade_indicator', 'outlier_status', cols.to.merge.each.year)]
 names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(upgrades.click.through)[names(upgrades.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -142,6 +142,22 @@ upgrades.click.through[grepl("ia_bw_mbps_total", names(upgrades.click.through))]
 upgrades.click.through[grepl("ia_monthly_cost_total", names(upgrades.click.through))] <- round(upgrades.click.through[grepl("ia_monthly_cost_total", names(upgrades.click.through))], 2)
 upgrades.click.through[grepl("ia_bandwidth_per_student_kbps", names(upgrades.click.through))] <- round(upgrades.click.through[grepl("ia_bandwidth_per_student_kbps", names(upgrades.click.through))], 0)
 
+## add in IRT links
+upgrades.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", upgrades.click.through$esh_id, "'>",
+                                             "http://irt.educationsuperhighway.org/entities/districts/", upgrades.click.through$esh_id, "</a>", sep='')
+## Rearrange columns to pair key metrics (column order). columns repeat after
+upgrades.click.through <- upgrades.click.through[c('esh_id', 'name', 'postal_cd', 'locale','district_size', 'upgrade_indicator', 'outlier_status','num_schools_2017', 'num_campuses_2017', 'num_students_2017',
+                                                   'ia_bw_mbps_total_2017','ia_bw_mbps_total_2016', 'diff_bw', 'ia_bandwidth_per_student_kbps_2017', 'ia_bandwidth_per_student_kbps_2016','ia_monthly_cost_total_2017',
+                                                   'ia_monthly_cost_total_2016','meeting_2014_goal_no_oversub_2017', 'meeting_knapsack_affordability_target_2017',
+                                                   'non_fiber_internet_upstream_lines_w_dirty_2017', 'fiber_internet_upstream_lines_w_dirty_2017', 'bundled_and_dedicated_isp_sp_2017','most_recent_ia_contract_end_date_2017',
+                                                   'num_internet_upstream_lines_2017','num_schools_2016', 'num_campuses_2016', 'num_students_2016', 
+                                                   'meeting_2014_goal_no_oversub_2016', 'meeting_knapsack_affordability_target_2016','non_fiber_internet_upstream_lines_w_dirty_2016',
+                                                   'fiber_internet_upstream_lines_w_dirty_2016', 'bundled_and_dedicated_isp_sp_2016',
+                                                   'most_recent_ia_contract_end_date_2016', 'num_internet_upstream_lines_2016','irt_link' )]
+                                                   
+                                                   
+                                                   
+                                                   
 
 ## CONNECTIVITY (Click-Through)
 ##-------------------------------
@@ -158,6 +174,8 @@ connectivity.click.through <- merge(connectivity.click.through, dd_2016[,c('esh_
 names(connectivity.click.through)[names(connectivity.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(connectivity.click.through)[names(connectivity.click.through) %in% cols.to.merge.each.year], "2016", sep="_")
 
+connectivity.click.through$diff_bw <- connectivity.click.through$ia_bw_mbps_total_2017 - connectivity.click.through$ia_bw_mbps_total_2016
+
 ## round cols
 connectivity.click.through[grepl("ia_bandwidth_per_student_kbps", names(connectivity.click.through))] <- round(connectivity.click.through[grepl("ia_bandwidth_per_student_kbps", names(connectivity.click.through))], 0)
 connectivity.click.through[grepl("ia_bw_mbps_total", names(connectivity.click.through))] <- round(connectivity.click.through[grepl("ia_bw_mbps_total", names(connectivity.click.through))], 0)
@@ -167,16 +185,21 @@ connectivity.click.through$irt_link <- paste("<a href='http://irt.educationsuper
 ## order the dataset by not meeting goals in 2016 to meeting goals in 2017
 connectivity.click.through <- connectivity.click.through[order(connectivity.click.through$meeting_2014_goal_no_oversub_2016,
                                                                rev(connectivity.click.through$meeting_2014_goal_no_oversub_2017), decreasing=F),]
-
+## Reordering Columns to put key metrics together
+connectivity.click.through <- connectivity.click.through[c('esh_id', 'postal_cd', 'name', 'locale', 'district_size', 'num_schools',
+                                 'num_students', 'outlier_status','ia_bandwidth_per_student_kbps_2017','ia_bandwidth_per_student_kbps_2016', 
+                                 'ia_bw_mbps_total_2017','ia_bw_mbps_total_2016', 'diff_bw', 'meeting_2014_goal_no_oversub_2017', 
+                                 'bundled_and_dedicated_isp_sp_2017', 'most_recent_ia_contract_end_date_2017', 
+                                 'meeting_2014_goal_no_oversub_2016', 'bundled_and_dedicated_isp_sp_2016', 'most_recent_ia_contract_end_date_2016','irt_link')]
+                                 
 
 ## FIBER (Click-Through)
 ##-------------------------------
-cols.to.merge.each.year <- c('bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date')
+cols.to.merge.each.year <- c('bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date','current_known_scalable_campuses', 'current_assumed_scalable_campuses',
+                             'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses')
 ## 2017
 fiber.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'num_campuses',
-                                  cols.to.merge.each.year, 'fiber_target_status',
-                                  'current_known_scalable_campuses', 'current_assumed_scalable_campuses',
-                                  'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses',
+                                  'fiber_target_status', cols.to.merge.each.year,
                                   names(dd_2017)[grepl('exclude', names(dd_2017))],
                                   names(dd_2017)[grepl('flag', names(dd_2017))],
                                   names(dd_2017)[grepl('tag', names(dd_2017))])]
@@ -188,11 +211,21 @@ fiber.click.through <- merge(fiber.click.through, dd_2016[,c('esh_id', cols.to.m
 names(fiber.click.through)[names(fiber.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(fiber.click.through)[names(fiber.click.through) %in% cols.to.merge.each.year], "2016", sep="_")
 ## order the dataset
-fiber.click.through <- fiber.click.through[order(fiber.click.through$current_assumed_unscalable_campuses, decreasing=T),]
+fiber.click.through <- fiber.click.through[order(fiber.click.through$current_assumed_unscalable_campuses_2017, decreasing=T),]
 ## add in IRT links
 fiber.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "'>",
                                       "http://irt.educationsuperhighway.org/entities/districts/", fiber.click.through$esh_id, "</a>", sep='')
 
+## Reorder Columns to place key metrics side by side
+fiber.click.through <- fiber.click.through[c('postal_cd', 'esh_id', 'name', 'num_campuses',
+  'fiber_target_status', 'bundled_and_dedicated_isp_sp_2017', 'bundled_and_dedicated_isp_sp_2016','most_recent_ia_contract_end_date_2017','most_recent_ia_contract_end_date_2016',
+  'current_known_scalable_campuses_2017', 'current_assumed_scalable_campuses_2017',
+  'current_assumed_unscalable_campuses_2017', 'current_known_unscalable_campuses_2017',
+   'current_known_scalable_campuses_2016', 'current_assumed_scalable_campuses_2016',
+  'current_assumed_unscalable_campuses_2016', 'current_known_unscalable_campuses_2016',
+  names(fiber.click.through)[grepl('exclude', names(fiber.click.through))],
+  names(fiber.click.through)[grepl('flag', names(fiber.click.through))],
+  names(fiber.click.through)[grepl('tag', names(fiber.click.through))])]
 
 ## AFFORDABILITY (Click-Through)
 ##-------------------------------
@@ -200,8 +233,8 @@ cols.to.merge.each.year <- c('ia_monthly_cost_per_mbps', 'ia_bw_mbps_total', 'ia
                              'meeting_knapsack_affordability_target')
 ## 2017
 affordability.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size',
-                                           'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
-                                           'num_internet_upstream_lines', 'num_students', 'outlier_status', cols.to.merge.each.year)]
+                                          'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
+                                          'num_internet_upstream_lines', 'num_students', 'outlier_status', cols.to.merge.each.year)]
 names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year] <- 
   paste(names(affordability.click.through)[names(affordability.click.through) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -219,7 +252,26 @@ affordability.click.through <- affordability.click.through[order(affordability.c
 ## add in IRT links
 affordability.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "'>",
                                               "http://irt.educationsuperhighway.org/entities/districts/", affordability.click.through$esh_id, "</a>", sep='')
+## Reorder Columns
+affordability.click.through <- affordability.click.through[c('postal_cd', 'esh_id', 'name', 'locale', 'district_size',
+    'bundled_and_dedicated_isp_sp', 'most_recent_ia_contract_end_date',
+    'num_internet_upstream_lines', 'num_students', 'outlier_status','meeting_knapsack_affordability_target_2017', 'meeting_knapsack_affordability_target_2016',
+    'ia_monthly_cost_per_mbps_2017', 'ia_monthly_cost_per_mbps_2016','ia_bw_mbps_total_2017', 'ia_bw_mbps_total_2016',
+    'ia_monthly_cost_total_2017', 'ia_monthly_cost_total_2016', 'irt_link')]
 
+## WIFI (Click-Through)
+##-------------------------------
+wifi.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'district_size','num_students','needs_wifi','c2_prediscount_remaining_17','c2_prediscount_remaining_16')]
+#wifi.click.through <- select(dd_2017, postal_cd, esh_id, name, locale, district_size,num_students,needs_wifi,c2_prediscount_remaining_17,c2_prediscount_remaining_16,irt_link)
+## order the dataset
+wifi.click.through <- wifi.click.through[order(wifi.click.through$needs_wifi, decreasing=T),]
+## round cols
+wifi.click.through[grepl("c2_prediscount_remaining_17", names(wifi.click.through))] <- round(wifi.click.through[grepl("c2_prediscount_remaining_17", names(wifi.click.through))], 2)
+wifi.click.through[grepl("c2_prediscount_remaining_16", names(wifi.click.through))] <- round(wifi.click.through[grepl("c2_prediscount_remaining_16", names(wifi.click.through))], 2)
+
+## add in IRT links
+wifi.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", wifi.click.through$esh_id, "'>",
+                                     "http://irt.educationsuperhighway.org/entities/districts/", wifi.click.through$esh_id, "</a>", sep='')
 
 ## CONNECTIVITY (Targets)
 ##-------------------------------
@@ -263,12 +315,12 @@ dd_2017$num_circuits <- dd_2017$non_fiber_lines + dd_2017$fiber_wan_lines + dd_2
 dd_2017$total_unknown_campuses <- dd_2017$current_assumed_scalable_campuses + dd_2017$current_assumed_unscalable_campuses
 fiber.targets <- dd_2017[which(dd_2017$fiber_target_status == 'Target' | dd_2017$fiber_target_status == 'Potential Target'),]
 fiber.targets <- fiber.targets[,c('esh_id', 'postal_cd', 'name', 'locale', 'district_size',
-                                                'num_students', 'num_campuses', 'num_circuits',
-                                                cols.to.merge.each.year, 'ia_bandwidth_per_student_kbps', 'ia_bw_mbps_total',
-                                                'current_known_scalable_campuses', 'current_assumed_scalable_campuses',
-                                                'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses', 'total_unknown_campuses',
-                                                'fiber_target_status', 'no_data',
-                                                names(fiber.targets)[grepl('exclude', names(fiber.targets))])]
+                                  'num_students', 'num_campuses', 'num_circuits',
+                                  cols.to.merge.each.year, 'ia_bandwidth_per_student_kbps', 'ia_bw_mbps_total',
+                                  'current_known_scalable_campuses', 'current_assumed_scalable_campuses',
+                                  'current_assumed_unscalable_campuses', 'current_known_unscalable_campuses', 'total_unknown_campuses',
+                                  'fiber_target_status', 'no_data',
+                                  names(fiber.targets)[grepl('exclude', names(fiber.targets))])]
 names(fiber.targets)[names(fiber.targets) %in% cols.to.merge.each.year] <- 
   paste(names(fiber.targets)[names(fiber.targets) %in% cols.to.merge.each.year], "2017", sep="_")
 
@@ -286,7 +338,7 @@ fiber.targets[grepl("current_assumed_unscalable", names(fiber.targets))] <- roun
 fiber.targets <- fiber.targets[order(fiber.targets$current_assumed_unscalable_campuses, decreasing=T),]
 ## add in IRT links
 fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "'>",
-                                       "http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "</a>", sep='')
+                                "http://irt.educationsuperhighway.org/entities/districts/", fiber.targets$esh_id, "</a>", sep='')
 
 
 
@@ -312,6 +364,7 @@ write.csv(upgrades.click.through, "tool/data/upgrades_click_through.csv", row.na
 write.csv(connectivity.click.through, "tool/data/connectivity_click_through.csv", row.names=F)
 write.csv(fiber.click.through, "tool/data/fiber_click_through.csv", row.names=F)
 write.csv(affordability.click.through, "tool/data/affordability_click_through.csv", row.names=F)
+write.csv(wifi.click.through, "tool/data/wifi_click_through.csv", row.names=F)
 ## targets
 write.csv(connectivity.targets, "tool/data/connectivity_targets.csv", row.names=F)
 write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)

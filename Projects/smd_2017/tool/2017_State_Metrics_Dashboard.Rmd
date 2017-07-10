@@ -13,6 +13,7 @@ resource_files:
 - data/sots16_click_through.csv
 - data/connectivity_targets.csv
 - data/fiber_targets.csv
+- data/wifi_click_through.csv
 #- data/snapshots.csv
 - data/tool_colors.csv
 - data/date.csv
@@ -62,7 +63,7 @@ upgrades_ct <- read.csv("data/upgrades_click_through.csv", as.is=T, header=T, st
 connectivity_ct <- read.csv("data/connectivity_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 fiber_ct <- read.csv("data/fiber_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 affordability_ct <- read.csv("data/affordability_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
-
+wifi_ct <- read.csv("data/wifi_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 ## targets
 connectivity_tar <- read.csv("data/connectivity_targets.csv", as.is=T, header=T, stringsAsFactors=F)
 fiber_tar <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -91,6 +92,7 @@ upgrades_ct_sub <- reactive({upgrades_ct %>% filter(postal_cd %in% input$state)}
 connectivity_ct_sub <- reactive({connectivity_ct %>% filter(postal_cd %in% input$state)})
 fiber_ct_sub <- reactive({fiber_ct %>% filter(postal_cd %in% input$state)})
 affordability_ct_sub <- reactive({affordability_ct %>% filter(postal_cd %in% input$state)})
+wifi_ct_sub <- reactive({wifi_ct %>% filter(postal_cd %in% input$state)})
 
 ## targets
 connectivity_tar_sub <- reactive({connectivity_tar %>% filter(postal_cd %in% input$state)})
@@ -473,7 +475,7 @@ Row {data-height = 350}
 img(src = "figures/wifi.png", height = "100%", width = "100%")
 ```
 
-### C2 Money Leftover (in Millions) {.no-padding}
+### [C2 Money Leftover (in Millions)](#deep-dive-wifi)
 ```{r}
 renderHighchart({
   highchart() %>% hc_chart(type = 'column') %>% 
@@ -931,13 +933,26 @@ Row
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(affordability_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(wifi_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   } else{
-    datatable(affordability_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(wifi_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   }
 })
 ```
 
+Deep Dive Wifi {.hidden data-orientation=rows}
+=====================================================================
+Row 
+---------------------------------------------------------------------
+```{r}
+renderDataTable({
+  if (input$state == 'ALL'){
+    datatable(wifi_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+  } else{
+    datatable(wifi_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+  }
+})
+```
 
 
 Target Lists Connectivity {.hidden data-orientation=rows}
