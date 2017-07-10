@@ -265,6 +265,9 @@ wifi.click.through <- dd_2017[,c('postal_cd', 'esh_id', 'name', 'locale', 'distr
 #wifi.click.through <- select(dd_2017, postal_cd, esh_id, name, locale, district_size,num_students,needs_wifi,c2_prediscount_remaining_17,c2_prediscount_remaining_16,irt_link)
 ## order the dataset
 wifi.click.through <- wifi.click.through[order(wifi.click.through$needs_wifi, decreasing=T),]
+## round cols
+wifi.click.through[grepl("c2_prediscount_remaining_17", names(wifi.click.through))] <- round(wifi.click.through[grepl("c2_prediscount_remaining_17", names(wifi.click.through))], 2)
+wifi.click.through[grepl("c2_prediscount_remaining_16", names(wifi.click.through))] <- round(wifi.click.through[grepl("c2_prediscount_remaining_16", names(wifi.click.through))], 2)
 
 ## add in IRT links
 wifi.click.through$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/entities/districts/", wifi.click.through$esh_id, "'>",
