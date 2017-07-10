@@ -1,0 +1,38 @@
+---
+title: "readme"
+author: "Sujin Oh"
+date: "October 4, 2016"
+output: html_document
+---
+
+## Motivation   
+
+The State Metric Dashboard was developed to aid exploratory analysis for answering research questions for 2016 Progress Tracking. 
+A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists.  
+
+## Synopsis         
+
+At the very least, this dashboard provides high level metric takeways for each state. This dashboard strives to also guide exploratory analysis with the aid of visualizations relevant to each section of the dashboard (i.e. Connectivity section vs. Affordability section).                 
+
+
+## Code Example    
+
+All code is written within "chunks". If you want to conduct any calculations or build any functions, all code must be written within these chunks. If you are working with reactive datasets (meaning, you allow the user to filter/manipulate the data on the dashboard), then you must nest all code within reactive or render functions such as reactive({ }) or renderPlot({ }). Essentially same idea as in Shiny.         
+
+         
+    
+## Installation             
+
+Provide code examples and explanations of how to get the project.           
+
+## Tests              
+
+Describe and show how to run the tests with code examples.          
+
+## Contributors           
+
+Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.       
+
+## License          
+
+A short snippet describing the license (MIT, Apache, etc.)            
