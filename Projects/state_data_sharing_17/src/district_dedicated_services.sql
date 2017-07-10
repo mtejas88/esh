@@ -1,6 +1,7 @@
 select d.esh_id,
 upper(d.name) as district_name,
 initcap(d.city) as city,
+d.postal_cd as state,
 li.frn_complete,
 d.discount_rate_c1_matrix*100 as erate_discount,
 case  when sr.purpose = 'WAN' then 'District WAN'
