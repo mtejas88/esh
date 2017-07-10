@@ -55,6 +55,8 @@ select distinct
 
 	discount_rate_c1,
 
+	discount_rate_c1_matrix,
+
 	discount_rate_c2,
 
 	address,

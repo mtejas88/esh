@@ -66,6 +66,12 @@ select
       else false
   end as meeting_$3_per_mbps_affordability_target,
 
+  case
+    when ((cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students)::numeric > 0
+      then affordability_calculator(((cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students * cdd_calc.ia_cost_per_mbps/12)::integer, ((cdd_calc.ia_bandwidth_per_student/1000) * cdd_calc.num_students)::integer)
+    else false
+  end as meeting_knapsack_affordability_target,
+
   --5) fiber
   COALESCE (
     case when (cdd_calc.all_IA_connectcat ILIKE '%Fiber%') then 'Fiber' else NULL end,
@@ -566,7 +572,7 @@ on districts.esh_id=pt.recipient_id
 /*
 Author: Justine Schott
 Created On Date: 2/9/2016
-Last Modified Date: 11/29/2016
+Last Modified Date: 6/23/17 - JH added meeting knapsack
 Name of QAing Analyst(s): Greg Kurzhals, last modified by Jess Seok
 Purpose: Purpose: Districts table data pull with added columns
 Methodology:

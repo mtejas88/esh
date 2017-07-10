@@ -7,151 +7,144 @@
 ## Clearing memory
 rm(list=ls())
 
-## source functions
-source("src/define_broadband.R")
+library(dplyr)
+library(tidyr)
 
 ##**************************************************************************************************************************************************
 ## READ IN DATA
 
-frn.line.items.2016 <- read.csv("data/raw/frn_line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
-frn.meta.data.2016 <- read.csv("data/raw/frn_meta_data_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 line.items.2016 <- read.csv("data/raw/line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+frn.meta.data.2016 <- read.csv("data/raw/frn_meta_data_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+clean.line.items.2016 <- read.csv("data/raw/clean_line_items_2016.csv", as.is=T, header=T, stringsAsFactors=F)
 sp.2016 <- read.csv("data/raw/service_providers_2016.csv", as.is=T, header=T, stringsAsFactors=F)
+
+line.items.2017 <- read.csv("data/raw/line_items_2017.csv", as.is=T, header=T, stringsAsFactors=F)
+frn.meta.data.2017 <- read.csv("data/raw/frn_meta_data_2017.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
 ## CLEAN DATA
 
-## first, merge together line item and meta data
-frn.dta <- merge(frn.line.items.2016, frn.meta.data.2016[,c('frn', names(frn.meta.data.2016)[!names(frn.meta.data.2016) %in% names(frn.line.items.2016)])],
-                 by='frn', all.x=T)
+line.items.2016$frn <- as.character(line.items.2016$frn)
+frn.meta.data.2016$frn <- as.character(frn.meta.data.2016$frn)
+line.items.2016$frn_complete <- as.character(line.items.2016$frn_complete)
+clean.line.items.2016$frn_complete <- as.character(clean.line.items.2016$frn_complete)
+line.items.2017$frn <- as.character(line.items.2017$frn)
+frn.meta.data.2017$frn <- as.character(frn.meta.data.2017$frn)
 
-## look into how often was "Not Broadband" changed to a Broadband category
-## first, translate the raw line items to whether they came in as not broadband
-frn.dta <- define_broadband(frn.dta)
+## combine metadata with line item data
+mg_raw <- merge(line.items.2016, frn.meta.data.2016[,c('frn', names(frn.meta.data.2016)[!names(frn.meta.data.2016) %in% names(line.items.2016)])],
+                by='frn', all.x=T)
+## subset to line items that are broadband
+mg_raw <- mg_raw[which(mg_raw$broadband == "t"),]
+
+## combine metadata with line item data
+line.items.2017 <- line.items.2017 %>% separate(frn, c("new_frn", "line_id"), "\\.")
+frn.meta.data.2017 <- frn.meta.data.2017 %>% separate(frn, c("new_frn", "line_id"), "\\.")
+mg_raw_2017 <- merge(line.items.2017, frn.meta.data.2017[,c('new_frn', names(frn.meta.data.2017)[!names(frn.meta.data.2017) %in% names(line.items.2017)])],
+                by='new_frn', all.x=T)
+## subset to line items that are broadband
+mg_raw_2017 <- mg_raw_2017[which(mg_raw_2017$broadband == "t"),]
+
+## collect all clean frn_completes that are duplicated (means they were de-bundled when cleaned)
+duplicate.frns <- clean.line.items.2016$frn_complete[duplicated(clean.line.items.2016$frn_complete)]
+duplicate.frns <- unique(duplicate.frns)
+## subset to the clean line items that are not duplicated
+clean.line.items.2016 <- clean.line.items.2016[which(!clean.line.items.2016$frn_complete %in% duplicate.frns),]
+## append "clean" to each variable name in line.items
+names(clean.line.items.2016) <- paste("cl", names(clean.line.items.2016), sep='_')
+
+## merge in raw with clean connect category
+full_mg <- merge(mg_raw, clean.line.items.2016[,c('cl_frn_complete', 'cl_connect_category', 'cl_exclude')], by.x='frn_complete', by.y='cl_frn_complete', all.x=T)
+## subset to only the line items that were cleaned
+full_mg <- full_mg[which(full_mg$cl_exclude == "f"),]
+
+full_mg <- merge(full_mg, sp.2016, by='service_provider_name', all.x=T)
+table(is.na(full_mg$reporting_name))
+
+##**************************************************************************************************************************************************
+## COMPARE COLUMNS THAT WERE CHANGED
+
+## take out the "cl_"
+names(clean.line.items.2016) <- gsub("cl_", "", names(clean.line.items.2016))
+
+## define that columns that overlap
+overlap.cols <- names(clean.line.items.2016)[names(clean.line.items.2016) %in% names(line.items.2016)]
+
+names(line.items.2016) <- paste("raw_", names(line.items.2016), sep='')
+## subset to line items that are broadband
+line.items.2016 <- line.items.2016[which(line.items.2016$raw_broadband == "t"),]
+## merge
+raw_clean_mg <- merge(line.items.2016[,paste("raw_", overlap.cols, sep='')], clean.line.items.2016[,overlap.cols],
+                      by.x="raw_frn_complete", by.y="frn_complete", all.x=T)
 
 ## subset line.items to those that are fit for analysis
-line.items.2016 <- line.items.2016[which(line.items.2016$exclude == FALSE),]
-## append "clean" to each variable name in line.items
-names(line.items.2016)[names(line.items.2016) != 'id'] <- paste(names(line.items.2016)[names(line.items.2016) != 'id'], "clean", sep='.')
+raw_clean_mg <- raw_clean_mg[which(raw_clean_mg$exclude == "f"),]
 
-## merge in cleaned data
-dta <- merge(frn.dta, line.items.2016, by='id', all.y=T)
+raw_clean_mg$num_lines <- as.numeric(raw_clean_mg$num_lines)
+raw_clean_mg$raw_num_lines <- as.numeric(raw_clean_mg$raw_num_lines)
 
-## SP DATA
-## merge in reporting name with raw data
-dta <- merge(dta, sp.2016, by="service_provider_name", all.x=T)
-
-##**************************************************************************************************************************************************
-## examine how often line items that came in as Not Broadband changed to Broadband
-
-## 99% (222,413 / 224,675) stayed Not Broadband
-sub.bb <- dta[which(dta$broadband == FALSE),]
-table(sub.bb$connect_category)
-
-##**************************************************************************************************************************************************
-
-## Format data for Random Forest
-## requirements:
-## 1) no categorical variables with more than 32 factors
-## 2) change the remaining categorical variables to factors
-## 3) no NA fields
-
-## 1st Attempt: Connect Category (defined as the class variable)
-## subset the dataset to the dirty columns plus the clean version of connect_type
-dta$class <- dta$connect_category.clean
-## the class frequencies of connect category are imbalanced
-prop.table(table(dta$class))
-
-## based on the investigation above, we can confidently ignore "Not Broadband" line items for now
-dta <- dta[which(dta$broadband == TRUE),]
-
-dta.ml <- dta[,names(dta)[!names(dta) %in% names(dta)[grepl(".clean", names(dta))]]]
-
-##================================================================================================
-## Translating character variables to factors
-
-## change all categorical variables to factors
-#str(dta.ml)
-character_vars <- lapply(dta.ml, class) == "character"
-character_vars <- character_vars[character_vars == TRUE]
-dta.ml[,names(character_vars)] <- lapply(dta.ml[,names(character_vars)], as.factor)
-#str(dta.ml)
-num_factor_levels <- sapply(dta.ml[,sapply(dta.ml, is.factor)], nlevels)
-
-## need to remove the categorical variables with greater than 32 levels
-names(num_factor_levels)[num_factor_levels >= 32]
-## but first, convert the postal_cd variable to integer
-dta.ml$postal_cd <- unclass(dta.ml$postal_cd)
-## now remove the variables that have more than 32 factors
-factors.over.32 <- names(num_factor_levels)[num_factor_levels >= 32 & names(num_factor_levels) != "postal_cd"]
-dta.ml <- dta.ml[,which(!names(dta.ml) %in% factors.over.32)]
-
-## also remove variables that only have one factor
-dta.ml <- dta.ml[,which(!names(dta.ml) %in% names(num_factor_levels)[num_factor_levels == 1])]
-
-## also take out id variables (ones that are specific to the line item/FRN)
-dta.ml <- dta.ml[,which(!names(dta.ml) %in% c('id','frn', 'applicant_ben', 'application_number', 'line_item'))]
-
-##================================================================================================
-## Removing NA fields
-
-## how many rows do not have an NA in the field?
-## 0! all rows have at least 1 NA
-perc.no.na <- rowSums(!is.na(dta.ml)) / ncol(dta.ml)
-## 1 means all columns do not have an NA
-table(perc.no.na)
-
-## find out which variables have the highest percentage of being NA
-na_percentage <- function(dta){
-  na.percentage <- data.frame(matrix(NA, nrow=ncol(dta), ncol=2))
-  names(na.percentage) <- c('variable', 'percentage.na.entries')
-  for (i in 1:ncol(dta)){
-    na.percentage$variable[i] <- names(dta)[i]
-    if (NA %in% dta[,i]){
-      na.percentage$percentage.na.entries[i] <- (length(which(is.na(dta[,i]))) / nrow(dta))*100
-    }
-  }
-  na.percentage <- na.percentage[order(na.percentage$percentage.na.entries, decreasing=T),]
-  return(na.percentage)
+## for each column, record the percentage that's different
+overlap.cols <- overlap.cols[overlap.cols != "frn_complete"]
+dta.store <- data.frame(matrix(NA, nrow=length(overlap.cols), ncol=3))
+names(dta.store) <- c('column', 'percent_changed', 'percent_changed_raw')
+for (i in 1:length(overlap.cols)){
+  print(overlap.cols[i])
+  dta.store$column[i] <- overlap.cols[i]
+  raw_clean_mg$temp.col <- ifelse(raw_clean_mg[,paste('raw_', overlap.cols[i], sep='')] != raw_clean_mg[,overlap.cols[i]], 1, 0)
+  dta.store$percent_changed[i] <- round((sum(raw_clean_mg$temp.col, na.rm=T) / nrow(raw_clean_mg[!is.na(raw_clean_mg$temp.col),]))*100, 0)
+  dta.store$percent_changed_raw[i] <- round((sum(raw_clean_mg$temp.col, na.rm=T) / nrow(raw_clean_mg))*100, 0)
 }
+## sort by largest difference
+dta.store <- dta.store[order(dta.store$percent_changed, decreasing=T),]
 
-na.percentage <- na_percentage(dta.ml)
-high.na.vars <- na.percentage$variable[which(na.percentage$percentage.na.entries > 1)]
-high.na.vars
-## take out variables with a high NA percentage:
-##[1] "award_date"                                         "expiration_date"
-##[3] "service_start_date"                                 "contract_expiry_date"
-##[5] "total_monthly_ineligible_charges"                   "total_eligible_pre_discount_recurring_charges"
-##[7] "total_eligible_pre_discount_one_time_charges"       "number_of_erate_eligible_strands"
-##[9] "total_number_of_terms_in_months"                    "baloon_payment"
-##[11] "annual_interest_rate"                               "total_amount_financed"
-##[13] "match_amount"                                       "source_of_matching_funds"
-##[15] "pricing_confidentiality_type"                       "special_construction_state_tribal_match_percentage"
-##[17] "total_project_plant_route_feet"                     "average_cost_per_foot_of_outside_plant"
-##[19] "total_strands"                                      "fiber_type"
-##[21] "fiber_sub_type"                                     "burstable_speed_units"
-##[23] "burstable_speed"                                    "remaining_voluntary_extensions"
-##[25] "total_remaining_contract_length"                    "user_entered_establishing_fcc_form470"
-##[27] "establishing_fcc_form470"
-
-## taking out the variables with high NA percentage
-dta.ml <- dta.ml[,which(!names(dta.ml) %in% high.na.vars)]
-
-## how many rows do not have an NA in the field now?
-perc.no.na <- rowSums(!is.na(dta.ml)) / ncol(dta.ml)
-## 1 means all rows do not have an NA
-table(perc.no.na)
-
-## remove the last rows that have an NA
-dta.ml <- dta.ml[complete.cases(dta.ml),]
+## for each column, record the percentage that's different
+## take into account NA's
+dta.store.with.nas <- data.frame(matrix(NA, nrow=length(overlap.cols), ncol=2))
+names(dta.store.with.nas) <- c('column', 'percent_changed')
+for (i in 1:length(overlap.cols)){
+  print(overlap.cols[i])
+  dta.store.with.nas$column[i] <- overlap.cols[i]
+  ## change NA values to "NA VALUE"
+  raw_clean_mg[,paste('raw_', overlap.cols[i], sep='')] <- ifelse(is.na(raw_clean_mg[,paste('raw_', overlap.cols[i], sep='')]), "NA_VALUE",
+                                                                  raw_clean_mg[,paste('raw_', overlap.cols[i], sep='')])
+  raw_clean_mg[,overlap.cols[i]] <- ifelse(is.na(raw_clean_mg[,overlap.cols[i]]), "NA_VALUE", raw_clean_mg[,overlap.cols[i]])
+  raw_clean_mg$temp.col <- ifelse(raw_clean_mg[,paste('raw_', overlap.cols[i], sep='')] != raw_clean_mg[,overlap.cols[i]], 1, 0)
+  dta.store.with.nas$percent_changed[i] <- round((sum(raw_clean_mg$temp.col, na.rm=T) / nrow(raw_clean_mg))*100, 0)
+}
+## sort by largest difference
+dta.store.with.nas <- dta.store.with.nas[order(dta.store.with.nas$percent_changed, decreasing=T),]
 
 
-## OLD NOTES:
-## consider over-sampling since we don't have a lot of data (tens of thousands of records or less)
-## also play around with different resampled ratios
-## add copies of lower frequency categories, using SMOTE package
+## investigate number of lines difference
+## is number of lines the same data type?
+#class(raw_clean_mg$num_lines)
+#class(raw_clean_mg$raw_num_lines)
+#raw_clean_mg$diff.num.lines <- ifelse(raw_clean_mg$num_lines != raw_clean_mg$raw_num_lines, TRUE, FALSE)
+#table(raw_clean_mg$diff.num.lines)
+#sub.diff.num.lines <- raw_clean_mg[which(raw_clean_mg$diff.num.lines == TRUE),]
+## for number of lines, pristine might be 1
+#table(raw_clean_mg$raw_num_lines == "1")
 
 ##**************************************************************************************************************************************************
-## write out the interim datasets
+## FORMAT OPEN FLAGS AND TAGS
 
-write.csv(dta.ml, "data/interim/ml_connect_type_2016.csv", row.names=F)
+## Flags
+sub <- full_mg[,c('frn_complete', 'open_flag_labels')]
+sub$open_flag_labels.2 <- gsub("\\{", "", sub$open_flag_labels)
+sub$open_flag_labels.3 <- gsub("\\}", "", sub$open_flag_labels.2)
+## break out the flags into different columns
+sub2 <- sub %>% separate(open_flag_labels.3, c("flag1", "flag2", "flag3", "flag4"), ",")
+unique.flags <- unique(c(sub2$flag1, sub2$flag2, sub2$flag3, sub2$flag4))
+unique.flags <- unique.flags[!unique.flags %in% c(NA, "")]
+unique.flags
+
+## Tags -- No Tags in the dataset
+#sub <- full_mg[,c('frn_complete', 'open_tag_labels')]
+#sub$open_tag_labels.2 <- gsub("\\{", "", sub$open_tag_labels)
+#sub$open_tag_labels.3 <- gsub("\\}", "", sub$open_tag_labels.2)
+## break out the tags into different columns
+#sub2 <- sub %>% separate(open_tag_labels.3, c("tag1", "tag2", "tag3", "tag4"), ",")
+#unique.tags <- unique(c(sub2$tag1, sub2$tag2, sub2$tag3, sub2$tag4))
+#unique.tags <- unique.tags[!unique.tags %in% c(NA, "")]
+#unique.tags
+

@@ -71,8 +71,8 @@ fiber_tar <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFact
 colors <- suppressWarnings(read.csv("data/tool_colors.csv", as.is=T, header=T, stringsAsFactors=F))
 
 ## date
-date <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
-date <- date$date
+date.updated <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
+date.updated <- date.updated$date
 ```
 
 
@@ -100,7 +100,7 @@ fiber_tar_sub <- reactive({fiber_tar %>% filter(postal_cd %in% input$state)})
 
 State Summary {data-orientation=rows}
 ======================================================================
-  Row 
+Row 
 ----------------------------------------------------------------------
 ### 
 ```{r}
@@ -110,7 +110,7 @@ renderValueBox({
   state_lookup$name_caps <- toupper(state_lookup$name)
   ## making this global so we can use it in other sections as well
   state_name_caps <<- state_lookup$name_caps[state_lookup$code == state.agg.2017.sub()$postal_cd]
-  valueBox(state_name_caps, paste("Date Updated:", date, sep=" "))
+  valueBox(state_name_caps, paste("Date Updated:", date.updated, sep=" "))
 })
 ```
 
