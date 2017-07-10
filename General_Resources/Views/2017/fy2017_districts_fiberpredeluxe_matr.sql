@@ -503,6 +503,8 @@ select distinct
 
   	fbts.bw_target_status,
 
+  	dpd.wifi_target_status,
+
   	case
 
   		when du.upgrade_indicator
@@ -551,7 +553,7 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 6/23/2017 -- JH added discount_rate_c1_matrix
+Last Modified Date: 7/5/2017 -- JH added  wifi target status
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:
