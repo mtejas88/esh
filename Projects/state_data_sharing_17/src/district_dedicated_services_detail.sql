@@ -96,7 +96,7 @@ on sr.line_item_id = li.id
 
 
 
-where sr.purpose in ('Internet','WAN','Upstream')
+where sr.purpose in ('Internet','WAN','Upstream', 'ISP')
 --and d.exclude_from_ia_analysis = false
 and sr.broadband = true
 and sr.inclusion_status != 'dqs_excluded'

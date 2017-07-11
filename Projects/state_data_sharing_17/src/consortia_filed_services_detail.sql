@@ -6,6 +6,8 @@ li.frn_complete,
 d.discount_rate_c1_matrix*100 as erate_discount,
 case  when sr.purpose = 'WAN' then 'District WAN'
       when sr.purpose = 'Upstream' then 'Transport to ISP'
+      when sr.purpose = 'ISP' and sr.consortium_shared = true then 'Shared ISP'
+      when sr.purpose = 'ISP' and sr.consortium_shared = false then 'ISP'
       else sr.purpose end as purpose_of_service,
 '' as purpose_of_service_corrected,
 sr.connect_category as type_of_connection,
