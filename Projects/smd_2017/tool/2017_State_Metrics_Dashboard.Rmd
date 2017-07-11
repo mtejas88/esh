@@ -935,7 +935,7 @@ renderDataTable({
   if (input$state == 'ALL'){
     datatable(affordability_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   } else{
-    datatable(affordability_ct(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(affordability_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   }
 })
 ```
