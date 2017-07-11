@@ -75,7 +75,7 @@ select  d.esh_id as district_esh_id,
           when eim.entity_id is null then 'Unknown'
             else eim.entity_id::varchar
         end as school_esh_id,
-        sc141a."LEAID" as nces_cd,
+        d.nces_cd as nces_cd,
         sc141a."NCESSCH" as school_nces_code,
         d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         f.name as name,
@@ -150,7 +150,7 @@ select  d.esh_id as district_esh_id,
           when eim.entity_id is null then 'Unknown'
             else eim.entity_id::varchar
         end as school_esh_id,
-        sc141a."LEAID" as nces_cd,
+        d.nces_cd as nces_cd,
         sc141a."NCESSCH" as school_nces_code,
         d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         f.name as name,
@@ -222,7 +222,7 @@ select  d.esh_id as district_esh_id,
           when eim.entity_id is null then 'Unknown'
             else eim.entity_id::varchar
         end as school_esh_id,
-        sc141af."LEAID" as nces_cd,
+        d.nces_cd as nces_cd,
         sc141af."NCESSCH" as school_nces_code,
         d.include_in_universe_of_districts as district_include_in_universe_of_districts,
         f.name as name,

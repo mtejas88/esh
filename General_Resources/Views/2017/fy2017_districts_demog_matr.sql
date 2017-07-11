@@ -20,7 +20,11 @@ select  case
         a.billingstatecode as postal_cd,
         a.billinglatitude as latitude,
         a.billinglongitude as longitude,
-        sf.num_students as num_students,
+        case 
+          when sf.num_students is null
+            then 0
+          else sf.num_students
+        end as num_students,
         /* OLD STUDENT COUNT METHOD
         case
           when a.billingstatecode = 'VT' then case
@@ -45,7 +49,11 @@ select  case
                   end
         end as num_students,
         */
-        sf.num_schools as num_schools,
+        case 
+          when sf.num_schools is null
+            then 0
+          else sf.num_schools
+        end as num_schools,
         "ULOCAL" as ulocal,
         case 
           when a.locale__c is null
@@ -63,8 +71,16 @@ select  case
           else 'Unknown'
         end as district_size,
         d."UNION" as union_code,
-        sf.include_in_universe_of_districts,
-        sf.include_in_universe_of_districts_all_charters as include_in_universe_of_districts_all_charters,
+        case
+          when sf.include_in_universe_of_districts is null
+            then false
+          else sf.include_in_universe_of_districts
+        end as include_in_universe_of_districts,
+        case 
+          when sf.include_in_universe_of_districts_all_charters is null
+            then false
+          else sf.include_in_universe_of_districts_all_charters
+        end as include_in_universe_of_districts_all_charters,
         case
           when a.billingstatecode = 'VT' then stf_VT.num_teachers
           when a.billingstatecode = 'MT' then stf_MT.num_teachers
@@ -455,8 +471,7 @@ left join ( select  case
                       "LSTATE" ) stf_NY
 on stf_NY.esh_id = eim.entity_id 
 
-where eim.entity_id is not null /* JAMIE-TEMP-EDIT this removes the 'Unknown' entities, if we want to add them back in we can remove this line */
-and a.recordtypeid = '012E0000000NE6DIAW'
+where a.recordtypeid = '012E0000000NE6DIAW'
 and a.out_of_business__c = false
 and a.type in ('Charter' ,'Bureau of Indian Education' ,'Tribal', 'Public')
 and d."LEAID" is not null
