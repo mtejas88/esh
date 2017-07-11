@@ -8,7 +8,7 @@ source_env <- function(path){
 
   load_dot_env(path)
   
-  ## ONYX
+  ## DIRECTORY PATHS
   ## assign google drive path if available
   if (Sys.getenv("GOOGLE_DRIVE") != ""){
     assign("google_drive_path", Sys.getenv("GOOGLE_DRIVE"), envir=.GlobalEnv)
@@ -22,7 +22,7 @@ source_env <- function(path){
     assign("ecto_path", Sys.getenv("ECTO"), envir=.GlobalEnv)
   }
   
-  ## Current DB -- ONYX
+  ## ONYX (CURRENT DB)
   ## assign url for DB if available
   if (Sys.getenv("URL") != ""){
     assign("url", Sys.getenv("URL"), envir=.GlobalEnv)
@@ -36,39 +36,49 @@ source_env <- function(path){
     assign("password", Sys.getenv("PASSWORD"), envir=.GlobalEnv)
   }
   
-  ## Pristine 2016
+  ## ML Mass Update
+  ## assign url for DB if available
+  if (Sys.getenv("URL_ML_Mass_Update") != ""){
+    assign("url_ml_mass_update", Sys.getenv("URL_ML_Mass_Update"), envir=.GlobalEnv)
+  }
+  ## assign username for DB if available
+  if (Sys.getenv("USER_ML_Mass_Update") != ""){
+    assign("user_ml_mass_update", Sys.getenv("USER_ML_Mass_Update"), envir=.GlobalEnv)
+  }
+  ## assign password for DB if available
+  if (Sys.getenv("PASSWORD_ML_Mass_Update") != ""){
+    assign("password_ml_mass_update", Sys.getenv("PASSWORD_ML_Mass_Update"), envir=.GlobalEnv)
+  }
+  
+  ## PRISTINE 2016
   ## assign url for DB if available
   if (Sys.getenv("URL_PRIS2016") != ""){
     assign("url_pris2016", Sys.getenv("URL_PRIS2016"), envir=.GlobalEnv)
   }
-  
   ## assign username for DB if available
   if (Sys.getenv("USER_PRIS2016") != ""){
     assign("user_pris2016", Sys.getenv("USER_PRIS2016"), envir=.GlobalEnv)
   }
-  
   ## assign password for DB if available
   if (Sys.getenv("PASSWORD_PRIS2016") != ""){
     assign("password_pris2016", Sys.getenv("PASSWORD_PRIS2016"), envir=.GlobalEnv)
   }
  
-  ## Pristine 2017
+  ## PRISTINE 2017
   ## assign url for DB if available
   if (Sys.getenv("URL_PRIS2017") != ""){
     assign("url_pris2017", Sys.getenv("URL_PRIS2017"), envir=.GlobalEnv)
   }
-  
   ## assign username for DB if available
   if (Sys.getenv("USER_PRIS2017") != ""){
     assign("user_pris2017", Sys.getenv("USER_PRIS2017"), envir=.GlobalEnv)
   }
-  
   ## assign password for DB if available
   if (Sys.getenv("PASSWORD_PRIS2017") != ""){
     assign("password_pris2017", Sys.getenv("PASSWORD_PRIS2017"), envir=.GlobalEnv)
   }
   
-  ## Frozen 2016 -- PINK
+  ## FROZEN 2016 -- PINK
   ## assign url for DB if available
   if (Sys.getenv("URL_PINK") != ""){
     assign("url_pink", Sys.getenv("URL_PINK"), envir=.GlobalEnv)
@@ -82,7 +92,7 @@ source_env <- function(path){
     assign("password_pink", Sys.getenv("PASSWORD_PINK"), envir=.GlobalEnv)
   }
  
-  ## SHINY -- RSTUDIO
+  ## SHINY CREDENTIALS (RSTUDIO)
   if (Sys.getenv("RSTUDIO_NAME") != ""){
     assign("rstudio_name", Sys.getenv("RSTUDIO_NAME"), envir=.GlobalEnv)
   }
