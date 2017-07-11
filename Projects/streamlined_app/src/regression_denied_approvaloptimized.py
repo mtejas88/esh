@@ -13,6 +13,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
 import pylab as pl
 from imblearn.under_sampling import RandomUnderSampler
+import csv
 
 ## data prep
 #import
@@ -79,18 +80,25 @@ print(classification_report(y_test, yhat_test,digits=3))
 
 ## 2017 data prep
 #import
-lowcost_applications = pd.read_csv('data/interim/lowcost_applications_2017_contd.csv')
+lowcost_applications_2017 = pd.read_csv('data/interim/lowcost_applications_2017_contd.csv')
+
 
 ## predict denial optimized with 2017
-x = lowcost_applications[feature_cols]
+x1  = lowcost_applications_2017.loc[lowcost_applications_2017['category_1'] == True]
+x = x1[feature_cols]
 x = sm.add_constant(x)
 
 yhat = est1.predict(x.T.drop_duplicates().T)
-plt.hist(yhat,100)
-plt.show()
+#plt.hist(yhat,100)
+#plt.show()
 
 yhat = [ 0 if y < 0.75 else 1 for y in yhat]
 
 print(yhat.count(1))
 print(yhat.count(0))
+
+x1.to_csv('data/interim/lowcost_applications_c1_2017_approval_optimized.csv')
+
+
+np.savetxt("data/interim/yhat_approval_optimized.csv", yhat, delimiter=",", fmt='%s')
 

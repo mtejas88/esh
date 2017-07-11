@@ -13,6 +13,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
 import pylab as pl
 from imblearn.under_sampling import RandomUnderSampler
+import csv
 
 ## data prep
 #import
@@ -139,43 +140,56 @@ print(classification_report(y_test, yhat_test,digits=3))
 
 ## 2017 data prep
 #import
-applications = pd.read_csv('data/raw/applications_2017_contd.csv')
+applications_2017 = pd.read_csv('data/raw/applications_2017_contd.csv')
 
 #create indicators
-applications['lowcost_indicator'] = np.where(applications['total_funding_year_commitment_amount_request'] < 25000, True, False)
-applications['discount_category'] = np.floor(applications['category_one_discount_rate']/10)*10
+applications_2017['lowcost_indicator'] = np.where(applications_2017['total_funding_year_commitment_amount_request'] < 25000, True, False)
+applications_2017['discount_category'] = np.floor(applications_2017['category_one_discount_rate']/10)*10
 
-#lowcost_applications  = applications.loc[applications['frns'] == applications['funded_frns'] + applications['denied_frns']]
-lowcost_applications  = lowcost_applications.loc[lowcost_applications['lowcost_indicator'] == True]
+#lowcost_applications_2017  = applications_2017.loc[applications_2017['frns'] == applications_2017['funded_frns'] + applications_2017['denied_frns']]
+lowcost_applications_2017  = applications_2017.loc[applications_2017['lowcost_indicator'] == True]
 
-lowcost_applications['denied_indicator'] = np.where(lowcost_applications['denied_frns'] > 0, 1, 0)
-lowcost_applications['denied_indicator_py'] = np.where(lowcost_applications['denied_frns_16'] > 0, 1, 0)
+lowcost_applications_2017['denied_indicator'] = np.where(lowcost_applications_2017['denied_frns'] > 0, 1, 0)
+lowcost_applications_2017['denied_indicator_py'] = np.where(lowcost_applications_2017['denied_frns_16'] > 0, 1, 0)
 
-applicant_type_dummies = pd.get_dummies(lowcost_applications.applicant_type, prefix='applicant_type')
-lowcost_applications = pd.concat([lowcost_applications, applicant_type_dummies], axis=1)
+applicant_type_dummies = pd.get_dummies(lowcost_applications_2017.applicant_type, prefix='applicant_type')
+lowcost_applications_2017 = pd.concat([lowcost_applications_2017, applicant_type_dummies], axis=1)
 
-locale_dummies = pd.get_dummies(lowcost_applications.urban_rural_status, prefix='locale')
-lowcost_applications = pd.concat([lowcost_applications, locale_dummies], axis=1)
+locale_dummies = pd.get_dummies(lowcost_applications_2017.urban_rural_status, prefix='locale')
+lowcost_applications_2017 = pd.concat([lowcost_applications_2017, locale_dummies], axis=1)
 
-lowcost_applications['copper_indicator'] = np.where(lowcost_applications['functions'].str.contains('Copper'), 1, 0)
-lowcost_applications['internet_indicator'] = np.where(lowcost_applications['purposes'].str.contains('Internet'), 1, 0)
-lowcost_applications['backbone_indicator'] = np.where(lowcost_applications['purposes'].str.contains('Backbone'), 1, 0)
+lowcost_applications_2017['copper_indicator'] = np.where(lowcost_applications_2017['functions'].str.contains('Copper'), 1, 0)
+lowcost_applications_2017['internet_indicator'] = np.where(lowcost_applications_2017['purposes'].str.contains('Internet'), 1, 0)
+lowcost_applications_2017['backbone_indicator'] = np.where(lowcost_applications_2017['purposes'].str.contains('Backbone'), 1, 0)
 
 #convert dates to deltas
-lowcost_applications['min_contract_expiry_date'] = pd.to_datetime(lowcost_applications['min_contract_expiry_date'])    
-lowcost_applications['min_contract_expiry_date_delta'] = (lowcost_applications['min_contract_expiry_date'] - lowcost_applications['min_contract_expiry_date'].min())  / np.timedelta64(1,'D')
+lowcost_applications_2017['min_contract_expiry_date'] = np.where(lowcost_applications_2017['min_contract_expiry_date'] == '6/30/3018', '06/30/2018', lowcost_applications_2017['min_contract_expiry_date'])
 
-lowcost_applications.to_csv('data/interim/lowcost_applications_2017_contd.csv')
+lowcost_applications_2017['min_contract_expiry_date'] = pd.to_datetime(lowcost_applications_2017['min_contract_expiry_date'])    
+lowcost_applications_2017['min_contract_expiry_date_delta'] = (lowcost_applications_2017['min_contract_expiry_date'] - lowcost_applications_2017['min_contract_expiry_date'].min())  / np.timedelta64(1,'D')
+
+# categories
+category_dummies = pd.get_dummies(lowcost_applications_2017.category_of_service, prefix='category')
+lowcost_applications_2017 = pd.concat([lowcost_applications_2017, category_dummies], axis=1)
+
+lowcost_applications_2017.to_csv('data/interim/lowcost_applications_2017_contd.csv')
 
 ## predict denial optimized with 2017
-x = lowcost_applications[feature_cols]
+x1  = lowcost_applications_2017.loc[lowcost_applications_2017['category_1'] == True]
+x = x1[feature_cols]
 x = sm.add_constant(x)
 
 yhat = est1.predict(x.T.drop_duplicates().T)
-plt.hist(yhat,100)
-plt.show()
+#plt.hist(yhat,100)
+#plt.show()
 
 yhat = [ 0 if y < 0.35 else 1 for y in yhat]
 
 print(yhat.count(1))
 print(yhat.count(0))
+
+x1.to_csv('data/interim/lowcost_applications_c1_2017_denial_optimized.csv')
+
+
+np.savetxt("data/interim/yhat_denial_optimized.csv", yhat, delimiter=",", fmt='%s')
+
