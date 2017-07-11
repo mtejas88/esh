@@ -199,7 +199,7 @@ select distinct
 
 		when ia_bw_mbps_total::integer > 0
 
-			then affordability_calculator(ia_monthly_cost_total, ia_bw_mbps_total::integer)
+			then affordability_calculator(ia_monthly_cost_total::integer, ia_bw_mbps_total::integer)
 
 		else false
 
@@ -553,7 +553,7 @@ on dpd.esh_id::varchar = dspa.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 7/5/2017 -- JH added  wifi target status
+Last Modified Date: 7/11/2017 -- JH fixed affordability calculator to only take integers
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:
