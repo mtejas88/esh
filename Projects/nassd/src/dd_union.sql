@@ -223,7 +223,8 @@ null as knapsack_meeting_2018_goal_oversub,
 
 -- UPGRADE
 null as upgraded_to_meet_2014_goal,
-
+null cohort_16_to_17_fiber,
+null cohort_16_to_17_connectivity,
 -- SWITCHER
 
 -- SERVICE PROVIDER
@@ -322,7 +323,7 @@ case
   else ' 85%'
 end as discount_rate_c2,
 org_structure,
-ia_procurement_type,
+dd.ia_procurement_type,
 case
   when dd.postal_cd in ('AZ','CA','CO','FL','IL','KS','MA','MD','MN','MO','MT','NC','NH','NJ','NM','NV','NY','OH','OK','TX','VA','WA','WI','WY','AK','AL','CT','NE','OR')
   then 'Engaged'
@@ -446,6 +447,16 @@ case
   then 1
   else 0
 end as upgraded_to_meet_2014_goal,
+case 
+  when ddd.fiber_target_status = 'Not Target' and dd.fiber_target_status = 'Target' 
+  then 1
+  else null
+end as cohort_16_to_17_fiber,
+case
+  when ddd.exclude_from_ia_analysis = false and dd.exclude_from_ia_analysis = false and ddd.meeting_2014_goal_no_oversub = true and dd.meeting_2014_goal_no_oversub = false
+  then 1
+  else null
+end as cohort_16_to_17_connectivity,
 
 -- SWITCHER
 
@@ -455,6 +466,8 @@ dd.service_provider_assignment
 from public.fy2016_districts_deluxe_matr dd
 left join public.fy2015_districts_deluxe_m d
 on dd.esh_id::numeric = d.esh_id
+left join public.fy2017_districts_deluxe_matr ddd
+on ddd.esh_id::numeric = dd.esh_id::numeric
 left join public.states s
 on dd.postal_cd = s.postal_cd
 where dd.include_in_universe_of_districts = true
@@ -676,6 +689,16 @@ case
   then 1
   else 0
 end as upgraded_to_meet_2014_goal,
+case 
+  when dd.fiber_target_status = 'Not Target' and d.fiber_target_status = 'Target' 
+  then 1
+  else null
+end as cohort_16_to_17_fiber,
+case
+  when dd.exclude_from_ia_analysis = false and d.exclude_from_ia_analysis = false and dd.meeting_2014_goal_no_oversub = true and d.meeting_2014_goal_no_oversub = false
+  then 1
+  else null
+end as cohort_16_to_17_connectivity,
 
 -- SWITCHER
 
