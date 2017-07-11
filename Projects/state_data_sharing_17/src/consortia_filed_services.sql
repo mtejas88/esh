@@ -68,9 +68,19 @@ sr.line_item_total_num_lines as total_circuits_in_line_item,
 sr.bandwidth_in_mbps as downspeed_bandwidth_mbps_per_connection,
 sr.line_item_total_cost as annual_cost,
 sr.line_item_recurring_elig_cost as eligible_mrc,
-upper(sr.applicant_name) as applied_for_by,
+case 
+  when sr.erate = false
+    then 'NON E-RATE'
+  else upper(sr.applicant_name)
+end as applied_for_by,
 li.one_time_elig_cost as eligible_nrc,
-sr.reporting_name as service_provider_name
+case
+  when sr.erate = false
+    then 'OWNED'
+  when li.reporting_name is null
+    then li.service_provider_name
+  else li.reporting_name
+end as service_provider_name
 
 FROM (
           SELECT
@@ -176,8 +186,9 @@ on sr.line_item_id = li.id
 
 where sr.broadband = true
 and sr.inclusion_status != 'dqs_excluded'
-and (li.applicant_type = 'Consortium' or li.applicant_type = 'OtherLocation')
+and li.applicant_type = 'Consortium'
 and d.include_in_universe_of_districts_all_charters = true
+and d.district_type = 'Traditional'
 
 /*
 Methodology: uses the logic from lines to district and services received, except I took out 
