@@ -933,9 +933,9 @@ Row
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(wifi_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(affordability_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   } else{
-    datatable(wifi_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(affordability_ct(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
   }
 })
 ```
