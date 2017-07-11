@@ -70,6 +70,16 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       li.num_lines as line_item_total_num_lines,
       li.total_cost as line_item_total_cost,
       li.rec_elig_cost as line_item_recurring_elig_cost,
+      CASE
+          WHEN li.rec_elig_cost is null or li.rec_elig_cost::numeric = 0
+            THEN  CASE
+                    WHEN li.orig_r_months_of_service IS NOT NULL
+                        AND li.orig_r_months_of_service > 0
+                      THEN li.total_cost::numeric / li.orig_r_months_of_service
+                    ELSE li.total_cost::numeric / 12
+                  END
+          ELSE li.rec_elig_cost::numeric
+      END AS line_item_mrc_unless_null,
       li.one_time_eligible_cost as "line_item_one-time_cost",
       li.orig_r_months_of_service,
       li.applicant_id,

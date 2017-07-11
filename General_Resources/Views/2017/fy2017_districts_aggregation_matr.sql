@@ -1245,7 +1245,7 @@ select  		dd.esh_id as district_esh_id,
 
 						sum(case
 
-									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels) or ('exclude_for_cost_only_unknown'= any(open_tag_labels)))
 
 									and (internet_conditions_met or upstream_conditions_met or isp_conditions_met or backbone_conditions_met)
 
@@ -1257,7 +1257,7 @@ select  		dd.esh_id as district_esh_id,
 
 						sum(case
 
-									when ('exclude_for_cost_only_restricted'= any(open_tag_labels))
+									when ('exclude_for_cost_only_restricted'= any(open_tag_labels) or ('exclude_for_cost_only_unknown'= any(open_tag_labels)))
 
 									and wan_conditions_met
 
@@ -1706,7 +1706,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 4/13/2017 - js remove references to applicant_id and applicant_type from li
+Last Modified Date: 6/23/2017 - jh added exclude for cost only unknown
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

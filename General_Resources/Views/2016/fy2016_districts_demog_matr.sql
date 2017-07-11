@@ -537,10 +537,10 @@ and not(d."LSTATE" = 'NY' and "NAME" ilike '%geographic%') --only include the 'g
 
 /*
 Author: Justine Schott
-Created On Date: 6/20/2016
-Last Modified Date: 3/21/2017 -- update MT smush to smush by both address AND city, not just address
+Incorporated On Date: 6/20/2016
+Last Modified Date: 3/21/2017 --  smush MT by both address AND city, not just address
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET for MT. Otherwise, metrics taken mostly from NCES. Done before
-metrics aggregation so school-district association can be created. Excluded schools have flags to be removed from the population.
+metrics aggregation so school-district association can be aligned. Excluded schools have flags to be removed from the population.
 */

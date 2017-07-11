@@ -436,6 +436,26 @@ select	dd.*,
 
 		    c1_discount_rate as discount_rate_c1,
 
+		    case  when c1_discount_rate::numeric is not null then c1_discount_rate::numeric
+			      when locale in ('Urban', 'Suburban') then
+			        case  when frl_percent < .10 then 20
+			              when frl_percent < .20 then 40
+			              when frl_percent < .35 then 50
+			              when frl_percent < .50 then 60
+			              when frl_percent < .75 then 80
+			              when frl_percent >= .75 then 90
+			              else 70
+			        end
+			      else case when frl_percent < .10 then 25
+			                when frl_percent < .20 then 50
+			                when frl_percent < .35 then 60
+			                when frl_percent < .50 then 70
+			                when frl_percent < .75 then 80
+			                when frl_percent >= .75 then 90
+			                else 70
+			      end
+			end as discount_rate_c1_matrix,
+
 		    c2_discount_rate as discount_rate_c2,
 
 		    flag_count,
@@ -502,18 +522,12 @@ Author: Justine Schott
 
 Created On Date: 6/20/2016
 
-Last Modified Date: 12/13/2016
+Last Modified Date: 6/23/17 added adjusted discount rate
 
 Name of QAing Analyst(s):
 
 Purpose: Districts in 2016 universe, including metric calculations and cleanliness
 
 Methodology: Utilizing other aggregation tables
-
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 
 */
