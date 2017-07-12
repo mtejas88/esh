@@ -23,7 +23,7 @@ select  case
         case 
           when sf.num_students is null
             then 0
-          else sf.num_students
+          else sf.num_students::integer
         end as num_students,
         /* OLD STUDENT COUNT METHOD
         case
@@ -128,10 +128,10 @@ left join (
   select 
     a.esh_id__c as district_esh_id,
     count(f.esh_id__c) as num_schools,
-    sum(f.num_students__c) as num_students,
+    sum(f.num_students__c)::integer as num_students,
     case
       when count(f.esh_id__c) > 0
-       and sum(f.num_students__c) > 0
+       and sum(f.num_students__c)::integer > 0
        and count(distinct f.campus__c) > 0
        and (a.type != 'Charter' or a.billingstatecode = 'AZ')
         then true
@@ -139,7 +139,7 @@ left join (
     end as include_in_universe_of_districts,
     case
       when count(f.esh_id__c) > 0
-       and sum(f.num_students__c) > 0
+       and sum(f.num_students__c)::integer > 0
        and count(distinct f.campus__c) > 0
         then true
       else false
@@ -478,7 +478,7 @@ and d."LEAID" is not null
 /*
 Author: Justine Schott
 Date: 6/20/2016
-Last Modified Date: 7/7 -Jeremy - updated demogs to be from salesforce
+Last Modified Date: 7/12 -Jeremy - changing students to integer
 Name of QAing Analyst(s): Greg Kurzhals
 Purpose: Districts demographics of those in the universe
 Methodology: Smushing by UNION for VT and district LSTREET1T for MT. Otherwise, metrics taken mostly from NCES. Done before

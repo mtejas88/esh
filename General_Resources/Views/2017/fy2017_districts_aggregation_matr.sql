@@ -1637,7 +1637,8 @@ left join (
 		from public.tags
 
 		where deleted_at is null
-    and funding_year = 2017
+    	and funding_year = 2017
+    	and taggable_type = 'District'
 
 
 
@@ -1704,7 +1705,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 6/23/2017 - jh fixed flag count to only look at entity level flags
+Last Modified Date: 7/12/2017 - jh fixed tag count to only look at entity level tags
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
