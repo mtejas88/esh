@@ -48,6 +48,8 @@ predictions <- predictions[which(predictions$connect_category != predictions$pre
 names(stag.line.items)[names(stag.line.items) == 'connect_category'] <- 'changed_connect_category'
 predictions <- merge(predictions, stag.line.items[,c('id', 'changed_connect_category')], by='id', all.x=T)
 predictions <- predictions[which(predictions$pred_connect_category == predictions$changed_connect_category),]
+## take out ISP Only Predictions
+predictions <- predictions[which(predictions$pred_connect_category != 'ISP Only'),]
 
 ## create the frn field
 for (i in 1:nrow(predictions)){
@@ -95,6 +97,9 @@ line.items.states$total_line.items <- rowSums(line.items.states[,c(2:4)])
 ## most common opened flags:
 pred.line.item.flags.open <- pred.line.item.flags[which(pred.line.item.flags$status == 'open'),]
 table(pred.line.item.flags.open$label)
+## make a subset for product bandwdith open flags
+pred.line.item.flags.open.product.bw <- pred.line.item.flags.open[which(pred.line.item.flags.open$label == 'product_bandwidth'),]
+
 ## most common resolved flags:
 pred.line.item.flags.resolved <- pred.line.item.flags[which(pred.line.item.flags$status == 'resolved'),]
 table(pred.line.item.flags.resolved$label)
@@ -253,3 +258,10 @@ for (i in 2:ncol(districts.states)){
 
 write.csv(districts.states, "data/interim/districts_by_states_impact_analysis.csv", row.names=F)
 write.csv(line.items.states, "data/interim/line_items_by_states_impact_analysis.csv", row.names=F)
+
+## write out open product BW line items
+write.csv(pred.line.item.flags.open.product.bw, "data/interim/product_bw_line_item_flags_open.csv", row.names=T)
+
+## cross-over between Jamie's work
+
+## product bandwidth -- why are they open 
