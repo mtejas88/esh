@@ -138,6 +138,30 @@ yhat_test = [ 0 if y < 0.35 else 1 for y in yhat_test ]
 print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
 
+## predict denial optimized with 2016
+x0  = lowcost_applications.loc[lowcost_applications['category_1'] == True]
+x = x0[feature_cols]
+x = sm.add_constant(x)
+
+yhat = est1.predict(x.T.drop_duplicates().T)
+#plt.hist(yhat,100)
+#plt.show()
+
+yhat = [ 0 if y < 0.35 else 1 for y in yhat]
+
+print(yhat.count(1))
+print(yhat.count(0))
+
+rows = yhat.count(1)+yhat.count(0)
+yhat = pd.DataFrame(data=yhat, index=range(rows), columns=['yhat'])
+
+x0 = x0.reset_index()
+x0 = x0.merge(yhat, left_index=True, right_index=True)
+
+x0.to_csv('data/interim/lowcost_applications_c1_2016_denial_optimized.csv')
+
+print(x0.groupby(['yhat','denied_indicator']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'}))
+
 ## 2017 data prep
 #import
 applications_2017 = pd.read_csv('data/raw/applications_2017_contd.csv')
@@ -185,11 +209,12 @@ yhat = est1.predict(x.T.drop_duplicates().T)
 
 yhat = [ 0 if y < 0.35 else 1 for y in yhat]
 
-print(yhat.count(1))
-print(yhat.count(0))
+rows = yhat.count(1)+yhat.count(0)
+yhat = pd.DataFrame(data=yhat, index=range(rows), columns=['yhat'])
+
+x1 = x1.reset_index()
+x1 = x1.merge(yhat, left_index=True, right_index=True)
 
 x1.to_csv('data/interim/lowcost_applications_c1_2017_denial_optimized.csv')
 
-
-np.savetxt("data/interim/yhat_denial_optimized.csv", yhat, delimiter=",", fmt='%s')
-
+print(x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'}))
