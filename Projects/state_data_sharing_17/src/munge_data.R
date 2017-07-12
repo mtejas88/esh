@@ -37,7 +37,8 @@ data.dictionary <- read.xlsx("other_tabs/values_and_dictionary.xlsx", 2)
 
 
 
-all_states <- district.master$state %>% unique()
+all_states <- district.master.detail$state %>% unique()
+
 
 head(district.master.detail)
 
@@ -81,6 +82,8 @@ for (i in 1:length(all_states)) {
   consortia <- consortia.master.detail[consortia.master.detail$state == all_states[i],]
   district <- district[,-4]
   consortia <- consortia[,-4]
+  district[is.na(district)] <- ''
+  consortia[is.na(consortia)] <- ''
   
   file <- paste('data/detailed/',all_states[i],'_data_summary.xlsx', sep = '')
   #writing out results to the detailed folder
@@ -165,6 +168,8 @@ for (i in 1:length(all_states)) {
 
 
 #Detailed Spreadsheets without formatting
+#removing AR for now
+all_states <- all_states[all_states != 'AR']
 for (i in 1:length(all_states)) {
   #for (i in 1:1) {
   print(all_states[i])
@@ -172,6 +177,8 @@ for (i in 1:length(all_states)) {
   consortia <- consortia.master.detail[consortia.master.detail$state == all_states[i],]
   district <- district[,-4]
   consortia <- consortia[,-4]
+  district[is.na(district)] <- ''
+  consortia[is.na(consortia)] <- ''
   
   if(nrow(consortia) == 0) {
     save.xlsx(paste('data/detailed/',all_states[i],'_data_summary.xlsx', sep = ''), district, valid.values, data.dictionary)

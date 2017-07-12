@@ -46,3 +46,5 @@ and sr.inclusion_status != 'dqs_excluded'
 and d.include_in_universe_of_districts_all_charters
 and d.district_type = 'Traditional'
 and li.applicant_type != 'Consortium'
+
+order by 2 asc

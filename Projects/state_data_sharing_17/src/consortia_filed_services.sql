@@ -192,6 +192,8 @@ and li.applicant_type = 'Consortium'
 and d.include_in_universe_of_districts_all_charters = true
 and d.district_type = 'Traditional'
 
+order by 2 asc
+
 /*
 Methodology: uses the logic from lines to district and services received, except I took out 
 the part that says the recipient must have at least one line allocated to them (it would have been
