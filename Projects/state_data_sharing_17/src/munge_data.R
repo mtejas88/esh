@@ -41,6 +41,11 @@ all_states <- district.master$state %>% unique()
 
 head(district.master.detail)
 
+valid.values$purpose_of_service <- as.character(valid.values$purpose_of_service)
+valid.values[is.na(valid.values)] <- ''
+data.dictionary$Source <- as.character(data.dictionary$Source)
+data.dictionary[is.na(data.dictionary)] <- ''
+
 system.time(
 
 #General Spreadsheets
@@ -54,9 +59,9 @@ for (i in 1:length(all_states)) {
   
   #writing out results to the general folder
   if(nrow(consortia) == 0) {
-    save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district)
+    save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district, data.dictionary)
   } else {
-    save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district, consortia)
+    save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district, consortia, data.dictionary)
   }
 
 }
@@ -66,10 +71,7 @@ for (i in 1:length(all_states)) {
 #replacing NAs with blanks
 district.master.detail[is.na(district.master.detail)] <- ''
 consortia.master.detail[is.na(consortia.master.detail)] <- ''
-valid.values$purpose_of_service <- as.character(valid.values$purpose_of_service)
-valid.values[is.na(valid.values)] <- ''
-data.dictionary$Source <- as.character(data.dictionary$Source)
-data.dictionary[is.na(data.dictionary)] <- ''
+
 
 
 system.time(
