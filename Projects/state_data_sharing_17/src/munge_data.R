@@ -46,7 +46,6 @@ valid.values[is.na(valid.values)] <- ''
 data.dictionary$Source <- as.character(data.dictionary$Source)
 data.dictionary[is.na(data.dictionary)] <- ''
 
-system.time(
 
 #General Spreadsheets
 for (i in 1:length(all_states)) {
@@ -66,15 +65,13 @@ for (i in 1:length(all_states)) {
 
 }
 
-)
-
 #replacing NAs with blanks
 district.master.detail[is.na(district.master.detail)] <- ''
 consortia.master.detail[is.na(consortia.master.detail)] <- ''
 
 
 
-system.time(
+
 
 #Detailed Spreadsheets
 for (i in 1:length(all_states)) {
@@ -165,5 +162,3 @@ for (i in 1:length(all_states)) {
   
   saveWorkbook(wb, file)
 } 
-
-)
