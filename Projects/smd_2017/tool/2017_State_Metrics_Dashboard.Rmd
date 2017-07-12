@@ -605,9 +605,11 @@ Row
 
 #renderDataTable({
 #   if (input$state == 'ALL'){
-#   datatable(current15_ct(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE)) 
+#   datatable(current15_ct(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+#                  filter = 'top') 
 # } else{
-#   datatable(current15_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+#   datatable(current15_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+#                  filter = 'top')
 #}
 #})
 ```
@@ -689,9 +691,11 @@ Row
 
 renderDataTable({
   if(input$state == 'ALL'){
-    datatable(sots16_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(sots16_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
   }else{
-    datatable(sots16_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(sots16_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
   }
 })
 ```
@@ -772,9 +776,11 @@ Row
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(current17_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(current17_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
   } else{
-    datatable(current17_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(current17_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
   }
 })
 ```
@@ -794,9 +800,9 @@ Row
 
 renderDataTable({
   if(input$state == 'ALL'){
-    datatable(upgrades_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(upgrades_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   } else{
-    datatable(upgrades_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(upgrades_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   }
 })
 ```
@@ -850,9 +856,9 @@ Row
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(connectivity_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(connectivity_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   } else{
-    datatable(connectivity_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(connectivity_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   }
 })
 ```
@@ -872,9 +878,9 @@ Column
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(fiber_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(fiber_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   } else{
-    datatable(fiber_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(fiber_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   }
 })
 ```
@@ -929,9 +935,9 @@ Row
 
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(affordability_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(affordability_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   } else{
-    datatable(affordability_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE))
+    datatable(affordability_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
   }
 })
 ```
@@ -943,9 +949,9 @@ Row
 ```{r}
 renderDataTable({
   if (input$state == 'ALL'){
-    datatable(wifi_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(wifi_ct, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE), filter = 'top')
   } else{
-    datatable(wifi_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+    datatable(wifi_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE), filter = 'top')
   }
 })
 ```
@@ -969,9 +975,11 @@ Target Lists Connectivity {.hidden data-orientation=rows}
  
  renderDataTable({
    if (input$state == 'ALL'){
-     datatable(connectivity_tar, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+     datatable(connectivity_tar, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
    } else{
-     datatable(connectivity_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+     datatable(connectivity_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+               filter = 'top')
    }
 })
 ```
@@ -996,9 +1004,11 @@ Target Lists Fiber {.hidden data-orientation=rows}
  
  renderDataTable({
    if (input$state == 'ALL'){
-     datatable(fiber_tar, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+     datatable(fiber_tar, rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
    } else{
-     datatable(fiber_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE))
+     datatable(fiber_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
    }
 })
 ```
