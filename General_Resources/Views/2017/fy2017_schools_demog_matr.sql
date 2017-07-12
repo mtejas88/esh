@@ -11,7 +11,7 @@ select d.esh_id as district_esh_id,
         f.city__c as city,
         d.postal_cd as postal_cd,
         left(f.zip_code__c, 5) as zip,
-        f.num_students__c as num_students,
+        f.num_students__c::integer as num_students,
         
         case 
           when f.locale__c is null
@@ -83,7 +83,7 @@ select  d.esh_id as district_esh_id,
         f.city__c as city,
         d.postal_cd as postal_cd,
         left(f.zip_code__c, 5) as zip,
-        f.num_students__c as num_students,
+        f.num_students__c::integer as num_students,
         
         case 
           when f.locale__c is null
@@ -158,7 +158,7 @@ select  d.esh_id as district_esh_id,
         f.city__c as city,
         d.postal_cd as postal_cd,
         left(f.zip_code__c, 5) as zip,
-        f.num_students__c as num_students,
+        f.num_students__c::integer as num_students,
         
         case 
           when f.locale__c is null
@@ -230,7 +230,7 @@ select  d.esh_id as district_esh_id,
         f.city__c as city,
         d.postal_cd as postal_cd,
         left(f.zip_code__c, 5) as zip,
-        f.num_students__c as num_students,
+        f.num_students__c::integer as num_students,
         case 
           when f.locale__c is null
             then 'Unknown'
@@ -292,7 +292,7 @@ where d.esh_id = '946654'
 Author: Justine Schott
 Created On Date: 6/20/2016
 Modified Date: 7/7/2017
-Name of Modifier: Jeremy - updated demogs to be from salesforce
+Name of Modifier: Jeremy - changing num students to integer
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
