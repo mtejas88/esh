@@ -89,7 +89,7 @@ s_16=munge_sr(s_16_all)
 #while 2017 data is still dirty
 s_17=s_17_all %>%
   filter(
-  applicant_postal_cd != "AK",
+  recipient_postal_cd != "AK",
   erate == 't') %>%
   select(line_item_id, purpose, bandwidth_in_mbps, connect_category, line_item_recurring_elig_cost, line_item_total_num_lines) %>%
   mutate(

@@ -56,7 +56,7 @@ date <- gsub(":", ".", date)
 ## QUERY THE DB -- SQL
 
 ## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "postgresql-9.4.1212.jre7.jar", sep=""), "`")
+pgsql <- JDBC("org.postgresql.Driver", paste('~/Documents/ESH/ficher/General_Resources/postgres_driver/', "postgresql-9.4.1212.jre7.jar", sep=""), "`")
 
 ## connect to the database
 con <- dbConnect(pgsql, url=p_url, user=p_user, password=p_password)
@@ -226,10 +226,13 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
 insert_error <- tryCatch(dbExecute(con,dml_script_outliers),error=function(e) e)
 dml_script_outliers=NULL
 
-
-no_longer_outliers_for_update <- update_no_longer_outliers()
 print("Endating no longer outliers")
-insert_error=tryCatch(dbExecute(con,no_longer_outliers_for_update),error=function(e) e)
+insert_error=tryCatch(dbExecute(con,update_no_longer_outliers('no longer found')),error=function(e) e)
+print('no longer found done')
+insert_error=tryCatch(dbExecute(con,update_no_longer_outliers('matches 2016')),error=function(e) e)
+print('matches 2016 done')
+insert_error=tryCatch(dbExecute(con,update_no_longer_outliers('cost exclude')),error=function(e) e)
+print('cost exclude done')
 
 print("Updating Tableau District Table")
 dml_script_tableaud_for_update <- dml_builder(c(),"update","tableau_district" )
