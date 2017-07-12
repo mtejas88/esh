@@ -1,0 +1,410 @@
+
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## =========================================
+> ##
+> ## MUNGE DATA: Subset and Clean data
+> ##
+> ## =========================================
+> 
+> rm(list=ls())
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(xlsx)
+Loading required package: rJava
+Loading required package: xlsxjars
+> library(stringr)
+> 
+> save.xlsx <- function (file, ...)
++ {
++   require(xlsx, quietly = TRUE)
++   objects <- list(...)
++   fargs <- as.list(match.call(expand.dots = TRUE))
++   objnames <- as.character(fargs)[-c(1, 2)]
++   nobjects <- length(objects)
++   for (i in 1:nobjects) {
++     if (i == 1)
++       write.xlsx(objects[[i]], file, sheetName = objnames[i], row.names = F)
++     else write.xlsx(objects[[i]], file, sheetName = objnames[i],
++                     append = TRUE, row.names = F)
++   }
++   print(paste("Workbook", file, "has", nobjects, "worksheets."))
++ }
+> 
+> ##**************************************************************************************************************************************************
+> ## read in data
+> 
+> district.master <- read.csv("data/raw/districts.csv", as.is=T, header=T, quote="\"", stringsAsFactors=F)
+> consortia.master <- read.csv("data/raw/consortia.csv", as.is=T, header=T, quote="\"", stringsAsFactors=F)
+> district.master.detail <- read.csv("data/raw/districts_detailed.csv", as.is=T, header=T, quote="\"", stringsAsFactors=F)
+> consortia.master.detail <- read.csv("data/raw/consortia_detailed.csv", as.is=T, header=T, quote="\"", stringsAsFactors=F)
+> valid.values <- read.xlsx("other_tabs/values_and_dictionary.xlsx", 1)
+> data.dictionary <- read.xlsx("other_tabs/values_and_dictionary.xlsx", 2)
+> 
+> 
+> 
+> all_states <- district.master$state %>% unique()
+> 
+> head(district.master.detail)
+  esh_id                  district_name        city state   frn_complete
+1 909764                   UNION PARISH Farmerville    LA 1799000080.001
+2 882080 ESTES PARK SCHOOL DISTRICT R-3  Estes Park    CO 1799000222.001
+3 909764                   UNION PARISH Farmerville    LA 1799000085.001
+4 942927      LOS ALAMOS PUBLIC SCHOOLS  Los Alamos    NM 1799000143.002
+5 909629                  ACADIA PARISH     Crowley    LA 1799000326.001
+6 942827         ARTESIA PUBLIC SCHOOLS     Artesia    NM 1799003317.001
+  erate_discount purpose_of_service purpose_of_service_corrected
+1             90           Internet                           NA
+2             70           Internet                           NA
+3             90       District WAN                           NA
+4             50       District WAN                           NA
+5             90           Internet                           NA
+6             80           Internet                           NA
+  type_of_connection type_of_connection_corrected
+1          Lit Fiber                           NA
+2          Lit Fiber                           NA
+3          Lit Fiber                           NA
+4          Lit Fiber                           NA
+5          Lit Fiber                           NA
+6          Lit Fiber                           NA
+  circuits_serving_districts_schools
+1                                  1
+2                                  3
+3                                  3
+4                                  6
+5                                  1
+6                                  1
+  circuits_serving_districts_schools_corrected total_circuits_in_line_item
+1                                           NA                           1
+2                                           NA                           3
+3                                           NA                           5
+4                                           NA                           6
+5                                           NA                           1
+6                                           NA                           1
+  total_circuits_in_line_item_corrected downspeed_bandwidth_mbps_per_connection
+1                                    NA                                     300
+2                                    NA                                     300
+3                                    NA                                     300
+4                                    NA                                      50
+5                                    NA                                    1000
+6                                    NA                                     400
+  downspeed_bandwidth_mbps_per_connection_corrected annual_cost
+1                                                NA   102000.00
+2                                                NA    11649.96
+3                                                NA    70820.88
+4                                                NA    53460.00
+5                                                NA    90000.00
+6                                                NA   104520.00
+  annual_cost_corrected eligible_mrc eligible_mrc_corrected
+1                    NA      8500.00                     NA
+2                    NA       970.83                     NA
+3                    NA      5901.74                     NA
+4                    NA      4455.00                     NA
+5                    NA      7500.00                     NA
+6                    NA      8710.00                     NA
+                  applied_for_by eligible_nrc eligible_nrc_corrected
+1      UNION PARISH SCHOOL BOARD            0                     NA
+2 ESTES PARK SCHOOL DISTRICT R-3            0                     NA
+3      UNION PARISH SCHOOL BOARD            0                     NA
+4      LOS ALAMOS PUBLIC SCHOOLS            0                     NA
+5  ACADIA PARISH SCHOOL DISTRICT            0                     NA
+6 ARTESIA PUBLIC SCHOOL DISTRICT            0                     NA
+  service_provider_name other_data_corrections
+1   Nexus Systems, Inc.                     NA
+2       Zayo Group, LLC                     NA
+3   Nexus Systems, Inc.                     NA
+4      Plateau Telecomm                     NA
+5        Detel Wireless                     NA
+6    PVT Networks, Inc.                     NA
+  suspected_incorrect_connection_technology suspected_incorrect_purpose
+1                                        No                          No
+2                                        No                         Yes
+3                                        No                          No
+4                                        No                          No
+5                                        No                          No
+6                                        No                          No
+  suspected_incorrect_bandwidth suspected_incorrect_quantity
+1                            No                           No
+2                            No                           No
+3                            No                           No
+4                            No                           No
+5                            No                           No
+6                            No                           No
+  suspected_incorrect_cost other_suspected_issue
+1                       No                    No
+2                       No                    No
+3                       No                    No
+4                       No                    No
+5                       No                    No
+6                       No                    No
+> 
+> valid.values$purpose_of_service <- as.character(valid.values$purpose_of_service)
+> valid.values[is.na(valid.values)] <- ''
+> data.dictionary$Source <- as.character(data.dictionary$Source)
+> data.dictionary[is.na(data.dictionary)] <- ''
+> 
+> system.time(
++ 
++ #General Spreadsheets
++ for (i in 1:length(all_states)) {
++ #for (i in 1:1) {
++   print(all_states[i])
++   district <- district.master[district.master$state == all_states[i],]
++   consortia <- consortia.master[consortia.master$state == all_states[i],]
++   district <- district[,-4]
++   consortia <- consortia[,-4]
++   
++   #writing out results to the general folder
++   if(nrow(consortia) == 0) {
++     save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district, data.dictionary)
++   } else {
++     save.xlsx(paste('data/general/',all_states[i],'_data_summary.xlsx', sep = ''), district, consortia, data.dictionary)
++   }
++ 
++ }
++ 
++ )
+[1] "LA"
+[1] "Workbook data/general/LA_data_summary.xlsx has 2 worksheets."
+[1] "CO"
+[1] "Workbook data/general/CO_data_summary.xlsx has 3 worksheets."
+[1] "NM"
+[1] "Workbook data/general/NM_data_summary.xlsx has 2 worksheets."
+[1] "TX"
+[1] "Workbook data/general/TX_data_summary.xlsx has 3 worksheets."
+[1] "AR"
+[1] "Workbook data/general/AR_data_summary.xlsx has 3 worksheets."
+[1] "MT"
+[1] "Workbook data/general/MT_data_summary.xlsx has 2 worksheets."
+[1] "CA"
+[1] "Workbook data/general/CA_data_summary.xlsx has 3 worksheets."
+[1] "IL"
+[1] "Workbook data/general/IL_data_summary.xlsx has 3 worksheets."
+[1] "MS"
+[1] "Workbook data/general/MS_data_summary.xlsx has 3 worksheets."
+[1] "OH"
+[1] "Workbook data/general/OH_data_summary.xlsx has 3 worksheets."
+[1] "PA"
+[1] "Workbook data/general/PA_data_summary.xlsx has 3 worksheets."
+[1] "MA"
+[1] "Workbook data/general/MA_data_summary.xlsx has 2 worksheets."
+[1] "IN"
+[1] "Workbook data/general/IN_data_summary.xlsx has 3 worksheets."
+[1] "NC"
+[1] "Workbook data/general/NC_data_summary.xlsx has 3 worksheets."
+[1] "OK"
+[1] "Workbook data/general/OK_data_summary.xlsx has 3 worksheets."
+[1] "NV"
+[1] "Workbook data/general/NV_data_summary.xlsx has 2 worksheets."
+[1] "NE"
+[1] "Workbook data/general/NE_data_summary.xlsx has 3 worksheets."
+[1] "SC"
+[1] "Workbook data/general/SC_data_summary.xlsx has 3 worksheets."
+[1] "NY"
+[1] "Workbook data/general/NY_data_summary.xlsx has 3 worksheets."
+[1] "OR"
+[1] "Workbook data/general/OR_data_summary.xlsx has 3 worksheets."
+[1] "MI"
+[1] "Workbook data/general/MI_data_summary.xlsx has 3 worksheets."
+[1] "CT"
+[1] "Workbook data/general/CT_data_summary.xlsx has 3 worksheets."
+[1] "GA"
+[1] "Workbook data/general/GA_data_summary.xlsx has 3 worksheets."
+[1] "NH"
+[1] "Workbook data/general/NH_data_summary.xlsx has 3 worksheets."
+[1] "AZ"
+[1] "Workbook data/general/AZ_data_summary.xlsx has 3 worksheets."
+[1] "SD"
+[1] "Workbook data/general/SD_data_summary.xlsx has 3 worksheets."
+[1] "DC"
+[1] "Workbook data/general/DC_data_summary.xlsx has 2 worksheets."
+[1] "FL"
+[1] "Workbook data/general/FL_data_summary.xlsx has 3 worksheets."
+[1] "TN"
+[1] "Workbook data/general/TN_data_summary.xlsx has 3 worksheets."
+[1] "MD"
+[1] "Workbook data/general/MD_data_summary.xlsx has 2 worksheets."
+[1] "NJ"
+[1] "Workbook data/general/NJ_data_summary.xlsx has 3 worksheets."
+[1] "UT"
+[1] "Workbook data/general/UT_data_summary.xlsx has 3 worksheets."
+[1] "MN"
+[1] "Workbook data/general/MN_data_summary.xlsx has 3 worksheets."
+[1] "VA"
+[1] "Workbook data/general/VA_data_summary.xlsx has 3 worksheets."
+[1] "KS"
+[1] "Workbook data/general/KS_data_summary.xlsx has 3 worksheets."
+[1] "ME"
+[1] "Workbook data/general/ME_data_summary.xlsx has 3 worksheets."
+[1] "AK"
+[1] "Workbook data/general/AK_data_summary.xlsx has 3 worksheets."
+[1] "VT"
+[1] "Workbook data/general/VT_data_summary.xlsx has 2 worksheets."
+[1] "RI"
+[1] "Workbook data/general/RI_data_summary.xlsx has 3 worksheets."
+[1] "WA"
+[1] "Workbook data/general/WA_data_summary.xlsx has 3 worksheets."
+[1] "KY"
+[1] "Workbook data/general/KY_data_summary.xlsx has 3 worksheets."
+[1] "AL"
+[1] "Workbook data/general/AL_data_summary.xlsx has 3 worksheets."
+[1] "WI"
+[1] "Workbook data/general/WI_data_summary.xlsx has 3 worksheets."
+[1] "IA"
+[1] "Workbook data/general/IA_data_summary.xlsx has 3 worksheets."
+[1] "HI"
+[1] "Workbook data/general/HI_data_summary.xlsx has 2 worksheets."
+[1] "MO"
+[1] "Workbook data/general/MO_data_summary.xlsx has 3 worksheets."
+[1] "WV"
+[1] "Workbook data/general/WV_data_summary.xlsx has 3 worksheets."
+[1] "WY"
+[1] "Workbook data/general/WY_data_summary.xlsx has 3 worksheets."
+[1] "ND"
+[1] "Workbook data/general/ND_data_summary.xlsx has 3 worksheets."
+[1] "ID"
+[1] "Workbook data/general/ID_data_summary.xlsx has 2 worksheets."
+   user  system elapsed 
+643.938   6.711 651.187 
+> 
+> #replacing NAs with blanks
+> district.master.detail[is.na(district.master.detail)] <- ''
+> consortia.master.detail[is.na(consortia.master.detail)] <- ''
+> 
+> 
+> 
+> system.time(
++ 
++ #Detailed Spreadsheets
++ for (i in 1:length(all_states)) {
++ #for (i in 1:1) {
++   print(all_states[i])
++   district <- district.master.detail[district.master.detail$state == all_states[i],]
++   consortia <- consortia.master.detail[consortia.master.detail$state == all_states[i],]
++   district <- district[,-4]
++   consortia <- consortia[,-4]
++   
++   file <- paste('data/detailed/',all_states[i],'_data_summary.xlsx', sep = '')
++   #writing out results to the detailed folder
++   if(nrow(consortia) == 0) {
++     save.xlsx(file, district, valid.values, data.dictionary)
++     sheetname <- 'district'
++   } else {
++     save.xlsx(file, district, consortia, valid.values, data.dictionary)
++     sheetname <- c('district', 'consortia')
++   }
++   
++   wb <- loadWorkbook(file)              # load workbook
++   fo <- Fill(foregroundColor="#FFC7CE")  # create fill object
++   cs <- CellStyle(wb, fill=fo)          # create cell style
++   sheets <- getSheets(wb)               # get all sheets
++   for (i in 1:length(sheetname)) {
++     sheet <- sheets[[sheetname[i]]]
++     if(sheetname[i] == 'district') {
++       mydata <- district
++     } else {
++       mydata <- consortia
++     }
++     rows <- getRows(sheet, rowIndex=2:(nrow(mydata)+1))     # get rows
++     cells <- getCells(rows, colIndex = 25:30)
++     values <- lapply(cells, getCellValue) # extract the values
++     highlight <- "test"
++     for (i in names(values)) {
++       x <- values[i]
++       if (x=='Yes') {
++         highlight <- c(highlight, i)
++       }    
++     }
++     
++     highlight <- highlight[-1]
++     
++     all.cells <- getCells(rows, colIndex = 1:30)
++     all.values <- lapply(all.cells, getCellValue) # extract the values
++     if (length(highlight) > 0) {
++       for (i in 1:length(highlight)) {
++         if (str_sub(highlight[i], -2, -1) == '26') {
++           cell.to.highlight <- paste0(str_sub(highlight[i], 1, -3), '6')
++           highlight <- c(highlight, cell.to.highlight)
++         } else if (str_sub(highlight[i], -2, -1) == '25') {
++           cell.to.highlight <- paste0(str_sub(highlight[i], 1, -3), '8')
++           highlight <- c(highlight, cell.to.highlight)
++         } else if (str_sub(highlight[i], -2, -1) == '28') {
++           cell.to.highlight <- paste0(str_sub(highlight[i], 1, -3), '12')
++           highlight <- c(highlight, cell.to.highlight)
++         } else if (str_sub(highlight[i], -2, -1) == '27') {
++           cell.to.highlight <- paste0(str_sub(highlight[i], 1, -3), '14')
++           highlight <- c(highlight, cell.to.highlight)
++         } else if (str_sub(highlight[i], -2, -1) == '29') {
++           highlight <- append(highlight,paste0(str_sub(highlight[i], 1, -3), '16'))
++           highlight <- append(highlight,paste0(str_sub(highlight[i], 1, -3), '18'))
++           highlight <- append(highlight,paste0(str_sub(highlight[i], 1, -3), '21'))
++         } else if (str_sub(highlight[i], -2, -1) == '30') {
++           cell.to.highlight <- paste0(str_sub(highlight[i], 1, -3), '24')
++           highlight <- c(highlight, cell.to.highlight)
++         }
++       }
++     }
++     
++     lines.cells <- getCells(rows, colIndex = 12)
++     lines.values <- lapply(lines.cells, getCellValue) # extract the values
++     for (i in names(lines.values)) {
++       x <- values[i]
++       if (x=='0' | is.null(x)) {
++         highlight <- append(highlight, i)
++       }
++     }
++     
++     highlight <- unique(highlight)
++     
++     #lapply(names(cells[highlight]),
++     #       function(ii)setCellStyle(cells[[ii]],cs))
++     lapply(names(all.cells[highlight]),
++            function(ii)setCellStyle(all.cells[[ii]],cs))
++   }
++   
++   saveWorkbook(wb, file)
++ } 
++ 
++ )
+[1] "LA"
+[1] "Workbook data/detailed/LA_data_summary.xlsx has 3 worksheets."
+[1] "CO"
+[1] "Workbook data/detailed/CO_data_summary.xlsx has 3 worksheets."
+[1] "NM"
+[1] "Workbook data/detailed/NM_data_summary.xlsx has 3 worksheets."
+[1] "TX"
+[1] "Workbook data/detailed/TX_data_summary.xlsx has 4 worksheets."
+[1] "AR"
+Error in .jcall("RJavaTools", "Ljava/lang/Object;", "invokeMethod", cl,  : 
+  java.lang.OutOfMemoryError: GC overhead limit exceeded
+Calls: system.time ... <Anonymous> -> .jrcall -> .jcall -> .jcheck -> .Call
+Timing stopped at: 1180.892 12.358 1170.166 
+Execution halted
