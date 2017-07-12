@@ -96,7 +96,13 @@ frn.meta.data.staging <- querydb(paste(github_path, "General_Resources/sql_scrip
 ## pristine line item data
 line.items.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_items.SQL", sep=""))
 ## flags
-flags.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_line_item_flags.SQL", sep=""))
+district.flags.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_staging_district_flags.SQL", sep=""))
+all.district.flags.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_all_district_flags.SQL", sep=""))
+li.flags.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_staging_line_item_flags.SQL", sep=""))
+## districts deluxe
+districts.deluxe.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_deluxe_districts.SQL", sep=""))
+## services received
+services.recieved.staging <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_services_received_crusher_materialized.SQL", sep=""))
 ## disconnect from database
 dbDisconnect(con)
 
@@ -119,4 +125,8 @@ write.csv(flags.2017, "data/raw/flags_2017.csv", row.names=F)
 
 write.csv(frn.meta.data.staging, "data/raw/frn_meta_data_staging.csv", row.names=F)
 write.csv(line.items.staging, "data/raw/line_items_staging.csv", row.names=F)
-write.csv(flags.staging, "data/raw/flags_staging.csv", row.names=F)
+write.csv(district.flags.staging, "data/raw/district_flags_staging.csv", row.names=F)
+write.csv(all.district.flags.staging, "data/raw/all_district_flags_staging.csv", row.names=F)
+write.csv(li.flags.staging, "data/raw/line_item_flags_staging.csv", row.names=F)
+write.csv(districts.deluxe.staging, "data/raw/districts_deluxe_staging.csv", row.names=F)
+write.csv(services.recieved.staging, "data/raw/services_received_staging.csv", row.names=F)
