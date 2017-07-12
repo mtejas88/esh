@@ -11,7 +11,8 @@ rm(list=ls())
 #setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv","knitr","rmarkdown","DBI")
+packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT",
+                         "htmltools", "dotenv", "knitr", "rmarkdown", "DBI")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
