@@ -8,7 +8,7 @@
 rm(list=ls())
 
 #setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-#setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
+setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv","knitr","rmarkdown","DBI")
@@ -46,7 +46,7 @@ source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## option to deploy the tool
-deploy <- 1
+deploy <- 0
 
 ##**************************************************************************************************************************************************
 ## READ DATA
@@ -60,10 +60,7 @@ dd_2017 <- read.csv("data/raw/2017_deluxe_districts.csv", as.is=T, header=T, str
 dd_2016 <- read.csv("data/raw/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 #dd_2015_froz <- read.csv("data/raw/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
-## Outlier Output
-outlier_output <- read.csv("data/raw/outlier_output.csv", as.is=T, header=T, stringsAsFactors=F)
-## Merge Outlier Output on dd_2017
-dd_2017 <- merge(x = dd_2017, y = outlier_output, by = "esh_id", all.x = TRUE)
+
 ## Date
 date <- read.csv("data/raw/date.csv", as.is=T, header=T, stringsAsFactors=F)
 

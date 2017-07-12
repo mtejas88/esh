@@ -8,7 +8,7 @@
 rm(list=ls())
 
 #setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-#setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
+setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 #args = commandArgs(trailingOnly=TRUE)
 #github_path <- args[1]
@@ -41,6 +41,8 @@ date <- gsub(" ", "_", date)
 date <- gsub(":", ".", date)
 
 ##**************************************************************************************************************************************************
+## read in outliers
+outlier_output <- read.csv("../../General_Resources/datasets/outlier_output.csv")
 ## QUERY THE DB
 
 ## load PostgreSQL Driver
@@ -67,6 +69,7 @@ dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
 resolved_outliers <- querydb("../../General_Resources/sql_scripts/resolved_outliers_smd.SQL")
 ## Merge outliers
 dd_2017 <- merge(x = dd_2017, y = resolved_outliers, by = "esh_id", all.x = TRUE)
+dd_2017 <- merge(x = dd_2017, y = outlier_output, by = "esh_id", all.x = TRUE)
 ## disconnect from database
 dbDisconnect(con)
 
@@ -104,6 +107,7 @@ write.csv(dd_2017, "data/raw/2017_deluxe_districts.csv", row.names=F)
 write.csv(dd_2016, "data/raw/2016_deluxe_districts.csv", row.names=F)
 #write.csv(dd_2016_froz, "data/raw/2016_frozen_deluxe_districts.csv", row.names=F)
 #write.csv(dd_2015_froz, "data/raw/2015_frozen_deluxe_districts.csv", row.names=F)
+#write.csv(outlier_output, "data/raw/outlier_output.csv", row.names=F)
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
 names(date.dta) <- 'date'
