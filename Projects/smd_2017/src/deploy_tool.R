@@ -8,7 +8,7 @@
 rm(list=ls())
 
 #setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
+#setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT", "htmltools", "dotenv","knitr","rmarkdown","DBI")
@@ -46,7 +46,7 @@ source("../../General_Resources/common_functions/source_env.R")
 source_env("~/.env")
 
 ## option to deploy the tool
-deploy <- 0
+deploy <- 1
 
 ##**************************************************************************************************************************************************
 ## READ DATA
