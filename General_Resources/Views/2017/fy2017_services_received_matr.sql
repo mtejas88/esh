@@ -66,7 +66,10 @@ FROM (
                     'canceled' = any(li.open_flag_labels) or
                     'video_conferencing' = any(li.open_flag_labels)
                 THEN 'dqs_excluded'
-              WHEN 'exclude_for_cost_only_free' = any(li.open_tag_labels) OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) and li.num_open_flags = 0
+              WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
+                OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
+                OR 'exclude_for_cost_only_unknown' = any(li.open_tag_labels))
+                and li.num_open_flags = 0
                 THEN 'clean_no_cost'
               WHEN li.num_open_flags > 0
                 THEN  'dirty'
@@ -201,7 +204,7 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       6/23/2017 - JH added mrc unless null calculations
+Last Modified Date:       7/12/2017 - JH added exclude_for_cost_only_unknown tag to be clean_no_cost
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:
