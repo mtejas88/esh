@@ -162,3 +162,21 @@ for (i in 1:length(all_states)) {
   
   saveWorkbook(wb, file)
 } 
+
+
+#Detailed Spreadsheets without formatting
+for (i in 1:length(all_states)) {
+  #for (i in 1:1) {
+  print(all_states[i])
+  district <- district.master.detail[district.master.detail$state == all_states[i],]
+  consortia <- consortia.master.detail[consortia.master.detail$state == all_states[i],]
+  district <- district[,-4]
+  consortia <- consortia[,-4]
+  
+  if(nrow(consortia) == 0) {
+    save.xlsx(paste('data/detailed/',all_states[i],'_data_summary.xlsx', sep = ''), district, valid.values, data.dictionary)
+  } else {
+    save.xlsx(paste('data/detailed/',all_states[i],'_data_summary.xlsx', sep = ''), district, consortia, valid.values, data.dictionary)
+  }
+} 
+
