@@ -63,6 +63,15 @@ predictions <- merge(predictions, stag.frns[,c('frn', 'postal_cd')], by='frn', a
 ## merge predictions with line item flags
 names(stag.line.item.flags)[names(stag.line.item.flags) == "id"] <- 'id_in_flag_table'
 pred.line.item.flags <- merge(predictions, stag.line.item.flags, by.x='id', by.y='flaggable_id', all.x=T)
+
+## due to Marques' QA: Need to take out line item predictions where Product BW flags are raised
+line.items.prod.bw.flag.open <- unique(pred.line.item.flags$id[which(pred.line.item.flags$label == "product_bandwidth" &
+                                                                       pred.line.item.flags$status == 'open')])
+pred.line.item.flags <- pred.line.item.flags[which(!pred.line.item.flags$id %in% line.items.prod.bw.flag.open),]
+## also take them out of the predictions dataset
+predictions <- predictions[which(!predictions$id %in% line.items.prod.bw.flag.open),]
+predictions.jamie <- predictions
+
 ## aggregate at the line item level to see how many total resolved and opened
 pred.line.item.flags$resolved <- ifelse(pred.line.item.flags$status == 'resolved', 1, 0)
 pred.line.item.flags$open <- ifelse(pred.line.item.flags$status == 'open', 1, 0)
@@ -93,23 +102,21 @@ names(line.items.states.no.change) <- c('postal_cd', 'num_line_items_no_change')
 line.items.states <- merge(line.items.states.smaller, line.items.states.larger, by='postal_cd', all=T) 
 line.items.states <- merge(line.items.states, line.items.states.no.change, by='postal_cd', all=T) 
 line.items.states$total_line.items <- rowSums(line.items.states[,c(2:4)])
-
-## most common opened flags:
-pred.line.item.flags.open <- pred.line.item.flags[which(pred.line.item.flags$status == 'open'),]
-table(pred.line.item.flags.open$label)
-## make a subset for product bandwdith open flags
-pred.line.item.flags.open.product.bw <- pred.line.item.flags.open[which(pred.line.item.flags.open$label == 'product_bandwidth'),]
-
-## most common resolved flags:
-pred.line.item.flags.resolved <- pred.line.item.flags[which(pred.line.item.flags$status == 'resolved'),]
-table(pred.line.item.flags.resolved$label)
-
 ## create a row at the end that is the sum of all values
 line.items.states <- rbind(line.items.states, rep(NA, ncol(line.items.states)))
 line.items.states$postal_cd[nrow(line.items.states)] <- 'TOTAL'
 for (i in 2:ncol(line.items.states)){
   line.items.states[line.items.states$postal_cd == 'TOTAL', i] <- sum(line.items.states[,i], na.rm=T)
 }
+
+## most common opened flags:
+pred.line.item.flags.open <- pred.line.item.flags[which(pred.line.item.flags$status == 'open'),]
+table(pred.line.item.flags.open$label)
+## make a subset for product bandwdith open flags
+pred.line.item.flags.open.product.bw <- pred.line.item.flags.open[which(pred.line.item.flags.open$label == 'product_bandwidth'),]
+## most common resolved flags:
+pred.line.item.flags.resolved <- pred.line.item.flags[which(pred.line.item.flags$status == 'resolved'),]
+table(pred.line.item.flags.resolved$label)
 
 
 
@@ -259,8 +266,11 @@ for (i in 2:ncol(districts.states)){
 write.csv(districts.states, "data/interim/districts_by_states_impact_analysis.csv", row.names=F)
 write.csv(line.items.states, "data/interim/line_items_by_states_impact_analysis.csv", row.names=F)
 
-## write out open product BW line items
-write.csv(pred.line.item.flags.open.product.bw, "data/interim/product_bw_line_item_flags_open.csv", row.names=T)
-
-## cross-over between Jamie's work
 ## product bandwidth -- why are they open?
+## write out open product BW line items
+#write.csv(pred.line.item.flags.open.product.bw, "data/interim/product_bw_line_item_flags_open.csv", row.names=T)
+
+## for cross-over between Jamie's work
+## write out the finalized line items affected by the mass update
+write.csv(predictions.jamie, "data/interim/line_items_predicted_for_jamie.csv", row.names=F)
+
