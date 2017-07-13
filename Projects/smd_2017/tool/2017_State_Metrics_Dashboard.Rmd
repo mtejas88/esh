@@ -94,6 +94,7 @@ fiber_ct_sub <- reactive({fiber_ct %>% filter(postal_cd %in% input$state)})
 affordability_ct_sub <- reactive({affordability_ct %>% filter(postal_cd %in% input$state)})
 wifi_ct_sub <- reactive({wifi_ct %>% filter(postal_cd %in% input$state)})
 
+
 ## targets
 connectivity_tar_sub <- reactive({connectivity_tar %>% filter(postal_cd %in% input$state)})
 fiber_tar_sub <- reactive({fiber_tar %>% filter(postal_cd %in% input$state)})
@@ -479,11 +480,11 @@ img(src = "figures/wifi.png", height = "100%", width = "100%")
 ```{r}
 renderHighchart({
   highchart() %>% hc_chart(type = 'column') %>% 
-  hc_xAxis(categories = c('Current 2015', 'Current 2016', 'Current 2017')) %>% 
-  hc_yAxis(labels = list(format = '${value}'), min=0, max=max(state.agg.2017.sub()$c2_remaining_2015/1000000,
+  hc_xAxis(categories = c('SotS 2016', 'Current 2016', 'Current 2017')) %>% 
+  hc_yAxis(labels = list(format = '${value}'), min=0, max=max(state.agg.sots.2016.sub()$c2_remaining_millions_sots,
                                                               state.agg.2017.sub()$c2_remaining_2016/1000000,
                                                               state.agg.2017.sub()$c2_remaining_2017/1000000, na.rm=T)) %>% 
-  hc_add_series(data = c(round(state.agg.2017.sub()$c2_remaining_2015/1000000, 1),
+  hc_add_series(data = c(round(state.agg.sots.2016.sub()$c2_remaining_millions_sots, 1),
                          round(state.agg.2017.sub()$c2_remaining_2016/1000000, 1),
                          round(state.agg.2017.sub()$c2_remaining_2017/1000000, 1)),
                 dataLabels=list(enabled=TRUE, format='${point.y}')) %>%  hc_legend(enabled=FALSE) %>% hc_colors(c(colors$color[colors$label == 'wifi1']))

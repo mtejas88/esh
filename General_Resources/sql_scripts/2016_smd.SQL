@@ -62,10 +62,10 @@ sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude
 sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_knapsack_affordability_target = 't' THEN dd_2016.num_students ELSE 0 END) as students_meeting_affordability,
 
 -- Total IA Monthly Cost
-round(sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_total::numeric ELSE 0 END), 0) as ia_monthly_cost_total,
+round(sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_total::numeric ELSE 0 END), 2) as ia_monthly_cost_total,
 
 -- Median IA Monthly Cost per Mbps
-round(median(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 0) as median_ia_monthly_cost_per_mbps,
+round(median(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 2) as median_ia_monthly_cost_per_mbps,
 
 
 /* FIBER */
@@ -167,10 +167,10 @@ sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude
 sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_knapsack_affordability_target = 't' THEN dd_2016.num_students ELSE 0 END) as students_meeting_affordability,
 
 -- Total IA Monthly Cost
-round(sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_total::numeric ELSE 0 END), 0) as ia_monthly_cost_total,
+round(sum(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_total::numeric ELSE 0 END), 2) as ia_monthly_cost_total,
 
 -- Median IA Monthly Cost per Mbps
-round(median(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 0) as median_ia_monthly_cost_per_mbps,
+round(median(CASE WHEN dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2016.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 2) as median_ia_monthly_cost_per_mbps,
 
 
 /* FIBER */
