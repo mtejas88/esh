@@ -263,5 +263,4 @@ write.csv(line.items.states, "data/interim/line_items_by_states_impact_analysis.
 write.csv(pred.line.item.flags.open.product.bw, "data/interim/product_bw_line_item_flags_open.csv", row.names=T)
 
 ## cross-over between Jamie's work
-
-## product bandwidth -- why are they open 
+## product bandwidth -- why are they open?
