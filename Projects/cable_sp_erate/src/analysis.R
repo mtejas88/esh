@@ -21,10 +21,13 @@ sp.all <- read.csv("data/raw/line_item_cost_sp.csv")
 sp.cable$erate <- sp.cable$line_item_district_cost * sp.cable$discount_rate_c1_matrix
 sp.all$erate <- sp.all$line_item_district_cost * sp.all$discount_rate_c1_matrix
 
+## aggregate cable lines
+sp.cable.agg.total <- aggregate(sp.cable$line_item_district_cost, by=list(sp.cable$connect_category), FUN=sum, na.rm=T)
+sp.cable.agg.erate <- aggregate(sp.cable$erate, by=list(sp.cable$connect_category), FUN=sum, na.rm=T)
 
-
-
-
+## aggregate all lines
+sp.all.agg.total <- aggregate(sp.all$line_item_district_cost, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
+sp.all.agg.erate <- aggregate(sp.all$erate, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
 
 
 ##**************************************************************************************************************************************************
