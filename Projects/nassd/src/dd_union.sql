@@ -177,18 +177,6 @@ end as ia_bandwidth_per_student_kbps,
 null as fiber_target_status,
 null as unscalable_campuses,
 
--- WAN
-case
-  when f.exclude_from_analysis = false
-  then f.gt_1g_wan_lines
-  else null 
-end as one_g_wan_lines,
-case
-  when f.exclude_from_analysis = false
-  then f.wan_lines 
-  else null 
-end as wan_lines,
-
 -- WIFI
 null as needs_wifi,
 null as percent_c2_budget_used,
@@ -222,6 +210,7 @@ null as knapsack_meeting_2014_goal_no_oversub,
 null as knapsack_meeting_2018_goal_oversub,
 
 -- UPGRADE
+null as upgrade,
 null as upgraded_to_meet_2014_goal,
 null cohort_16_to_17_fiber,
 null cohort_16_to_17_connectivity,
@@ -265,33 +254,9 @@ end as frl_percent_grouping,
 
 -- General E-rate/Broadband Info
 case
-  when dd.discount_rate_c1 <= .25
+  when dd.discount_rate_c1_matrix <= .25
   then ' 20-25%'
-  when dd.discount_rate_c1 is not null 
-  then to_char(dd.discount_rate_c1*100,'99%')
-  when dd.frl_percent is null
-  then null
-  when dd.frl_percent < .1 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 20-25%'
-  when dd.frl_percent < .1 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 20-25%'
-  when dd.frl_percent < .2 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 40%'
-  when dd.frl_percent < .2 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 50%'
-  when dd.frl_percent < .35 and (dd.locale = 'Urban' or dd.locale = 'Suburban')
-  then ' 50%'
-  when dd.frl_percent < .35 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 60%'
-  when dd.frl_percent < .50 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 60%'
-  when dd.frl_percent < .50 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 70%'
-  when dd.frl_percent < .75 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 80%'
-  when dd.frl_percent < .75 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 80%'
-  else ' 90%'
+  else to_char(dd.discount_rate_c1_matrix*100,'99%')
 end as discount_rate_c1,
 case
   when dd.discount_rate_c2 <= .25
@@ -323,7 +288,11 @@ case
   else ' 85%'
 end as discount_rate_c2,
 org_structure,
-dd.ia_procurement_type,
+case 
+  when dd.exclude_from_ia_analysis = false
+  then dd.ia_procurement_type
+  else null
+end as ia_procurement_type,
 case
   when dd.postal_cd in ('AZ','CA','CO','FL','IL','KS','MA','MD','MN','MO','MT','NC','NH','NJ','NM','NV','NY','OH','OK','TX','VA','WA','WI','WY','AK','AL','CT','NE','OR')
   then 'Engaged'
@@ -365,18 +334,6 @@ end as ia_bandwidth_per_student_kbps,
 -- FIBER
 dd.fiber_target_status,
 (dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses) as unscalable_campuses,
-
--- WAN
-case
-  when dd.exclude_from_ia_analysis = false
-  then dd.gt_1g_wan_lines
-  else null 
-end as one_g_wan_lines,
-case
-  when dd.exclude_from_ia_analysis = false
-  then dd.wan_lines 
-  else null 
-end as wan_lines,
 
 -- WIFI
 case
@@ -441,6 +398,13 @@ case
 end as knapsack_meeting_2018_goal_oversub,
 -- UPGRADE
 case
+   when dd.exclude_from_ia_analysis = true or d.exclude_from_analysis = true
+   then null
+   when dd.upgrade_indicator = true 
+   then 1
+   else 0
+end as upgrade,
+case
   when dd.exclude_from_ia_analysis = true or d.exclude_from_analysis = true
   then null
   when dd.meeting_2014_goal_no_oversub = true and d.meeting_2014_goal_no_oversub = false 
@@ -498,33 +462,9 @@ end as frl_percent_grouping,
 
 -- General E-rate/Broadband Info
 case
-  when dd.discount_rate_c1 <= .25
+  when dd.discount_rate_c1_matrix <= .25
   then ' 20-25%'
-  when dd.discount_rate_c1 is not null 
-  then to_char(dd.discount_rate_c1*100,'99%')
-  when dd.frl_percent is null
-  then null
-  when dd.frl_percent < .1 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 20-25%'
-  when dd.frl_percent < .1 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 20-25%'
-  when dd.frl_percent < .2 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 40%'
-  when dd.frl_percent < .2 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 50%'
-  when dd.frl_percent < .35 and (dd.locale = 'Urban' or dd.locale = 'Suburban')
-  then ' 50%'
-  when dd.frl_percent < .35 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 60%'
-  when dd.frl_percent < .50 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 60%'
-  when dd.frl_percent < .50 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 70%'
-  when dd.frl_percent < .75 and (dd.locale = 'Urban' or  dd.locale = 'Suburban')
-  then ' 80%'
-  when dd.frl_percent < .75 and (dd.locale = 'Town' or  dd.locale = 'Rural')
-  then ' 80%'
-  else ' 90%'
+  else to_char(dd.discount_rate_c1_matrix*100,'99%')
 end as discount_rate_c1,
 case
   when dd.discount_rate_c2 <= .25
@@ -556,7 +496,11 @@ case
   else ' 85%'
 end as discount_rate_c2,
 s.org_structure,
-dd.ia_procurement_type,
+case
+  when dd.exclude_from_ia_analysis = false 
+  then dd.ia_procurement_type
+  else null
+end as ia_procurement_type,
 case
   when dd.postal_cd in ('AZ','CA','CO','FL','IL','KS','MA','MD','MN','MO','MT','NC','NH','NJ','NM','NV','NY','OH','OK','TX','VA','WA','WI','WY','AK','AL','CT','NE','OR')
   then 'Engaged'
@@ -598,18 +542,6 @@ end as ia_bandwidth_per_student_kbps,
 -- FIBER
 dd.fiber_target_status,
 (dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses) as unscalable_campuses,
-
--- WAN
-case
-  when dd.exclude_from_ia_analysis = false
-  then dd.gt_1g_wan_lines
-  else null 
-end as one_g_wan_lines,
-case
-  when dd.exclude_from_ia_analysis = false
-  then dd.wan_lines 
-  else null 
-end as wan_lines,
 
 -- WIFI
 case
@@ -663,25 +595,32 @@ end as ia_monthly_district_total,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
-  else knapsack_bandwidth(dd.ia_monthly_cost_total)
+  else knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)
 end as knapsack_bandwidth,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
-  when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000/dd.num_students) < 100 
+  when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000/dd.num_students) < 100 
   then 0
-  when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000/dd.num_students) >= 100 
+  when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000/dd.num_students) >= 100 
   then 1
 end as knapsack_meeting_2014_goal_no_oversub,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
-  when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000*dd.ia_oversub_ratio/dd.num_students) < 1000 
+  when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000*dd.ia_oversub_ratio/dd.num_students) < 1000 
   then 0
-  when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000*dd.ia_oversub_ratio/dd.num_students) >= 1000 
+  when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000*dd.ia_oversub_ratio/dd.num_students) >= 1000 
   then 1
 end as knapsack_meeting_2018_goal_oversub,
 -- UPGRADE
+case
+   when dd.exclude_from_ia_analysis = true or d.exclude_from_ia_analysis = true
+   then null
+   when dd.upgrade_indicator = true 
+   then 1
+   else 0
+end as upgrade,
 case
   when dd.exclude_from_ia_analysis = true or d.exclude_from_ia_analysis = true
   then null
