@@ -128,8 +128,9 @@ table(pred.line.item.flags.resolved$label)
 ## (cleared this with Jeremy)
 predictions <- merge(predictions, stag.sr[,c('line_item_id', 'recipient_id')], by.x='id', by.y='line_item_id', all.x=T)
 predictions <- predictions[!is.na(predictions$recipient_id),]
+districts.affected <- unique(predictions$recipient_id)
 names(stag.district.flags)[names(stag.district.flags) == "id"] <- 'id_in_flag_table'
-pred.district.flags <- merge(predictions, stag.district.flags, by.x='recipient_id', by.y='flaggable_id', all.x=T)
+pred.district.flags <- stag.district.flags[c(stag.district.flags$flaggable_id %in% districts.affected),]
 ## aggregate at the district level to see how many total resolved and opened
 pred.district.flags$resolved <- ifelse(pred.district.flags$status == 'resolved', 1, 0)
 pred.district.flags$open <- ifelse(pred.district.flags$status == 'open', 1, 0)
@@ -137,14 +138,14 @@ pred.district.flags$open <- ifelse(pred.district.flags$status == 'open', 1, 0)
 pred.district.flags$resolved <- ifelse(is.na(pred.district.flags$status), 0, pred.district.flags$resolved)
 pred.district.flags$open <- ifelse(is.na(pred.district.flags$status), 0, pred.district.flags$open)
 ## aggregate
-pred.districts <- aggregate(pred.district.flags$resolved, by=list(pred.district.flags$recipient_id), FUN=sum, na.rm=T)
-names(pred.districts) <- c('recipient_id', 'resolved')
-pred.districts.x <- aggregate(pred.district.flags$open, by=list(pred.district.flags$recipient_id), FUN=sum, na.rm=T)
-names(pred.districts.x) <- c('recipient_id', 'opened')
-pred.districts <- merge(pred.districts, pred.districts.x, by='recipient_id', all=T)
+pred.districts <- aggregate(pred.district.flags$resolved, by=list(pred.district.flags$flaggable_id), FUN=sum, na.rm=T)
+names(pred.districts) <- c('flaggable_id', 'resolved')
+pred.districts.x <- aggregate(pred.district.flags$open, by=list(pred.district.flags$flaggable_id), FUN=sum, na.rm=T)
+names(pred.districts.x) <- c('flaggable_id', 'opened')
+pred.districts <- merge(pred.districts, pred.districts.x, by='flaggable_id', all=T)
 ## merge in state
 districts.to.state <- unique(predictions[,c('recipient_id', 'postal_cd')])
-pred.districts <- merge(pred.districts, districts.to.state, by='recipient_id', all.x=T)
+pred.districts <- merge(pred.districts, districts.to.state, by.x='flaggable_id', by.y='recipient_id', all.x=T)
 ## create an indicator where the districts only had resolved flags (and none opened)
 pred.districts$smaller_num_flags <- ifelse(pred.districts$resolved > pred.districts$opened, 1, 0)
 pred.districts$larger_num_flags <- ifelse(pred.districts$resolved < pred.districts$opened, 1, 0)
@@ -173,7 +174,7 @@ table(pred.district.flags.resolved$label)
 
 ## create a version of the flags as of Friday BEFORE the mass update and keep a version AFTER the mass update:
 ## 1) subset all flags to only the districts we care about and merge in ia_bandwidth_per_student
-stag.all.district.flags <- stag.all.district.flags[which(stag.all.district.flags$flaggable_id %in% pred.district.flags$recipient_id),]
+stag.all.district.flags <- stag.all.district.flags[which(stag.all.district.flags$flaggable_id %in% pred.district.flags$flaggable_id),]
 stag.all.district.flags <- merge(stag.all.district.flags, stag.dd[,c('esh_id', 'ia_bandwidth_per_student_kbps')], by.x='flaggable_id',
                                  by.y='esh_id', all.x=T)
 ## 2) make copy for BEFORE and AFTER update
@@ -188,13 +189,13 @@ before.update.flags$status[before.update.flags$id %in% opened_flag_ids] <- 'reso
 
 ## define the logic for whether a district is dirty:
 define.district.dirty <- function(dta, dta.store){
-  unique.districts <- unique(pred.district.flags$recipient_id)
+  unique.districts <- unique(pred.district.flags$flaggable_id)
   for (i in 1:length(unique.districts)){
     sub <- dta[which(dta$flaggable_id == unique.districts[i] & dta$status == 'open'),]
     collect.flags.wan <- unique(sub$label)
     collect.flags.ia <- collect.flags.wan[!grepl("wan", collect.flags.wan)]
     ## assign district
-    dta.store$recipient_id[i] <- unique.districts[i]
+    dta.store$flaggable_id[i] <- unique.districts[i]
     ## apply logic for dirty for ia
     if ((length(collect.flags.ia) > 0) | (0 %in% unique(sub$ia_bandwidth_per_student_kbps))){
       dta.store$dirty_for_ia[i] <- TRUE
@@ -211,19 +212,19 @@ define.district.dirty <- function(dta, dta.store){
   return(dta.store)
 }
 
-unique.districts <- unique(pred.district.flags$recipient_id)
+unique.districts <- unique(pred.district.flags$flaggable_id)
 before.districts <- data.frame(matrix(NA, nrow=length(unique.districts), ncol=3))
-names(before.districts) <- c('recipient_id', 'dirty_for_ia', 'dirty_for_wan')
+names(before.districts) <- c('flaggable_id', 'dirty_for_ia', 'dirty_for_wan')
 after.districts <- data.frame(matrix(NA, nrow=length(unique.districts), ncol=3))
-names(after.districts) <- c('recipient_id', 'dirty_for_ia', 'dirty_for_wan')
+names(after.districts) <- c('flaggable_id', 'dirty_for_ia', 'dirty_for_wan')
 
 before.districts <- define.district.dirty(before.update.flags, before.districts)
-names(before.districts) <- c('recipient_id', 'before_dirty_for_ia', 'before_dirty_for_wan')
+names(before.districts) <- c('flaggable_id', 'before_dirty_for_ia', 'before_dirty_for_wan')
 after.districts <- define.district.dirty(after.update.flags, after.districts)
-names(after.districts) <- c('recipient_id', 'after_dirty_for_ia', 'after_dirty_for_wan')
+names(after.districts) <- c('flaggable_id', 'after_dirty_for_ia', 'after_dirty_for_wan')
 
 ## combine
-districts <- merge(before.districts, after.districts, by='recipient_id', all=T)
+districts <- merge(before.districts, after.districts, by='flaggable_id', all=T)
 districts$made_dirty_ia <- ifelse(districts$before_dirty_for_ia == FALSE & districts$after_dirty_for_ia == TRUE, 1, 0)
 districts$made_dirty_wan <- ifelse(districts$before_dirty_for_wan == FALSE & districts$after_dirty_for_wan == TRUE, 1, 0)
 districts$made_clean_ia <- ifelse(districts$before_dirty_for_ia == TRUE & districts$after_dirty_for_ia == FALSE, 1, 0)
@@ -232,7 +233,7 @@ districts$same_ia <- ifelse(districts$before_dirty_for_ia == districts$after_dir
 districts$same_wan <- ifelse(districts$before_dirty_for_wan == districts$after_dirty_for_wan, 1, 0)
 
 ## merge into pred.districts
-pred.districts <- merge(pred.districts, districts, by='recipient_id', all=T)
+pred.districts <- merge(pred.districts, districts, by='flaggable_id', all=T)
 
 ## aggregate by state
 districts.states.made.dirty.ia <- aggregate(pred.districts$made_dirty_ia, by=list(pred.districts$postal_cd), FUN=sum, na.rm=T)
