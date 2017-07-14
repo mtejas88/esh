@@ -1,0 +1,1 @@
+This project was needed because there was no way to map our district and school esh_ids to census blocks (and several policy analysis requests such as CAF and Form 477 which only have data at the census block level required this) - so this project used an API to map out school and district lat/longs to census blocks.

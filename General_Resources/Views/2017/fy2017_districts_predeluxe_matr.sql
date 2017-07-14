@@ -38,6 +38,8 @@ select distinct
 
 	discount_rate_c1::numeric/100 as discount_rate_c1,
 
+	discount_rate_c1_matrix::numeric/100 as discount_rate_c1_matrix,
+
 	discount_rate_c2::numeric/100 as discount_rate_c2,
 
 	--c2.c2_discount_rate as discount_rate_c2_for_remaining_budget, using funding c2 discount columns in the code logic below
@@ -418,6 +420,16 @@ when
 
 	c2.budget_used_c2_17,
 
+	CASE 	WHEN wifi.count_wifi_needed > 0 
+				OR round(c2.c2_budget::numeric,2) = round(c2.budget_remaining_c2_2017::numeric,2)
+				THEN 'Target'
+			WHEN wifi.count_wifi_needed is null
+				THEN 'Potential Target'
+			WHEN round(c2.c2_budget::numeric,2) > round(c2.budget_remaining_c2_2017::numeric,2)
+				AND wifi.count_wifi_needed = 0
+				THEN 'Not Target'
+			END AS wifi_target_status,
+
 	wan_lines_w_dirty,
 
 	ia_monthly_cost_district_applied,
@@ -445,7 +457,7 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 6/5/2017 -- JH added 2017 wifi metrics and removed wifi haircut
+Last Modified Date: 7/5/2017 -- JH added wifi target status
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

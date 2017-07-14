@@ -12,6 +12,17 @@ select base.*,
     END AS line_item_district_monthly_cost_recurring,
     CASE
       WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
+            then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_mrc_unless_null
+      WHEN consortium_shared=true OR purpose = 'Backbone'
+        then null
+      WHEN base.line_item_total_num_lines = 'Unknown'
+        THEN null
+      when base.line_item_total_num_lines::numeric > 0
+        THEN (base.quantity_of_line_items_received_by_district / base.line_item_total_num_lines::numeric) * base.line_item_mrc_unless_null
+      ELSE NULL
+    END AS line_item_district_mrc_unless_null,
+    CASE
+      WHEN district_info_by_li.num_students_served > 0 and (consortium_shared=true OR purpose = 'Backbone')
             then (base.recipient_num_students/district_info_by_li.num_students_served)*base.line_item_total_monthly_cost
       WHEN consortium_shared=true OR purpose = 'Backbone'
         then null
@@ -55,7 +66,10 @@ FROM (
                     'canceled' = any(li.open_flag_labels) or
                     'video_conferencing' = any(li.open_flag_labels)
                 THEN 'dqs_excluded'
-              WHEN 'exclude_for_cost_only_free' = any(li.open_tag_labels) OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) and li.num_open_flags = 0
+              WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
+                OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
+                OR 'exclude_for_cost_only_unknown' = any(li.open_tag_labels))
+                and li.num_open_flags = 0
                 THEN 'clean_no_cost'
               WHEN li.num_open_flags > 0
                 THEN  'dirty'
@@ -89,6 +103,15 @@ FROM (
             END AS line_item_total_monthly_cost,
             li.total_cost AS line_item_total_cost,
             li.rec_elig_cost AS line_item_recurring_elig_cost,
+            CASE
+              WHEN li.rec_elig_cost is null or li.rec_elig_cost = 0
+                THEN  CASE
+                        WHEN li.months_of_service > 0
+                          THEN li.total_cost / li.months_of_service
+                        ELSE li.total_cost / 12
+                      END
+              ELSE li.rec_elig_cost
+            END AS line_item_mrc_unless_null,
             li.one_time_elig_cost AS line_item_one_time_cost,
             li.bandwidth_in_mbps AS bandwidth_in_mbps,
             li.months_of_service AS months_of_service,
@@ -181,7 +204,7 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       6/7/2017 - JH added district line item one time cost
+Last Modified Date:       7/12/2017 - JH added exclude_for_cost_only_unknown tag to be clean_no_cost
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology:

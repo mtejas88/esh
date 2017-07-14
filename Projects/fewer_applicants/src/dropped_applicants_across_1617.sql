@@ -141,7 +141,19 @@ select
 			when ros.recipient_ben is null
 				then 1
 			else 0
-		end) as num_recipients_dropped
+		end) as num_recipients_dropped,
+	sum(case
+          when number_of_students > 13300
+            then 13300
+          else number_of_students
+        end) as num_students,
+	sum(case
+			when ros.recipient_ben is null and number_of_students > 13300
+            	then 13300
+			when ros.recipient_ben is null
+				then number_of_students
+			else 0
+		end) as num_students_dropped
 
 from dropped_app_recipients dar
 left join (
@@ -149,5 +161,13 @@ left join (
 	from fy2017.recipients_of_services
 ) ros
 on dar.recipient_ben = ros.recipient_ben
+left join (
+    select
+      child_entity_ben,
+      avg(child_number_of_students::numeric) as number_of_students
+    from fy2016.discount_calculations
+    group by 1
+) dc
+on dar.recipient_ben = dc.child_entity_ben
 group by 1
 order by 1

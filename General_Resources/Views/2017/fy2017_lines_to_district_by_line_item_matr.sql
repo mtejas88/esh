@@ -1,16 +1,60 @@
-select dl.district_esh_id,
-         c.line_item_id,
-         count(distinct circuit_id) as allocation_lines
-from public.esh_entity_ben_circuits ec
-join public.esh_circuits c
-on ec.circuit_id = c.id
-left join entity_bens eb
-on ec.ben = eb.ben
-join fy2017_district_lookup_matr dl
-on eb.entity_id::varchar = dl.esh_id
-where funding_year = 2017 --public.esh_circuits to be filtered by funding year
-group by  district_esh_id,
-          line_item_id
+with li_lookup as (
+
+    select
+      dl.district_esh_id,
+      a.line_item_id,
+      --li.num_lines::numeric,
+      li.num_lines as li_lookup_num_lines,
+      sum(  case
+              when a.num_lines_to_allocate is null
+                then 0
+              else a.num_lines_to_allocate
+            end
+          )::numeric as sum_lines_to_allocate
+
+
+    from
+      public.esh_allocations a
+
+    join public.esh_line_items li
+    on a.line_item_id = li.id
+
+    left join entity_bens eb
+    on a.recipient_ben = eb.ben
+
+    join fy2017_district_lookup_matr dl
+    on eb.entity_id::varchar = dl.esh_id
+
+    where
+      li.funding_year = 2017
+      and li.broadband = true
+
+    group by
+      dl.district_esh_id,
+      a.line_item_id,
+      li.num_lines
+
+  )
+
+  select
+    district_esh_id,
+    line_item_id,
+    case
+      when li_lookup_num_lines::numeric > sum_lines_to_allocate
+        then sum_lines_to_allocate
+      else li_lookup_num_lines
+    end as allocation_lines
+  
+  from
+    li_lookup
+  where
+    li_lookup_num_lines != -1 and
+    (case 
+      when li_lookup_num_lines::numeric > sum_lines_to_allocate
+        then sum_lines_to_allocate
+      else li_lookup_num_lines end) > 0
+    
+
 
 
 
@@ -21,7 +65,8 @@ Author:                       Justine Schott
 
 Created On Date:              06/16/2016
 
-Last Modified Date: 		  08/26/2016
+Last Modified Date: 		  6/13/2017 - JH changed methodology to remove cases when num_lines = -1 or the sum_allocations = 0.
+This is how the old circuits to EBC query worked.
 
 Name of QAing Analyst(s):
 
@@ -31,8 +76,6 @@ Modified Date: 4/27/2017
 Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
-usage of public.esh_entity_ben_circuits and
-public.esh_circuits and filtering the funding year with 2017
-
+Methodology: Using allocations table (instead of esh_entity_ben_circuits) to count lines
+received by district
 */

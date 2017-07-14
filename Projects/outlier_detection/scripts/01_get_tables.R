@@ -2,8 +2,6 @@
 # clear the console
 cat("\014")
 rm(list=ls())
-args = commandArgs(trailingOnly=TRUE)
-github_path <- args[1]
 
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
 for (i in 1:length(packages.to.install)){
@@ -16,24 +14,21 @@ library(rJava)
 library(RJDBC)
 library(dotenv)
 
-# set up workding directory -- it is currently set up to the folder which contains all scripts
-#this is my github path. DONT FORGET TO COMMENT OUT
-github_path <- '~/Documents/ESH/ficher/'
-
-
 options(java.parameters = "-Xmx4g" )
 
+# set up workding directory -- it is currently set up to the folder which contains all scripts
+#this is my github path. DONT FORGET TO COMMENT OUT
+github_path <- '~/sat_r_programs/R_database_access/'
+
 ## source environment variables
-source(paste(github_path, "General_Resources/common_functions/source_env.R", sep=""))
+source(paste('~/Documents/ESH/ficher/General_Resources/common_functions/', "source_env.R", sep=""))
 source_env("~/.env")
-#source("/home/sat/db_utils/R_database_access/db_credentials/wheaton_connect.R")
 
 ##**************************************************************************************************************************************************
 ## QUERY THE DB
 
-
 ## load PostgreSQL Driver
-pgsql <- JDBC("org.postgresql.Driver", paste(github_path, "General_Resources/postgres_driver/postgresql-9.4.1212.jre7.jar", sep=""), "`")
+pgsql <- JDBC("org.postgresql.Driver", paste('~/Documents/ESH/ficher/General_Resources/postgres_driver/', "postgresql-9.4.1212.jre7.jar", sep=""), "`")
 #pgsql <- JDBC("org.postgresql.Driver", "/home/sat/db_utils/R_database_access/postgresql-9.4.1212.jre7.jar", "`")
 
 ## connect to the database
