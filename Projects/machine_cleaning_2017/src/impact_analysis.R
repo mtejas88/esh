@@ -32,6 +32,9 @@ stag.sr <- read.csv("data/raw/services_received_staging.csv", as.is=T, header=T,
 ## ESH model predictions
 predictions <- read.csv("data/interim/eng_subset_for_staging.csv", as.is=T, header=T, stringsAsFactors=F)
 
+## ENG logic for predictions
+eng.logic <- read.csv("../../General_Resources/datasets/Mass update_pred algorithm_FINAL_7.7.17.csv", as.is=T, header=T, stringsAsFactors=F)
+
 ##**************************************************************************************************************************************************
 ## FORMAT & MERGE DATA
 
@@ -260,6 +263,14 @@ for (i in 2:ncol(districts.states)){
   districts.states[districts.states$postal_cd == 'TOTAL', i] <- sum(districts.states[,i], na.rm=T)
 }
 
+
+## format predictions to be passed back to ENG
+predictions.eng <- predictions.jamie 
+## subset logic defined previously by ENG
+eng.logic <- eng.logic[which(eng.logic$id %in% predictions.eng$id),]
+## merge in the probabilities
+eng.logic <- merge(eng.logic, predictions.eng[,c(2,8:17)], by='id', all.x=T)
+
 ##**************************************************************************************************************************************************
 ## write out data
 
@@ -274,3 +285,5 @@ write.csv(line.items.states, "data/interim/line_items_by_states_impact_analysis.
 ## write out the finalized line items affected by the mass update
 write.csv(predictions.jamie, "data/interim/line_items_predicted_for_jamie.csv", row.names=F)
 
+## write out FINAL ENG dataset
+write.csv(eng.logic, "data/interim/final_ML_update_line_items_7-13-2017.csv", row.names=F)
