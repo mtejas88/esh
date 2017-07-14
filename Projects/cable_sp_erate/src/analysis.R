@@ -29,8 +29,3 @@ sp.cable.agg.erate <- aggregate(sp.cable$erate, by=list(sp.cable$connect_categor
 sp.all.agg.total <- aggregate(sp.all$line_item_district_cost, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
 sp.all.agg.erate <- aggregate(sp.all$erate, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
 
-
-##**************************************************************************************************************************************************
-## write out the datasets
-
-write.csv(sp.cable, "data/raw/line_item_cost_cable_sp.csv", row.names=F)
