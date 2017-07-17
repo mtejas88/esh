@@ -1,6 +1,6 @@
 select distinct recipient_id,
 sr.line_item_id,
-line_item_district_monthly_cost_total + line_item_district_one_time_cost as line_item_district_cost,
+(line_item_district_monthly_cost_total * months_of_service) + line_item_district_one_time_cost as line_item_district_cost,
 sr.reporting_name,
 sr.connect_category,
 dd.discount_rate_c1_matrix

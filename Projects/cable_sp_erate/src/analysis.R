@@ -29,3 +29,19 @@ sp.cable.agg.erate <- aggregate(sp.cable$erate, by=list(sp.cable$connect_categor
 sp.all.agg.total <- aggregate(sp.all$line_item_district_cost, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
 sp.all.agg.erate <- aggregate(sp.all$erate, by=list(sp.all$connect_category), FUN=sum, na.rm=T)
 
+
+
+## CABLE LINE ITEMS
+sum(sp.cable.agg.total$x[sp.cable.agg.total$Group.1 == 'Cable'])
+sum(sp.cable.agg.erate$x[sp.cable.agg.erate$Group.1 == 'Cable'])
+
+sum(sp.all.agg.total$x[sp.all.agg.total$Group.1 == 'Cable'])
+sum(sp.all.agg.erate$x[sp.all.agg.erate$Group.1 == 'Cable'])
+
+
+## NOT CABLE LINE ITEMS
+sum(sp.cable.agg.total$x[sp.cable.agg.total$Group.1 != 'Cable'])
+sum(sp.cable.agg.erate$x[sp.cable.agg.erate$Group.1 != 'Cable'])
+
+sum(sp.all.agg.total$x[sp.all.agg.total$Group.1 != 'Cable'])
+sum(sp.all.agg.erate$x[sp.all.agg.erate$Group.1 != 'Cable'])
