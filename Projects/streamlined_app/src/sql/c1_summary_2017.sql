@@ -21,17 +21,39 @@ with lca as (
 select
   frns_denied > 0 as application_denied,
   count(*) as apps,
+  sum(total_funding_year_commitment_amount_request) as requested,
   sum(case
       when total_funding_year_commitment_amount_request < 25000
         then 1
       else 0
-    end) as lowcost_apps,
-  sum(total_funding_year_commitment_amount_request) as requested,
+    end) as lowcost_25k_apps,
   sum(case
       when total_funding_year_commitment_amount_request < 25000
         then total_funding_year_commitment_amount_request
       else 0
-    end) as lowcost_requested
+    end) as lowcost_25k_requested,
+  sum(case
+      when total_funding_year_commitment_amount_request < 50000
+        then 1
+      else 0
+    end) as lowcost_50k_apps,
+  sum(total_funding_year_commitment_amount_request) as requested,
+  sum(case
+      when total_funding_year_commitment_amount_request < 50000
+        then total_funding_year_commitment_amount_request
+      else 0
+    end) as lowcost_50k_requested,
+  sum(case
+      when total_funding_year_commitment_amount_request < 110000
+        then 1
+      else 0
+    end) as lowcost_110k_apps,
+  sum(total_funding_year_commitment_amount_request) as requested,
+  sum(case
+      when total_funding_year_commitment_amount_request < 110000
+        then total_funding_year_commitment_amount_request
+      else 0
+    end) as lowcost_110k_requested
 
 from lca
 group by 1
