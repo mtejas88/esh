@@ -27,6 +27,22 @@ select
   sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
   count(*) as application_number,
   2016 as year,
+  'all actual' as model
+
+from lca
+group by 1, 4, 5
+
+UNION
+
+select
+  case
+    when frns_denied > 0
+      then 1
+    else 0
+  end as yhat,
+  sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
+  count(*) as application_number,
+  2016 as year,
   '25k actual' as model
 
 from lca

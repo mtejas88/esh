@@ -72,6 +72,9 @@ yhat_test = [ 0 if y < 0.75 else 1 for y in yhat_test ]
 print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
 
+cm = confusion_matrix(y_test, yhat_test)
+np.savetxt('data/interim/sm_lowcost_50k_applications_c1_approval_optimized.out', cm, delimiter=',') 
+
 ## predict denial optimized with 2016
 x0  = lowcost_50k_applications_c1
 x = x0[feature_cols]
@@ -91,7 +94,7 @@ x0 = x0.merge(yhat, left_index=True, right_index=True)
 
 x0.to_csv('data/interim/lowcost_50k_applications_c1_2016_approval_optimized.csv')
 
-x0_summ = x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
+x0_summ = x0.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 
 x0_summ.to_csv('data/interim/summ_lowcost_50k_applications_c1_2016_approval_optimized.csv')
 
