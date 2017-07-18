@@ -17,9 +17,9 @@ import csv
 
 ## data prep
 #import
-lowcost_25k_applications = pd.read_csv('data/interim/lowcost_25k_applications.csv')
+lowcost_50k_applications = pd.read_csv('data/interim/lowcost_50k_applications.csv')
 
-lowcost_25k_applications_c1  = lowcost_25k_applications.loc[lowcost_25k_applications['category_1'] == True]
+lowcost_50k_applications_c1  = lowcost_50k_applications.loc[lowcost_50k_applications['category_1'] == True]
 
 feature_cols = ['locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'denied_indicator_py',  
 'applicant_type_Library', 'applicant_type_Library System',   
@@ -39,7 +39,7 @@ insig_cols = ['mastercontract_indicator', 'prevyear_indicator', '1bids_indicator
 ##regression with test/train, approval optimized
 
 #define model inputs
-train, test = train_test_split(lowcost_25k_applications_c1, train_size=0.75, random_state=1)
+train, test = train_test_split(lowcost_50k_applications_c1, train_size=0.75, random_state=1)
 
 X1 = train[feature_cols]
 y1 = train.denied_indicator
@@ -54,8 +54,8 @@ y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['denied_indicator'
 
 X_res = sm.add_constant(X_res)
 
-est_25k_app = sm.Logit(y_res, X_res.astype(float)).fit()
-print(est_25k_app.summary())
+est_50k_app = sm.Logit(y_res, X_res.astype(float)).fit()
+print(est_50k_app.summary())
 
 #predict on test set
 x_test = test[feature_cols]
@@ -63,7 +63,7 @@ x_test = sm.add_constant(x_test)
 
 y_test = test.denied_indicator
 
-yhat_test = est_25k_app.predict(x_test)
+yhat_test = est_50k_app.predict(x_test)
 plt.hist(yhat_test,100)
 plt.show()
 
@@ -73,11 +73,11 @@ print(confusion_matrix(y_test, yhat_test))
 print(classification_report(y_test, yhat_test,digits=3))
 
 ## predict denial optimized with 2016
-x0  = lowcost_25k_applications_c1
+x0  = lowcost_50k_applications_c1
 x = x0[feature_cols]
 x = sm.add_constant(x)
 
-yhat = est_25k_app.predict(x.T.drop_duplicates().T)
+yhat = est_50k_app.predict(x.T.drop_duplicates().T)
 #plt.hist(yhat,100)
 #plt.show()
 
@@ -89,24 +89,24 @@ yhat = pd.DataFrame(data=yhat, index=range(rows), columns=['yhat'])
 x0 = x0.reset_index()
 x0 = x0.merge(yhat, left_index=True, right_index=True)
 
-x0.to_csv('data/interim/lowcost_25k_applications_c1_2016_approval_optimized.csv')
+x0.to_csv('data/interim/lowcost_50k_applications_c1_2016_approval_optimized.csv')
 
 x0_summ = x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 
-x0_summ.to_csv('data/interim/summ_lowcost_25k_applications_c1_2016_approval_optimized.csv')
+x0_summ.to_csv('data/interim/summ_lowcost_50k_applications_c1_2016_approval_optimized.csv')
 
 
 ## 2017 data prep
 #import
-lowcost_25k_applications_2017 = pd.read_csv('data/interim/lowcost_25k_applications_2017.csv')
+lowcost_50k_applications_2017 = pd.read_csv('data/interim/lowcost_50k_applications_2017.csv')
 
 
 ## predict denial optimized with 2017
-x1  = lowcost_25k_applications_2017.loc[lowcost_25k_applications_2017['category_1'] == True]
+x1  = lowcost_50k_applications_2017.loc[lowcost_50k_applications_2017['category_1'] == True]
 x = x1[feature_cols]
 x = sm.add_constant(x)
 
-yhat = est_25k_app.predict(x.T.drop_duplicates().T)
+yhat = est_50k_app.predict(x.T.drop_duplicates().T)
 #plt.hist(yhat,100)
 #plt.show()
 
@@ -118,9 +118,8 @@ yhat = pd.DataFrame(data=yhat, index=range(rows), columns=['yhat'])
 x1 = x1.reset_index()
 x1 = x1.merge(yhat, left_index=True, right_index=True)
 
-x1.to_csv('data/interim/lowcost_25k_applications_c1_2017_approval_optimized.csv')
-
+x1.to_csv('data/interim/lowcost_50k_applications_c1_2017_approval_optimized.csv')
 
 x1_summ = x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 
-x1_summ.to_csv('data/interim/summ_lowcost_25k_applications_c1_2017_approval_optimized.csv')
+x1_summ.to_csv('data/interim/summ_lowcost_50k_applications_c1_2017_approval_optimized.csv')

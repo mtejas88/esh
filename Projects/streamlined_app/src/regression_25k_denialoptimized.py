@@ -1,4 +1,4 @@
-##Determining significant factors for cost and plotting cost diff for consultant
+##Determining significant factors for denial
 import os
 os.chdir('C:/Users/jesch/OneDrive/Documents/GitHub/ficher/Projects/streamlined_app') 
 
@@ -21,18 +21,6 @@ lowcost_25k_applications = pd.read_csv('data/interim/lowcost_25k_applications.cs
 
 lowcost_25k_applications_c1  = lowcost_25k_applications.loc[lowcost_25k_applications['category_1'] == True]
 
-##regression with test/train -- c1 only, best for .35 threshold (denial optimized)
-
-#remove outliers
-mean= np.mean(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'])
-std = np.std(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'])
-
-lowcost_25k_applications_c1 = lowcost_25k_applications_c1.loc[abs(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'] - mean) < 3 * std]
-
-
-#define model inputs
-train, test = train_test_split(lowcost_25k_applications_c1, train_size=0.75, random_state=1)
-
 feature_cols = ['locale_Rural', 'category_one_discount_rate', 'consultant_indicator', 'denied_indicator_py',  
 'applicant_type_School',  
 'backbone_indicator',  
@@ -45,6 +33,19 @@ insig_cols = ['mastercontract_indicator', 'prevyear_indicator', '0bids_indicator
 'wireless_indicator', 'fiber_indicator',
 'total_eligible_one_time_costs', 'total_funding_year_commitment_amount_request', 'num_service_types', 'num_spins', 'frns', 'num_recipients', 'line_items', 'fulltime_enrollment',
 'max_contract_expiry_date_delta', 'min_contract_expiry_date_delta', 'certified_timestamp_delta']
+
+
+##regression with test/train -- c1 only, best for .35 threshold (denial optimized)
+
+#remove outliers
+mean= np.mean(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'])
+std = np.std(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'])
+
+lowcost_25k_applications_c1 = lowcost_25k_applications_c1.loc[abs(lowcost_25k_applications_c1['total_monthly_eligible_recurring_costs'] - mean) < 3 * std]
+
+
+#define model inputs
+train, test = train_test_split(lowcost_25k_applications_c1, train_size=0.75, random_state=1)
 
 X1 = train[feature_cols]
 y1 = train.denied_indicator
@@ -88,9 +89,6 @@ yhat = est_25k_den.predict(x.T.drop_duplicates().T)
 
 yhat = [ 0 if y < 0.35 else 1 for y in yhat]
 
-print(yhat.count(1))
-print(yhat.count(0))
-
 rows = yhat.count(1)+yhat.count(0)
 yhat = pd.DataFrame(data=yhat, index=range(rows), columns=['yhat'])
 
@@ -99,7 +97,9 @@ x0 = x0.merge(yhat, left_index=True, right_index=True)
 
 x0.to_csv('data/interim/lowcost_25k_applications_c1_2016_denial_optimized.csv')
 
-print(x0.groupby(['yhat','denied_indicator']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'}))
+x0_summ = x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
+
+x0_summ.to_csv('data/interim/summ_lowcost_25k_applications_c1_2016_denial_optimized.csv')
 
 
 ## 2017 data prep
@@ -126,4 +126,6 @@ x1 = x1.merge(yhat, left_index=True, right_index=True)
 
 x1.to_csv('data/interim/lowcost_25k_applications_c1_2017_denial_optimized.csv')
 
-print(x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'}))
+x1_summ = x1.groupby('yhat').agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
+
+x1_summ.to_csv('data/interim/summ_lowcost_25k_applications_c1_2017_denial_optimized.csv')

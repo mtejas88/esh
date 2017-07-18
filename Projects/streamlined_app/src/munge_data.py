@@ -1,4 +1,4 @@
-##Determining significant factors for cost and plotting cost diff for consultant
+##Indicators for regression
 import os
 os.chdir('C:/Users/jesch/OneDrive/Documents/GitHub/ficher/Projects/streamlined_app') 
 
