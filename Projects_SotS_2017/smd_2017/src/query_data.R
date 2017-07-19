@@ -7,8 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-#setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+#setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 #args = commandArgs(trailingOnly=TRUE)
 #github_path <- args[1]

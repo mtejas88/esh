@@ -7,8 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects/smd_2017/")
-#setwd("~/Documents/R_WORK/ficher/Projects/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+#setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT",
@@ -76,6 +76,11 @@ state_2017 <- apply_state_names(state_2017)
 dd_2017 <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE),]
 dd_2016 <- dd_2016[which(dd_2016$include_in_universe_of_districts == TRUE),]
 dd_2016_froz <- dd_2016_froz[which(dd_2016_froz$include_in_universe_of_districts == TRUE),]
+
+## also subset to Traditional districts
+dd_2017 <- dd_2017[which(dd_2017$district_type == "Traditional"),]
+dd_2016 <- dd_2016[which(dd_2016$district_type == "Traditional"),]
+dd_2016_froz <- dd_2016_froz[which(dd_2016_froz$district_type == "Traditional"),]
 
 ## create sp indicators
 dd_2017 <- combine.sp(dd_2017)
