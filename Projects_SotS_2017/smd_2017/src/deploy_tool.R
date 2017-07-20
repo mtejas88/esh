@@ -7,7 +7,7 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
