@@ -71,7 +71,7 @@ students (e.g. num_students in district/num_students in ALL districts served by 
       li.total_cost as line_item_total_cost,
       li.rec_elig_cost as line_item_recurring_elig_cost,
       CASE
-          WHEN li.rec_elig_cost = 'No data' or li.rec_elig_cost::numeric = 0
+          WHEN li.rec_elig_cost is null or li.rec_elig_cost::numeric = 0
             THEN  CASE
                     WHEN li.orig_r_months_of_service IS NOT NULL
                         AND li.orig_r_months_of_service > 0
