@@ -484,7 +484,7 @@ renderHighchart({
   hc_yAxis(labels = list(format = '${value}'), min=0, max=max(state.agg.sots.2016.sub()$c2_remaining_millions_sots,
                                                               state.agg.2017.sub()$c2_remaining_2016/1000000,
                                                               state.agg.2017.sub()$c2_remaining_2017/1000000, na.rm=T)) %>% 
-  hc_add_series(data = c(round(state.agg.sots.2016.sub()$c2_remaining_millions_sots, 1),
+  hc_add_series(data = c(round(state.agg.sots.2016.sub()$c2_remaining_millions_current16, 1),
                          round(state.agg.2017.sub()$c2_remaining_2016/1000000, 1),
                          round(state.agg.2017.sub()$c2_remaining_2017/1000000, 1)),
                 dataLabels=list(enabled=TRUE, format='${point.y}')) %>%  hc_legend(enabled=FALSE) %>% hc_colors(c(colors$color[colors$label == 'wifi1']))

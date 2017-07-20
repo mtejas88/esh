@@ -94,10 +94,10 @@ sum(CASE WHEN dd_2017.fiber_target_status = 'Potential Target' THEN 1 ELSE 0 END
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_students ELSE 0 END) as students_with_wifi,
--- Prediscount C2 Funding (Across Years: 2015, 2016, 2017)
-sum(dd_2017.c2_prediscount_remaining_15) as c2_remaining_2015,
-sum(dd_2017.c2_prediscount_remaining_16) as c2_remaining_2016,
-sum(dd_2017.c2_prediscount_remaining_17) as c2_remaining_2017
+-- Postdiscount C2 Funding (Across Years: 2015, 2016, 2017) (changed from Prediscount)
+sum(dd_2017.c2_postdiscount_remaining_15) as c2_remaining_2015,
+sum(dd_2017.c2_postdiscount_remaining_16) as c2_remaining_2016,
+sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017
 
 FROM public.fy2017_districts_deluxe_matr as dd_2017
 left join public.fy2016_districts_deluxe_matr as dd_2016 on dd_2016.esh_id = dd_2017.esh_id
@@ -204,10 +204,10 @@ sum(CASE WHEN dd_2017.fiber_target_status = 'Potential Target' THEN 1 ELSE 0 END
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_students ELSE 0 END) as students_with_wifi,
--- Prediscount C2 Funding (Across Years: 2015, 2016, 2017)
-sum(dd_2017.c2_prediscount_remaining_15) as c2_remaining_2015,
-sum(dd_2017.c2_prediscount_remaining_16) as c2_remaining_2016,
-sum(dd_2017.c2_prediscount_remaining_17) as c2_remaining_2017
+-- Postdiscount C2 Funding (Across Years: 2015, 2016, 2017) (changed from Prediscount)
+sum(dd_2017.c2_postdiscount_remaining_15) as c2_remaining_2015,
+sum(dd_2017.c2_postdiscount_remaining_16) as c2_remaining_2016,
+sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017
 
 FROM public.fy2017_districts_deluxe_matr as dd_2017
 left join public.fy2016_districts_deluxe_matr as dd_2016 on dd_2016.esh_id = dd_2017.esh_id
