@@ -24,40 +24,34 @@ select
 	case
 	  when fiber_metric_calc_group_2017 = 'extrapolate_to'
 	    then 'any'
-	  when fiber_metric_calc_group_2017 is null
-	    then 'any'
 	  when (target_status_2017 = 'No Data' and (target_status_2016 != 'No Data' or target_status_2016 is null))
 	  or (target_status_2016 = 'Not Target' and target_status_2017 != 'Not Target')
 	  or (target_status_2016 = 'Target' and target_status_2017 = 'Potential Target')
 	  	then 'any'
-	  when target_status_2017 = 'Not Target' and target_status_2016 = 'Target'
+	  when (target_status_2017 = 'Not Target' or target_status_2017 is null) and target_status_2016 = 'Target'
 	  	then 'target'
-	  when target_status_2017 = 'Not Target'
+	  when target_status_2017 = 'Not Target' or target_status_2017 is null
 	  	then 'any_other'
-	  when target_status_2017 in ('Target', 'Potential Target') and target_status_2016 in ('Target', 'Potential Target') 
-	  	then 'potential_or_target'
-	  when target_status_2017 = 'No Data' and target_status_2016 = 'No Data'
-	  	then 'no_data'
-	  else 'no_data'
+	  when  (target_status_2017 is null or target_status_2017 in ('Target', 'Potential Target', 'No Data')
+	  	and target_status_2016 is null or target_status_2016 in ('Target', 'Potential Target', 'No Data') )
+	  	then 'potential_or_target_or_no_data'
+	  else target_status_2016
 	end as status_2016,
 	case
 	  when fiber_metric_calc_group_2017 = 'extrapolate_to'
 	    then 'cleaning_outstanding'
-	  when fiber_metric_calc_group_2017 is null
-	    then null
 	  when (target_status_2017 = 'No Data' and (target_status_2016 != 'No Data' or target_status_2016 is null))
 	  or (target_status_2016 = 'Not Target' and target_status_2017 != 'Not Target')
 	  or (target_status_2016 = 'Target' and target_status_2017 = 'Potential Target')
 	  	then 'cleaning_outstanding'
-	  when target_status_2017 = 'Not Target' and target_status_2016 = 'Target'
+	  when (target_status_2017 = 'Not Target' or target_status_2017 is null) and target_status_2016 = 'Target'
 	  	then 'not_target'
-	  when target_status_2017 = 'Not Target'
+	  when target_status_2017 = 'Not Target' or target_status_2017 is null
 	  	then 'not_target'
-	  when target_status_2017 in ('Target', 'Potential Target') and target_status_2016 in ('Target', 'Potential Target') 
-	  	then 'potential_or_target'
-	  when target_status_2017 = 'No Data' and target_status_2016 = 'No Data'
-	  	then 'no_data'
-	  else 'potential_or_target'
+	  when (target_status_2017 is null or target_status_2017 in ('Target', 'Potential Target', 'No Data')
+	  	and target_status_2016 is null or target_status_2016 in ('Target', 'Potential Target', 'No Data') )
+	  	then 'potential_or_target_or_no_data'
+	  else target_status_2017
 	end as status_2017,
 	sum(case
 			when unscalable_campuses_2016 is null
@@ -85,39 +79,33 @@ group by 1, 2,
 	case
 	  when fiber_metric_calc_group_2017 = 'extrapolate_to'
 	    then 1
-	  when fiber_metric_calc_group_2017 is null
-	    then 2
 	  when (target_status_2017 = 'No Data' and (target_status_2016 != 'No Data' or target_status_2016 is null))
 	  or (target_status_2016 = 'Not Target' and target_status_2017 != 'Not Target')
 	  or (target_status_2016 = 'Target' and target_status_2017 = 'Potential Target')
 	  	then 1
-	  when target_status_2017 = 'Not Target' and target_status_2016 = 'Target'
+	  when (target_status_2017 = 'Not Target' or target_status_2017 is null) and target_status_2016 = 'Target'
+	  	then 2
+	  when target_status_2017 = 'Not Target' or target_status_2017 is null
 	  	then 3
-	  when target_status_2017 = 'Not Target'
+	  when (target_status_2017 is null or target_status_2017 in ('Target', 'Potential Target', 'No Data')
+	  	and target_status_2016 is null or target_status_2016 in ('Target', 'Potential Target', 'No Data') )
 	  	then 4
-	  when target_status_2017 in ('Target', 'Potential Target') and target_status_2016 in ('Target', 'Potential Target') 
-	  	then 7
-	  when target_status_2017 = 'No Data' and target_status_2016 = 'No Data'
-	  	then 5
-	  else 6
+	  else 5
 	end
 order by 	
 	case
 	  when fiber_metric_calc_group_2017 = 'extrapolate_to'
 	    then 1
-	  when fiber_metric_calc_group_2017 is null
-	    then 2
 	  when (target_status_2017 = 'No Data' and (target_status_2016 != 'No Data' or target_status_2016 is null))
 	  or (target_status_2016 = 'Not Target' and target_status_2017 != 'Not Target')
 	  or (target_status_2016 = 'Target' and target_status_2017 = 'Potential Target')
 	  	then 1
-	  when target_status_2017 = 'Not Target' and target_status_2016 = 'Target'
+	  when (target_status_2017 = 'Not Target' or target_status_2017 is null) and target_status_2016 = 'Target'
+	  	then 2
+	  when target_status_2017 = 'Not Target' or target_status_2017 is null
 	  	then 3
-	  when target_status_2017 = 'Not Target'
+	  when (target_status_2017 is null or target_status_2017 in ('Target', 'Potential Target', 'No Data')
+	  	and target_status_2016 is null or target_status_2016 in ('Target', 'Potential Target', 'No Data') )
 	  	then 4
-	  when target_status_2017 in ('Target', 'Potential Target') and target_status_2016 in ('Target', 'Potential Target') 
-	  	then 7
-	  when target_status_2017 = 'No Data' and target_status_2016 = 'No Data'
-	  	then 5
-	  else 6
+	  else 5
 	end
