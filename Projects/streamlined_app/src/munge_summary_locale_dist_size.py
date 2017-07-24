@@ -29,19 +29,19 @@ list_25k_2017_approval_optimized = list_25k_2017_approval_optimized.join(lookup.
 list_25k_2017_denial_optimized = list_25k_2017_denial_optimized.join(lookup.set_index('applicant_type'), on='applicant_type')
 
 #summarize 
-approval_50k =  list_50k_2017_approval_optimized.loc[list_50k_2017_approval_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count', 'fulltime_enrollment': 'sum'})
+approval_50k =  list_50k_2017_approval_optimized.loc[list_50k_2017_approval_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 approval_50k = approval_50k.reset_index()
 approval_50k['model'] = '50k approval'
 
-denial_50k =  list_50k_2017_denial_optimized.loc[list_50k_2017_denial_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count', 'fulltime_enrollment': 'sum'})
+denial_50k =  list_50k_2017_denial_optimized.loc[list_50k_2017_denial_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 denial_50k = denial_50k.reset_index()
 denial_50k['model'] = '50k denial'
 
-approval_25k =  list_25k_2017_approval_optimized.loc[list_25k_2017_approval_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count', 'fulltime_enrollment': 'sum'})
+approval_25k =  list_25k_2017_approval_optimized.loc[list_25k_2017_approval_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 approval_25k = approval_25k.reset_index()
 approval_25k['model'] = '25k approval'
 
-denial_25k =  list_25k_2017_denial_optimized.loc[list_50k_2017_denial_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count', 'fulltime_enrollment': 'sum'})
+denial_25k =  list_25k_2017_denial_optimized.loc[list_50k_2017_denial_optimized['yhat'] == 0].groupby(['urban_rural_status', 'applicant_type_group']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 denial_25k = denial_25k.reset_index()
 denial_25k['model'] = '25k denial'
 
