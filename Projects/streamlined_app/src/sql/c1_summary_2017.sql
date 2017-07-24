@@ -19,19 +19,66 @@ with lca as (
 )
 
 select
-  frns_denied > 0 as application_denied,
-  count(*) as apps,
-  sum(case
-      when total_funding_year_commitment_amount_request < 25000
-        then 1
-      else 0
-    end) as lowcost_apps,
-  sum(total_funding_year_commitment_amount_request) as requested,
-  sum(case
-      when total_funding_year_commitment_amount_request < 25000
-        then total_funding_year_commitment_amount_request
-      else 0
-    end) as lowcost_requested
+  case
+    when frns_denied > 0
+      then 1
+    else 0
+  end as yhat,
+  sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
+  count(*) as application_number,
+  2017 as year,
+  'all actual' as model
 
 from lca
-group by 1
+group by 1, 4, 5
+
+UNION
+
+select
+  case
+    when frns_denied > 0
+      then 1
+    else 0
+  end as yhat,
+  sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
+  count(*) as application_number,
+  2017 as year,
+  '25k actual' as model
+
+from lca
+where total_funding_year_commitment_amount_request < 25000
+group by 1, 4, 5
+
+UNION
+
+select
+  case
+    when frns_denied > 0
+      then 1
+    else 0
+  end as yhat,
+  sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
+  count(*) as application_number,
+  2017 as year,
+  '50k actual' as model
+
+from lca
+where total_funding_year_commitment_amount_request < 50000
+group by 1, 4, 5
+
+UNION
+
+select
+  case
+    when frns_denied > 0
+      then 1
+    else 0
+  end as yhat,
+  sum(total_funding_year_commitment_amount_request) as total_funding_year_commitment_amount_request,
+  count(*) as application_number,
+  2017 as year,
+  '110k actual' as model
+
+from lca
+where total_funding_year_commitment_amount_request < 110000
+group by 1, 4, 5
