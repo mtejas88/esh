@@ -29,8 +29,8 @@ Icon
 !**/figures/.gitkeep
 
 ## and out files
-**/src/out_files/*
-!**/src/out_files/.gitkeep
+**/out_files/*
+!**/out_files/.gitkeep
 
 ## and ignore all data and history created by running R in batch
 **/.RData

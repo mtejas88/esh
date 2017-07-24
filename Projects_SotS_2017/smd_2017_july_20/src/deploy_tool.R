@@ -7,7 +7,7 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017_july_20/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
@@ -389,5 +389,5 @@ if (deploy == 1){
   rsconnect::setAccountInfo(name=rstudio_name,
                             token=rstudio_token,
                             secret=rstudio_secret)
-  rsconnect::deployDoc("tool/2017_State_Metrics_Dashboard.Rmd")
+  rsconnect::deployDoc("tool/2017_State_Metrics_Dashboard_July_20th.Rmd")
 }
