@@ -1,7 +1,7 @@
 ## =========================================
 ##
 ## QUERY DATA FROM THE DB
-##  for Comparison Check #2
+##  for SAT and ENG Comparison
 ##
 ## =========================================
 
@@ -56,6 +56,8 @@ dbDisconnect(con)
 ## connect to the database -- ONYX
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 cck12_ds <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_cck12_district_summary_v04.SQL", sep=""))
+dd_2015 <- querydb(paste(github_path, "General_Resources/sql_scripts/2015_deluxe_districts_crusher_materialized.SQL", sep=""))
+dd_2017 <- querydb(paste(github_path, "General_Resources/sql_scripts/2017_deluxe_districts.SQL", sep=""))
 ## disconnect from database
 dbDisconnect(con)
 
@@ -64,3 +66,5 @@ dbDisconnect(con)
 
 write.csv(cck12_ds_qa, "data/raw/fy2017_cck12_district_summary_qa.csv", row.names=F)
 write.csv(cck12_ds, "data/raw/fy2017_cck12_district_summary.csv", row.names=F)
+write.csv(dd_2017, "data/raw/2017_districts_deluxe.csv", row.names=F)
+write.csv(dd_2015, "data/raw/2015_districts_deluxe.csv", row.names=F)
