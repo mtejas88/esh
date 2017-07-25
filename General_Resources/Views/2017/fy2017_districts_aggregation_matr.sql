@@ -1484,8 +1484,12 @@ public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_it
    FROM public.fy2017_esh_line_items_v -- this is the view name
 
 
-   left join salesforce.account eb
-
+   left join (
+   		select a.*
+   		from salesforce.account a
+   		join fy2017_districts_demog_matr dd 
+   		on a.esh_id__c::varchar = dd.esh_id
+   	) eb
 
    on eb.ben__c::varchar = public.fy2017_esh_line_items_v.applicant_ben::varchar
 
@@ -1705,7 +1709,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 7/12/2017 - jh fixed tag count to only look at entity level tags
+Last Modified Date: 7/12/2017 - js update salesforce.account to only join BENs for accounts on districts_demog
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
