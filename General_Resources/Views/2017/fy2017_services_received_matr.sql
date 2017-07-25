@@ -155,10 +155,10 @@ FROM (
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
-            select distinct name, reporting_name
+            select distinct id, name, reporting_name
             from public.esh_service_providers
           ) spc
-          ON spc.name = li.service_provider_name
+          ON spc.id = li.service_provider_id
           LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
           left join public.fy2017_districts_aggregation_matr d
