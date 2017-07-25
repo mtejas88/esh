@@ -14,6 +14,9 @@ summ_110k_2017_approval_optimized ['model'] = '110k approval'
 summ_50k_2017_approval_optimized = pd.read_csv('data/interim/summ_lowcost_50k_applications_c1_2017_approval_optimized.csv')
 summ_50k_2017_approval_optimized ['year'] = 2017
 summ_50k_2017_approval_optimized ['model'] = '50k approval'
+summ_50k_2017_denial_optimized = pd.read_csv('data/interim/summ_lowcost_50k_applications_c1_2017_denial_optimized.csv')
+summ_50k_2017_denial_optimized['year'] = 2017
+summ_50k_2017_denial_optimized['model'] = '50k denial'
 summ_25k_2017_approval_optimized = pd.read_csv('data/interim/summ_lowcost_25k_applications_c1_2017_approval_optimized.csv')
 summ_25k_2017_approval_optimized ['year'] = 2017
 summ_25k_2017_approval_optimized ['model'] = '25k approval'
@@ -27,6 +30,9 @@ summ_110k_2016_approval_optimized ['model'] = '110k approval'
 summ_50k_2016_approval_optimized = pd.read_csv('data/interim/summ_lowcost_50k_applications_c1_2016_approval_optimized.csv')
 summ_50k_2016_approval_optimized ['year'] = 2016
 summ_50k_2016_approval_optimized ['model'] = '50k approval'
+summ_50k_2016_denial_optimized = pd.read_csv('data/interim/summ_lowcost_50k_applications_c1_2016_denial_optimized.csv')
+summ_50k_2016_denial_optimized['year'] = 2016
+summ_50k_2016_denial_optimized['model'] = '50k denial'
 summ_25k_2016_approval_optimized = pd.read_csv('data/interim/summ_lowcost_25k_applications_c1_2016_approval_optimized.csv')
 summ_25k_2016_approval_optimized ['year'] = 2016
 summ_25k_2016_approval_optimized ['model'] = '25k approval'
@@ -39,7 +45,7 @@ summ_2016 = pd.read_csv('data/raw/c1_summary_2016.csv')
 summ_2017 = pd.read_csv('data/raw/c1_summary_2017.csv')
 
 #append
-summ = summ_110k_2017_approval_optimized.append([summ_50k_2017_approval_optimized, summ_25k_2017_approval_optimized, summ_25k_2017_denial_optimized, summ_110k_2016_approval_optimized, summ_50k_2016_approval_optimized, summ_25k_2016_approval_optimized, summ_25k_2016_denial_optimized, summ_2016, summ_2017], ignore_index=True) 
+summ = summ_110k_2017_approval_optimized.append([summ_50k_2017_approval_optimized, summ_50k_2017_denial_optimized, summ_25k_2017_approval_optimized, summ_25k_2017_denial_optimized, summ_110k_2016_approval_optimized, summ_50k_2016_approval_optimized, summ_50k_2016_denial_optimized, summ_25k_2016_approval_optimized, summ_25k_2016_denial_optimized, summ_2016, summ_2017], ignore_index=True) 
 
 #export
 summ.to_csv('data/processed/results_summary.csv')
@@ -127,6 +133,11 @@ error_50_approval_2016 = data_50_approval_2016.groupby(['yhat', 'denied_indicato
 error_50_approval_2016 = error_50_approval_2016.reset_index()
 error_50_approval_2016 = error_50_approval_2016.loc[np.logical_and(error_50_approval_2016['yhat'] == 0, error_50_approval_2016['denied_indicator'] == 1)]
 
+data_50_denial_2016 = pd.read_csv('data/interim/lowcost_50k_applications_c1_2016_denial_optimized.csv')
+error_50_denial_2016 = data_50_denial_2016.groupby(['yhat', 'denied_indicator']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
+error_50_denial_2016 = error_50_denial_2016.reset_index()
+error_50_denial_2016 = error_50_denial_2016.loc[np.logical_and(error_50_denial_2016['yhat'] == 0, error_50_denial_2016['denied_indicator'] == 1)]
+
 data_25_approval_2016 = pd.read_csv('data/interim/lowcost_25k_applications_c1_2016_approval_optimized.csv')
 error_25_approval_2016 = data_25_approval_2016.groupby(['yhat', 'denied_indicator']).agg({'total_funding_year_commitment_amount_request': 'sum', 'application_number': 'count'})
 error_25_approval_2016 = error_25_approval_2016.reset_index()
@@ -143,6 +154,9 @@ pct_110_approval= cm_110_approval[0,1]/(cm_110_approval[0,1]+cm_110_approval[0,0
 cm_50_approval = np.loadtxt('data/interim/sm_lowcost_50k_applications_c1_approval_optimized.out', delimiter=',')
 pct_50_approval= cm_50_approval[0,1]/(cm_50_approval[0,1]+cm_50_approval[0,0])
 
+cm_50_denial = np.loadtxt('data/interim/sm_lowcost_50k_applications_c1_denial_optimized.out', delimiter=',')
+pct_50_denial = cm_50_denial[0,1]/(cm_50_denial[0,1]+cm_50_denial[0,0])
+
 cm_25_approval = np.loadtxt('data/interim/sm_lowcost_25k_applications_c1_approval_optimized.out', delimiter=',')
 pct_25_approval= cm_25_approval[0,1]/(cm_25_approval[0,1]+cm_25_approval[0,0])
 
@@ -156,6 +170,9 @@ summ_2['application_number_2016'] = np.where(np.logical_and(summ_2['model'] == '
 
 summ_2['total_funding_year_commitment_amount_request_2016'] = np.where(np.logical_and(summ_2['model'] == '50k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_50_approval_2016.total_funding_year_commitment_amount_request, summ_2['total_funding_year_commitment_amount_request_2016'] )
 summ_2['application_number_2016'] = np.where(np.logical_and(summ_2['model'] == '50k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_50_approval_2016.application_number, summ_2['application_number_2016'] )
+
+summ_2['total_funding_year_commitment_amount_request_2016'] = np.where(np.logical_and(summ_2['model'] == '50k denial', summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_50_denial_2016.total_funding_year_commitment_amount_request, summ_2['total_funding_year_commitment_amount_request_2016'] )
+summ_2['application_number_2016'] = np.where(np.logical_and(summ_2['model'] == '50k denial',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_50_denial_2016.application_number, summ_2['application_number_2016'] )
 
 summ_2['total_funding_year_commitment_amount_request_2016'] = np.where(np.logical_and(summ_2['model'] == '25k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_25_approval_2016.total_funding_year_commitment_amount_request, summ_2['total_funding_year_commitment_amount_request_2016'] )
 summ_2['application_number_2016'] = np.where(np.logical_and(summ_2['model'] == '25k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), error_25_approval_2016.application_number, summ_2['application_number_2016'] )
@@ -171,6 +188,9 @@ summ_2['application_number_2017'] = np.where(np.logical_and(summ_2['model'] == '
 
 summ_2['total_funding_year_commitment_amount_request_2017'] = np.where(np.logical_and(summ_2['model'] == '50k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_50_approval, summ_2['total_funding_year_commitment_amount_request_2017'] )
 summ_2['application_number_2017'] = np.where(np.logical_and(summ_2['model'] == '50k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_50_approval, summ_2['application_number_2017'] )
+
+summ_2['total_funding_year_commitment_amount_request_2017'] = np.where(np.logical_and(summ_2['model'] == '50k denial',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_50_denial, summ_2['total_funding_year_commitment_amount_request_2017'] )
+summ_2['application_number_2017'] = np.where(np.logical_and(summ_2['model'] == '50k denial',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_50_denial, summ_2['application_number_2017'] )
 
 summ_2['total_funding_year_commitment_amount_request_2017'] = np.where(np.logical_and(summ_2['model'] == '110k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_110_approval, summ_2['total_funding_year_commitment_amount_request_2017'] )
 summ_2['application_number_2017'] = np.where(np.logical_and(summ_2['model'] == '110k approval',summ_2['label'] == 'Low Cost C1 Approvals could be Denials'), pct_110_approval, summ_2['application_number_2017'] )
