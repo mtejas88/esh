@@ -72,7 +72,8 @@ dist_2017 as (
 			when change_sps.recipient_id is not null
 				then true
 			else false
-		end as change_sps 
+		end as change_sps,
+		outreach_status__c = 'Fiber Project' as esh_engaged_fiber_project
 	from fy2017_districts_deluxe_matr dd
 	left join change_sps 
 	on dd.esh_id = change_sps.recipient_id
@@ -80,6 +81,8 @@ dist_2017 as (
 	on dd.esh_id = spec_k_2016.recipient_id
 	left join spec_k_2017
 	on dd.esh_id = spec_k_2017.recipient_id
+	left join salesforce.account a
+	on dd.esh_id = a.esh_id__c
 	where include_in_universe_of_districts
 	and district_type = 'Traditional'
 ),
@@ -87,10 +90,39 @@ dist_2017 as (
 comparison as (
 	select
 		dist_2017.esh_id,
-		dist_2017.locale,
-		dist_2017.most_recent_spec_k,
-		dist_2017.change_sps,
-		dist_2016.fiber_target_status,
+		dist_2016.locale,
+		dist_2017.exclude_from_ia_analysis,
+		case
+			when dist_2017.most_recent_spec_k is null
+				then 'none'
+			else dist_2017.most_recent_spec_k
+		end as most_recent_spec_k,
+		dist_2017.change_sps or dist_2017.change_sps is null as change_sps,
+		case
+			when dist_2017.upgrade_indicator is null
+				then false
+			else dist_2017.upgrade_indicator
+		end as upgrade_indicator,
+		dist_2016.fiber_target_status as fiber_target_status_2016,
+		dist_2017.fiber_target_status as fiber_target_status_2017,
+		dist_2016.meeting_2014_goal_no_oversub as meeting_2014_goal_no_oversub_2016,
+		case
+			when dist_2017.meeting_2014_goal_no_oversub is null
+				then false
+			else dist_2017.meeting_2014_goal_no_oversub 
+		end as meeting_2014_goal_no_oversub_2017,
+		case
+			when dist_2017.esh_engaged_fiber_project is null
+				then false
+			else dist_2017.esh_engaged_fiber_project
+		end as esh_engaged_fiber_project,		
+		case
+			when dist_2017.service_provider_assignment != dist_2016.service_provider_assignment
+			and dist_2017.service_provider_assignment is not null 
+			and dist_2016.service_provider_assignment is not null 
+				then true
+			else false
+		end as switcher,	
 		case
 			when dist_2017.ia_monthly_cost_total is null 
 				then false
@@ -99,28 +131,37 @@ comparison as (
 			else false
 		end as spent_10pct_more,	
 		case
+			when dist_2017.unscalable_campuses is null 
+				then dist_2016.unscalable_campuses
+			when dist_2016.unscalable_campuses is null 
+				then -dist_2017.unscalable_campuses
+			else dist_2016.unscalable_campuses - dist_2017.unscalable_campuses
+		end as lost_unscalable_campuses,	
+		case
 			when dist_2017.num_campuses is null 
 				then dist_2016.num_campuses
-			when dist_2016.num_campuses - dist_2017.num_campuses < 0 
+			when dist_2016.num_campuses is null or dist_2016.num_campuses - dist_2017.num_campuses < 0 
 				then 0
 			else dist_2016.num_campuses - dist_2017.num_campuses
-		end as lost_campuses,	
-		dist_2016.unscalable_campuses as lost_unscalable_campuses
+		end as lost_campuses
 	from dist_2016
 	full outer join dist_2017
 	on dist_2016.esh_id = dist_2017.esh_id
-	where (dist_2017.fiber_target_status = 'Not Target' or dist_2017.fiber_target_status is null)
-	--and dist_2016.fiber_target_status = 'Target'
-	and dist_2016.unscalable_campuses > 0
 )
 
 
 select
+	esh_id,
+	exclude_from_ia_analysis,
+
+	(fiber_target_status_2017 = 'Not Target' or fiber_target_status_2017 is null) as not_target_2017,
+
 	case
-		when fiber_target_status = 'Target'
+		when fiber_target_status_2016 = 'Target'
 			then true
 		else false
 	end as target_2016,
+
 	case
 		when locale in ('Rural', 'Town')
 			then 'Rural'
@@ -128,39 +169,79 @@ select
 	end as locale_grouped,
 
 	case
+		when switcher
+			then 'switched majority bw'
+		when change_sps
+			then 'at least 1 sp change'
+		else 'no sp change'
+	end as service_provider,
+
+	case
+		when meeting_2014_goal_no_oversub_2016 = false and meeting_2014_goal_no_oversub_2017
+			then 'now meeting goals'
+		when upgrade_indicator
+			then 'bw upgrade'
+		else 'no bw increase'
+	end as bandwidth_change,
+
+	case
+		when spent_10pct_more
+			then 'costs 10% more'
+		else 'costs about the same or less'
+	end as cost_change,
+
+	case
+		when most_recent_spec_k in ('2016', '2017') and esh_engaged_fiber_project
+			then 'special construction with esh fiber engagement'
+		when most_recent_spec_k in ('2016', '2017')
+			then 'special construction'
+		when esh_engaged_fiber_project
+			then 'esh fiber engagement'
+		else 'unknown'
+	end as mechanisms,
+	  	
+	lost_unscalable_campuses as lost_unscalable_campuses,
+	case
+		when lost_campuses > lost_unscalable_campuses
+			then lost_unscalable_campuses
+		else lost_campuses
+	end as lost_unscalable_campuses_due_to_lost_campuses,
+	case
+		when lost_campuses > lost_unscalable_campuses
+			then 0
+		else lost_unscalable_campuses - lost_campuses
+	end as lost_unscalable_campuses_due_to_reason
+
+from comparison
+where lost_unscalable_campuses != 0
+
+	/*case
 	  when esh_id is null
 	  	then 'left universe'
-	  when change_sps is null or change_sps
-	  	then 'at least 1 sp change'
-	  when spent_10pct_more
-	  	then 'spent more $'
+	  when switcher
+	  	then 'sp switcher'
+--	  when change_sps is null or change_sps
+--	  	then 'at least 1 sp change'
+	  when upgrade_indicator and spent_10pct_more
+	  	then 'bw upgrade and spent more $'
+	  when upgrade_indicator
+	  	then 'bw upgrade'
 	  when most_recent_spec_k in ('2016', '2017')
 	  	then 'fiber construction 2017 or 2016'
 	  else 'unknown'
-	end as reason_heirarchy,
-	  	
-	count(*) as districts,
-	sum(lost_unscalable_campuses) as lost_unscalable_campuses,
-	sum(case
-			when lost_campuses > lost_unscalable_campuses
-				then lost_unscalable_campuses
-			else lost_campuses
-		end) as lost_unscalable_campuses_due_to_lost_campuses,
-	sum(case
-			when lost_campuses > lost_unscalable_campuses
-				then 0
-			else lost_unscalable_campuses - lost_campuses
-		end) as lost_unscalable_campuses_due_to_reason
-/*	dist_2017.*, dist_2016.unscalable_campuses as unscalable_campuses_2016, dist_2016.ia_bw_mbps_total as ia_bw_mbps_total_2016 */
+	end as reason_heirarchy,*/
 
-from comparison
-group by 1, 2, 3
-
+/*	esh_id is null as left_universe,
+	switcher,
+	change_sps,
+	upgrade_indicator,
+	spent_10pct_more,
+	most_recent_spec_k in ('2016', '2017') as spec_k,
+	esh_engaged_fiber_project,
+	meeting_2014_goal_no_oversub_2016,
+	meeting_2014_goal_no_oversub_2017,*/
 
 /*	
-switcher -- next week
-outreach_status__c for if they are a project
-
 dist_2017.fiber_wan_lines > dist_2016.fiber_wan_lines or
 		dist_2017.lt_1g_nonfiber_wan_lines < dist_2016.lt_1g_nonfiber_wan_lines as more_fiber_less_nonfiber_wan_lines,
 	dist_2017.fiber_internet_upstream_lines > dist_2016.fiber_internet_upstream_lines as more_fiber_internet_lines,

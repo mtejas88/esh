@@ -33,7 +33,13 @@ select
 	    then 'new'
 	  when dist_2017.exclude_from_ia_analysis = true
 	  	then 'dirty'
-	  else concat('z',dist_2017.upgrade_indicator::varchar) 
+	  when dist_2017.upgrade_indicator 
+	  and dist_2017.meeting_2014_goal_no_oversub 
+	  and dist_2016.meeting_2014_goal_no_oversub = false
+	  	then 'upgrade and moved to meeting'
+	  when dist_2017.upgrade_indicator 
+	  	then 'upgrade'
+	  else 'no upgrade' 
 	end as bw_upgrade,	
 	count(*) as districts,
 	sum(dist_2016.unscalable_campuses) as unscalable_campuses_2016
