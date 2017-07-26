@@ -147,7 +147,12 @@ case
     then TRUE
     else FALSE
 end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
-most_recent_ia_contract_end_date
+most_recent_ia_contract_end_date,
+
+dspa.reporting_name as service_provider_assignment,
+dspa.purpose as primary_sp_purpose,
+dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
 
 
   from  public.districts
@@ -566,6 +571,8 @@ left join (
     GROUP BY recipient_id
 ) pt
 on districts.esh_id=pt.recipient_id
+left join public.fy2015_districts_service_provider_assignments_matr dspa
+on districts.esh_id = dspa.esh_id
 
   where districts.include_in_universe_of_districts = TRUE
 
