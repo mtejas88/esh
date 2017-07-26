@@ -177,14 +177,20 @@ select
 	end as service_provider,
 
 	case
+		when exclude_from_ia_analysis = true
+			then 'dirty'
 		when meeting_2014_goal_no_oversub_2016 = false and meeting_2014_goal_no_oversub_2017
 			then 'now meeting goals'
+		when upgrade_indicator and meeting_2014_goal_no_oversub_2017 = false
+		  	then 'upgrade and not meeting'
 		when upgrade_indicator
 			then 'bw upgrade'
 		else 'no bw increase'
 	end as bandwidth_change,
 
 	case
+		when exclude_from_ia_analysis = true
+			then 'dirty'
 		when spent_10pct_more
 			then 'costs 10% more'
 		else 'costs about the same or less'
@@ -202,11 +208,15 @@ select
 	  	
 	lost_unscalable_campuses as lost_unscalable_campuses,
 	case
+		when lost_unscalable_campuses < 0
+			then 0
 		when lost_campuses > lost_unscalable_campuses
 			then lost_unscalable_campuses
 		else lost_campuses
 	end as lost_unscalable_campuses_due_to_lost_campuses,
 	case
+		when lost_unscalable_campuses < 0
+			then lost_unscalable_campuses
 		when lost_campuses > lost_unscalable_campuses
 			then 0
 		else lost_unscalable_campuses - lost_campuses

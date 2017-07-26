@@ -20,38 +20,76 @@ dist_2017 as (
 	from fy2017_districts_deluxe_matr
 	where include_in_universe_of_districts
 	and district_type = 'Traditional'
+),
+
+baseline as (
+	select
+		case
+			when dist_2017.locale in ('Rural', 'Town')
+				then 'Rural'
+			else 'Urban'
+		end as locale_grouped,
+		case
+		  when dist_2017.upgrade_indicator is null
+		    then 'lost'
+		  when dist_2017.exclude_from_ia_analysis = true
+		  	then 'dirty'
+		  when dist_2017.upgrade_indicator 
+		  and dist_2017.meeting_2014_goal_no_oversub 
+		  and dist_2016.meeting_2014_goal_no_oversub = false
+		  	then 'upgrade and moved to meeting'
+		  when dist_2017.upgrade_indicator 
+		  and dist_2017.meeting_2014_goal_no_oversub = false
+		  	then 'upgrade and not meeting'
+		  when dist_2017.upgrade_indicator
+		  	then 'upgrade'
+		  else 'no upgrade' 
+		end as bw_upgrade,	
+		count(*) as districts,
+		sum(dist_2016.unscalable_campuses) as unscalable_campuses_2016
+	/*	dist_2017.*, dist_2016.unscalable_campuses as unscalable_campuses_2016, dist_2016.ia_bw_mbps_total as ia_bw_mbps_total_2016 */
+
+	from dist_2016
+	full outer join dist_2017
+	on dist_2016.esh_id = dist_2017.esh_id
+	where (dist_2017.fiber_target_status = 'Not Target' or dist_2017.fiber_target_status is null)
+	and dist_2016.fiber_target_status = 'Target'
+	and dist_2016.unscalable_campuses > 0
+	group by 1, 2
+),
+
+locale_agg as (
+	select
+		case
+			when dist_2017.locale in ('Rural', 'Town')
+				then 'Rural'
+			else 'Urban'
+		end as locale_grouped,
+		sum(dist_2016.unscalable_campuses) as unscalable_campuses_2016
+	/*	dist_2017.*, dist_2016.unscalable_campuses as unscalable_campuses_2016, dist_2016.ia_bw_mbps_total as ia_bw_mbps_total_2016 */
+
+	from dist_2016
+	full outer join dist_2017
+	on dist_2016.esh_id = dist_2017.esh_id
+	where (dist_2017.fiber_target_status = 'Not Target' or dist_2017.fiber_target_status is null)
+	and dist_2016.fiber_target_status = 'Target'
+	and dist_2016.unscalable_campuses > 0
+	and dist_2017.exclude_from_ia_analysis = false
+	group by 1
 )
 
-select
+select 
+	baseline.*,
 	case
-		when dist_2017.locale in ('Rural', 'Town')
-			then 'Rural'
-		else 'Urban'
-	end as locale_grouped,
-	case
-	  when dist_2017.upgrade_indicator is null
-	    then 'new'
-	  when dist_2017.exclude_from_ia_analysis = true
-	  	then 'dirty'
-	  when dist_2017.upgrade_indicator 
-	  and dist_2017.meeting_2014_goal_no_oversub 
-	  and dist_2016.meeting_2014_goal_no_oversub = false
-	  	then 'upgrade and moved to meeting'
-	  when dist_2017.upgrade_indicator 
-	  	then 'upgrade'
-	  else 'no upgrade' 
-	end as bw_upgrade,	
-	count(*) as districts,
-	sum(dist_2016.unscalable_campuses) as unscalable_campuses_2016
-/*	dist_2017.*, dist_2016.unscalable_campuses as unscalable_campuses_2016, dist_2016.ia_bw_mbps_total as ia_bw_mbps_total_2016 */
+	  when bw_upgrade in ('new', 'dirty')
+		then null
+	  else baseline.unscalable_campuses_2016 / locale_agg.unscalable_campuses_2016 
+	end as pct_unscalable_campuses_2016
+from baseline
+join locale_agg
+on baseline.locale_grouped = locale_agg.locale_grouped
 
-from dist_2016
-full outer join dist_2017
-on dist_2016.esh_id = dist_2017.esh_id
-where (dist_2017.fiber_target_status = 'Not Target' or dist_2017.fiber_target_status is null)
-and dist_2016.fiber_target_status = 'Target'
-and dist_2016.unscalable_campuses > 0
-group by 1, 2
+
 
 
 /*	
