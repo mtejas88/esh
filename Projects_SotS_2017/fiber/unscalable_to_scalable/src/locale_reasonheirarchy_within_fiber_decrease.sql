@@ -158,6 +158,9 @@ group by 1, 2, 3
 
 
 /*	
+switcher -- next week
+outreach_status__c for if they are a project
+
 dist_2017.fiber_wan_lines > dist_2016.fiber_wan_lines or
 		dist_2017.lt_1g_nonfiber_wan_lines < dist_2016.lt_1g_nonfiber_wan_lines as more_fiber_less_nonfiber_wan_lines,
 	dist_2017.fiber_internet_upstream_lines > dist_2016.fiber_internet_upstream_lines as more_fiber_internet_lines,
