@@ -150,63 +150,63 @@ end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits
 most_recent_ia_contract_end_date,
 
 dspa.reporting_name as service_provider_assignment,
-dspa.purpose as primary_sp_purpose,
+dspa.primary_sp_purpose as primary_sp_purpose,
 dspa.primary_sp_bandwidth as primary_sp_bandwidth,
 dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
 
 
   from  public.districts
   left join (
-		select  district_esh_id,
-		        case when true_count >= 1 then 'verified'
-		          when true_count = 0 and false_count >= 1 then 'inferred'
-		          when true_count = 0 and false_count = 0 and null_assumed_count >= 1 then 'interpreted'
-		          when true_count = 0 and false_count = 0 and null_assumed_count = 0 and null_untouched_count >= 1 then 'assumed'
-		        end as clean_categorization,
-		        case when true_count >= 1 and false_count = 0 and null_assumed_count = 0 and null_untouched_count = 0
-		          then true else false end as totally_verified
+    select  district_esh_id,
+            case when true_count >= 1 then 'verified'
+              when true_count = 0 and false_count >= 1 then 'inferred'
+              when true_count = 0 and false_count = 0 and null_assumed_count >= 1 then 'interpreted'
+              when true_count = 0 and false_count = 0 and null_assumed_count = 0 and null_untouched_count >= 1 then 'assumed'
+            end as clean_categorization,
+            case when true_count >= 1 and false_count = 0 and null_assumed_count = 0 and null_untouched_count = 0
+              then true else false end as totally_verified
 
-		from (
-		    select district_esh_id,
-		          count(case when contacted = 'true' then 1 end) as true_count,
-		          count(case when contacted = 'false' then 1 end) as false_count,
-		          count(case when contacted is null and assumed_flags = true then 1 end) as null_assumed_count,
-		          count(case when contacted is null and assumed_flags = false then 1 end) as null_untouched_count
+    from (
+        select district_esh_id,
+              count(case when contacted = 'true' then 1 end) as true_count,
+              count(case when contacted = 'false' then 1 end) as false_count,
+              count(case when contacted is null and assumed_flags = true then 1 end) as null_assumed_count,
+              count(case when contacted is null and assumed_flags = false then 1 end) as null_untouched_count
 
-		    from (
-		        select av.line_item_id,
-		              version_order.contacted,
-		              av.district_esh_id,
-		              case when 'assumed_ia' = any(open_flags)
-		                    or 'assumed_wan' = any(open_flags)
-		                    or 'assumed_fiber' = any(open_flags)
-		              then true else false end as assumed_flags
+        from (
+            select av.line_item_id,
+                  version_order.contacted,
+                  av.district_esh_id,
+                  case when 'assumed_ia' = any(open_flags)
+                        or 'assumed_wan' = any(open_flags)
+                        or 'assumed_fiber' = any(open_flags)
+                  then true else false end as assumed_flags
 
-		        from line_item_district_association_2015_m av
-		        left join (
-		            select fy2015_item21_services_and_cost_id,
-		                  case when contacted is null or contacted = false then 'false'
-		                    when contacted = true then 'true'
-		                  end as contacted,
-		                  version_id,
-		                  row_number() over (
-		                                    partition by fy2015_item21_services_and_cost_id
-		                                    order by version_id desc
-		                                    ) as row_num
+            from line_item_district_association_2015_m av
+            left join (
+                select fy2015_item21_services_and_cost_id,
+                      case when contacted is null or contacted = false then 'false'
+                        when contacted = true then 'true'
+                      end as contacted,
+                      version_id,
+                      row_number() over (
+                                        partition by fy2015_item21_services_and_cost_id
+                                        order by version_id desc
+                                        ) as row_num
 
-		            from public.line_item_notes
-		            where note not like '%little magician%'
-		        ) version_order
-		        on av.line_item_id = version_order.fy2015_item21_services_and_cost_id
-		        left join public.line_items
-		        on av.line_item_id = line_items.id
+                from public.line_item_notes
+                where note not like '%little magician%'
+            ) version_order
+            on av.line_item_id = version_order.fy2015_item21_services_and_cost_id
+            left join public.line_items
+            on av.line_item_id = line_items.id
 
-		        where (row_num = 1 or row_num is null)
-		        and broadband = true
-		    ) most_recent
+            where (row_num = 1 or row_num is null)
+            and broadband = true
+        ) most_recent
 
-		    group by district_esh_id
-		) district_counts
+        group by district_esh_id
+    ) district_counts
   ) as district_contacted
   on district_contacted.district_esh_id = districts.esh_id
   left join sc121a_frl
