@@ -1709,7 +1709,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 7/12/2017 - js update salesforce.account to only join BENs for accounts on districts_demog
+Last Modified Date: 7/12/2017 - js updated salesforce.account to only join BENs for accounts on districts_demog
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
