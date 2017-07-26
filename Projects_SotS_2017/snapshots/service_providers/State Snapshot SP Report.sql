@@ -19,10 +19,10 @@ case when dd.service_provider_assignment is not null then dd.service_provider_as
 else sr.reporting_name end as service_provider_assignment,
 sum(case when exclude_from_ia_analysis=false and meeting_2014_goal_no_oversub=false then num_students else 0 end) as num_students_not_meeting_clean,
 sum(case when exclude_from_ia_analysis=false then num_students else 0 end) as num_students_served_clean,
-count(case when exclude_from_ia_analysis=false then esh_id end) as num_districts_served_clean,
-count(case when exclude_from_ia_analysis=false and district_size in ('Mega','Large') then esh_id end) as num_districts_served_mega_large_clean,
-count(case when exclude_from_ia_analysis!=false and district_size in ('Mega','Large') then esh_id end) as num_districts_served_mega_large_dirty,
-count(sr.recipient_id) as num_districts_served_total,
+count(distinct case when dd.service_provider_assignment is not null then esh_id end) as num_districts_served_clean,
+count(distinct case when exclude_from_ia_analysis=false and district_size in ('Mega','Large') then esh_id end) as num_districts_served_mega_large_clean,
+count(distinct case when exclude_from_ia_analysis!=false and district_size in ('Mega','Large') then esh_id end) as num_districts_served_mega_large_dirty,
+count(distinct sr.recipient_id) as num_districts_served_total,
 sum(case when sr.recipient_id is not null then num_students else 0 end) as num_students_served_total
 from public.fy2017_districts_deluxe_matr dd
 --select all (distinct) recipients of the set of dominant service providers in dd
