@@ -7,6 +7,8 @@
 ## Clearing memory
 rm(list=ls())
 
+setwd("~/Documents/ESH-Code/ficher/Projects/service_provider_ranking/")
+
 ##**************************************************************************************************************************************************
 ## READ IN DATA
 
@@ -39,6 +41,9 @@ sp.2016$sp_bw_per_student <- (sp.2016$primary_sp_bandwidth * 1000) / sp.2016$num
 sp.2016$sp_meeting_goals_2014 <- ifelse(sp.2016$sp_bw_per_student >= 100, 1, 0)
 sp.2016$sp_not_meeting_goals_2014 <- ifelse(sp.2016$sp_meeting_goals_2014 == 0, 1, 0)
 
+## create a binary indicator for cleanliness
+sp.2016$clean <- ifelse(sp.2016$exclude_from_ia_analysis == FALSE, 1, 0)
+
 ##------------------------------------------------------------------------------
 ## Aggregate by service provider
 
@@ -46,6 +51,10 @@ sp.2016$sp_not_meeting_goals_2014 <- ifelse(sp.2016$sp_meeting_goals_2014 == 0, 
 sp.2016$counter <- 1
 sp.agg.districts <- aggregate(sp.2016$counter, by=list(sp.2016$service_provider_assignment), FUN=sum, na.rm=T)
 names(sp.agg.districts) <- c('service_provider', 'num_districts_served')
+
+## TOTAL NUMBER OF CLEAN DISTRICTS
+sp.agg.districts.clean <- aggregate(sp.2016$clean, by=list(sp.2016$service_provider_assignment), FUN=sum, na.rm=T)
+names(sp.agg.districts.clean) <- c('service_provider', 'num_districts_served_clean')
 
 ## subset only to the districts not meeting goals
 sp.2016.not.meeting <- sp.2016[sp.2016$district_meeting_goals_2014 == 0,]
@@ -76,7 +85,7 @@ names(sp.agg.students) <- c('service_provider', 'num_students_meeting_goal')
 dta.sp <- merge(sp.agg.students.not, sp.agg.students, by='service_provider', all=T)
 dta.sp <- merge(dta.sp, sp.agg.students.not.sp.meeting, by='service_provider', all=T)
 dta.sp <- merge(dta.sp, sp.agg.districts, by='service_provider', all=T)
-#dta.sp <- merge(dta.sp, sp.agg.students.dirty, by='service_provider', all=T)
+dta.sp <- merge(dta.sp, sp.agg.districts.clean, by='service_provider', all=T)
 ## sub NAs for 0 for students not meeting/meeting the goal
 dta.sp$num_students_not_meeting_goal[which(is.na(dta.sp$num_students_not_meeting_goal))] <- 0
 dta.sp$num_students_meeting_goal[which(is.na(dta.sp$num_students_meeting_goal))] <- 0
