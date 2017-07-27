@@ -20,6 +20,7 @@ SELECT
                 num_campuses,
                 frl_percent,
                 discount_rate_c1_matrix,
+                service_provider_assignment,
 
                 sum(case
                         when num_bids_received = 0
@@ -58,7 +59,8 @@ SELECT
                 del.num_students,
                 del.num_campuses,
                 del.frl_percent,
-                del.discount_rate_c1_matrix
+                del.discount_rate_c1_matrix,
+                del.service_provider_assignment
             from public.fy2017_districts_deluxe_matr del
             left join (
                 select *
@@ -75,7 +77,7 @@ SELECT
         	and include_in_universe_of_districts
         	and district_type = 'Traditional'
         	and meeting_2014_goal_no_oversub=true
-        	group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        	group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
         ) frns_districts
-        group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
         ORDER BY esh_id;

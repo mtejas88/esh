@@ -67,7 +67,7 @@ t.test(districts_t_test[["ia_monthly_cost_per_mbps"]][districts_t_test$exclude_f
 #merge in the schools meeting in the state
 districts_notmeeting_expanded=merge(districts_notmeeting,districts_meeting[,c('postal_cd','latitude','longitude')],by='postal_cd',all.x=T)
 
-length(unique(districts_notmeeting_expanded$esh_id)) #521
+length(unique(districts_notmeeting_expanded$esh_id)) #566
 districts_notmeeting_expanded=as.data.table(districts_notmeeting_expanded)
 
 system.time({
@@ -88,7 +88,7 @@ districts_meeting$latitude.y=0
 districts_meeting$longitude.y=0
 districts_meeting=districts_meeting[c("esh_id","postal_cd","name","county","latitude","longitude","fiber_target_status","locale","district_size","ia_monthly_cost_total","ia_bw_mbps_total","ia_monthly_cost_per_mbps","ia_bandwidth_per_student_kbps"
                                        ,"meeting_2014_goal_no_oversub",  "exclude_from_ia_cost_analysis", "num_schools","num_students"                
-                                       ,"num_campuses","frl_percent","discount_rate_c1_matrix","frns_0_bid_indicator"         
+                                       ,"num_campuses","frl_percent","discount_rate_c1_matrix","service_provider_assignment","frns_0_bid_indicator"         
                                        ,"frns_1_bid_indicator","frns_2p_bid_indicator","latitude.y","longitude.y","distance_hav")]
 names(districts_meeting)=names(districts_notmeeting_final)
 dta=rbind(districts_notmeeting_final,districts_meeting)
