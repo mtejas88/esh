@@ -39,12 +39,22 @@ correct.dataset <- function(dataset, sots.flag, services.flag){
   ## BOOLEANS
   ##---------------
   ## change "true"/"false" variables to TRUE/FALSE boolean
-  if (sots.flag == 0){
+  if (services.flag == 0 & sots.flag == 0){
     for (i in 1:ncol(dataset)){
       values <- unique(dataset[,i])
       if ("true" %in% values | "false" %in% values){
         dataset[,i] <- as.logical(dataset[,i])
       }
+      if ("t" %in% values | "f" %in% values){
+        dataset[,i] <- gsub("t", "True", dataset[,i])
+        dataset[,i] <- gsub("f", "False", dataset[,i])
+        dataset[,i] <- as.logical(dataset[,i])
+      }
+    }
+  }
+  if (services.flag == 1 & sots.flag == 0){
+    for (i in 1:ncol(dataset)){
+      values <- unique(dataset[,i])
       if ("t" %in% values | "f" %in% values){
         dataset[,i] <- gsub("t", "True", dataset[,i])
         dataset[,i] <- gsub("f", "False", dataset[,i])
