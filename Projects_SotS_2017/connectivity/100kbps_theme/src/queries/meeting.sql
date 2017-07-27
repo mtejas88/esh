@@ -1,6 +1,7 @@
 
 SELECT 
                 esh_id,
+                name,
                 postal_cd,
                 county,
                 latitude,
@@ -39,6 +40,7 @@ SELECT
                 frns.frn,
                 frns.num_bids_received::numeric,
                 del.esh_id,
+                del.name,
                 del.postal_cd,
                 del.county,
                 del.latitude,
@@ -73,7 +75,7 @@ SELECT
         	and include_in_universe_of_districts
         	and district_type = 'Traditional'
         	and meeting_2014_goal_no_oversub=true
-        	group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+        	group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
         ) frns_districts
-        group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+        group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
         ORDER BY esh_id;
