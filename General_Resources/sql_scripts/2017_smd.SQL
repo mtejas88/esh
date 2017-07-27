@@ -175,9 +175,9 @@ sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.meeting_kn
 sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.meeting_knapsack_affordability_target = 't' THEN dd_2017.num_schools ELSE 0 END) as schools_meeting_affordability,
 sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.meeting_knapsack_affordability_target = 't' THEN dd_2017.num_students ELSE 0 END) as students_meeting_affordability,
 -- Total IA Monthly Cost
-round(sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' THEN dd_2017.ia_monthly_cost_total::numeric ELSE 0 END), 2) as ia_monthly_cost_total,
+round(sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.postal_cd != 'AK' THEN dd_2017.ia_monthly_cost_total::numeric ELSE 0 END), 2) as ia_monthly_cost_total,
 -- Median IA Monthly Cost per Mbps
-round(median(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' THEN dd_2017.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 2) as median_ia_monthly_cost_per_mbps,
+round(median(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.postal_cd != 'AK' THEN dd_2017.ia_monthly_cost_per_mbps ELSE NULL END)::numeric, 2) as median_ia_monthly_cost_per_mbps,
 
 
 /* FIBER */
@@ -211,8 +211,8 @@ sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017
 
 FROM public.fy2017_districts_deluxe_matr as dd_2017
 left join public.fy2016_districts_deluxe_matr as dd_2016 on dd_2016.esh_id = dd_2017.esh_id
--- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI, DC)
-WHERE dd_2017.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC','AE','AP','AS','MP')
+-- take out non-US states at the end (AE, AP, AS, GU, MP, PR, VI)
+WHERE dd_2017.postal_cd NOT IN ('GU', 'PR', 'VI', 'AE', 'AP', 'AS', 'MP')
 AND dd_2017.district_type = 'Traditional'
 AND dd_2017.include_in_universe_of_districts = 't'
 GROUP BY 1
@@ -220,3 +220,4 @@ GROUP BY 1
 ORDER BY postal_cd
 
 /* This query generates the state-level and National aggregation of most of the metrics for the State Metric Dashboard for 2017. */
+
