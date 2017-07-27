@@ -1,9 +1,7 @@
-
+select * from (
 select postal_cd, 
 service_provider_assignment,
 num_students_not_meeting_clean,
-num_students_served_clean,
-num_students_served_total,
 case when num_students_served_clean > 0 then 
 (num_students_not_meeting_clean::numeric/num_students_served_clean)*num_students_served_total 
 else 0 end as extrap_num_students_not_meeting,
@@ -11,8 +9,8 @@ num_districts_served_clean,
 case when (num_districts_served_mega_large_dirty+num_districts_served_mega_large_clean) > 0
 then num_districts_served_mega_large_clean::numeric/
 (num_districts_served_mega_large_dirty+num_districts_served_mega_large_clean) end as pct_mega_large_clean,
-num_districts_served_mega_large_dirty,
-num_districts_served_total
+num_districts_served_total,
+ROW_NUMBER() OVER (PARTITION BY postal_cd ORDER BY num_students_not_meeting_clean desc) AS r
 from(
 select postal_cd, 
 case when dd.service_provider_assignment is not null then dd.service_provider_assignment
@@ -43,4 +41,7 @@ on dd.esh_id::numeric=sr.recipient_id::numeric
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
 group by 1,2) a
+where num_students_not_meeting_clean > 0
+) as t
+where r <=5
 order by postal_cd
