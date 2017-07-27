@@ -58,7 +58,7 @@ t.test(districts_t_test[["ia_monthly_cost_per_mbps"]][districts_t_test$exclude_f
 #all are significant - not super interesting
 
 ## ================================================================
-## Segmentation could be more useful here. To revisit
+## Segmentation/clustering could be more useful here. To revisit
 ## ================================================================
 
 ## ================================================================
