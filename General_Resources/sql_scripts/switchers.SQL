@@ -543,7 +543,7 @@ left join public.fy2016_districts_deluxe_matr d
 on dd.esh_id::numeric = d.esh_id::numeric
 left join public.states s
 on dd.postal_cd = s.postal_cd
-join (select recipient_id, reporting_name, min(contract_end_date) as earliest_contract_end_date
+left join (select recipient_id, reporting_name, min(contract_end_date) as earliest_contract_end_date
 from public.fy2016_services_received_matr
 group by 1,2) sr16
 on dd.esh_id::numeric=sr16.recipient_id::numeric

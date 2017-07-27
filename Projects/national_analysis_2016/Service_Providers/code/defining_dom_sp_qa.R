@@ -145,6 +145,8 @@ define_dom <- function(sr_dta){
 ## create subset:
 ## subset to recipient_include_in_universe_of_districts = TRUE
 sr_2016 <- sr_2016[which(sr_2016$recipient_include_in_universe_of_districts == TRUE),]
+## subset to district_type = Traditional
+sr_2016 <- sr_2016[which(sr_2016$recipient_id %in% dd_2016$esh_id[dd_2016$district_type == 'Traditional']),]
 ## subset to exlude_from_ia_analysis = FALSE
 sr_2016 <- sr_2016[which(sr_2016$recipient_exclude_from_ia_analysis == FALSE),]
 ## subset to only inclusion_status = clean
@@ -180,6 +182,8 @@ if (compare.2016.2017 == 1){
   ## create subset:
   ## subset to recipient_include_in_universe_of_districts = TRUE
   sr_2017 <- sr_2017[which(sr_2017$recipient_include_in_universe_of_districts == TRUE),]
+  ## subset to district_type = Traditional
+  sr_2017 <- sr_2017[which(sr_2017$recipient_id %in% dd_2017$esh_id[dd_2017$district_type == 'Traditional']),]
   ## subset to exlude_from_ia_analysis = FALSE
   sr_2017 <- sr_2017[which(sr_2017$recipient_exclude_from_ia_analysis == FALSE),]
   ## subset to only inclusion_status = clean
@@ -232,7 +236,9 @@ sub.false.2016 <- sub.false.2016[,c('esh_id', 'service_provider_old', 'reporting
                           'bandwidth_in_mbps_old', 'primary_sp_bandwidth', 'percent_bw_old', 'primary_sp_percent_of_bandwidth',
                           "service_provider_match", "purpose_match", "bandwidth_match", "bandwidth_perc_match")]
 ## create a subset of the districts that were only assigned in the old methodology
-sub.na.2016 <- compare_2016[which(is.na(compare_2016$service_provider_match)),]
+#sub.na.2016 <- compare_2016[which(is.na(compare_2016$service_provider_match)),]
+sub.na.2016 <- dta.2016[which(!dta.2016$esh_id %in% sp_assign_2016$esh_id),]
+
 
 if (compare.2015.2016 == 1){
   ## FOR 2015 DO IT MANUALLY:
@@ -265,7 +271,8 @@ if (compare.2015.2016 == 1){
                                       'bandwidth_in_mbps_old', 'primary_sp_bandwidth', 'percent_bw_old', 'primary_sp_percent_of_bandwidth',
                                       "service_provider_match", "purpose_match", "bandwidth_match", "bandwidth_perc_match")]
   ## create a subset of the districts that were only assigned in the old methodology
-  sub.na.2015 <- compare_2015[which(is.na(compare_2015$service_provider_match)),]
+  #sub.na.2015 <- compare_2015[which(is.na(compare_2015$service_provider_match)),]
+  sub.na.2015 <- dta.2015[which(!dta.2015$esh_id %in% sp_assign_2015$esh_id),]
 }
 
 if (compare.2016.2017 == 1){
@@ -277,7 +284,8 @@ if (compare.2016.2017 == 1){
                                       'bandwidth_in_mbps_old', 'primary_sp_bandwidth', 'percent_bw_old', 'primary_sp_percent_of_bandwidth',
                                       "service_provider_match", "purpose_match", "bandwidth_match", "bandwidth_perc_match")]
   ## create a subset of the districts that were only assigned in the old methodology
-  sub.na.2017 <- compare_2017[which(is.na(compare_2017$service_provider_match)),]
+  #sub.na.2017 <- compare_2017[which(is.na(compare_2017$service_provider_match)),]
+  sub.na.2017 <- dta.2017[which(!dta.2017$esh_id %in% sp_assign_2017$esh_id),]
 }
 
 ##**************************************************************************************************************************************************
@@ -329,7 +337,7 @@ if (compare.2016.2017 == 1){
   
   ## combine 2017 and 2016
   dta <- merge(dta.2017, dta.2016, by='esh_id', all=T)
-  ## only keep where the is info in both years
+  ## only keep where the info is in both years
   dta <- dta[which(!is.na(dta$service_provider_2017) & !is.na(dta$service_provider_2016)),]
   ## merge in postal_cd
   dta <- merge(dta, dd_2017[,c('esh_id', 'postal_cd')], by='esh_id', all.x=T)
@@ -343,9 +351,16 @@ if (compare.2016.2017 == 1){
   table(sp_switchers$switcher)
   nrow(dta)
   table(dta$switcher)
+  ## difference
+  nrow(dta) - nrow(sp_switchers)
   
   ## look at missing in each table
   missing.sierra <- dta[which(!dta$esh_id %in% sp_switchers$esh_id),]
+  missing.sierra.districts.2017 <- dd_2017[which(dd_2017$esh_id %in% missing.sierra$esh_id),]
+  missing.sierra.districts.2016 <- dd_2016[which(dd_2016$esh_id %in% missing.sierra$esh_id),]
+  missing.sierra.services.2017 <- dd_2017[which(sr_2017$recipient_id %in% missing.sierra$esh_id),]
+  missing.sierra.services.2016 <- dd_2016[which(sr_2016$recipient_id %in% missing.sierra$esh_id),]
+  
   missing.adrianna <- sp_switchers[which(!sp_switchers$esh_id %in% dta$esh_id),]
 }
 

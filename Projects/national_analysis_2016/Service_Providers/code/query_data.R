@@ -57,23 +57,23 @@ dd_2017 <- querydb("../../../General_Resources/sql_scripts/2017_deluxe_districts
 dd_2017 <- correct.dataset(dd_2017, sots.flag=0, services.flag=0)
 dd_2016 <- querydb("../../../General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL")
 dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
-dd_2015 <- querydb("../../../General_Resources/sql_scripts/2015_deluxe_districts_crusher_materialized.SQL")
-dd_2015 <- correct.dataset(dd_2015, sots.flag=0, services.flag=0)
+#dd_2015 <- querydb("../../../General_Resources/sql_scripts/2015_deluxe_districts_crusher_materialized.SQL")
+#dd_2015 <- correct.dataset(dd_2015, sots.flag=0, services.flag=0)
 
 ## Services Received
 sr_2017 <- querydb("../../../General_Resources/sql_scripts/2017_services_received_crusher_materialized.SQL")
 sr_2017 <- correct.dataset(sr_2017, sots.flag=0, services.flag=1)
 sr_2016 <- querydb("../../../General_Resources/sql_scripts/2016_services_received_crusher_materialized.SQL")
 sr_2016 <- correct.dataset(sr_2016, sots.flag=0, services.flag=1)
-sr_2015 <- querydb("../../../General_Resources/sql_scripts/2015_services_received_crusher_materialized.SQL")
-sr_2015 <- correct.dataset(sr_2015, sots.flag=0, services.flag=1)
+#sr_2015 <- querydb("../../../General_Resources/sql_scripts/2015_services_received_crusher_materialized.SQL")
+#sr_2015 <- correct.dataset(sr_2015, sots.flag=0, services.flag=1)
 
 ## new assignments (Sierra's queries)
 sp_assign_2017 <- querydb("../../../General_Resources/Views/2017/fy2017_districts_service_provider_assignments_matr.sql")
 sp_assign_2016 <- querydb("../../../General_Resources/Views/2016/fy2016_districts_service_provider_assignments_matr.sql")
-sp_assign_2015 <- querydb("../../../General_Resources/Views/2015/fy2015_districts_service_provider_assignments_matr.sql")
+#sp_assign_2015 <- querydb("../../../General_Resources/Views/2015/fy2015_districts_service_provider_assignments_matr.sql")
 
-## new switchers (Sierra's query) -- takes a min
+## new switchers (Sierra's query) -- takes a few min
 sp_switchers <- querydb("../../../General_Resources/sql_scripts/switchers.SQL")
 
 ## disconnect from database
