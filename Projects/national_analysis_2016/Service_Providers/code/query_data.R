@@ -68,10 +68,13 @@ sr_2016 <- correct.dataset(sr_2016, sots.flag=0, services.flag=1)
 sr_2015 <- querydb("../../../General_Resources/sql_scripts/2015_services_received_crusher_materialized.SQL")
 sr_2015 <- correct.dataset(sr_2015, sots.flag=0, services.flag=1)
 
-## new assignments
+## new assignments (Sierra's queries)
 sp_assign_2017 <- querydb("../../../General_Resources/Views/2017/fy2017_districts_service_provider_assignments_matr.sql")
 sp_assign_2016 <- querydb("../../../General_Resources/Views/2016/fy2016_districts_service_provider_assignments_matr.sql")
-#sp_assign_2015 <- querydb("../../../General_Resources/Views/2015/fy2015_districts_service_provider_assignments_matr.sql")
+sp_assign_2015 <- querydb("../../../General_Resources/Views/2015/fy2015_districts_service_provider_assignments_matr.sql")
+
+## new switchers (Sierra's query) -- takes a min
+sp_switchers <- querydb("../../../General_Resources/sql_scripts/switchers.SQL")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -92,5 +95,7 @@ write.csv(sr_2015, "data/raw/2015_services_received.csv", row.names=F)
 ## SP Assignments
 write.csv(sp_assign_2017, "data/raw/2017_current_sp_assignments.csv", row.names=F)
 write.csv(sp_assign_2016, "data/raw/2016_current_sp_assignments.csv", row.names=F)
-#write.csv(sp_assign_2015, "data/raw/2015_current_sp_assignments.csv", row.names=F)
+write.csv(sp_assign_2015, "data/raw/2015_current_sp_assignments.csv", row.names=F)
 
+## switchers
+write.csv(sp_switchers, "data/raw/current_switchers.csv", row.names=F)
