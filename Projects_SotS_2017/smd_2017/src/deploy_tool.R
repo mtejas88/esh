@@ -49,16 +49,28 @@ source_env("~/.env")
 ## option to deploy the tool
 deploy <- 1
 
+## retrieve date (in order to accurately timestamp files)
+actual.date <- Sys.time()
+weekday <- weekdays(actual.date)
+actual.date <- gsub("PST", "", actual.date)
+actual.date <- gsub(" ", "_", actual.date)
+actual.date <- gsub(":", ".", actual.date)
+
 ##**************************************************************************************************************************************************
 ## READ DATA
 
 ## State Aggregation
-state_2017 <- read.csv("data/raw/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
-state_2016 <- read.csv("data/raw/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016_froz <- read.csv("data/raw/frozen_files/2016_2015_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
+state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+
+## Top Service Providers
+top_sp <- read.csv("data/raw/top_service_providers.csv", as.is=T, header=T, stringsAsFactors=F)
+
 ## Districts Deluxe
-dd_2017 <- read.csv("data/raw/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
-dd_2016 <- read.csv("data/raw/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 #dd_2015_froz <- read.csv("data/raw/frozen_files/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -71,6 +83,15 @@ date <- read.csv("data/raw/date.csv", as.is=T, header=T, stringsAsFactors=F)
 ## add state name to state aggregation
 state_2016 <- apply_state_names(state_2016)
 state_2017 <- apply_state_names(state_2017)
+
+## rename rural/small town columns
+state_rural_small_town$postal_cd.1 <- NULL
+names(state_rural_small_town)[!names(state_rural_small_town)
+                              %in% c('postal_cd', 'erate_money_no_voice_millions')] <- paste(names(state_rural_small_town)[!names(state_rural_small_town)
+                                                                                                          %in% c('postal_cd', 'erate_money_no_voice_millions')],
+                                                                                                          "rural_small_town", sep="_")
+## merge in rural_small_town with state_agg
+state_2017 <- merge(state_2017, state_rural_small_town, by='postal_cd', all.x=T)
 
 ## make sure to include districts in universe
 dd_2017 <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE),]
@@ -353,7 +374,55 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## SNAPSHOTS (MASTER METRICS)
 ##-------------------------------
 
+## Number of More Districts Connected between 2016 and 2017 (Extrapolated)
+## Methodology: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
+state_2017$districts_meeting_2014_bw_goal_2016_extrap <- round((state_2016$districts_meeting_2014_bw_goal / state_2016$districts_clean_ia_sample)
+                                                                * state_2016$districts_population, 0)
+state_2017$districts_meeting_2014_bw_goal_2017_extrap <- round((state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
+                                                               * state_2017$districts_population, 0)
+state_2017$more_districts_connected_extrap <- state_2017$districts_meeting_2014_bw_goal_2017_extrap - state_2017$districts_meeting_2014_bw_goal_2016_extrap
+## create extrapolated number of more students connected between 2016 and 2017
+state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2016$students_meeting_2014_bw_goal / state_2016$students_clean_ia_sample)
+                                                               * state_2016$students_population, 0)
+state_2017$students_meeting_2014_bw_goal_2017_extrap <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
+                                                               * state_2017$students_population, 0)
+state_2017$more_students_connected_extrap <- state_2017$students_meeting_2014_bw_goal_2017_extrap - state_2017$students_meeting_2014_bw_goal_2016_extrap
 
+## 2017 Districts/Students Not Meeting Goal (Actual and Extrapolated)
+state_2017$districts_not_meeting_2014_bw_goal <- state_2017$districts_clean_ia_sample - state_2017$districts_meeting_2014_bw_goal
+state_2017$districts_not_meeting_2014_bw_goal_extrap <- round((state_2017$districts_not_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
+                                                              * state_2017$districts_population, 0)
+state_2017$students_not_meeting_2014_bw_goal <- state_2017$students_clean_ia_sample - state_2017$students_meeting_2014_bw_goal
+state_2017$students_not_meeting_2014_bw_goal_extrap <- round((state_2017$students_not_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
+                                                              * state_2017$students_population, 0)
+
+## 2017 Service Providers serving the most students not meeting goals
+
+## 2017 Districts that Need Fiber (Extrapolated)
+state_2017$district_fiber_targets_extrap <- round((state_2017$clean_district_bw_targets / state_2017$districts_clean_ia_sample)
+                                                  * state_2017$districts_population, 0)
+
+## 2017 Districts Not Meeting Affordability Goals (Actual and Extrapolated)
+state_2017$districts_not_meeting_affordability <- state_2017$districts_clean_ia_cost_sample - state_2017$districts_meeting_affordability
+state_2017$districts_not_meeting_affordability_extrap <- round((state_2017$districts_not_meeting_affordability / state_2017$districts_clean_ia_cost_sample)
+                                                              * state_2017$districts_population, 0)
+
+## order the columns: state abbr, state name, connectivity rank, e-rate $, state match $, more students connected, more districts connected,
+## current num districts connected, current num students connected, students still not meeting goals, districts still not meeting goals,
+## number of service providers to partner with, number of students affected by sp, number of districts that need fiber, % in rural and small towns,
+## wifi funds remaining, number of districts who haven't used any wifi funds, number of districts not meeting affordability goals
+
+snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'erate_money_no_voice_millions', 'more_students_connected_extrap', 'more_districts_connected_extrap',
+                           'districts_meeting_2014_bw_goal', 'districts_meeting_2014_bw_goal_2017_extrap',
+                           'students_meeting_2014_bw_goal', 'students_meeting_2014_bw_goal_2017_extrap',
+                           'districts_not_meeting_2014_bw_goal', 'districts_not_meeting_2014_bw_goal_extrap',
+                           'students_not_meeting_2014_bw_goal', 'students_not_meeting_2014_bw_goal_extrap',
+                           'clean_district_fiber_targets', 'district_fiber_targets_extrap',
+                           'percent_fiber_targets_regular_rural_small_town', 'percent_fiber_targets_extrap_rural_small_town',
+                           'c2_remaining_2017', 'districts_not_meeting_affordability', 'districts_not_meeting_affordability_extrap')]
+
+## currently still not included: connectivity rank, state match $, number of service providers to partner with, number of students affected by sp,
+##                                number of districts who haven't used any wifi funds
 
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
@@ -368,7 +437,7 @@ write.csv(dd_2017, "tool/data/2017_deluxe_districts.csv", row.names=F)
 write.csv(dd_2016, "tool/data/2016_deluxe_districts.csv", row.names=F)
 write.csv(dd_2016_froz, "tool/data/2016_sots_deluxe_districts.csv", row.names=F)
 
-## Click Throughs
+## Click-Throughs
 write.csv(current17.click.through, "tool/data/current17_click_through.csv", row.names=F)
 write.csv(sots16.click.through, "tool/data/sots16_click_through.csv", row.names=F)
 write.csv(upgrades.click.through, "tool/data/upgrades_click_through.csv", row.names=F)
@@ -384,7 +453,7 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 ## Snapshots
 write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 ## also store the snapshots 
-write.csv(snapshots, paste("data/raw/2017_snapshots_", date, ".csv", sep=''), row.names=F)
+write.csv(snapshots, paste("data/raw/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## Date
 write.csv(date, "tool/data/date.csv", row.names=F)
