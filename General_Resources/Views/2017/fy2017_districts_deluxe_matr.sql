@@ -334,9 +334,7 @@ select distinct
 
 	primary_sp_bandwidth,
 
-	primary_sp_percent_of_bandwidth,
-
-	switcher
+	primary_sp_percent_of_bandwidth
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
 

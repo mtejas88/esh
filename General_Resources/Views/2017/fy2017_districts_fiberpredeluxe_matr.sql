@@ -527,9 +527,7 @@ select distinct
 
 	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
 
-	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth,
-
-	case when dspa.service_provider_assignment!=d16.service_provider_assignment then 'Switched' else 'Did Not Switch' end as switcher
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
 
 
 
@@ -548,10 +546,6 @@ on dpd.esh_id::varchar = du.esh_id_2017::varchar --correcting year to 2017
 left join public.fy2017_districts_service_provider_assignments_matr dspa
 
 on dpd.esh_id::varchar = dspa.esh_id::varchar
-
-left join public.fy2016_districts_deluxe_matr d16
-
-on dpd.esh_id::varchar = d16.esh_id::varchar
 
 
 

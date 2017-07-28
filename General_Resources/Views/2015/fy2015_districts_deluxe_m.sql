@@ -147,61 +147,66 @@ case
     then TRUE
     else FALSE
 end as meeting_2018_goal_oversub_fcc_25, -- TRUE if NOT ALL IA/upstream circuits are <25 mbps AND nonfiber
-most_recent_ia_contract_end_date
+most_recent_ia_contract_end_date,
+
+dspa.reporting_name as service_provider_assignment,
+dspa.primary_sp_purpose as primary_sp_purpose,
+dspa.primary_sp_bandwidth as primary_sp_bandwidth,
+dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
 
 
   from  public.districts
   left join (
-		select  district_esh_id,
-		        case when true_count >= 1 then 'verified'
-		          when true_count = 0 and false_count >= 1 then 'inferred'
-		          when true_count = 0 and false_count = 0 and null_assumed_count >= 1 then 'interpreted'
-		          when true_count = 0 and false_count = 0 and null_assumed_count = 0 and null_untouched_count >= 1 then 'assumed'
-		        end as clean_categorization,
-		        case when true_count >= 1 and false_count = 0 and null_assumed_count = 0 and null_untouched_count = 0
-		          then true else false end as totally_verified
+    select  district_esh_id,
+            case when true_count >= 1 then 'verified'
+              when true_count = 0 and false_count >= 1 then 'inferred'
+              when true_count = 0 and false_count = 0 and null_assumed_count >= 1 then 'interpreted'
+              when true_count = 0 and false_count = 0 and null_assumed_count = 0 and null_untouched_count >= 1 then 'assumed'
+            end as clean_categorization,
+            case when true_count >= 1 and false_count = 0 and null_assumed_count = 0 and null_untouched_count = 0
+              then true else false end as totally_verified
 
-		from (
-		    select district_esh_id,
-		          count(case when contacted = 'true' then 1 end) as true_count,
-		          count(case when contacted = 'false' then 1 end) as false_count,
-		          count(case when contacted is null and assumed_flags = true then 1 end) as null_assumed_count,
-		          count(case when contacted is null and assumed_flags = false then 1 end) as null_untouched_count
+    from (
+        select district_esh_id,
+              count(case when contacted = 'true' then 1 end) as true_count,
+              count(case when contacted = 'false' then 1 end) as false_count,
+              count(case when contacted is null and assumed_flags = true then 1 end) as null_assumed_count,
+              count(case when contacted is null and assumed_flags = false then 1 end) as null_untouched_count
 
-		    from (
-		        select av.line_item_id,
-		              version_order.contacted,
-		              av.district_esh_id,
-		              case when 'assumed_ia' = any(open_flags)
-		                    or 'assumed_wan' = any(open_flags)
-		                    or 'assumed_fiber' = any(open_flags)
-		              then true else false end as assumed_flags
+        from (
+            select av.line_item_id,
+                  version_order.contacted,
+                  av.district_esh_id,
+                  case when 'assumed_ia' = any(open_flags)
+                        or 'assumed_wan' = any(open_flags)
+                        or 'assumed_fiber' = any(open_flags)
+                  then true else false end as assumed_flags
 
-		        from line_item_district_association_2015_m av
-		        left join (
-		            select fy2015_item21_services_and_cost_id,
-		                  case when contacted is null or contacted = false then 'false'
-		                    when contacted = true then 'true'
-		                  end as contacted,
-		                  version_id,
-		                  row_number() over (
-		                                    partition by fy2015_item21_services_and_cost_id
-		                                    order by version_id desc
-		                                    ) as row_num
+            from line_item_district_association_2015_m av
+            left join (
+                select fy2015_item21_services_and_cost_id,
+                      case when contacted is null or contacted = false then 'false'
+                        when contacted = true then 'true'
+                      end as contacted,
+                      version_id,
+                      row_number() over (
+                                        partition by fy2015_item21_services_and_cost_id
+                                        order by version_id desc
+                                        ) as row_num
 
-		            from public.line_item_notes
-		            where note not like '%little magician%'
-		        ) version_order
-		        on av.line_item_id = version_order.fy2015_item21_services_and_cost_id
-		        left join public.line_items
-		        on av.line_item_id = line_items.id
+                from public.line_item_notes
+                where note not like '%little magician%'
+            ) version_order
+            on av.line_item_id = version_order.fy2015_item21_services_and_cost_id
+            left join public.line_items
+            on av.line_item_id = line_items.id
 
-		        where (row_num = 1 or row_num is null)
-		        and broadband = true
-		    ) most_recent
+            where (row_num = 1 or row_num is null)
+            and broadband = true
+        ) most_recent
 
-		    group by district_esh_id
-		) district_counts
+        group by district_esh_id
+    ) district_counts
   ) as district_contacted
   on district_contacted.district_esh_id = districts.esh_id
   left join sc121a_frl
@@ -566,6 +571,137 @@ left join (
     GROUP BY recipient_id
 ) pt
 on districts.esh_id=pt.recipient_id
+left join (select  recipient_sp_bw_rank.recipient_id as esh_id,
+
+reporting_name,
+
+recipient_sp_bw_rank.purpose_list as primary_sp_purpose,
+
+recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
+
+recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
+
+  from (
+
+    select  *,
+
+            row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
+
+    from (
+
+      select  recipient_id,
+
+              case
+
+                when reporting_name = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+                when reporting_name is null then service_provider_name
+
+                else reporting_name
+
+              end as reporting_name,
+
+              sum(bandwidth_in_mbps * quantity_of_lines_received_by_district::numeric) as bandwidth,
+
+              sum(case
+
+                    when purpose = 'Transport'
+
+                      then bandwidth_in_mbps * quantity_of_lines_received_by_district::numeric
+
+                    else 0
+
+                  end) as upstream_bandwidth,
+                
+              array_agg(distinct purpose2 order by purpose2) as purpose_list
+
+      from (select a.*, case when purpose='Transport' then 'Upstream' else purpose end as purpose2
+      from public.fy2015_services_received_m a) sr
+
+
+      where quantity_of_lines_received_by_district != 'Shared Circuit'
+      and (internet_conditions_met=true or upstream_conditions_met=true)
+      and consortium_shared=false
+      and dirty_status ilike '%clean%'
+
+      group by 1,2
+
+    )recipient_sp_bw
+
+  ) recipient_sp_bw_rank
+
+  left join (
+
+    select  recipient_id,
+
+            sum(bandwidth) as bw_total
+
+    from (
+
+      select  recipient_id,
+
+              case
+
+                when reporting_name = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+                when reporting_name is null then service_provider_name
+
+                else reporting_name
+
+              end as reporting_name,
+
+              sum(bandwidth_in_mbps * quantity_of_lines_received_by_district::numeric) as bandwidth,
+
+              sum(case
+
+                    when purpose = 'Upstream'
+
+                      then bandwidth_in_mbps * quantity_of_lines_received_by_district::numeric
+
+                    else 0
+
+                  end) as upstream_bandwidth
+
+      from public.fy2015_services_received_m sr
+
+      where quantity_of_lines_received_by_district != 'Shared Circuit'
+      and (internet_conditions_met=true or upstream_conditions_met=true)
+      and consortium_shared=false
+      and dirty_status ilike '%clean%'
+
+      group by 1,2
+
+    )recipient_sp_bw
+
+
+
+
+    group by 1
+
+  ) recipient_sp_bw_total
+
+  on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
+
+  where bw_rank = 1
+  
+  and recipient_sp_bw_total.bw_total > 0
+
+  /*adding bw_total > 0 as the new staging db Rose has more 2017 data and a lot of rows have bw_total that are 0,
+this prevents the creation of the materialized view due to division error of 0*/
+
+  and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5) 
+dspa
+on districts.esh_id = dspa.esh_id
 
   where districts.include_in_universe_of_districts = TRUE
 
