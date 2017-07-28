@@ -73,4 +73,5 @@ dta <- dta[which(!is.na(dta$service_provider)),]
 ## merge in the actual SP
 combined <- merge(dta, top_2017, by.x=c('service_provider', 'postal_cd'), by.y=c('service_provider_assignment', 'postal_cd'), all=T)
 combined$diff_num_students_not_meeting_goals <- combined$num_clean_students_not_meeting_goals - combined$num_students_not_meeting_clean
-
+combined$diff_num_districts_served_clean <- combined$num_clean_districts_served - combined$num_districts_served_clean
+#combined$diff_num_districts_served <- combined$num_total_districts_served - combined$num_districts_served_total
