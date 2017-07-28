@@ -71,7 +71,7 @@ dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
 ## Snapshot metrics for Rural/Small Town
 rural_small_town <- querydb("../../General_Resources/sql_scripts/2017/snapshots.sql")
 ## Top Service Providers not meeting goals
-top_sp <- querydb("../../General_Resources/sql_scripts/2017/State Snapshot SP Report.sql")
+top_sp <- querydb("../../General_Resources/sql_scripts/2017/state_snapshot_sp_report.sql")
 ## Outlier Flags
 resolved_outliers <- querydb("../../General_Resources/sql_scripts/2017/2017_resolved_outliers_smd.SQL")
 ## Merge outliers

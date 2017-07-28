@@ -375,18 +375,33 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ##-------------------------------
 
 ## Number of More Districts Connected between 2016 and 2017 (Extrapolated)
-## Methodology: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
+## Methodology #1: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
 state_2017$districts_meeting_2014_bw_goal_2016_extrap <- round((state_2016$districts_meeting_2014_bw_goal / state_2016$districts_clean_ia_sample)
                                                                 * state_2016$districts_population, 0)
 state_2017$districts_meeting_2014_bw_goal_2017_extrap <- round((state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
                                                                * state_2017$districts_population, 0)
-state_2017$more_districts_connected_extrap <- state_2017$districts_meeting_2014_bw_goal_2017_extrap - state_2017$districts_meeting_2014_bw_goal_2016_extrap
+state_2017$more_districts_connected_extrap_meth_1 <- state_2017$districts_meeting_2014_bw_goal_2017_extrap - state_2017$districts_meeting_2014_bw_goal_2016_extrap
 ## create extrapolated number of more students connected between 2016 and 2017
 state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2016$students_meeting_2014_bw_goal / state_2016$students_clean_ia_sample)
                                                                * state_2016$students_population, 0)
 state_2017$students_meeting_2014_bw_goal_2017_extrap <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                                * state_2017$students_population, 0)
-state_2017$more_students_connected_extrap <- state_2017$students_meeting_2014_bw_goal_2017_extrap - state_2017$students_meeting_2014_bw_goal_2016_extrap
+state_2017$more_students_connected_extrap_meth_1 <- state_2017$students_meeting_2014_bw_goal_2017_extrap - state_2017$students_meeting_2014_bw_goal_2016_extrap
+
+## Methodology #2: take percent of 2016 districts/students meeting bw goals and apply to 2017 population and take difference with extrapolated 2017
+state_2017$districts_meeting_2014_bw_goal_2016_extrap <- round((state_2016$districts_meeting_2014_bw_goal / state_2016$districts_clean_ia_sample)
+                                                               * state_2017$districts_population, 0)
+state_2017$districts_meeting_2014_bw_goal_2017_extrap <- round((state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
+                                                               * state_2017$districts_population, 0)
+state_2017$more_districts_connected_extrap_meth_2 <- state_2017$districts_meeting_2014_bw_goal_2017_extrap - state_2017$districts_meeting_2014_bw_goal_2016_extrap
+## create extrapolated number of more students connected between 2016 and 2017
+state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2016$students_meeting_2014_bw_goal / state_2016$students_clean_ia_sample)
+                                                              * state_2017$students_population, 0)
+state_2017$students_meeting_2014_bw_goal_2017_extrap <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
+                                                              * state_2017$students_population, 0)
+state_2017$more_students_connected_extrap_meth_2 <- state_2017$students_meeting_2014_bw_goal_2017_extrap - state_2017$students_meeting_2014_bw_goal_2016_extrap
+
+
 
 ## 2017 Districts/Students Not Meeting Goal (Actual and Extrapolated)
 state_2017$districts_not_meeting_2014_bw_goal <- state_2017$districts_clean_ia_sample - state_2017$districts_meeting_2014_bw_goal
