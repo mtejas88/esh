@@ -253,13 +253,15 @@ use_case_district <- function (data, data_17, metric, district_locale, size, sta
             postal_cd %in% state,
             locale %in% district_locale,
             district_size %in% size) %>% 
-          filter_(paste('!is.na(', column, ')'))
+          filter_(paste('!is.na(', column, ')'))  %>%
+          select (-c(meeting_to_not_meeting_connectivity, meeting_to_not_meeting_affordability,change_in_cost_tot_nb))
       } else {
         output17 <- data_17 %>%
           filter(
             locale %in% district_locale,
             district_size %in% size) %>% 
-          filter_(paste('!is.na(', column, ')'))
+          filter_(paste('!is.na(', column, ')')) %>%
+          select (-c(meeting_to_not_meeting_connectivity, meeting_to_not_meeting_affordability,change_in_cost_tot_nb))
       }
       #combine filtered outputs
       output=rbind(output16,output17) }
@@ -294,4 +296,42 @@ use_case_district <- function (data, data_17, metric, district_locale, size, sta
     distribution=NULL
   }
   return(distribution)
+}
+
+###
+# use case type #3
+# identify outliers based on rules
+###
+
+use_case_rule <- function(current_year,rule_type){
+  #Make a string to add to the eventual script for inserting NULL values
+  n='NULL'
+  if(rule_type == 'meeting_to_not_meeting_connectivity' && current_year =='2017'){  
+    uc13 <- filter(d_17,meeting_to_not_meeting_connectivity==TRUE)
+    if (dim(uc13)[1] > 1) { #if there are any districts meeting this, insert into master_output
+    uc13_formatted <- data.frame('Meeting-not Meeting Connectivity Rule','mtg_not_mtg_connectivity_rule','','',uc13$esh_id,n,n,n)
+    colnames(uc13_formatted) <-c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters','outlier_test_parameters','outlier_unique_id','outlier_value','R','lam')
+    master_output <- rbind(master_output,uc13_formatted) 
+    assign('master_output',master_output,envir=.GlobalEnv)} 
+  }else if(rule_type == 'meeting_to_not_meeting_affordability' && current_year =='2017'){
+    uc14 <- filter(d_17,meeting_to_not_meeting_affordability==TRUE)
+    if (dim(uc14)[1] > 1) { #if there are any districts meeting this, insert into master_output
+    uc14_formatted <- data.frame('Meeting-not Meeting Affordability Rule','mtg_not_mtg_affordability_rule','','',uc14$esh_id,n,n,n)
+    colnames(uc14_formatted) <-c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters','outlier_test_parameters','outlier_unique_id','outlier_value','R','lam')
+    master_output <- rbind(master_output,uc14_formatted)
+    assign('master_output',master_output,envir=.GlobalEnv)}
+  }else if(rule_type == 'decrease_in_bw' && current_year =='2017'){
+    uc15 <- filter(d_17,change_in_bw_tot<0)
+    uc15_formatted <- data.frame('Decrease in BW Rule','decrease_in_bw_rule','','',uc15$esh_id,as.numeric(uc15$change_in_bw_tot),n,n)
+    colnames(uc15_formatted) <-c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters','outlier_test_parameters','outlier_unique_id','outlier_value','R','lam')
+    master_output <- rbind(master_output,uc15_formatted) 
+    assign('master_output',master_output,envir=.GlobalEnv)
+  }else if(rule_type == 'increase_in_cost' && current_year =='2017'){
+    uc16 <- filter(d_17,change_in_cost_tot_nb >= 1)
+    uc16_formatted <- data.frame('Increase in $/BW Rule','increase_cost_mbps_rule','','',uc16$esh_id,as.numeric(uc16$change_in_cost_tot),n,n)
+    colnames(uc16_formatted) <-c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters','outlier_test_parameters','outlier_unique_id','outlier_value','R','lam')
+    master_output <- rbind(master_output,uc16_formatted)  
+    assign('master_output',master_output,envir=.GlobalEnv)
+  }
+  
 }

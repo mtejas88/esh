@@ -25,13 +25,14 @@ s_17_all <- read.csv(  paste0("../data/mode/crusher_sr_fy2017_", Sys.Date(), ".c
 
 # Munge Deluxe Districts
 logical <- c("exclude_from_ia_analysis", "exclude_from_ia_cost_analysis", "exclude_from_wan_analysis",
-             "exclude_from_wan_cost_analysis", "exclude_from_current_fiber_analysis", "include_in_universe_of_districts",
-             "meeting_2014_goal_no_oversub", "meeting_2014_goal_oversub", 
-             "meeting_2018_goal_no_oversub", "meeting_2018_goal_oversub")
+               "exclude_from_wan_cost_analysis", "exclude_from_current_fiber_analysis", "include_in_universe_of_districts",
+               "meeting_2014_goal_no_oversub", "meeting_2014_goal_oversub", 
+               "meeting_2018_goal_no_oversub", "meeting_2018_goal_oversub")
+logical17 <- append(logical,c("meeting_to_not_meeting_connectivity", "meeting_to_not_meeting_affordability"))
 
 d_16_all[, logical] <- sapply(d_16_all[, logical], function(x) ifelse(x == "t", TRUE, 
                                                                       ifelse(x =="f", FALSE, x)))
-d_17_all[, logical] <- sapply(d_17_all[, logical], function(x) ifelse(x == "t", TRUE,
+d_17_all[, logical17] <- sapply(d_17_all[, logical17], function(x) ifelse(x == "t", TRUE,
                                                                      ifelse(x == "f", FALSE, x)))
 d_16 <- d_16_all %>%
           filter(exclude_from_ia_analysis == FALSE,
@@ -42,7 +43,7 @@ d_17 <- d_17_all %>%
           filter(exclude_from_ia_analysis == FALSE,
                  include_in_universe_of_districts==TRUE,
                  postal_cd != 'AK') %>%
-          select(esh_id,postal_cd,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_pct)
+          select(esh_id,postal_cd,locale,district_size,ia_bandwidth_per_student_kbps,ia_monthly_cost_per_mbps,change_in_bw_tot,change_in_bw_pct,change_in_cost_tot,change_in_cost_tot_nb,change_in_cost_pct,meeting_to_not_meeting_connectivity,meeting_to_not_meeting_affordability)
 
 
 # Munge Services Received
@@ -58,8 +59,6 @@ munge_sr <- function(data) {
                                                                         ifelse(x %in% "f", FALSE, x)))
   data[, numeric] <- sapply(data[, numeric], function(x) as.numeric(x))
   
-  # filter down to line items that are in our consideration; this would most likely be generally applicable to all outlier analysis
-  # for instance, filter dataset so that we only consider
   
   output <- data %>%
             filter(

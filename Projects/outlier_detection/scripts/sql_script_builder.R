@@ -8,7 +8,7 @@ load_candidate_details <- function(master_output,table_name){
     script <- 
       "create temp table temp_outlier_use_case_detail_candidates 
     (
-    use_case_name varchar(40),
+    use_case_name varchar(250),
     outlier_use_case_params hstore,
     outlier_test_case_params hstore);
     insert into temp_outlier_use_case_detail_candidates values "
@@ -19,21 +19,21 @@ load_candidate_details <- function(master_output,table_name){
     script <- paste0(script,substr(script_values,1,nchar(script_values)-1),";")
     
     print("Script Created")
-   # print(script)
   }else if(table_name == "outliers"){
     
     script <- 
       "create temp table temp_outlier_candidates 
     (
-    use_case_name varchar(40),
+    use_case_name varchar(250),
     outlier_use_case_params hstore,
     outlier_test_case_params hstore,
     ref_id varchar(50) NOT NULL,
     value varchar(255) NOT NULL,
-    R  decimal NOT NULL,
-    lambda decimal NOT NULL);
+    R  decimal,
+    lambda decimal);
     
     insert into temp_outlier_candidates values "
+    #if (master_output$outlier_use_case_name %in% c('Decrease in BW Rule', 'Increase in $/BW Rule', 'Decrease BW Not Meeting Connectivity','Increase Cost/Mbps Not Meeting Affordability')){
     script_values <- paste("('",master_output$outlier_use_case_name,"','",
                            master_output$outlier_use_case_parameters,"','",
                            master_output$outlier_test_parameters,"','",
@@ -131,20 +131,32 @@ find_new_cases <- function(table_name){
 update_no_longer_outliers <- function(reason){
 if (reason == 'no longer found') {
     script <- 
-    "with outlier_a as (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
-    from outliers out join outlier_use_case_details oucd on out.outlier_use_case_detail_id=oucd.outlier_use_case_detail_id),
+      "with outlier_a as (select ref_id, outlier_use_case_detail_id
+    from outliers),
     
-    outlier_b as (select ref_id, case when use_case_name ='Cost per Circuit' then 'LineItem' else 'District' end as type
-    from temp_outlier_candidates)
-
-    update outliers set end_dt = current_timestamp 
-    where ref_id in(
-    select outlier_a.ref_id from outlier_a
+    outlier_b as (select
+    *
+    from
+    temp_outlier_candidates toc,
+    outlier_use_case_details oucd
+    where
+    toc.use_case_name = oucd.use_case_name and
+    toc.outlier_use_case_params = oucd.outlier_use_case_params and
+    toc.outlier_test_case_params =oucd.outlier_test_case_params),
+    
+    no_longer_found as(
+    select distinct outlier_a.ref_id,outlier_a.outlier_use_case_detail_id from outlier_a
     left join
-    outlier_b on outlier_a.ref_id=outlier_b.ref_id and outlier_a.type=outlier_b.type
-    where outlier_b.ref_id is null
-    );
+    outlier_b on outlier_a.ref_id=outlier_b.ref_id and outlier_a.outlier_use_case_detail_id=outlier_b.outlier_use_case_detail_id
+    where outlier_b.ref_id is null)
+    
+    update public.outliers o
+    set end_dt=current_timestamp
+    from no_longer_found n
+    where o.ref_id=n.ref_id
+    and o.outlier_use_case_detail_id=n.outlier_use_case_detail_id;
     "
+    
   }else if (reason=='matches 2016'){
   script <-
     "WITH dd_2015 AS 
@@ -249,7 +261,6 @@ if (reason == 'no longer found') {
 
 dml_builder <- function(values,script_type,postgres_table){
   
-  #print(values)
   syntax_stitcher <- function(script_content,script_begin,script_end){
     ##declare script variable 
     script <- c()  
@@ -268,7 +279,6 @@ dml_builder <- function(values,script_type,postgres_table){
         
       }
     }  
-    #print(script)
     return(script) 
   }
   
@@ -330,6 +340,7 @@ dml_builder <- function(values,script_type,postgres_table){
                                                     updated_values$r,",",
                                                     updated_values$lambda,",",
                                                     "current_timestamp)"))
+      script_content$content = gsub("NA", "NULL", script_content$content)
       
     }else if(postgres_table == 'tableau_district'){                                                                                                                  
                                                                                                                                                              
@@ -389,7 +400,6 @@ dml_builder <- function(values,script_type,postgres_table){
       script=script_begin
       ## Script Content    
       for(i in 1:length(values)){
-        print(unique(values[i]))
         if (i==length(values)) {
           script <- paste0(script,values[i],script_end)
         } else {

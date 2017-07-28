@@ -9,6 +9,7 @@ for (i in 1:length(packages.to.install)){
     install.packages(packages.to.install[i])
   }
 }
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 library(DBI)
 library(rJava)
 library(RJDBC)
@@ -43,9 +44,8 @@ querydb <- function(query_name){
 
 crusher_sr_fy2016 <- querydb('../sql/crusher_fy2016_sr.sql')
 crusher_dd_fy2016 <- querydb('../sql/crusher_fy2016_dd.sql')
-# placeholder for 2017 tables
- crusher_sr_fy2017 <- querydb('../sql/crusher_fy2017_sr.sql')
- crusher_dd_fy2017 <- querydb('../sql/crusher_fy2017_dd.sql')
+crusher_sr_fy2017 <- querydb('../sql/crusher_fy2017_sr.sql')
+crusher_dd_fy2017 <- querydb('../sql/crusher_fy2017_dd.sql')
 
 ## disconnect from database
 dbDisconnect(con)
@@ -54,6 +54,5 @@ dbDisconnect(con)
 
 write.csv(crusher_dd_fy2016, paste0("../data/mode/crusher_dd_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
 write.csv(crusher_sr_fy2016, paste0("../data/mode/crusher_sr_fy2016_", Sys.Date(), ".csv"), row.names = FALSE)
-# placeholder for 2017 tables 
 write.csv(crusher_dd_fy2017, paste0("../data/mode/crusher_dd_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
 write.csv(crusher_sr_fy2017, paste0("../data/mode/crusher_sr_fy2017_", Sys.Date(), ".csv"), row.names = FALSE)
