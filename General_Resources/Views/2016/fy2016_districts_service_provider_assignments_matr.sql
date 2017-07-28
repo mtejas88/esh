@@ -1,6 +1,6 @@
 select  recipient_sp_bw_rank.recipient_id as esh_id, 
 reporting_name, 
-recipient_sp_bw_rank.purpose_list as purpose,
+recipient_sp_bw_rank.purpose_list as primary_sp_purpose,
 recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
 recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
 
