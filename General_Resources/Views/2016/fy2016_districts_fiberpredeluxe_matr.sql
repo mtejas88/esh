@@ -275,10 +275,10 @@ left join public.fy2015_districts_deluxe_m d15
 on dpd.esh_id::numeric=d15.esh_id::numeric
 left join  public.general_sp_not_switchers gsp
 on d15.service_provider_assignment=gsp.service_provider_2015
-and dpd.service_provider_assignment=gsp.service_provider_2016
+and dspa.service_provider_assignment=gsp.service_provider_2016
 left join public.state_specific_sp_not_switchers ssp
 on d15.service_provider_assignment=ssp.service_provider_2015
-and dpd.service_provider_assignment=ssp.service_provider_2016
+and dspa.service_provider_assignment=ssp.service_provider_2016
 and dpd.postal_cd=ssp.postal_cd
 /*
 Author: Justine Schott
