@@ -184,5 +184,5 @@ where num_students_not_meeting_clean > 0
 )
 
 as t
-where r <=5
+--where r <=5
 order by postal_cd
