@@ -350,22 +350,25 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 
 
 
-##** STILL NEED TO CREATE SNAPSHOTS SUBSET ONCE THE VARIABLES TO INCLUDE ARE DECIDED ON **##
-## SNAPSHOTS
+## SNAPSHOTS (MASTER METRICS)
 ##-------------------------------
+
+
 
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
 
-## state aggregation
+## State Aggregation
 write.csv(state_2017, "tool/data/2017_state_aggregation.csv", row.names=F)
 write.csv(state_2016, "tool/data/2016_state_aggregation.csv",row.names=F)
 write.csv(state_2016_froz, "tool/data/2016_2015_sots_state_aggregation.csv",row.names=F)
-## deluxe districts
+
+## Deluxe Districts
 write.csv(dd_2017, "tool/data/2017_deluxe_districts.csv", row.names=F)
 write.csv(dd_2016, "tool/data/2016_deluxe_districts.csv", row.names=F)
 write.csv(dd_2016_froz, "tool/data/2016_sots_deluxe_districts.csv", row.names=F)
-## click-throughs
+
+## Click Throughs
 write.csv(current17.click.through, "tool/data/current17_click_through.csv", row.names=F)
 write.csv(sots16.click.through, "tool/data/sots16_click_through.csv", row.names=F)
 write.csv(upgrades.click.through, "tool/data/upgrades_click_through.csv", row.names=F)
@@ -373,11 +376,16 @@ write.csv(connectivity.click.through, "tool/data/connectivity_click_through.csv"
 write.csv(fiber.click.through, "tool/data/fiber_click_through.csv", row.names=F)
 write.csv(affordability.click.through, "tool/data/affordability_click_through.csv", row.names=F)
 write.csv(wifi.click.through, "tool/data/wifi_click_through.csv", row.names=F)
-## targets
+
+## Targets
 write.csv(connectivity.targets, "tool/data/connectivity_targets.csv", row.names=F)
 write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
-## snapshots
-#write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
+
+## Snapshots
+write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
+## also store the snapshots 
+write.csv(snapshots, paste("data/raw/2017_snapshots_", date, ".csv", sep=''), row.names=F)
+
 ## Date
 write.csv(date, "tool/data/date.csv", row.names=F)
 
