@@ -14,6 +14,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
                   then 'ENA Services, LLC'
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
                   then 'Charter'
+                when reporting_name is null then service_provider_name
                 else reporting_name
               end as reporting_name,
               num_students,
@@ -46,6 +47,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
                   then 'ENA Services, LLC'
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
                   then 'Charter'
+                when reporting_name is null then service_provider_name
                 else reporting_name
               end as reporting_name,
               num_students,

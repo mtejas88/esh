@@ -151,7 +151,8 @@ select distinct
 	service_provider_assignment,
 	primary_sp_purpose,
 	primary_sp_bandwidth,
-	primary_sp_percent_of_bandwidth
+	primary_sp_percent_of_bandwidth,
+	switcher
 
 from fy2016_districts_fiberpredeluxe_matr dfpd
 left join state_level_extrap sle

@@ -256,7 +256,13 @@ select distinct
 	dspa.reporting_name as service_provider_assignment,
 	dspa.purpose as primary_sp_purpose,
 	dspa.primary_sp_bandwidth as primary_sp_bandwidth,
-	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
+	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth,
+	case when dspa.primary_sp_purpose::varchar=d15.primary_sp_purpose::varchar then 'Same' else 'Different' end as purpose_match, 
+	case when dspa.service_provider_assignment=d15.service_provider_assignment or ((d15.service_provider_assignment=gsp.service_provider_2015
+	and dspa.service_provider_assignment=gsp.service_provider_2016)
+	or (d15.service_provider_assignment=ssp.service_provider_2015
+	and dspa.service_provider_assignment=ssp.service_provider_2016
+	and dpd.postal_cd=ssp.postal_cd)) then 'Did Not Switch' else 'Switched' end as switcher
 
 from public.fy2016_districts_predeluxe_matr dpd
 left join public.fy2016_fiber_bw_target_status_matr fbts
@@ -265,7 +271,15 @@ left join public.fy2015_fy2016_districts_upgrades_m du
 on dpd.esh_id = du.esh_id_2016
 left join public.fy2016_districts_service_provider_assignments_matr dspa
 on dpd.esh_id = dspa.esh_id
-
+left join public.fy2015_districts_deluxe_m d15
+on dpd.esh_id::numeric=d15.esh_id::numeric
+left join  public.general_sp_not_switchers gsp
+on d15.service_provider_assignment=gsp.service_provider_2015
+and dpd.service_provider_assignment=gsp.service_provider_2016
+left join public.state_specific_sp_not_switchers ssp
+on d15.service_provider_assignment=ssp.service_provider_2015
+and dpd.service_provider_assignment=ssp.service_provider_2016
+and dpd.postal_cd=ssp.postal_cd
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
