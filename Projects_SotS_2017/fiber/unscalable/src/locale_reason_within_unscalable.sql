@@ -11,7 +11,7 @@ dist_2016 as (
 	select dd.*,
 		current_assumed_unscalable_campuses + current_known_unscalable_campuses as unscalable_campuses,
 		taggable_id is not null as manually_tagged_target,
-		wan_bw_2016.wan_bw 
+		wan_bw_2016.wan_bw
 	from fy2016_districts_deluxe_matr dd
 	left join wan_bw_2016
 	on dd.esh_id = wan_bw_2016.recipient_id
@@ -114,7 +114,7 @@ dist_2017 as (
 comparison as (
 	select
 		dist_2017.esh_id,
-		dist_2016.locale,
+		dist_2017.locale,
 		dist_2017.exclude_from_ia_analysis,
 		case
 			when dist_2017.most_recent_spec_k is null
@@ -153,27 +153,13 @@ comparison as (
 			when dist_2017.ia_monthly_cost_total + dist_2017.wan_monthly_cost_total > (dist_2016.ia_monthly_cost_total + dist_2016.wan_monthly_cost_total) * 1.1
 				then true
 			else false
-		end as spent_10pct_more,
-		dist_2017.ia_monthly_cost_total + dist_2017.wan_monthly_cost_total as monthly_cost_total_2017,
-		dist_2016.ia_monthly_cost_total + dist_2016.wan_monthly_cost_total as monthly_cost_total_2016,	
-		case
-			when dist_2017.unscalable_campuses is null 
-				then dist_2016.unscalable_campuses
-			when dist_2016.unscalable_campuses is null 
-				then -dist_2017.unscalable_campuses
-			else dist_2016.unscalable_campuses - dist_2017.unscalable_campuses
-		end as lost_unscalable_campuses,	
-		case
-			when dist_2017.num_campuses is null 
-				then dist_2016.num_campuses
-			when dist_2016.num_campuses is null or dist_2016.num_campuses - dist_2017.num_campuses < 0 
-				then 0
-			else dist_2016.num_campuses - dist_2017.num_campuses
-		end as lost_campuses,
+		end as spent_10pct_more,	
+		dist_2017.unscalable_campuses,
+		dist_2017.meeting_knapsack_affordability_target,
 		case
 			when dist_2017.wan_bw is null 
 				then false
-			when dist_2017.wan_bw > (dist_2017.wan_bw) * 1.1
+			when dist_2017.wan_bw > (dist_2016.wan_bw) * 1.1
 				then true
 			else false
 		end as wan_bw_10pct_more
@@ -187,13 +173,7 @@ select
 	esh_id,
 	exclude_from_ia_analysis,
 
-	(fiber_target_status_2017 = 'Not Target' or fiber_target_status_2017 is null) as not_target_2017,
-
-	case
-		when fiber_target_status_2016 = 'Target'
-			then true
-		else false
-	end as target_2016,
+	fiber_target_status_2017,
 
 	case
 		when locale in ('Rural', 'Town')
@@ -240,73 +220,16 @@ select
 			then 'esh fiber engagement'
 		else 'unknown'
 	end as mechanisms,
-	  	
-	lost_unscalable_campuses as lost_unscalable_campuses,
-	case
-		when lost_unscalable_campuses < 0
-			then 0
-		when lost_campuses > lost_unscalable_campuses
-			then lost_unscalable_campuses
-		else lost_campuses
-	end as lost_unscalable_campuses_due_to_lost_campuses,
-	case
-		when lost_unscalable_campuses < 0
-			then lost_unscalable_campuses
-		when lost_campuses > lost_unscalable_campuses
-			then 0
-		else lost_unscalable_campuses - lost_campuses
-	end as lost_unscalable_campuses_due_to_reason,
-
+	
 	case
 		when exclude_from_ia_analysis = true
-			then NULL
-		when  monthly_cost_total_2016 > 0
-			then (monthly_cost_total_2017-monthly_cost_total_2016)/monthly_cost_total_2016
-	end as pct_cost_change
+			then 'dirty'
+		when meeting_knapsack_affordability_target
+			then 'IA MRC not restrictive'
+		else 'IA MRC restrictive'
+	end as ia_affordability,
+
+	unscalable_campuses
 
 from comparison
-where lost_unscalable_campuses != 0
-
-	/*case
-	  when esh_id is null
-	  	then 'left universe'
-	  when switcher
-	  	then 'sp switcher'
---	  when change_sps is null or change_sps
---	  	then 'at least 1 sp change'
-	  when upgrade_indicator and spent_10pct_more
-	  	then 'bw upgrade and spent more $'
-	  when upgrade_indicator
-	  	then 'bw upgrade'
-	  when most_recent_spec_k in ('2016', '2017')
-	  	then 'fiber construction 2017 or 2016'
-	  else 'unknown'
-	end as reason_heirarchy,*/
-
-/*	esh_id is null as left_universe,
-	switcher,
-	change_sps,
-	upgrade_indicator,
-	spent_10pct_more,
-	most_recent_spec_k in ('2016', '2017') as spec_k,
-	esh_engaged_fiber_project,
-	meeting_2014_goal_no_oversub_2016,
-	meeting_2014_goal_no_oversub_2017,*/
-
-/*	
-dist_2017.fiber_wan_lines > dist_2016.fiber_wan_lines or
-		dist_2017.lt_1g_nonfiber_wan_lines < dist_2016.lt_1g_nonfiber_wan_lines as more_fiber_less_nonfiber_wan_lines,
-	dist_2017.fiber_internet_upstream_lines > dist_2016.fiber_internet_upstream_lines as more_fiber_internet_lines,
-		dist_2017.fixed_wireless_internet_upstream_lines + dist_2017.cable_internet_upstream_lines +
-			dist_2017.copper_internet_upstream_lines + dist_2017.satellite_lte_internet_upstream_lines < 
-				dist_2016.fixed_wireless_internet_upstream_lines + dist_2016.cable_internet_upstream_lines +
-					dist_2016.copper_internet_upstream_lines + dist_2016.satellite_lte_internet_upstream_lines
-					as less_nonfiber_internet_lines,
-dist_2017.wan_monthly_cost_total + dist_2017.ia_monthly_cost_total > 
-		(dist_2016.wan_monthly_cost_total + dist_2016.ia_monthly_cost_total) * 1.1 as more_money_spent_on_services,
-	manually_tagged_target,
-	dist_2017.num_campuses < dist_2016.num_campuses as less_campuses,
-
-and dist_2017.exclude_from_ia_analysis = false
-
-*/
+where unscalable_campuses > 0
