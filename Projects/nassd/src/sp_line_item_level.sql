@@ -14,12 +14,18 @@ case
   then 'District Owned'
   else 'Regular'
 end as service_provider_assignment_type,
+case
+  when reporting_name in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
+  then 1
+  else null end
+as sots_2016_service_provider,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
 monthly_circuit_cost_total,
 contract_end_date,
 connect_category,
 bandwidth_in_mbps,
+purpose,
 case
   when monthly_circuit_cost_total = 0
   then null
@@ -35,7 +41,6 @@ on dd.esh_id = sr.recipient_id
 where sr.inclusion_status like 'clean%'
 and dd.district_type = 'Traditional'
 and dd.include_in_universe_of_districts = true
-and (purpose = 'Internet' or purpose = 'Upstream')
 and reporting_name != ''
 and bandwidth_in_mbps > 0
 
@@ -48,7 +53,8 @@ monthly_circuit_cost_total,
 contract_end_date,
 bandwidth_in_mbps,
 months_of_service,
-connect_category
+connect_category,
+purpose
 
 union
 
@@ -68,12 +74,18 @@ case
   then 'District Owned'
   else 'Regular'
 end as service_provider_assignment_type,
+case
+  when reporting_name in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
+  then 1
+  else null end
+as sots_2016_service_provider,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
 monthly_circuit_cost_total,
 contract_end_date,
 connect_category,
 bandwidth_in_mbps,
+purpose,
 case
   when monthly_circuit_cost_total = 0
   then null
@@ -89,9 +101,9 @@ on dd.esh_id = sr.recipient_id
 where sr.inclusion_status like 'clean%'
 and dd.district_type = 'Traditional'
 and dd.include_in_universe_of_districts = true
-and (purpose = 'Internet' or purpose = 'Upstream')
 and line_item_id != 873578 /* removing line item that goes to OK and TX districts */
 and reporting_name != ''
+and bandwidth_in_mbps > 0
 
 group by line_item_id,
 reporting_name,
@@ -102,4 +114,5 @@ contract_end_date,
 connect_category,
 bandwidth_in_mbps,
 months_of_service,
-line_item_total_num_lines
+line_item_total_num_lines,
+purpose
