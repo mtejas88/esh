@@ -32,16 +32,35 @@ source_env_Mirror <- function(path){
   }
   
   ## assign username for DB if available
-  if (Sys.getenv("S_USER") != ""){
+  if (Sys.getenv("P_USER") != ""){
     assign("p_user", Sys.getenv("P_USER"), envir=.GlobalEnv)
   }
   
   ## assign password for DB if available
-  if (Sys.getenv("S_PASSWORD") != ""){
+  if (Sys.getenv("P_PASSWORD") != ""){
     assign("p_password", Sys.getenv("P_PASSWORD"), envir=.GlobalEnv)
   }
 }
 source_env_Mirror("~/.env")
+
+source_env_Test <- function(path){
+  load_dot_env(path)
+  ## assign url for DB if available
+  if (Sys.getenv("T_URL") != ""){
+    assign("t_url", Sys.getenv("T_URL"), envir=.GlobalEnv)
+  }
+  
+  ## assign username for DB if available
+  if (Sys.getenv("T_USER") != ""){
+    assign("t_user", Sys.getenv("T_USER"), envir=.GlobalEnv)
+  }
+  
+  ## assign password for DB if available
+  if (Sys.getenv("T_PASSWORD") != ""){
+    assign("t_password", Sys.getenv("T_PASSWORD"), envir=.GlobalEnv)
+  }
+}
+source_env_Test("~/.env")
 
 source("sql_script_builder.R")
 
@@ -70,7 +89,6 @@ querydb <- function(query_name) {
 
 ## execute function
 executedb <- function(script_name) {
-  print("made it into the execute block")
   query <- readChar(script_name, file.info(script_name)$size)
   data <- dbExecute(con, query)
   return(data)
@@ -85,16 +103,9 @@ outlier_use_cases <- querydb("../sql/retrieve_use_cases.SQL")
 
 new_use_cases <- data.frame("outlier_use_case_cd"=setdiff(master_output$outlier_use_case_cd,outlier_use_cases$outlier_use_case_cd))
 
-print(paste0("length of use cases is...",length(new_use_cases$outlier_use_case_cd)))
-
 if (length(new_use_cases$outlier_use_case_cd) != 0){
-  print("New Use Cases Found:")
- # print(new_use_cases)
-
 
   dml_script <- dml_builder(new_use_cases,"insert","outlier_use_cases" )
-#  print("Running the following command")
-#  print(dml_script)
 
   fileConn<-file(paste0("../sql/insert_outlier_use_case_", Sys.Date(), ".SQL"))
   writeLines(dml_script, fileConn)
@@ -106,46 +117,35 @@ if (length(new_use_cases$outlier_use_case_cd) != 0){
 
 
 insert_error <- tryCatch(dbExecute(con,dml_script),error=function(e) e)
-#print(lines_inserted)
 
 
 ## Look for new Outlier Use Cases
-print("Loading use case detail candidates")
 load_script <- load_candidate_details(master_output,"outlier_use_case_details")
 
-print("Writing Script to file")
 scriptName <- paste0("../sql/create_temp_outlier_use_case_detail", Sys.Date(), ".SQL")
 fileConn<-file(scriptName)
 writeLines(load_script, fileConn, sep = "\n")
 close(fileConn)
 
-print("Running Load Script")
 insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
 
-print("Determining New Use Cases")
 new_use_case_detail_script <- find_new_cases("outlier_use_case_details")
-#print(new_use_case_detail_script)
 
-print("Writing new use cases sql file")
 queryName <- paste0("../sql/retrieve_new_use_case_details_", Sys.Date(), ".SQL")
 fileConn<-file(queryName)
 writeLines(new_use_case_detail_script, fileConn, sep = "\n")
 close(fileConn)
 
-print("Running new use case finder")
 new_outlier_use_case_details <- querydb(queryName)
 new_outlier_use_case_details <- unique(new_outlier_use_case_details)
 
 
-print("Inserting New Outlier Use Case Details:")
+#print("Inserting New Outlier Use Case Details:")
 if (length(new_outlier_use_case_details$outlier_use_case_id) != 0){
-  print("New Use Cases Found:")
- # print(new_outlier_use_case_details)
 
 
   dml_script_outlier_use_case_details <- dml_builder(new_outlier_use_case_details,"insert","outlier_use_case_details" )
-  print("Running the following command")
-  #print(dml_script_outlier_use_case_details)
+
 
   fileConn<-file(paste0("../sql/insert_outlier_use_case_details_", Sys.Date(), ".SQL"))
   writeLines(dml_script_outlier_use_case_details, fileConn)
@@ -159,45 +159,34 @@ insert_error <- tryCatch(dbExecute(con,dml_script_outlier_use_case_details),erro
 dml_script_outlier_use_case_details=NULL
 
 ## Look for outliers to upsert
-print("Loading use case detail candidates")
 load_script <- load_candidate_details(master_output,"outliers")
 
-print("Writing Script to file")
 scriptName <- paste0("../sql/create_temp_outlier_", Sys.Date(), ".SQL")
 
 fileConn<-file(scriptName)
 writeLines(load_script, fileConn, sep = "\n")
 close(fileConn)
 
-print("Running Load Script")
+
 insert_error <- tryCatch(executedb(scriptName),error=function(e) e)
 
-print("Determining New Use Cases")
 new_outliers_script <- find_new_cases("outliers")
 
-print("Writing new use cases sql file")
 queryName <- paste0("../sql/retrieve_new_outliers_", Sys.Date(), ".SQL")
 fileConn<-file(queryName)
 writeLines(new_outliers_script, fileConn, sep = "\n")
 close(fileConn)
 
-print("Running new use case finder")
 new_outliers <- querydb(queryName)
 new_outliers <- unique(new_outliers)
 
 
-print("Inserting New Outliers:")
 if (length(new_outliers$outlier_use_case_detail_id) != 0){
-  print("New Use Cases Found:")
-  #print(new_outliers)
 
   update_ids <- new_outliers[which(new_outliers$outlier_action =="update"),c("outlier_id")]
   update_ids <- unique(update_ids)
 
-  print("Endating existing outliers for updates")
   if(length(update_ids) !=0){
-    print("Outliers Id's for update...")
-   # print(update_ids)
     dml_script_outliers_for_update <- dml_builder(update_ids,"update","outliers" )
 
     fileConn<-file(paste0("../sql/update_outliers_", Sys.Date(), ".SQL"))
@@ -210,10 +199,7 @@ if (length(new_outliers$outlier_use_case_detail_id) != 0){
     print("No updates")
   }
 
-  print("Inserting new outliers")
   dml_script_outliers <- dml_builder(new_outliers,"insert","outliers" )
-  print("Running the following command")
-  #print(dml_script_outliers)
 
   fileConn<-file(paste0("../sql/insert_outliers_", Sys.Date(), ".SQL"))
   writeLines(dml_script_outliers, fileConn)
@@ -251,12 +237,6 @@ dml_script_tableaul_for_update=NULL
 dml_script_tableaul_for_insert <- dml_builder(li_distributions,"insert","tableau_line_item" )
 insert_error <- tryCatch(dbExecute(con,dml_script_tableaul_for_insert),error=function(e) e)
 dml_script_tableaul_for_insert=NULL
-
-# con <- dbConnect(pgsql, url=p_url, user=p_user, password=p_password)
-# # table=dbGetQuery(con,"select*from outliers")
-# delete_error <- tryCatch(dbSendUpdate(con,"delete from public.outliers where outlier_id in (1861,1862,1863)"),error=function(e) e)
-# oucd=dbGetQuery(con,"select*from outlier_use_case_details")
-# ouc=dbGetQuery(con,"select*from outlier_use_cases")
 
 # disconnect from database  
 dbDisconnect(con)

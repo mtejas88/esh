@@ -1,0 +1,5 @@
+insert into outlier_use_case_details (outlier_use_case_id,use_case_name,outlier_use_case_params,outlier_test_case_params,create_dt)
+      values(3,'Change in Total Monthly Cost','"district_size"=>"Small", "district_state"=>"GA", "district_locale"=>"Town"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"change_in_cost_tot", "significance_level"=>"0.05"',current_timestamp),
+(6,'% Change in BW','"district_size"=>"Small", "district_state"=>"MS", "district_locale"=>"Rural"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"change_in_bw_pct", "significance_level"=>"0.05"',current_timestamp),
+(3,'Change in Total Monthly Cost','"district_size"=>"Small", "district_state"=>"MS", "district_locale"=>"Rural"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"change_in_cost_tot", "significance_level"=>"0.05"',current_timestamp),
+(7,'BW per Student','"district_size"=>"Small", "district_state"=>"MS", "district_locale"=>"Rural"','"outlier_id_type"=>"esh_id", "outlier_value_type"=>"ia_bandwidth_per_student_kbps", "significance_level"=>"0.05"',current_timestamp);
