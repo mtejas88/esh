@@ -9,16 +9,34 @@ case
         'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
         'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
         'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+    
+
   then 'Consortia'
   when reporting_name = 'District Owned'
   then 'District Owned'
+  when reporting_name is null
+  then null
   else 'Regular'
 end as service_provider_assignment_type,
 case
   when reporting_name in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
-  then 1
-  else null end
+  then true
+  else false end
 as sots_2016_service_provider,
+case
+  when reporting_name in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+  then true 
+  else false 
+end as consortia_service_provider,
+case
+  when reporting_name = 'District Owned'
+  then true
+  else false end
+as district_owned_service_provider,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
 monthly_circuit_cost_total,
@@ -69,16 +87,34 @@ case
         'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
         'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
         'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+    
+
   then 'Consortia'
   when reporting_name = 'District Owned'
   then 'District Owned'
+  when reporting_name is null
+  then null
   else 'Regular'
 end as service_provider_assignment_type,
 case
   when reporting_name in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
-  then 1
-  else null end
+  then true
+  else false end
 as sots_2016_service_provider,
+case
+  when reporting_name in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+  then true 
+  else false 
+end as consortia_service_provider,
+case
+  when reporting_name = 'District Owned'
+  then true
+  else false end
+as district_owned_service_provider,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
 monthly_circuit_cost_total,
