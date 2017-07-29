@@ -14,7 +14,7 @@ resource_files:
 - data/connectivity_targets.csv
 - data/fiber_targets.csv
 - data/wifi_click_through.csv
-#- data/snapshots.csv
+- data/snapshots.csv
 - data/tool_colors.csv
 - data/date.csv
 
@@ -67,10 +67,10 @@ wifi_ct <- read.csv("data/wifi_click_through.csv", as.is=T, header=T, stringsAsF
 ## targets
 connectivity_tar <- read.csv("data/connectivity_targets.csv", as.is=T, header=T, stringsAsFactors=F)
 fiber_tar <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFactors=F)
-
+## snapshots
+snapshots <- read.csv("data/snapshots.csv", as.is=T, header=T, stringsAsFactors=F)
 ## color data
 colors <- suppressWarnings(read.csv("data/tool_colors.csv", as.is=T, header=T, stringsAsFactors=F))
-
 ## date
 date.updated <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
 date.updated <- date.updated$date
@@ -148,18 +148,16 @@ Row
 state.agg.2017$postal_cd <- as.character(state.agg.2017$postal_cd)
 selectInput('state', label="", choices=unique(state.agg.2017$postal_cd), selected="ALL")
 
-#output$downloadData <- downloadHandler(
-#  filename = function() {"data/snapshots.csv"},
-#  content = function(file) {
-#  write.csv(snapshots, file, row.names=F)
-#  })
-#downloadLink('downloadData', label = 'Download State Snapshot Data')
-
-## paste below outside of this box when want to add the snapshot download
-#***
-#NOTE: Underlying Data Download will pull state metrics spreadsheet for all 50 states.
+output$downloadData <- downloadHandler(
+  filename = function() {"data/snapshots.csv"},
+  content = function(file) {
+  write.csv(snapshots, file, row.names=F)
+  })
+downloadLink('downloadData', label = 'Download State Snapshot Data')
 ```
 
+***
+NOTE: Underlying Data Download will pull state metrics spreadsheet for all 50 states.
 
 
 ### [SotS 2015: % Clean Districts](#deep-dive-sots15)
