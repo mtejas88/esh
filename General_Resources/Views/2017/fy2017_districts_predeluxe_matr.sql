@@ -60,65 +60,40 @@ select distinct
 
 	case
 
-	    when
-	    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
-	    (flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	    (flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%'
-	    and array_to_string(flag_array,',') ilike '%dirty_wan%')
-	    or flag_array is null  -- adding flag arrray null logic
-	    /*              (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags
-	            and ia_bandwidth_per_student_kbps > 0
-	            then false
-	        else true
+	    when 
+			(   (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
+			    (flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_services_wan%') or
+			    (flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%' and array_to_string(flag_array,',') ilike '%dirty_services_wan%') or
+		        flag_array is null
+		    )  
+	        and ia_bandwidth_per_student_kbps > 0
+	    then false
+	    else true
 	    end as exclude_from_ia_analysis,
 
-
-
 	case
-
-	when
-
-	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
-	(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-	(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%')
-	and (array_to_string(flag_array,',') ilike '%dirty_wan%')
- or flag_array is null  -- adding flag arrray null logic
-
-		/*when 	(flag_array is null or
-				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))*/ -- new changes based on flags
-
-				and ia_no_cost_lines = 0
-
-				and ia_bandwidth > 0
-
-			then false
-
+		when
+			(	(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
+				(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_services_wan%') or
+				(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%' and array_to_string(flag_array,',') ilike '%dirty_services_wan%') or
+	 			flag_array is null  
+	 		)
+			and ia_no_cost_lines = 0
+			and ia_bandwidth_per_student_kbps > 0
+		then false
 		else true
-
 	end as exclude_from_ia_cost_analysis,
 
 	case
-
-		when 	flag_array is null
-
-			then false
-
+		when flag_array is null
+		then false
 		else true
-
 	end as exclude_from_wan_analysis,
 
 	case
-
-		when 	flag_array is null
-
-				and wan_no_cost_lines = 0
-
-				and wan_lines_w_dirty > 0
-
-			then false
-
+		when flag_array is null and wan_no_cost_lines = 0 and wan_lines_w_dirty > 0
+		then false
 		else true
-
 	end as exclude_from_wan_cost_analysis,
 
 	include_in_universe_of_districts,
@@ -133,39 +108,20 @@ select distinct
 
 	case
 
-when
-			(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%') or
-			(flag_count = 1 and array_to_string(flag_array,',') ilike '%dirty_wan%') or
-			(flag_count = 2 and array_to_string(flag_array,',') ilike '%missing_wan%')
-			and (array_to_string(flag_array,',') ilike '%dirty_wan%')
-     or flag_array is null  -- adding flag arrray null logic
-				/*flag_count = 1 and array_to_string(flag_array,',')
-				ilike '%missing_wan%')-- commenting out due to new flag logic (see above)*/
-
-			then 'dirty'
-
+		when flag_count > 1
+		 	or (flag_count = 1 and array_to_string(flag_array,',') not ilike '%missing_wan%')	
+		then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
-
 			then  'outreach_confirmed'
-
 		when 'line_items_outreach_confirmed' = any(tag_array)
-
 			then 'line_items_outreach_confirmed'
-
 		when 'outreach_confirmed_auto' = any(tag_array)
-
 			then 'line_items_verified'
-
 		when 'dqt_reviewed' = any(tag_array)
-
 			then 'dqt_reviewed'
-
 		when machine_cleaned_lines > 0
-
 			then 'machine_cleaned'
-
 		else 'natively_clean'
-
 	end as clean_categorization,
 
 	ia_bandwidth_per_student_kbps,
@@ -457,7 +413,7 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 7/5/2017 -- JH added wifi target status
+Last Modified Date: 7/28/2017 -- JMB fixing dirty_wan flag name, changing exclude_from_ia_cost_analysis to have same bw/student rule, fixing clean_categorization
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:
