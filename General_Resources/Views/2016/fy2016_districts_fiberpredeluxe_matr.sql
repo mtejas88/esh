@@ -260,7 +260,7 @@ select distinct
 	case when dspa.primary_sp_purpose is not null and d15.primary_sp_purpose is not null 
 	and dspa.primary_sp_purpose::varchar=d15.primary_sp_purpose::varchar then 'Same' 
 	when dspa.primary_sp_purpose is not null and d15.primary_sp_purpose is not null
-	and dspa.primary_sp_purpose::varchar!=d15.primary_sp_purpose::varchar 'Different' 
+	and dspa.primary_sp_purpose::varchar!=d15.primary_sp_purpose::varchar then 'Different' 
 	end as purpose_match, 
 	case when dspa.reporting_name is not null and d15.service_provider_assignment is not null
 	and dspa.reporting_name=d15.service_provider_assignment or ((d15.service_provider_assignment=gsp.service_provider_2015
