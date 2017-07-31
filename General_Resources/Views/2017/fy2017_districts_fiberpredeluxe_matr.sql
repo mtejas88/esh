@@ -529,7 +529,7 @@ select distinct
 
 	dspa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth,
 
-	case when dspa.service_provider_assignment!=d16.service_provider_assignment then 'Switched' else 'Did Not Switch' end as switcher
+	case when dspa.reporting_name!=d16.service_provider_assignment then 'Switched' else 'Did Not Switch' end as switcher
 
 
 
