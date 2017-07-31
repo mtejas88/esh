@@ -31,7 +31,9 @@ select
    dd.fiber_target_status as district_fiber_target_status,
    dd.bw_target_status as district_bw_target_status,
    case
-   		when dd.exclude_from_ia_analysis = false 
+   		--exclude districts that are dirty unless the only flag is 'DQT_VETO'
+   		--these should be excluded still at a district level, but are fine at the campus level
+   		when (dd.exclude_from_ia_analysis = false or dd.flag_array = 'dqt_veto')
    		--exclude campuses with no bandwidth
    		and sm.ia_bandwidth_per_student_kbps > 0
    		--exclude campuses with only ISP
