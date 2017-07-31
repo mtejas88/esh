@@ -5,67 +5,67 @@ select distinct
 
 	dpd.esh_id,
 
-	nces_cd,
+	dpd.nces_cd,
 
-	name,
+	dpd.name,
 
-	union_code,
+	dpd.union_code,
 
-	state_senate_district,
+	dpd.state_senate_district,
 
-	state_assembly_district,
+	dpd.state_assembly_district,
 
-	ulocal,
+	dpd.ulocal,
 
-	locale,
+	dpd.locale,
 
-	district_size,
+	dpd.district_size,
 
-	ia_oversub_ratio,
+	dpd.ia_oversub_ratio,
 
-	district_type,
+	dpd.district_type,
 
-	num_schools,
+	dpd.num_schools,
 
-	num_campuses,
+	dpd.num_campuses,
 
-	num_students,
+	dpd.num_students,
 
-	num_teachers,
+	dpd.num_teachers,
 
-	num_aides,
+	dpd.num_aides,
 
-	num_other_staff,
+	dpd.num_other_staff,
 
-	frl_percent,
+	dpd.frl_percent,
 
-	discount_rate_c1,
+	dpd.discount_rate_c1,
 
-	discount_rate_c1_matrix,
+	dpd.discount_rate_c1_matrix,
 
-	discount_rate_c2,
+	dpd.discount_rate_c2,
 
-	address,
+	dpd.address,
 
-	city,
+	dpd.city,
 
-	zip,
+	dpd.zip,
 
-	county,
+	dpd.county,
 
 	dpd.postal_cd,
 
-	latitude,
+	dpd.latitude,
 
-	longitude,
+	dpd.longitude,
 
 	dpd.exclude_from_ia_analysis,
 
-	exclude_from_ia_cost_analysis,
+	dpd.exclude_from_ia_cost_analysis,
 
 	dpd.exclude_from_wan_analysis,
 
-	exclude_from_wan_cost_analysis,
+	dpd.exclude_from_wan_cost_analysis,
 
 	case
 
@@ -125,7 +125,7 @@ select distinct
 
 	    	then 'dirty_not_target'
 
-	    when  current_known_unscalable_campuses + current_assumed_unscalable_campuses = 0
+	    when  dpd.current_known_unscalable_campuses + dpd.current_assumed_unscalable_campuses = 0
 
 	    	  and dpd.exclude_from_ia_analysis = false
 
@@ -151,63 +151,63 @@ select distinct
 
 	end as fiber_metric_status,
 
-	include_in_universe_of_districts,
+	dpd.include_in_universe_of_districts,
 
-	include_in_universe_of_districts_all_charters,
+	dpd.include_in_universe_of_districts_all_charters,
 
-	flag_array,
+	dpd.flag_array,
 
-	tag_array,
+	dpd.tag_array,
 
-	num_open_district_flags,
+	dpd.num_open_district_flags,
 
-	clean_categorization,
+	dpd.clean_categorization,
 
-	ia_bandwidth_per_student_kbps,
+	dpd.ia_bandwidth_per_student_kbps,
 
-	meeting_2014_goal_no_oversub,
+	dpd.meeting_2014_goal_no_oversub,
 
-	meeting_2014_goal_oversub,
+	dpd.meeting_2014_goal_oversub,
 
-	meeting_2014_goal_no_oversub_fcc_25,
+	dpd.meeting_2014_goal_no_oversub_fcc_25,
 
-	meeting_2018_goal_no_oversub,
+	dpd.meeting_2018_goal_no_oversub,
 
-	meeting_2018_goal_oversub,
+	dpd.meeting_2018_goal_oversub,
 
-	meeting_2018_goal_no_oversub_fcc_25,
+	dpd.meeting_2018_goal_no_oversub_fcc_25,
 
-	at_least_one_line_not_meeting_broadband_goal,
+	dpd.at_least_one_line_not_meeting_broadband_goal,
 
-	ia_monthly_cost_per_mbps,
+	dpd.ia_monthly_cost_per_mbps,
 
-	ia_bw_mbps_total,
+	dpd.ia_bw_mbps_total,
 
-	ia_monthly_cost_total,
+	dpd.ia_monthly_cost_total,
 
-	ia_monthly_cost_direct_to_district,
+	dpd.ia_monthly_cost_direct_to_district,
 
-	ia_monthly_cost_shared,
+	dpd.ia_monthly_cost_shared,
 
-	wan_monthly_cost_per_line,
+	dpd.wan_monthly_cost_per_line,
 
-	wan_monthly_cost_total,
+	dpd.wan_monthly_cost_total,
 
-	meeting_3_per_mbps_affordability_target,
+	dpd.meeting_3_per_mbps_affordability_target,
 
 	case
 
-		when ia_bw_mbps_total::integer > 0
+		when dpd.ia_bw_mbps_total::integer > 0
 
-			then affordability_calculator(ia_monthly_cost_total::integer, ia_bw_mbps_total::integer)
+			then affordability_calculator(dpd.ia_monthly_cost_total::integer, dpd.ia_bw_mbps_total::integer)
 
 		else false
 
 	end as meeting_knapsack_affordability_target,
 
-	hierarchy_ia_connect_category,
+	dpd.hierarchy_ia_connect_category,
 
-	all_ia_connectcat,
+	dpd.all_ia_connectcat,
 
 	case
 
@@ -215,23 +215,23 @@ select distinct
 
 	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses = 0
+	              dpd.current_assumed_unscalable_campuses = 0
 
-	          and non_fiber_lines > 0
+	          and dpd.non_fiber_lines > 0
 
 	    then 0
 
 	  when    dpd.exclude_from_ia_analysis = false
 
-	          and fiber_target_status = 'Target'
+	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses > 0
+	              dpd.current_assumed_unscalable_campuses > 0
 
-	  	then current_known_scalable_campuses
+	  	then dpd.current_known_scalable_campuses
 
 	  when fbts.fiber_target_status in ('Target', 'No Data')
 
@@ -241,7 +241,7 @@ select distinct
 
 	    then 0
 
-	  else current_known_scalable_campuses
+	  else dpd.current_known_scalable_campuses
 
 	end as current_known_scalable_campuses,
 
@@ -251,53 +251,53 @@ select distinct
 
 	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses = 0
+	              dpd.current_assumed_unscalable_campuses = 0
 
-	          and non_fiber_lines > 0
+	          and dpd.non_fiber_lines > 0
 
 	    then 	case
 
-		    		when non_fiber_lines > num_campuses
+		    		when dpd.non_fiber_lines > dpd.num_campuses
 
 		    			then 0
 
-		    		else num_campuses - non_fiber_lines
+		    		else dpd.num_campuses - dpd.non_fiber_lines
 
 		    	end
 
 	  when    dpd.exclude_from_ia_analysis = false
 
-	          and fiber_target_status = 'Target'
+	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses > 0
+	              dpd.current_assumed_unscalable_campuses > 0
 
-	  	then  current_assumed_scalable_campuses
+	  	then  dpd.current_assumed_scalable_campuses
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data')
 
-	          and num_campuses = 1
+	          and dpd.num_campuses = 1
 
 	    then 0
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data')
 
-	          and num_campuses = 2
+	          and dpd.num_campuses = 2
 
 	    then 1
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data')
 
-	    then num_campuses::numeric * .66
+	    then dpd.num_campuses::numeric * .66
 
 	  when fbts.fiber_target_status = 'Not Target'
 
-	    then num_campuses
+	    then dpd.num_campuses
 
-	  else current_assumed_scalable_campuses
+	  else dpd.current_assumed_scalable_campuses
 
 	end as current_assumed_scalable_campuses,
 
@@ -307,29 +307,29 @@ select distinct
 
 	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses = 0
+	              dpd.current_assumed_unscalable_campuses = 0
 
-	          and non_fiber_lines > 0
+	          and dpd.non_fiber_lines > 0
 
 	    then 0
 
 	  when    dpd.exclude_from_ia_analysis = false
 
-	          and fiber_target_status = 'Target'
+	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses > 0
+	              dpd.current_assumed_unscalable_campuses > 0
 
-	  	then  current_known_unscalable_campuses
+	  	then  dpd.current_known_unscalable_campuses
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data', 'Not Target')
 
 	    then 0
 
-	  else current_known_unscalable_campuses
+	  else dpd.current_known_unscalable_campuses
 
 	end as current_known_unscalable_campuses,
 
@@ -339,165 +339,165 @@ select distinct
 
 	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses = 0
+	              dpd.current_assumed_unscalable_campuses = 0
 
-	          and non_fiber_lines > 0
+	          and dpd.non_fiber_lines > 0
 
 	    then 	case
 
-		    		when non_fiber_lines > num_campuses
+		    		when dpd.non_fiber_lines > dpd.num_campuses
 
-		    			then num_campuses
+		    			then dpd.num_campuses
 
-		    		else non_fiber_lines
+		    		else dpd.non_fiber_lines
 
 		    	end
 
 	  when    dpd.exclude_from_ia_analysis = false
 
-	          and fiber_target_status = 'Target'
+	          and fbts.fiber_target_status = 'Target'
 
-	          and current_known_unscalable_campuses +
+	          and dpd.current_known_unscalable_campuses +
 
-	              current_assumed_unscalable_campuses > 0
+	              dpd.current_assumed_unscalable_campuses > 0
 
-	  	then  current_assumed_unscalable_campuses
+	  	then  dpd.current_assumed_unscalable_campuses
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data')
 
-	          and num_campuses in (1,2)
+	          and dpd.num_campuses in (1,2)
 
 	    then 1
 
 	  when    fbts.fiber_target_status in ('Target', 'No Data')
 
-	    then num_campuses::numeric * .34
+	    then dpd.num_campuses::numeric * .34
 
 	  when fbts.fiber_target_status = 'Not Target'
 
 	    then 0
 
-	  else current_assumed_unscalable_campuses
+	  else dpd.current_assumed_unscalable_campuses
 
 	end as current_assumed_unscalable_campuses,
 
-	sots_known_scalable_campuses,
+	dpd.sots_known_scalable_campuses,
 
-	sots_assumed_scalable_campuses,
+	dpd.sots_assumed_scalable_campuses,
 
-	sots_known_unscalable_campuses,
+	dpd.sots_known_unscalable_campuses,
 
-	sots_assumed_unscalable_campuses,
+	dpd.sots_assumed_unscalable_campuses,
 
-	fiber_internet_upstream_lines,
+	dpd.fiber_internet_upstream_lines,
 
-	fixed_wireless_internet_upstream_lines,
+	dpd.fixed_wireless_internet_upstream_lines,
 
-	cable_internet_upstream_lines,
+	dpd.cable_internet_upstream_lines,
 
-	copper_internet_upstream_lines,
+	dpd.copper_internet_upstream_lines,
 
-	satellite_lte_internet_upstream_lines,
+	dpd.satellite_lte_internet_upstream_lines,
 
-	uncategorized_internet_upstream_lines,
+	dpd.uncategorized_internet_upstream_lines,
 
-	wan_lines,
+	dpd.wan_lines,
 
-	wan_bandwidth_low,
+	dpd.wan_bandwidth_low,
 
-	wan_bandwidth_high,
+	dpd.wan_bandwidth_high,
 
-	gt_1g_wan_lines,
+	dpd.gt_1g_wan_lines,
 
-	lt_1g_fiber_wan_lines,
+	dpd.lt_1g_fiber_wan_lines,
 
-	lt_1g_nonfiber_wan_lines,
+	dpd.lt_1g_nonfiber_wan_lines,
 
-    consortium_affiliation,
+    dpd.consortium_affiliation,
 
-    ia_procurement_type,
+    dpd.ia_procurement_type,
 
-	ia_applicants,
+	dpd.ia_applicants,
 
-	dedicated_isp_sp,
+	dpd.dedicated_isp_sp,
 
-	dedicated_isp_services,
+	dpd.dedicated_isp_services,
 
-	dedicated_isp_contract_expiration,
+	dpd.dedicated_isp_contract_expiration,
 
-	bundled_internet_sp,
+	dpd.bundled_internet_sp,
 
-	bundled_internet_services,
+	dpd.bundled_internet_services,
 
-	bundled_internet_contract_expiration,
+	dpd.bundled_internet_contract_expiration,
 
-	upstream_sp,
+	dpd.upstream_sp,
 
-	upstream_services,
+	dpd.upstream_services,
 
-	upstream_contract_expiration,
+	dpd.upstream_contract_expiration,
 
-	wan_applicants,
+	dpd.wan_applicants,
 
-	wan_sp,
+	dpd.wan_sp,
 
-	wan_services,
+	dpd.wan_services,
 
-	wan_contract_expiration,
+	dpd.wan_contract_expiration,
 
-	non_fiber_lines,
+	dpd.non_fiber_lines,
 
-    non_fiber_lines_w_dirty,
+    dpd.non_fiber_lines_w_dirty,
 
-    non_fiber_internet_upstream_lines_w_dirty,
+    dpd.non_fiber_internet_upstream_lines_w_dirty,
 
-    fiber_internet_upstream_lines_w_dirty,
+    dpd.fiber_internet_upstream_lines_w_dirty,
 
-    fiber_wan_lines_w_dirty,
+    dpd.fiber_wan_lines_w_dirty,
 
-	lines_w_dirty,
+	dpd.lines_w_dirty,
 
-	line_items_w_dirty,
+	dpd.line_items_w_dirty,
 
-	fiber_wan_lines,
+	dpd.fiber_wan_lines,
 
-	most_recent_ia_contract_end_date,
+	dpd.most_recent_ia_contract_end_date,
 
-	wan_lines_w_dirty,
+	dpd.wan_lines_w_dirty,
 
-  	ia_monthly_cost_no_backbone,
+  	dpd.ia_monthly_cost_no_backbone,
 
-  	(ia_monthly_cost_total - ia_monthly_cost_no_backbone) as backbone_monthly_cost,
+  	(dpd.ia_monthly_cost_total - dpd.ia_monthly_cost_no_backbone) as backbone_monthly_cost,
 
-	needs_wifi,
+	dpd.needs_wifi,
 
-	c2_prediscount_budget_15,
+	dpd.c2_prediscount_budget_15,
 
-	c2_prediscount_remaining_15,
+	dpd.c2_prediscount_remaining_15,
 
-	c2_prediscount_remaining_16,
+	dpd.c2_prediscount_remaining_16,
 
-	c2_prediscount_remaining_17,
+	dpd.c2_prediscount_remaining_17,
 
-	c2_postdiscount_remaining_15,
+	dpd.c2_postdiscount_remaining_15,
 
-	c2_postdiscount_remaining_16,
+	dpd.c2_postdiscount_remaining_16,
 
-	c2_postdiscount_remaining_17,
+	dpd.c2_postdiscount_remaining_17,
 
-	received_c2_15,
+	dpd.received_c2_15,
 
-	received_c2_16,
+	dpd.received_c2_16,
 
-	received_c2_17,
+	dpd.received_c2_17,
 
-	budget_used_c2_15,
+	dpd.budget_used_c2_15,
 
-	budget_used_c2_16,
+	dpd.budget_used_c2_16,
 
-	budget_used_c2_17,
+	dpd.budget_used_c2_17,
 
 	fbts.fiber_target_status,
 
@@ -515,11 +515,11 @@ select distinct
 
   	end as upgrade_indicator,
 
-	ia_monthly_cost_district_applied,
+	dpd.ia_monthly_cost_district_applied,
 
-	ia_monthly_cost_other_applied,
+	dpd.ia_monthly_cost_other_applied,
 
-	ia_monthly_funding_total,
+	dpd.ia_monthly_funding_total,
 
 	dspa.reporting_name as service_provider_assignment,
 
