@@ -8,11 +8,11 @@ dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
 case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 'Rural & Town' 
-	when dd.locale = 'Urban' or dd.locale = 'Suburban'
-	then 'Urban & Suburban'
-	else null
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 'Rural & Town' 
+  when dd.locale = 'Urban' or dd.locale = 'Suburban'
+  then 'Urban & Suburban'
+  else null
 end as locale_2,
 dd.district_size,
 dd.frl_percent,
@@ -118,14 +118,14 @@ case
   else null
 end as needs_wifi,
 case
-	when dd.c2_prediscount_budget_15 = 0
-	then null
-	else (dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15
+  when dd.c2_prediscount_budget_15 = 0
+  then null
+  else (dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15
 end as percent_c2_budget_used,
 case 
-	when dd.c2_prediscount_budget_15 = 0
-	then null
-	else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) 
+  when dd.c2_prediscount_budget_15 = 0
+  then null
+  else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) 
 end as percent_c2_budget_remaining,
 dd.c2_prediscount_remaining_16 as c2_prediscount_remaining,
 dd.c2_postdiscount_remaining_16 as c2_postdiscount_remaining,
@@ -208,22 +208,7 @@ end as cohort_16_to_17_connectivity,
 -- SWITCHER
 
 -- SERVICE PROVIDER
-dd.service_provider_assignment,
-case
-  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
-        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
-        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
-        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
-        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
-    
-
-  then 'Consortia'
-  when dd.service_provider_assignment = 'District Owned'
-  then 'District Owned'
-  when dd.service_provider_assignment is null
-  then null
-  else 'Regular'
-end as service_provider_assignment_type
+    dd.service_provider_assignment
 
 from public.fy2016_districts_deluxe_matr dd
 left join public.fy2015_districts_deluxe_m d
@@ -247,11 +232,11 @@ dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
 case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 'Rural & Town' 
-	when dd.locale = 'Urban' or dd.locale = 'Suburban'
-	then 'Urban & Suburban'
-	else null
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 'Rural & Town' 
+  when dd.locale = 'Urban' or dd.locale = 'Suburban'
+  then 'Urban & Suburban'
+  else null
 end as locale_2,
 dd.district_size,
 dd.frl_percent,
@@ -448,22 +433,7 @@ end as cohort_16_to_17_connectivity,
 -- SWITCHER
 
 -- SERVICE PROVIDER
-dd.service_provider_assignment,
-case
-  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
-        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
-        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
-        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
-        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
-    
-
-  then 'Consortia'
-  when dd.service_provider_assignment = 'District Owned'
-  then 'District Owned'
-  when dd.service_provider_assignment is null
-  then null
-  else 'Regular'
-end as service_provider_assignment_type
+dd.service_provider_assignment
 
 from public.fy2017_districts_deluxe_matr dd
 left join public.fy2016_districts_deluxe_matr d
@@ -480,15 +450,48 @@ sp_union as (
 select dd.year,
 dd.postal_cd,
 dd.service_provider_assignment,
-dd.service_provider_assignment_type,
+case
+  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+    
+
+  then 'Consortia'
+  when dd.service_provider_assignment = 'District Owned'
+  then 'District Owned'
+  when dd.service_provider_assignment is null
+  then null
+  else 'Regular'
+end as service_provider_assignment_type,
+case
+  when dd.service_provider_assignment in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
+  then true
+  else false end
+as sots_2016_service_provider,
+case
+  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+  then true 
+  else false 
+end as consortia_service_provider,
+case
+  when dd.service_provider_assignment = 'District Owned'
+  then true
+  else false end
+as district_owned_service_provider,
 
 -- DEMOGRAPHIC
 count(dd.esh_id) as districts_served,
 sum(dd.num_students) as students_served,
 sum(case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 1
-	else null end)
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 1
+  else null end)
 as districts_rural_and_town,
 
 
@@ -501,71 +504,71 @@ sum(case
   else null end)
 as students_meeting_100k,
 case 
-	when (sum(dd.meeting_2014_goal_no_oversub)/count(dd.meeting_2014_goal_no_oversub)::numeric) > .99 
-	then true
-	else false
+  when (sum(dd.meeting_2014_goal_no_oversub)/count(dd.meeting_2014_goal_no_oversub)::numeric) = 1 
+  then true
+  else false
 end as all_districts_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then 1
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then 1
+  else null end)
 as districts_not_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then 1
-	else null end)/count(dd.meeting_2014_goal_no_oversub)::numeric as districts_not_meeting_100k_p,
+  when dd.meeting_2014_goal_no_oversub = 0
+  then 1
+  else null end)/count(dd.meeting_2014_goal_no_oversub)::numeric as districts_not_meeting_100k_p,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then dd.num_students
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then dd.num_students
+  else null end)
 as students_not_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then dd.num_students
-	else null end)/sum(case
-	when dd.meeting_2014_goal_no_oversub = 0 or dd.meeting_2014_goal_no_oversub = 1
-	then dd.num_students
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then dd.num_students
+  else null end)/sum(case
+  when dd.meeting_2014_goal_no_oversub = 0 or dd.meeting_2014_goal_no_oversub = 1
+  then dd.num_students
+  else null end)
 as students_not_meeting_100k_p,
 sum(dd.meeting_2018_goal_oversub) as districts_meeting_1m,
 sum(dd.meeting_2018_goal_oversub)/count(dd.meeting_2018_goal_oversub)::numeric as districts_meeting_1m_p,
 sum(case
-	when meeting_2018_goal_oversub = 0
-	then 1
-	else null end)
+  when meeting_2018_goal_oversub = 0
+  then 1
+  else null end)
 as districts_not_meeting_1m,
 sum(case
-	when meeting_2018_goal_oversub = 0
-	then 1
-	else null end)/count(dd.meeting_2018_goal_oversub)::numeric as districts_not_meeting_1m_p,
+  when meeting_2018_goal_oversub = 0
+  then 1
+  else null end)/count(dd.meeting_2018_goal_oversub)::numeric as districts_not_meeting_1m_p,
 median(dd.ia_bandwidth_per_student_kbps) as median_bw_per_student_kbps,
 
 -- FIBER
 sum(case
-	when dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_not_target,
 sum(case
-	when dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)/sum(
-	case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)/sum(
+  case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_not_target_p,
 sum(case
-	when dd.fiber_target_status = 'Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Target'
+  then 1
+  else null end)
 as districts_fiber_target,
 sum(case
-	when dd.fiber_target_status = 'Target'
-	then 1
-	else null end)/sum(
-	case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Target'
+  then 1
+  else null end)/sum(
+  case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_fiber_target_p,
 sum(dd.unscalable_campuses) as unscalable_campuses,
 
@@ -585,13 +588,12 @@ sum(cohort_16_to_17_connectivity) as districts_cohort_16_to_17_connectivity
 
 from dd_union dd
 where dd.service_provider_assignment is not null
+and dd.service_provider_assignment != ''
 
 
 group by dd.year,
 dd.postal_cd,
-dd.service_provider_assignment,
-dd.service_provider_assignment_type
-
+dd.service_provider_assignment
 
 
 
@@ -606,15 +608,49 @@ UNION
 select dd.year,
 'National' as postal_cd,
 dd.service_provider_assignment,
-dd.service_provider_assignment_type,
+case
+  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+    
+
+  then 'Consortia'
+  when dd.service_provider_assignment = 'District Owned'
+  then 'District Owned'
+  when dd.service_provider_assignment is null
+  then null
+  else 'Regular'
+end as service_provider_assignment_type,
+case
+  when dd.service_provider_assignment in ('Level 3','CenturyLink', 'Windstream' , 'Grande Comm', 'Cogent', 'Cox', 'Sunesys, LLC', 'Frontier','Computer Sciences','Charter','PHONOSCOPE LIGHT','Comcast','AT&T','ENA Services, LLC','Zayo Group, LLC')
+  then true
+  else false end
+as sots_2016_service_provider,
+case
+  when dd.service_provider_assignment in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
+        'ESC Region 1', 'ESC Region 11', 'ESC Region 17', 'ESC Region 2', 'ESC Region 6', 'ESC7Net', 'Illinois Century', 'King County', 'Lake Geauga', 'Lower Hudson', 
+        'Metropolitan Dayton', 'Miami Valley', 'Midland Council', 'NC OH Comp Coop', 'NE OH Management', 'NE OH Network', 'NE Serv Coop', 'Norther OH Area CS', 'Northern Buckeye', 
+        'Northern OH Ed Comp', 'OH Mid Eastern ESA', 'Region 16 ESC', 'Region 18 ESC', 'Region 19 ESC', 'Region 3 ESC', 'Region 4 ESC', 'Region 9 ESC', 'SC OH Comp', 'SE MN Network', 
+        'South Dakota Network', 'Stark Portage', 'SW OH Comp Asso', 'W OH Computer Org', 'W Suffolk Boces', 'Wasioja Cooperative','NC Office','Dept of Admin Services, CT','State of Iowa')
+  then true 
+  else false 
+end as consortia_service_provider,
+case
+  when dd.service_provider_assignment = 'District Owned'
+  then true
+  else false end
+as district_owned_service_provider,
+
 
 -- DEMOGRAPHIC
 count(dd.esh_id) as districts_served,
 sum(dd.num_students) as students_served,
 sum(case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 1
-	else null end)
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 1
+  else null end)
 as districts_rural_and_town,
 
 
@@ -627,71 +663,71 @@ sum(case
   else null end)
 as students_meeting_100k,
 case 
-	when (sum(dd.meeting_2014_goal_no_oversub)/count(dd.meeting_2014_goal_no_oversub)::numeric) > .99 
-	then true
-	else false
+  when (sum(dd.meeting_2014_goal_no_oversub)/count(dd.meeting_2014_goal_no_oversub)::numeric) = 1
+  then true
+  else false
 end as all_districts_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then 1
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then 1
+  else null end)
 as districts_not_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then 1
-	else null end)/count(dd.meeting_2014_goal_no_oversub)::numeric as districts_not_meeting_100k_p,
+  when dd.meeting_2014_goal_no_oversub = 0
+  then 1
+  else null end)/count(dd.meeting_2014_goal_no_oversub)::numeric as districts_not_meeting_100k_p,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then dd.num_students
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then dd.num_students
+  else null end)
 as students_not_meeting_100k,
 sum(case
-	when dd.meeting_2014_goal_no_oversub = 0
-	then dd.num_students
-	else null end)/sum(case
-	when dd.meeting_2014_goal_no_oversub = 0 or dd.meeting_2014_goal_no_oversub = 1
-	then dd.num_students
-	else null end)
+  when dd.meeting_2014_goal_no_oversub = 0
+  then dd.num_students
+  else null end)/sum(case
+  when dd.meeting_2014_goal_no_oversub = 0 or dd.meeting_2014_goal_no_oversub = 1
+  then dd.num_students
+  else null end)
 as students_not_meeting_100k_p,
 sum(dd.meeting_2018_goal_oversub) as districts_meeting_1m,
 sum(dd.meeting_2018_goal_oversub)/count(dd.meeting_2018_goal_oversub)::numeric as districts_meeting_1m_p,
 sum(case
-	when meeting_2018_goal_oversub = 0
-	then 1
-	else null end)
+  when meeting_2018_goal_oversub = 0
+  then 1
+  else null end)
 as districts_not_meeting_1m,
 sum(case
-	when meeting_2018_goal_oversub = 0
-	then 1
-	else null end)/count(dd.meeting_2018_goal_oversub)::numeric as districts_not_meeting_1m_p,
+  when meeting_2018_goal_oversub = 0
+  then 1
+  else null end)/count(dd.meeting_2018_goal_oversub)::numeric as districts_not_meeting_1m_p,
 median(dd.ia_bandwidth_per_student_kbps) as median_bw_per_student_kbps,
 
 -- FIBER
 sum(case
-	when dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_not_target,
 sum(case
-	when dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)/sum(
-	case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)/sum(
+  case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_not_target_p,
 sum(case
-	when dd.fiber_target_status = 'Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Target'
+  then 1
+  else null end)
 as districts_fiber_target,
 sum(case
-	when dd.fiber_target_status = 'Target'
-	then 1
-	else null end)/sum(
-	case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
-	then 1
-	else null end)
+  when dd.fiber_target_status = 'Target'
+  then 1
+  else null end)/sum(
+  case when dd.fiber_target_status = 'Target' or dd.fiber_target_status = 'Not Target'
+  then 1
+  else null end)
 as districts_fiber_target_p,
 sum(dd.unscalable_campuses) as unscalable_campuses,
 
@@ -711,11 +747,11 @@ sum(cohort_16_to_17_connectivity) as districts_cohort_16_to_17_connectivity
 
 from dd_union dd
 where dd.service_provider_assignment is not null
+and dd.service_provider_assignment != ''
 
 
 group by dd.year,
-dd.service_provider_assignment,
-dd.service_provider_assignment_type)
+dd.service_provider_assignment)
 
 select 
 year,
@@ -731,46 +767,30 @@ and service_provider_assignment in ('Level 3','CenturyLink', 'Windstream' , 'Gra
 and postal_cd = 'National'
 
 union
-
   select 2016 as year, 'Level 3' as service_provider_assignment, 0.81 as students_not_meeting_100k_p, 360000 as students_not_meeting_100k, 80000 as students_meeting_100k
   from sp_union
-
 union
-
   select 2016 as year, 'CenturyLink' as service_provider_assignment, 0.46 as students_not_meeting_100k_p, 810000 as students_not_meeting_100k, 960000 as students_meeting_100k
   from sp_union
-
-union
-  
+union 
   select 2016 as year, 'Windstream' as service_provider_assignment, 0.44 as students_not_meeting_100k_p, 310000 as students_not_meeting_100k, 390000 as students_meeting_100k
   from sp_union
-
 union
-
   select 2016 as year, 'Grande Comm' as service_provider_assignment, 0.42 as students_not_meeting_100k_p, 70000 as students_not_meeting_100k, 90000 as students_meeting_100k
   from sp_union
-
 union
-
   select 2016 as year, 'Cogent' as service_provider_assignment, 0.37 as students_not_meeting_100k_p, 160000 as students_not_meeting_100k, 280000 as students_meeting_100k
   from sp_union
-
-union
-  
+union  
   select 2016 as year, 'Cox' as service_provider_assignment, 0.33 as students_not_meeting_100k_p, 590000 as students_not_meeting_100k, 1190000 as students_meeting_100k
   from sp_union
-
 union
-
   select 2016 as year, 'Sunesys, LLC' as service_provider_assignment, 0.32 as students_not_meeting_100k_p, 220000 as students_not_meeting_100k, 450000 as students_meeting_100k
   from sp_union
-
 union  
   select 2016 as year, 'Frontier' as service_provider_assignment, 0.3 as students_not_meeting_100k_p, 110000 as students_not_meeting_100k, 250000 as students_meeting_100k
   from sp_union
-
 union
-
   select 2016 as year, 'Computer Sciences' as service_provider_assignment, 0.26 as students_not_meeting_100k_p, 140000 as students_not_meeting_100k, 390000 as students_meeting_100k
   from sp_union  
 union
