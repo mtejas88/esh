@@ -322,7 +322,7 @@ use_case_rule <- function(current_year,rule_type){
     assign('master_output',master_output,envir=.GlobalEnv)}
   }else if(rule_type == 'decrease_in_bw' && current_year =='2017'){
     uc15 <- filter(d_17,change_in_bw_tot<0)
-    uc15_formatted <- data.frame('Decrease in BW Rule','decrease_in_bw_rule','','',uc15$esh_id,as.numeric(uc15$change_in_bw_tot),n,n)
+    uc15_formatted <- data.frame('Decrease in Bandwidth Rule','decrease_in_bw_rule','','',uc15$esh_id,as.numeric(uc15$change_in_bw_tot),n,n)
     colnames(uc15_formatted) <-c('outlier_use_case_name','outlier_use_case_cd','outlier_use_case_parameters','outlier_test_parameters','outlier_unique_id','outlier_value','R','lam')
     master_output <- rbind(master_output,uc15_formatted) 
     assign('master_output',master_output,envir=.GlobalEnv)

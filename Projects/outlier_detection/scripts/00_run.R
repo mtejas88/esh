@@ -139,7 +139,7 @@ ucd=consolidate_dups('tableau_national',ucd,c())
 
 #Consolidate the specific requested duplicate use cases (and create new use case names) for districts
 #for master output
-master_output=consolidate_dups('master_output_new',master_output,c('Meeting-not Meeting Connectivity Rule','Decrease in BW Rule'))
+master_output=consolidate_dups('master_output_new',master_output,c('Meeting-not Meeting Connectivity Rule','Decrease in Bandwidth Rule'))
 master_output=consolidate_dups('master_output_new',master_output,c('Meeting-not Meeting Affordability Rule','Increase in $/BW Rule'))
 #for tableau
 #ucd=consolidate_dups('tableau_new',ucd,c('Meeting-not Meeting Connectivity Rule','Decrease in BW Rule'))
