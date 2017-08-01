@@ -4,7 +4,7 @@ with state_level_extrap as (
 
   (sum(sm.current_known_unscalable_campuses) + sum(sm.current_assumed_unscalable_campuses))/sum(sm.num_campuses) as extrap_percent
 
-  from sm
+  from public.fy2017_schools_metrics_matr sm
   left join public.fy2017_districts_deluxe_matr dd
   on sm.district_esh_id = dd.esh_id
 
