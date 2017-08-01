@@ -177,8 +177,16 @@ select
 	  else sm.current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
 	sm.wan_lines,
-	sm.ia_monthly_cost_no_backbone
+	sm.ia_monthly_cost_no_backbone,
+	case
 
+		when sm.ia_bandwidth::integer > 0
+
+			then affordability_calculator(sm.ia_monthly_cost::integer, sm.ia_bandwidth::integer)
+
+		else false
+
+	end as meeting_knapsack_affordability_target
 from public.fy2017_schools_metrics_matr sm
 left join public.fy2017_districts_deluxe_matr dd
 on sm.district_esh_id = dd.esh_id
