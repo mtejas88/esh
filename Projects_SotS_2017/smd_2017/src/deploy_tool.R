@@ -94,6 +94,7 @@ names(state_rural_small_town)[!names(state_rural_small_town)
                                                                                                           "rural_small_town", sep="_")
 ## merge in rural_small_town with state_agg
 state_2017 <- merge(state_2017, state_rural_small_town, by='postal_cd', all.x=T)
+names(state_2017)[names(state_2017) == 'erate_money_no_voice_millions'] <- 'erate_money_millions'
 
 ## make sure to include districts in universe
 dd_2017 <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE),]
@@ -377,74 +378,19 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ##-------------------------------
 ## store state_2017 so we don't keep renames
 state_2017_orig <- state_2017
-## Connectivity Ranking (by percent of students meeting BW goal, Actual)
+## Connectivity Ranking (by percent of students meeting BW goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 2nd, 3rd, 4th, etc.
+state_2017$connectivity_ranking <- NA
 state_2017$students_meeting_2014_bw_goal_perc <- state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample
 state_2017 <- state_2017[order(state_2017$students_meeting_2014_bw_goal_perc, decreasing=T),]
-state_2017$connectivity_ranking <- NA
 state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc == 1] <- 1
 state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc != 1] <-
   seq(2, length(state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc != 1])+1)
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
-## Number of More Districts Connected between 2016 and 2017 (Extrapolated)
-## Methodology: If a state has the following:
-##              A) State % clean is less than 70%.
-##              B) State has dirty Mega's in 2017 that were clean in 2016. -- this is relaxed to all states
-##              C) Total Students meeting is less than zero.
-## Then apply the following methodology:
-##    For the districts that are dirty in 2017 but were clean AND meeting goals in 2016, bring over the total BW and use it to calculate BW goals.
-## Step #1: define the states that qualify for the revised methodology.
-state_2017$percent_clean <- round(state_2017$districts_clean_ia_sample / state_2017$districts_population, 2)
-## (~21 states)
-#states_to_adjust <- state_2017$postal_cd[which(state_2017$percent_clean < .70 | state_2017$megas_dirty_2017_clean_2016 > 0 & state_2017$postal_cd != 'ALL')]
-states_to_adjust <- state_2017$postal_cd[which(state_2017$percent_clean < .70 | state_2017$postal_cd %in% c('TN', 'MS', 'NV', 'NY', 'MD')
-                                               & state_2017$postal_cd != "ALL")]
-## Step #2: for the states selected, narrow down to the districts that are dirty in 2017 but clean and meeting goals in 2016
-## create 2016 subset (clean and meeting BW goals)
-dd_2016_sub <- dd_2016[which(dd_2016$exclude_from_ia_analysis == FALSE & dd_2016$meeting_2014_goal_no_oversub == TRUE & dd_2016$postal_cd %in% states_to_adjust),]
-districts_to_adjust <- dd_2017$esh_id[which(dd_2017$postal_cd %in% states_to_adjust & dd_2017$exclude_from_ia_analysis == TRUE)]
-## subset to the districts we care about (~1,300 districts)
-dd_2016_sub <- dd_2016_sub[which(dd_2016_sub$esh_id %in% districts_to_adjust),]
-names(dd_2016_sub)[names(dd_2016_sub) == "ia_bw_mbps_total"] <- "ia_bw_mbps_total_2016"
-## bring over the 2016 total bw for these districts
-dd_2017 <- merge(dd_2017, dd_2016_sub[,c('esh_id', 'ia_bw_mbps_total_2016')], by='esh_id', all.x=T)
-## recalculate whether the district is now meeting goals (100 kbps/student)
-dd_2017$ia_bw_mbps_total_2016 <- dd_2017$ia_bw_mbps_total_2016 * 1000
-dd_2017$ia_bw_mbps_total_2016 <- dd_2017$ia_bw_mbps_total_2016 / dd_2017$num_students
-dd_2017$new_connectivity_metric <- ifelse(dd_2017$ia_bw_mbps_total_2016 >= 100, TRUE, FALSE)
-## adjust the clealiness indicator
-dd_2017$exclude <- ifelse(is.na(dd_2017$new_connectivity_metric), dd_2017$exclude_from_ia_analysis, FALSE)
-dd_2017$clean <- ifelse(dd_2017$exclude == FALSE, 1, 0)
-dd_2017$new_connectivity_metric <- ifelse(is.na(dd_2017$new_connectivity_metric), dd_2017$meeting_2014_goal_no_oversub, dd_2017$new_connectivity_metric)
-dd_2017$new_connectivity_metric <- ifelse(dd_2017$new_connectivity_metric == TRUE, 1, 0)
-## for each state, aggregate the new connectivity metric (districts)
-state_agg <- aggregate(dd_2017$new_connectivity_metric * dd_2017$clean, by=list(dd_2017$postal_cd), FUN=sum, na.rm=T)
-names(state_agg) <- c('postal_cd', 'adjusted_meeting_bw_goals')
-state_2017 <- merge(state_2017, state_agg, by='postal_cd', all.x=T)
-## for each state, aggregate the new clean sample (districts)
-state_agg <- aggregate(dd_2017$clean, by=list(dd_2017$postal_cd), FUN=sum, na.rm=T)
-names(state_agg) <- c('postal_cd', 'adjusted_districts_clean')
-state_2017 <- merge(state_2017, state_agg, by='postal_cd', all.x=T)
-## for each state, aggregate the new connectivity metric (students)
-state_agg <- aggregate(dd_2017$new_connectivity_metric * dd_2017$clean * dd_2017$num_students, by=list(dd_2017$postal_cd), FUN=sum, na.rm=T)
-names(state_agg) <- c('postal_cd', 'adjusted_meeting_bw_goals_students')
-state_2017 <- merge(state_2017, state_agg, by='postal_cd', all.x=T)
-## for each state, aggregate the new clean sample (students)
-state_agg <- aggregate(dd_2017$clean * dd_2017$num_students, by=list(dd_2017$postal_cd), FUN=sum, na.rm=T)
-names(state_agg) <- c('postal_cd', 'adjusted_students_clean')
-state_2017 <- merge(state_2017, state_agg, by='postal_cd', all.x=T)
-## Step #3: calculate the extrapolation
-## districts
-state_2017$districts_meeting_2014_bw_goal_2017_extrap_new_meth <- round((state_2017$adjusted_meeting_bw_goals / state_2017$adjusted_districts_clean)
-                                                                          * state_2017$districts_population, 0)
-## students
-state_2017$students_meeting_2014_bw_goal_2017_extrap_new_meth <- round((state_2017$adjusted_meeting_bw_goals_students / state_2017$adjusted_students_clean)
-                                                                        * state_2017$students_population, 0)
-
 ## Original Methodology: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
-## merge in frozen data to 2017
+## merge in 2016 frozen data to 2017
 state_2017 <- merge(state_2017, state_2016_froz[,c('postal_cd', 'current16_districts_mtg2014goal', 'current16_districts_sample',
                                                    'current16_districts_pop', 'current16_students_mtg2014goal', 'current16_students_sample',
                                                    'current16_students_pop')], by='postal_cd', all.x=T)
@@ -459,6 +405,9 @@ state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2017$curren
                                                                * state_2017$current16_students_pop, 0)
 state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                                              * state_2017$students_population, 0)
+## calculate differences
+state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap
+state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap
 
 ## Upgrade Methodology: how many had a bandwidth upgrade and went from not meeting to meeting goals
 state_2017$more_students_connected_actual_upgrade_meth <- state_2017$students_upgraded_meeting_goals
@@ -467,13 +416,6 @@ state_2017$more_students_connected_extrap_upgrade_meth <- round((state_2017$stud
 state_2017$more_districts_connected_actual_upgrade_meth <- state_2017$districts_upgraded_meeting_goals
 state_2017$more_districts_connected_extrap_upgrade_meth <- round((state_2017$districts_upgraded_meeting_goals / state_2017$districts_clean_upgrades_sample)
                                                                 * state_2017$districts_population, 0)
-
-## calculate differences
-state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap
-state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap
-state_2017$more_districts_connected_extrap_new_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_new_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap
-state_2017$more_students_connected_extrap_new_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_new_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap
-
 
 ## 2017 Districts/Students Not Meeting Goal (Actual and Extrapolated)
 state_2017$districts_not_meeting_2014_bw_goal_actual <- state_2017$districts_clean_ia_sample - state_2017$districts_meeting_2014_bw_goal
@@ -546,6 +488,9 @@ state_2017$mega_large_clean_perc <- round(state_2017$mega_large_clean_ia_sample 
 ## percent clean districts
 state_2017$distrcts_clean_ia_sample_perc <- round(state_2017$districts_clean_ia_sample / state_2017$districts_population, 2)
 
+## round c2 to nearest million
+state_2017$c2_remaining_2017 <- round(state_2017$c2_remaining_2017 / 1000000, 1)
+
 ## placeholder columns
 state_2017$state_match_or_action <- NA
 state_2017$gov_pic <- NA
@@ -556,10 +501,9 @@ state_2017$gov_lastname <- NA
 ## current num districts connected, current num students connected, students still not meeting goals, districts still not meeting goals,
 ## number of service providers to partner with, number of students affected by sp, number of districts that need fiber, % in rural and small towns,
 ## wifi funds remaining, number of districts who still have wifi funds, number of districts not meeting affordability goals
-snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_no_voice_millions',
+snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_millions',
                                                         'state_match_or_action', 'gov_pic', 'gov_quote', 'gov_lastname',
                                                         'more_students_connected_extrap_original_meth', 'more_districts_connected_extrap_original_meth',
-                                                        'more_students_connected_extrap_new_meth', 'more_districts_connected_extrap_new_meth',
                                                         'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
                                                         'more_students_connected_actual_upgrade_meth', 'more_districts_connected_actual_upgrade_meth',
                                                         'students_meeting_2014_bw_goal_actual', 'students_meeting_2014_bw_goal_2017_extrap_original_meth',
