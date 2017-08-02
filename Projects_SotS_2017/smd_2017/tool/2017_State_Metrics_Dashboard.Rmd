@@ -260,16 +260,17 @@ img(src = "figures/connectivity.png", height = "100%", width = "100%")
 ### [Districts Meeting Connectivity Goals](#deep-dive-connectivity)
 ```{r}
 renderHighchart({
-  highchart() %>% hc_chart(type = 'column') %>% 
+  highchart() %>% 
+    hc_chart(type = 'column') %>% 
     hc_xAxis(categories = c(paste('Published SotS 2015 (n=', format(state.agg.sots.2016.sub()$sots15_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
       paste('Published SotS 2016 (n=', format(state.agg.sots.2016.sub()$current16_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
       paste('Current 2016 (n=', format(state.agg.2016.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
-      paste('Current 2017 (n=', format(state.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>%
+      paste('Current 2017 (n=', format(state.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
     hc_yAxis(labels = list(format = '{value}%'), min = 0, max = 100) %>% 
     hc_add_series(data = c(state.agg.sots.2016.sub()$sots15_districts_mtg2014goal_perc,
       state.agg.sots.2016.sub()$current16_districts_mtg2014goal_perc,
-      round((state.agg.2016.sub()$districts_meeting_2014_bw_goal / state.agg.2016.sub()$districts_clean_ia_sample)*100, 0),
-      round((state.agg.2017.sub()$districts_meeting_2014_bw_goal / state.agg.2017.sub()$districts_clean_ia_sample)*100, 0)),
+      round((state.agg.2016.sub()$districts_meeting_2014_bw_goal / state.agg.2016.sub()$districts_clean_ia_cost_sample)*100, 0),
+      round((state.agg.2017.sub()$districts_meeting_2014_bw_goal / state.agg.2017.sub()$districts_clean_ia_cost_sample)*100, 0)),
       dataLabels = list(enabled = TRUE, format = '{point.y}%')) %>% hc_legend(enabled = FALSE) %>% hc_colors(c(colors$color[colors$label == 'connectivity1']))
 })
 ```
@@ -415,13 +416,13 @@ renderHighchart({
     hc_chart(type = 'column') %>% 
     hc_xAxis(categories = c(paste('Published SotS 2015 (n=', format(state.agg.sots.2016.sub()$sots15_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
       paste('Published SotS 2016 (n=', format(state.agg.sots.2016.sub()$current16_districts_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
-      paste('Current 2016 (n=', format(state.agg.2016.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
-      paste('Current 2017 (n=', format(state.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
+      paste('Current 2016 (n=', format(state.agg.2016.sub()$districts_clean_ia_cost_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
+      paste('Current 2017 (n=', format(state.agg.2017.sub()$districts_clean_ia_cost_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
     hc_yAxis(labels = list(format = '{value}%'), min = 0, max = 100) %>% 
     hc_add_series(data = c(state.agg.sots.2016.sub()$sots15_districts_mtg_affordability_perc,
       state.agg.sots.2016.sub()$current16_districts_mtg_affordability_perc,
-      round((state.agg.2016.sub()$districts_meeting_affordability / state.agg.2016.sub()$districts_clean_ia_sample)*100, 0),
-      round((state.agg.2017.sub()$districts_meeting_affordability / state.agg.2017.sub()$districts_clean_ia_sample)*100, 0)),
+      round((state.agg.2016.sub()$districts_meeting_affordability / state.agg.2016.sub()$districts_clean_ia_cost_sample)*100, 0),
+      round((state.agg.2017.sub()$districts_meeting_affordability / state.agg.2017.sub()$districts_clean_ia_cost_sample)*100, 0)),
       dataLabels = list(enabled = TRUE, format = '{point.y}%')) %>% hc_legend(enabled = FALSE) %>% hc_colors(c(colors$color[colors$label == 'affordability1'])) 
 })
 ```
