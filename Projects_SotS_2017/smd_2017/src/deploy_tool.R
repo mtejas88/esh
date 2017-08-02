@@ -395,19 +395,19 @@ state_2017 <- merge(state_2017, state_2016_froz[,c('postal_cd', 'current16_distr
                                                    'current16_districts_pop', 'current16_students_mtg2014goal', 'current16_students_sample',
                                                    'current16_students_pop')], by='postal_cd', all.x=T)
 ## districts
-state_2017$districts_meeting_2014_bw_goal_2016_extrap <- round((state_2017$current16_districts_mtg2014goal / state_2017$current16_districts_sample)
+state_2017$districts_meeting_2014_bw_goal_2016_extrap_original_meth <- round((state_2017$current16_districts_mtg2014goal / state_2017$current16_districts_sample)
                                                                 * state_2017$current16_districts_pop, 0)
 state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth <- round((state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
                                                                               * state_2017$districts_population, 0)
 ## create extrapolated number of more students connected between 2016 and 2017
 ## students
-state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2017$current16_students_mtg2014goal / state_2017$current16_students_sample)
+state_2017$students_meeting_2014_bw_goal_2016_extrap_original_meth <- round((state_2017$current16_students_mtg2014goal / state_2017$current16_students_sample)
                                                                * state_2017$current16_students_pop, 0)
 state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                                              * state_2017$students_population, 0)
 ## calculate differences
-state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap
-state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap
+state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap_original_meth
+state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap_original_meth
 
 ## Upgrade Methodology: how many had a bandwidth upgrade and went from not meeting to meeting goals
 state_2017$more_students_connected_actual_upgrade_meth <- state_2017$students_upgraded_meeting_goals
@@ -507,7 +507,9 @@ snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name
                                                         'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
                                                         'more_students_connected_actual_upgrade_meth', 'more_districts_connected_actual_upgrade_meth',
                                                         'students_meeting_2014_bw_goal_actual', 'students_meeting_2014_bw_goal_2017_extrap_original_meth',
+                                                        'students_meeting_2014_bw_goal_2016_extrap_original_meth',
                                                         'districts_meeting_2014_bw_goal_actual', 'districts_meeting_2014_bw_goal_2017_extrap_original_meth',
+                                                        'districts_meeting_2014_bw_goal_2016_extrap_original_meth',
                                                         'students_not_meeting_2014_bw_goal_actual', 'students_not_meeting_2014_bw_goal_extrap',
                                                         'districts_not_meeting_2014_bw_goal_actual', 'districts_not_meeting_2014_bw_goal_extrap',
                                                         'num_service_providers_w_students_not_meeting_goals_top_5', 'num_students_not_meeting_goals_served_by_sp_top_5',
