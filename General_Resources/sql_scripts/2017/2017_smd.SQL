@@ -8,6 +8,8 @@ count(dd_2017.esh_id) as districts_population,
 sum(dd_2017.num_schools) as schools_population,
 sum(dd_2017.num_students) as students_population,
 sum(dd_2017.num_campuses) as campuses_population,
+sum(CASE WHEN dd_2017.district_size = 'Mega' OR dd_2017.district_size = 'Large' THEN 1 ELSE 0 END) as mega_large_population,
+
 
 /* SAMPLES */
 -- IA
@@ -31,6 +33,7 @@ sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_univ
 sum(CASE WHEN (dd_2017.needs_wifi = 't' OR dd_2017.needs_wifi = 'f') THEN 1 ELSE 0 END) as districts_wifi_sample,
 --Mega Districts
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2017.district_size = 'Mega' THEN 1 ELSE 0 END) as megas_dirty_2017_clean_2016,
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND (dd_2017.district_size = 'Mega' OR dd_2017.district_size = 'Large') THEN 1 ELSE 0 END) as mega_large_clean_ia_sample,
 
 /* UPGRADES */
 -- Upgraded
@@ -73,6 +76,8 @@ round(median(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' THEN dd_2017.
 sum(dd_2017.current_known_scalable_campuses + dd_2017.current_assumed_scalable_campuses) as scalable_campuses,
 -- Total Unscalable Campuses
 sum(dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses) as unscalable_campuses,
+-- Total Unscalable Campuses (Rural and Small Town)
+sum(CASE WHEN dd_2017.locale = 'Rural' OR dd_2017.locale = 'Town' THEN dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses ELSE 0 END) as unscalable_campuses_rural_small_town,
 -- Average Number of Unscalable Campuses
 round(avg(CASE WHEN dd_2017.fiber_target_status = 'Target' THEN dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses ELSE NULL END)::numeric, 0) as mean_unscalable_campuses_targets,
 -- Fiber Targets - Campuses
@@ -118,6 +123,8 @@ count(dd_2017.esh_id) as districts_population,
 sum(dd_2017.num_schools) as schools_population,
 sum(dd_2017.num_students) as students_population,
 sum(dd_2017.num_campuses) as campuses_population,
+sum(CASE WHEN dd_2017.district_size = 'Mega' OR dd_2017.district_size = 'Large' THEN 1 ELSE 0 END) as mega_large_population,
+
 
 /* SAMPLES */
 -- IA
@@ -141,6 +148,8 @@ sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_univ
 sum(CASE WHEN (dd_2017.needs_wifi = 't' OR dd_2017.needs_wifi = 'f') THEN 1 ELSE 0 END) as districts_wifi_sample,
 --Mega Districts
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2017.district_size = 'Mega' THEN 1 ELSE 0 END) as megas_dirty_2017_clean_2016,
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND (dd_2017.district_size = 'Mega' OR dd_2017.district_size = 'Large') THEN 1 ELSE 0 END) as mega_large_clean_ia_sample,
+
 
 /* UPGRADES */
 -- Upgraded
@@ -183,6 +192,8 @@ round(median(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' AND dd_2017.p
 sum(dd_2017.current_known_scalable_campuses + dd_2017.current_assumed_scalable_campuses) as scalable_campuses,
 -- Total Unscalable Campuses
 sum(dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses) as unscalable_campuses,
+-- Total Unscalable Campuses (Rural and Small Town)
+sum(CASE WHEN dd_2017.locale = 'Rural' OR dd_2017.locale = 'Town' THEN dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses ELSE 0 END) as unscalable_campuses_rural_small_town,
 -- Average Number of Unscalable Campuses
 round(avg(CASE WHEN dd_2017.fiber_target_status = 'Target' THEN dd_2017.current_known_unscalable_campuses + dd_2017.current_assumed_unscalable_campuses ELSE NULL END)::numeric, 0) as mean_unscalable_campuses_targets,
 -- Fiber Targets - Campuses
@@ -219,5 +230,3 @@ GROUP BY 1
 ORDER BY postal_cd
 
 /* This query generates the state-level and National aggregation of most of the metrics for the State Metric Dashboard for 2017. */
-
-

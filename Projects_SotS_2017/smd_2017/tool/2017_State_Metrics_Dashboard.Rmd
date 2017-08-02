@@ -149,7 +149,7 @@ state.agg.2017$postal_cd <- as.character(state.agg.2017$postal_cd)
 selectInput('state', label="", choices=unique(state.agg.2017$postal_cd), selected="ALL")
 
 output$downloadData <- downloadHandler(
-  filename = function() {"data/snapshots.csv"},
+  filename = function(){paste("data/snapshots_", date.updated, ".csv", sep="")},
   content = function(file) {
   write.csv(snapshots, file, row.names=F)
   })

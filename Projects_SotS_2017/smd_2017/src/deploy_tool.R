@@ -376,10 +376,21 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## SNAPSHOTS (MASTER METRICS)
 ##-------------------------------
 
+## Connectivity Ranking (by percent of students meeting BW goal, Actual)
+## right now, ranking everyone with 100% as 1st and then anyone after as 2nd, 3rd, 4th, etc.
+state_2017$students_meeting_2014_bw_goal_perc <- state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample
+state_2017 <- state_2017[order(state_2017$students_meeting_2014_bw_goal_perc, decreasing=T),]
+state_2017$connectivity_ranking <- NA
+state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc == 1] <- 1
+state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc != 1] <-
+  seq(2, length(state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc != 1])+1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
 ## Number of More Districts Connected between 2016 and 2017 (Extrapolated)
 ## Methodology: If a state has the following:
 ##              A) State % clean is less than 70%.
-##              B) State has dirty Mega's in 2017 that were clean in 2016.
+##              B) State has dirty Mega's in 2017 that were clean in 2016. -- this is relaxed to all states
 ##              C) Total Students meeting is less than zero.
 ## Then apply the following methodology:
 ##    For the districts that are dirty in 2017 but were clean AND meeting goals in 2016, bring over the total BW and use it to calculate BW goals.
@@ -387,7 +398,9 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## Step #1: define the states that qualify for the revised methodology.
 state_2017$percent_clean <- round(state_2017$districts_clean_ia_sample / state_2017$districts_population, 2)
 ## (~21 states)
-states_to_adjust <- state_2017$postal_cd[which(state_2017$percent_clean < .70 | state_2017$megas_dirty_2017_clean_2016 > 0 & state_2017$postal_cd != 'ALL')]
+#states_to_adjust <- state_2017$postal_cd[which(state_2017$percent_clean < .70 | state_2017$megas_dirty_2017_clean_2016 > 0 & state_2017$postal_cd != 'ALL')]
+states_to_adjust <- state_2017$postal_cd[which(state_2017$percent_clean < .70 | state_2017$postal_cd %in% c('TN', 'MS', 'NV', 'NY', 'MD')
+                                               & state_2017$postal_cd != "ALL")]
 
 ## Step #2: for the states selected, narrow down to the districts that are dirty in 2017 but clean and meeting goals in 2016
 ## create 2016 subset (clean and meeting BW goals)
@@ -445,6 +458,15 @@ state_2017$students_meeting_2014_bw_goal_2016_extrap <- round((state_2016$studen
                                                                * state_2016$students_population, 0)
 state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                                              * state_2017$students_population, 0)
+
+## Upgrade Methodology: how many had a bandwidth upgrade and went from not meeting to meeting goals
+state_2017$more_students_connected_actual_upgrade_meth <- state_2017$students_upgraded_meeting_goals
+state_2017$more_students_connected_extrap_upgrade_meth <- round((state_2017$students_upgraded_meeting_goals / state_2017$students_clean_upgrades_sample)
+                                                                  * state_2017$students_population, 0)
+state_2017$more_districts_connected_actual_upgrade_meth <- state_2017$districts_upgraded_meeting_goals
+state_2017$more_districts_connected_extrap_upgrade_meth <- round((state_2017$districts_upgraded_meeting_goals / state_2017$districts_clean_upgrades_sample)
+                                                                * state_2017$districts_population, 0)
+
 ## calculate differences
 state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap
 state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap
@@ -453,10 +475,10 @@ state_2017$more_students_connected_extrap_new_meth <- state_2017$students_meetin
 
 
 ## 2017 Districts/Students Not Meeting Goal (Actual and Extrapolated)
-state_2017$districts_not_meeting_2014_bw_goal <- state_2017$districts_clean_ia_sample - state_2017$districts_meeting_2014_bw_goal
+state_2017$districts_not_meeting_2014_bw_goal_actual <- state_2017$districts_clean_ia_sample - state_2017$districts_meeting_2014_bw_goal
 state_2017$districts_not_meeting_2014_bw_goal_extrap <- round((state_2017$districts_not_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample)
                                                               * state_2017$districts_population, 0)
-state_2017$students_not_meeting_2014_bw_goal <- state_2017$students_clean_ia_sample - state_2017$students_meeting_2014_bw_goal
+state_2017$students_not_meeting_2014_bw_goal_actual <- state_2017$students_clean_ia_sample - state_2017$students_meeting_2014_bw_goal
 state_2017$students_not_meeting_2014_bw_goal_extrap <- round((state_2017$students_not_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                               * state_2017$students_population, 0)
 
@@ -473,36 +495,78 @@ names(sp_state_students) <- c('postal_cd', 'num_students_not_meeting_goals_serve
 ## merge in state_2017
 state_2017 <- merge(state_2017, sp_state, by='postal_cd', all.x=T)
 state_2017 <- merge(state_2017, sp_state_students, by='postal_cd', all.x=T)
+## calculate percentage of students affected by all sp out of overall not meeting
+state_2017$students_not_meeting_goals_served_by_sp_perc_actual_not_meeting <- round(state_2017$num_students_not_meeting_goals_served_by_sp / state_2017$students_not_meeting_2014_bw_goal_actual, 2)
+## calculate percentage of students affected by all sp out of overall not meeting extrap
+state_2017$students_not_meeting_goals_served_by_sp_perc_extrap_not_meeting <- round(state_2017$num_students_not_meeting_goals_served_by_sp / state_2017$students_not_meeting_2014_bw_goal_extrap, 2)
+
+## number of SPs serving students not meeting goals (Top 5)
+top_sp_sub <- top_sp[which(top_sp$r <= 5),]
+## aggregate by state
+sp_state <- aggregate(top_sp_sub$counter, by=list(top_sp_sub$postal_cd), FUN=sum, na.rm=T)
+names(sp_state) <- c('postal_cd', 'num_service_providers_w_students_not_meeting_goals_top_5')
+## number of students not meeting goals served by SPs
+## aggregate by state
+sp_state_students <- aggregate(top_sp_sub$num_students_not_meeting_clean, by=list(top_sp_sub$postal_cd), FUN=sum, na.rm=T)
+names(sp_state_students) <- c('postal_cd', 'num_students_not_meeting_goals_served_by_sp_top_5')
+## merge in state_2017
+state_2017 <- merge(state_2017, sp_state, by='postal_cd', all.x=T)
+state_2017 <- merge(state_2017, sp_state_students, by='postal_cd', all.x=T)
+## calculate percentage of students affected by top 5 out of overall not meeting
+state_2017$students_not_meeting_goals_served_by_sp_top_5_perc_actual_not_meeting <- round(state_2017$num_students_not_meeting_goals_served_by_sp_top_5 / state_2017$students_not_meeting_2014_bw_goal_actual, 2)
+## calculate percentage of students affected by top 5 out of overall not meeting extrap
+state_2017$students_not_meeting_goals_served_by_sp_top_5_perc_extrap_not_meeting <- round(state_2017$num_students_not_meeting_goals_served_by_sp_top_5 / state_2017$students_not_meeting_2014_bw_goal_extrap, 2)
 
 ## 2017 Districts that Need Fiber (Extrapolated)
 state_2017$district_fiber_targets_extrap <- round((state_2017$clean_district_bw_targets / state_2017$districts_clean_ia_sample)
                                                   * state_2017$districts_population, 0)
+## 2017 Campuses not on Fiber (Extrapolated)
+names(state_2017)[names(state_2017) == 'unscalable_campuses'] <- 'total_campuses_not_on_fiber'
+## just Rural / Small Town
+names(state_2017)[names(state_2017) == 'unscalable_campuses_rural_small_town'] <- 'campuses_not_on_fiber_rural_small_town'
+state_2017$campuses_not_on_fiber_rural_small_town_perc <- round(state_2017$campuses_not_on_fiber_rural_small_town / state_2017$total_campuses_not_on_fiber, 2)
 
 ## 2017 Districts Not Meeting Affordability Goals (Actual and Extrapolated)
 state_2017$districts_not_meeting_affordability <- state_2017$districts_clean_ia_cost_sample - state_2017$districts_meeting_affordability
 state_2017$districts_not_meeting_affordability_extrap <- round((state_2017$districts_not_meeting_affordability / state_2017$districts_clean_ia_cost_sample)
                                                               * state_2017$districts_population, 0)
 
+## rename students meeting goal
+names(state_2017)[names(state_2017) == 'students_meeting_2014_bw_goal'] <- 'students_meeting_2014_bw_goal_actual'
+names(state_2017)[names(state_2017) == 'districts_meeting_2014_bw_goal'] <- 'districts_meeting_2014_bw_goal_actual'
+
+## calculate Mega and Large clean percent
+state_2017$mega_large_clean_perc <- round(state_2017$mega_large_clean_ia_sample / state_2017$mega_large_population, 2)
+
 ## order the columns: state abbr, state name, connectivity rank, e-rate $, state match $, more students connected, more districts connected,
 ## current num districts connected, current num students connected, students still not meeting goals, districts still not meeting goals,
 ## number of service providers to partner with, number of students affected by sp, number of districts that need fiber, % in rural and small towns,
 ## wifi funds remaining, number of districts who still have wifi funds, number of districts not meeting affordability goals
-snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'erate_money_no_voice_millions',
+snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_no_voice_millions',
                                                         'more_students_connected_extrap_original_meth', 'more_districts_connected_extrap_original_meth',
                                                         'more_students_connected_extrap_new_meth', 'more_districts_connected_extrap_new_meth',
-                                                        'districts_meeting_2014_bw_goal', 'districts_meeting_2014_bw_goal_2017_extrap_original_meth',
+                                                        'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
+                                                        'more_students_connected_actual_upgrade_meth', 'more_districts_connected_actual_upgrade_meth',
+                                                        'students_meeting_2014_bw_goal_actual', 'students_meeting_2014_bw_goal_2017_extrap_original_meth',
+                                                        'districts_meeting_2014_bw_goal_actual', 'districts_meeting_2014_bw_goal_2017_extrap_original_meth',
                                                         'districts_meeting_2014_bw_goal_2017_extrap_new_meth',
-                                                        'students_meeting_2014_bw_goal', 'students_meeting_2014_bw_goal_2017_extrap_original_meth',
-                                                        'students_meeting_2014_bw_goal_2017_extrap_new_meth',
-                                                        'districts_not_meeting_2014_bw_goal', 'districts_not_meeting_2014_bw_goal_extrap',
-                                                        'students_not_meeting_2014_bw_goal', 'students_not_meeting_2014_bw_goal_extrap',
+                                                        'students_not_meeting_2014_bw_goal_actual', 'students_not_meeting_2014_bw_goal_extrap',
+                                                        'districts_not_meeting_2014_bw_goal_actual', 'districts_not_meeting_2014_bw_goal_extrap',
+                                                        'num_service_providers_w_students_not_meeting_goals_top_5', 'num_students_not_meeting_goals_served_by_sp_top_5',
+                                                        'students_not_meeting_goals_served_by_sp_top_5_perc_actual_not_meeting', 'students_not_meeting_goals_served_by_sp_top_5_perc_extrap_not_meeting',
                                                         'num_service_providers_w_students_not_meeting_goals', 'num_students_not_meeting_goals_served_by_sp',
+                                                        'students_not_meeting_goals_served_by_sp_perc_actual_not_meeting', 'students_not_meeting_goals_served_by_sp_perc_extrap_not_meeting',
+                                                        'total_campuses_not_on_fiber', 'campuses_not_on_fiber_rural_small_town', 'campuses_not_on_fiber_rural_small_town_perc',
                                                         'clean_district_fiber_targets', 'district_fiber_targets_extrap',
                                                         'percent_fiber_targets_regular_rural_small_town', 'percent_fiber_targets_extrap_rural_small_town',
                                                         'c2_remaining_2017', 'num_districts_c2_remaining',
-                                                        'districts_not_meeting_affordability', 'districts_not_meeting_affordability_extrap')]
+                                                        'districts_not_meeting_affordability', 'districts_not_meeting_affordability_extrap',
+                                                        'districts_clean_ia_sample', 'districts_population',
+                                                        'schools_clean_ia_sample', 'schools_population',
+                                                        'students_clean_ia_sample', 'students_population',
+                                                        'mega_large_clean_perc')]
 
-## currently still not included: connectivity rank, state match $
+## not included: state match $
 
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
