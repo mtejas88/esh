@@ -4,7 +4,7 @@ with state_level_extrap as (
 
   (sum(sm.current_known_unscalable_campuses) + sum(sm.current_assumed_unscalable_campuses))/sum(sm.num_campuses) as extrap_percent
 
-  from sm
+  from public.fy2017_schools_metrics_matr sm
   left join public.fy2017_districts_deluxe_matr dd
   on sm.district_esh_id = dd.esh_id
 
@@ -33,7 +33,7 @@ select
    case
    		--exclude districts that are dirty unless the only flag is 'DQT_VETO'
    		--these should be excluded still at a district level, but are fine at the campus level
-   		when (dd.exclude_from_ia_analysis = false or dd.flag_array = 'dqt_veto')
+   		when (dd.exclude_from_ia_analysis = false or array_to_string(dd.flag_array,';') = 'dqt_veto')
    		--exclude campuses with no bandwidth
    		and sm.ia_bandwidth_per_student_kbps > 0
    		--exclude campuses with only ISP
@@ -177,8 +177,16 @@ select
 	  else sm.current_assumed_unscalable_campuses
 	end as current_assumed_unscalable_campuses,
 	sm.wan_lines,
-	sm.ia_monthly_cost_no_backbone
+	sm.ia_monthly_cost_no_backbone,
+	case
 
+		when sm.ia_bandwidth::integer > 0
+
+			then affordability_calculator(sm.ia_monthly_cost::integer, sm.ia_bandwidth::integer)
+
+		else false
+
+	end as meeting_knapsack_affordability_target
 from public.fy2017_schools_metrics_matr sm
 left join public.fy2017_districts_deluxe_matr dd
 on sm.district_esh_id = dd.esh_id
