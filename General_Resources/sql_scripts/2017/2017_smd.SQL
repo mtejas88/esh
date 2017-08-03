@@ -29,6 +29,9 @@ sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' THEN dd_2017.num_stude
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN 1 ELSE 0 END) as districts_clean_upgrades_sample,
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_clean_upgrades_sample,
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2017.num_students ELSE 0 END) as students_clean_upgrades_sample,
+-- Upgrades (Not Meeting 2016) 
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN 1 ELSE 0 END) as districts_clean_upgrades_2016_not_meeting_sample,
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN dd_2017.num_students ELSE 0 END) as students_clean_upgrades_2016_not_meeting_sample,
 -- WIFI
 sum(CASE WHEN (dd_2017.needs_wifi = 't' OR dd_2017.needs_wifi = 'f') THEN 1 ELSE 0 END) as districts_wifi_sample,
 --Mega Districts
@@ -144,6 +147,9 @@ sum(CASE WHEN dd_2017.exclude_from_ia_cost_analysis = 'f' THEN dd_2017.num_stude
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN 1 ELSE 0 END) as districts_clean_upgrades_sample,
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_clean_upgrades_sample,
 sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' THEN dd_2017.num_students ELSE 0 END) as students_clean_upgrades_sample,
+-- Upgrades (Not Meeting 2016) 
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN 1 ELSE 0 END) as districts_clean_upgrades_2016_not_meeting_sample,
+sum(CASE WHEN dd_2017.exclude_from_ia_analysis = 'f' AND dd_2016.include_in_universe_of_districts = 't' AND dd_2016.exclude_from_ia_analysis = 'f' AND dd_2016.meeting_2014_goal_no_oversub = 'f' THEN dd_2017.num_students ELSE 0 END) as students_clean_upgrades_2016_not_meeting_sample,
 -- WIFI
 sum(CASE WHEN (dd_2017.needs_wifi = 't' OR dd_2017.needs_wifi = 'f') THEN 1 ELSE 0 END) as districts_wifi_sample,
 --Mega Districts
@@ -230,3 +236,4 @@ GROUP BY 1
 ORDER BY postal_cd
 
 /* This query generates the state-level and National aggregation of most of the metrics for the State Metric Dashboard for 2017. */
+
