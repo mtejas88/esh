@@ -181,6 +181,7 @@ where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
 group by 1,2) a
 where num_students_not_meeting_clean > 0
+and service_provider_assignment !='District Owned'
 )
 
 as t

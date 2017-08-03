@@ -30,18 +30,21 @@ select distinct
 	latitude,
 	longitude,
 	case
-		when  	(flag_array is null or
-				    (flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
+		when  	
+			(	flag_array is null or
+				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%')
+			)
             and ia_bandwidth_per_student_kbps > 0
-			then false
+		then false
 		else true
 	end as exclude_from_ia_analysis,
 	case
-		when 	(flag_array is null or
+		when
+			( 	flag_array is null or
 				(flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%'))
-				and ia_no_cost_lines = 0
-				and ia_bandwidth > 0
-			then false
+			and ia_no_cost_lines = 0
+			and ia_bandwidth_per_student_kbps > 0
+		then false
 		else true
 	end as exclude_from_ia_cost_analysis,
 	case
@@ -62,8 +65,8 @@ select distinct
 	tag_array,
 	flag_count as num_open_district_flags,
 	case
-		when 	(flag_array is not null or
-				flag_count = 1 and array_to_string(flag_array,',') ilike '%missing_wan%')
+		when 	flag_count > 1 
+				or (flag_count = 1 and array_to_string(flag_array,',') not ilike '%missing_wan%')
 			then 'dirty'
 		when 'outreach_confirmed' = any(tag_array)
 			then  'outreach_confirmed'
@@ -213,7 +216,7 @@ on dm.esh_id = c2.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 7/6/2017 - JH the new c2 methodology does not have the 
+Last Modified Date: 7/28/2017 - JMB fixing clean_categorization and exclude_from_ia_analysis  
 discount rate for the remaining budget (also had some name changes)
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
