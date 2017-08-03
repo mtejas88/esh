@@ -157,3 +157,15 @@ ggplot(dd_allblocks_2tgts_dsum, aes(x = factor(dlevel,levels=c("census block","b
   scale_fill_manual(values=c('#f09222' ,'#f5bc74', '#f8ddbb'))+
   theme_esh()
 dev.off()
+
+##**************************************************************************************************************************************************
+##7/12/17 After district team meeitng: list of fiber targets and the fiber providers that serve their district's census tract
+dta.477s_fiber_ct = read.csv("../data/raw/form_477s_fiber_ct3.csv", as.is=T, header=T, stringsAsFactors=F)
+names(dta.477s_fiber_ct) = c("district_esh_id", "fiber_target_status","nproviders_ct","providerlist_ct")
+
+dta.477s_fiber_ct_target=dta.477s_fiber_ct %>% filter (fiber_target_status=='Target')
+dta.477s_fiber_ct_target$providerlist_ct=gsub(",NULL}", "}", dta.477s_fiber_ct_target$providerlist_ct)
+dta.477s_fiber_ct_target$providerlist_ct=gsub("\\{|\\}", "", dta.477s_fiber_ct_target$providerlist_ct)
+
+#export
+write.csv(dta.477s_fiber_ct_target, "../data/export/service_providers_targets_ct.csv", row.names=F)
