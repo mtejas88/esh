@@ -140,13 +140,7 @@ comparison as (
 				then false
 			else dist_2017.esh_engaged_fiber_project
 		end as esh_engaged_fiber_project,		
-		case
-			when dist_2017.service_provider_assignment != dist_2016.service_provider_assignment
-			and dist_2017.service_provider_assignment is not null 
-			and dist_2016.service_provider_assignment is not null 
-				then true
-			else false
-		end as switcher,	
+		dist_2017.switcher = 'Switched' and dist_2017.purpose_match = 'Same' as switcher,	
 		case
 			when dist_2017.ia_monthly_cost_total is null 
 				then false
