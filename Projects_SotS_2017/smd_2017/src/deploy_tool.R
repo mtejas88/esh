@@ -9,7 +9,7 @@ rm(list=ls())
 
 print(Sys.time())
 
-setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
@@ -537,6 +537,18 @@ snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name
                                                         'districts_clean_ia_sample_perc', 'mega_large_clean_perc')]
 
 ## not included: state match $
+
+## add commas for numbers over 1,000
+## grab only numeric columns
+nums <- sapply(snapshots, is.numeric)
+cols <- names(snapshots)[nums]
+
+## for each numeric column, when any total is >= 1,000, format with commas
+for (col in cols){
+  if (length(which(snapshots[,col]  > 1000)) > 0){
+    snapshots[,col] <- format(snapshots[,col], big.mark = ",", nsmall = 0, scientific = FALSE)
+  }
+}
 
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
