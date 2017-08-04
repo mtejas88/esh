@@ -1,8 +1,8 @@
-## =========================================
+## ====================================================================
 ##
-## QUERY DATA FROM THE DB
+## QUERY DATA FROM THE DB - had to use mode sometimes, R got overwhelmed
 ##
-## =========================================
+## ====================================================================
 
 ## Clearing memory
 rm(list=ls())
@@ -41,13 +41,15 @@ querydb <- function(query_name){
 }
 
 districts_notmeeting <- querydb("queries/not_meeting.sql")
+districts_notmeeting <- querydb("queries/meeting.sql")
+
 #making format compatible
 logical <- c("exclude_from_ia_cost_analysis", 
              "meeting_2014_goal_no_oversub","frns_2p_bid_indicator","frns_0_bid_indicator" ,"frns_1_bid_indicator")
 districts_notmeeting[, logical] <- sapply(districts_notmeeting[, logical], function(x) ifelse(x == "t", 'true', 
                                                                                               ifelse(x =="f", 'false', x)))
-#note, got this error "An I/O error occurred while sending to the backend." - so I ended up exporting from mode
-#districts_meeting <- querydb("queries/meeting.sql")
+districts_meeting[, logical] <- sapply(districts_meeting[, logical], function(x) ifelse(x == "t", 'true', 
+                                                                                              ifelse(x =="f", 'false', x)))
 
 write.csv(districts_notmeeting, "../data/raw/districts_notmeeting.csv", row.names=F)
-#write.csv(districts_meeting, "../data/raw/districts_meeting.csv", row.names=F)
+write.csv(districts_meeting, "../data/raw/districts_meeting.csv", row.names=F)

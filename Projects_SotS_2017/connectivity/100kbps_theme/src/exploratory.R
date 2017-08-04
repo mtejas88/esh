@@ -24,6 +24,8 @@ for (i in 1:length(packages.to.install)){
   }
 }
 
+source("query_data.R")
+
 #read in data
 districts_notmeeting <- read.csv("../data/raw/districts_notmeeting.csv", as.is=T, header=T)
 districts_meeting <- read.csv("../data/raw/districts_meeting.csv", as.is=T, header=T)
