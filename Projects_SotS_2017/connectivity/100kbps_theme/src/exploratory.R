@@ -24,7 +24,7 @@ for (i in 1:length(packages.to.install)){
   }
 }
 
-source("query_data.R")
+#source("query_data.R")
 
 #read in data
 districts_notmeeting <- read.csv("../data/raw/districts_notmeeting.csv", as.is=T, header=T)
@@ -69,7 +69,7 @@ t.test(districts_t_test[["ia_monthly_cost_per_mbps"]][districts_t_test$exclude_f
 #merge in the schools meeting in the state
 districts_notmeeting_expanded=merge(districts_notmeeting,districts_meeting[,c('postal_cd','latitude','longitude')],by='postal_cd',all.x=T)
 
-length(unique(districts_notmeeting_expanded$esh_id)) #566
+length(unique(districts_notmeeting_expanded$esh_id)) #682
 districts_notmeeting_expanded=as.data.table(districts_notmeeting_expanded)
 
 system.time({
