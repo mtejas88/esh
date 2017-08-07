@@ -750,3 +750,13 @@ and dd.service_provider_assignment != ''
 
 group by dd.year,
 dd.service_provider_assignment
+
+
+/*
+
+Author: Jamie Barnes
+Date: 7/25/17
+Purpose: For NASSD Service Provider Dashboard - Calculates metrics for Primary Service Providers using dd_union. 
+Calculations are done at National and State level using a union/group by.
+
+*/

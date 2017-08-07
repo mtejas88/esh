@@ -152,3 +152,13 @@ bandwidth_in_mbps,
 months_of_service,
 line_item_total_num_lines,
 purpose
+
+
+
+/*
+
+Author: Jamie Barnes
+Date: 7/25/17
+Purpose: For NASSD Service Provider Dashboard - 2016 and 2017 clean line items in our universe.
+
+*/

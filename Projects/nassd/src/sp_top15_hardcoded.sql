@@ -811,3 +811,11 @@ union
 union
   select 2016 as year, 'Zayo Group, LLC' as service_provider_assignment, 0.11 as students_not_meeting_100k_p, 90000 as students_not_meeting_100k, 660000 as students_meeting_100k
   from sp_union
+
+/*
+
+Author: Jamie Barnes
+Date: 7/25/17
+Purpose: For NASSD Service Provider Dashboard - includes hardcoded numbers for Top 15 SPs in 2016 SotS and recalculates the same metrics for 2017 using same logic as sp_primary_sp_aggregate.sql
+
+*/
