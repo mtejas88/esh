@@ -83,18 +83,21 @@ find_new_cases <- function(table_name){
     (select 
     1
     from 
-    outliers o2
+    public.outliers o2
     where 
     cand.outlier_use_case_detail_id = o2.outlier_use_case_detail_id and
-    cand.ref_id = o2.ref_id)  
+    cand.ref_id = o2.ref_id
+    and o2.end_dt is null)  
     THEN 'insert'
-    WHEN  (cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
+    WHEN  o.end_dt is null and
+    (cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
     cand.ref_id = o.ref_id) 
     and
     (cand.value != o.value or
     cand.lambda != o.lambda)
     THEN 'update'
-    WHEN cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
+    WHEN o.end_dt is null and
+    cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
     cand.ref_id = o.ref_id and 
     cand.value = o.value and
     cand.lambda = o.lambda 
@@ -111,17 +114,15 @@ find_new_cases <- function(table_name){
     *
     from
     temp_outlier_candidates toc,
-    outlier_use_case_details oucd
+    public.outlier_use_case_details oucd
     where
     toc.use_case_name = oucd.use_case_name and
     toc.outlier_use_case_params = oucd.outlier_use_case_params and
     toc.outlier_test_case_params =oucd.outlier_test_case_params) cand
     left join
-    outliers o
+    public.outliers o
     on (cand.outlier_use_case_detail_id = o.outlier_use_case_detail_id and
-    cand.ref_id = o.ref_id)
-    where
-    o.end_dt is null;"  
+    cand.ref_id = o.ref_id);"  
     
   } 
   
@@ -132,13 +133,13 @@ update_no_longer_outliers <- function(reason){
 if (reason == 'no longer found') {
     script <- 
       "with outlier_a as (select ref_id, outlier_use_case_detail_id
-    from outliers),
+    from public.outliers),
     
     outlier_b as (select
     *
     from
     temp_outlier_candidates toc,
-    outlier_use_case_details oucd
+    public.outlier_use_case_details oucd
     where
     toc.use_case_name = oucd.use_case_name and
     toc.outlier_use_case_params = oucd.outlier_use_case_params and
