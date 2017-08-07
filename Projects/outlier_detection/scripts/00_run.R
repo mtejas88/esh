@@ -145,7 +145,7 @@ master_output=consolidate_dups('master_output_new',master_output,c('Meeting-not 
 #ucd=consolidate_dups('tableau_new',ucd,c('Meeting-not Meeting Connectivity Rule','Decrease in BW Rule'))
 #ucd=consolidate_dups('tableau_new',ucd,c('Meeting-not Meeting Affordability Rule','Increase in $/BW Rule'))
 
-master_output=master_output %>% filter(!(outlier_use_case_name %in% c('Meeting-not Meeting Connectivity Rule','Meeting-not Meeting Affordability Rule')))
+master_output=master_output %>% filter(!(outlier_use_case_name %in% c('Meeting-not Meeting Connectivity Rule','Meeting-not Meeting Affordability Rule','Decrease in Bandwidth Rule')))
 #ucd=ucd %>% filter(!(outlier_use_case_name %in% c('Meeting-not Meeting Connectivity Rule','Meeting-not Meeting Affordability Rule')))
 
 # export
