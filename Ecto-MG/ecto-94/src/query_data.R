@@ -58,6 +58,12 @@ dd_2017 <- correct.dataset(dd_2017, sots.flag=0, services.flag=0)
 ## Services Received
 sr_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_services_received_crusher_materialized.SQL")
 sr_2017 <- correct.dataset(sr_2017, sots.flag=0, services.flag=1)
+
+## also test SQL logic for unscalable
+uc_2017 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_line_items_v01.sql", sep=""))
+## also test SQL logic for scalable
+#sc_2017 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_scalable_line_items_v01.sql", sep=""))
+
 ## disconnect from database
 dbDisconnect(con)
 
@@ -66,3 +72,5 @@ dbDisconnect(con)
 
 write.csv(dd_2017, "data/raw/2017_deluxe_districts.csv", row.names=F)
 write.csv(sr_2017, "data/raw/2017_services_recieved.csv", row.names=F)
+write.csv(uc_2017, "data/raw/2017_unscalable_line_items.csv", row.names=F)
+#write.csv(sc_2017, "data/raw/2017_scalable_line_items.csv", row.names=F)
