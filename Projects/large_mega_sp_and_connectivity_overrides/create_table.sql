@@ -1,17 +1,4 @@
-CREATE TABLE public.large_mega_dqt_overrides (
-esh_id INTEGER PRIMARY KEY,
-postal_cd varchar(2),
-name varchar(250),
-district_size varchar(100),
-num_schools integer,
-num_students integer,
-status_2017 varchar(50),
-status_2016 varchar(50),
-service_provider_assignment varchar(250),
-connectivity_goal_override boolean,
-create_dt TIMESTAMP NOT NULL,
-end_dt TIMESTAMP
-);
+delete from public.large_mega_dqt_overrides;
 
 insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif School District','Large',39,33656,'Dirty','Clean','Alameda Co Office',TRUE,current_timestamp,NULL),
 (882329,'AL','Tuscaloosa City School Dist','Large',23,10249,'Dirty','Clean IA','AT&T',TRUE,current_timestamp,NULL),
@@ -65,11 +52,7 @@ insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif Sc
 (883778,'CA','Palos Verdes Peninsula Un Dist','Large',17,11576,'Dirty','Clean','Cox',FALSE,current_timestamp,NULL),
 (883052,'CA','Capistrano Unif School Dist','Mega',57,49634,'Dirty','Clean','Cox',TRUE,current_timestamp,NULL),
 (903686,'KS','Wichita Unif Sch District 259','Mega',88,50082,'Clean IA','Clean IA','Cox',TRUE,current_timestamp,NULL),
-(881743,'AL','Calhoun County School District','Large',16,9232,'Clean IA','Clean IA','CSC State and Local Solutions LLC',TRUE,current_timestamp,NULL),
-(962286,'SC','School District 5 Of Lexington And Richland Counties','Large',21,16738,'Clean IA','Clean IA','Division of Technology',TRUE,current_timestamp,NULL),
-(962235,'SC','Berkeley County School Dist','Large',40,32565,'Clean IA','Clean','Division of Technology',TRUE,current_timestamp,NULL),
-(962295,'SC','Oconee Co School District','Large',18,10550,'Dirty','Clean','Division of Technology',FALSE,current_timestamp,NULL),
-(962274,'SC','Horry County School District','Large',49,41531,'Dirty','Clean','Division of Technology',FALSE,current_timestamp,NULL),
+(881743,'AL','Calhoun County School District','Large',16,9232,'Clean IA','Clean IA','Computer Sciences',TRUE,current_timestamp,NULL),
 (889918,'GA','Fayette County Board Of Education','Large',24,20074,'Dirty','Clean','ENA Services, LLC',TRUE,current_timestamp,NULL),
 (902082,'IN','Msd Lawrence Township','Large',16,15164,'Dirty','Clean','ENA Services, LLC',TRUE,current_timestamp,NULL),
 (983313,'WA','Yakima School District 7','Large',22,15646,'Dirty','Clean','Fatbeam, LLC',NULL,current_timestamp,NULL),
@@ -103,6 +86,9 @@ insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif Sc
 (883891,'CA','San Luis Coastal Unif Sch Dist','Large',16,7482,'Dirty','Clean','San Luis Obispo',TRUE,current_timestamp,NULL),
 (883771,'CA','Pajaro Valley Unified Sch Dist','Large',26,18167,'Dirty','Clean','Santa Cruz',TRUE,current_timestamp,NULL),
 (884022,'CA','Vallejo City Unif Sch District','Large',22,13499,'Dirty','Clean','Solano Co',TRUE,current_timestamp,NULL),
+(962235,'SC','Berkeley County School Dist','Large',40,32565,'Clean IA','Clean','South Carolina Net',TRUE,current_timestamp,NULL),
+(962274,'SC','Horry County School District','Large',49,41531,'Dirty','Clean','South Carolina Net',FALSE,current_timestamp,NULL),
+(965986,'SD','Sioux Falls School District 49-5','Large',46,23497,'Dirty','Dirty','South Dakota Network',NULL,current_timestamp,NULL),
 (882631,'CA','Anaheim City School District','Large',24,19156,'Dirty','Clean','Sunesys, LLC',FALSE,current_timestamp,NULL),
 (883854,'CA','Riverside Unif School District','Large',46,41460,'Dirty','Clean','Sunesys, LLC',TRUE,current_timestamp,NULL),
 (883818,'CA','Pomona Unified School District','Large',39,24546,'Dirty','Clean','Sunesys, LLC',TRUE,current_timestamp,NULL),
@@ -130,5 +116,6 @@ insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif Sc
 (882995,'CA','Burbank Unified School Dist','Large',17,15061,'Dirty','Clean','Wilshire Connection',TRUE,current_timestamp,NULL),
 (984098,'WI','Oshkosh Area School District','Large',19,8595,'Dirty','Dirty','AT&T',NULL,current_timestamp,NULL),
 (984183,'WI','Sheboygan Area School District','Large',16,8289,'Dirty','Dirty','AT&T',TRUE,current_timestamp,NULL),
+(954189,'PA','West Chester Area District','Large',16,11618,'Clean IA','Clean','XTel Communications',FALSE,current_timestamp,NULL),
 (882594,'CA','Alum Rock Union Elem Sch Dist','Large',23,10896,'Dirty','Clean','Zayo',TRUE,current_timestamp,NULL),
 (949585,'OH','Canton City School District','Large',22,8993,'Clean IA','Clean','OARnet',TRUE,current_timestamp,NULL);

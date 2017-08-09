@@ -103,6 +103,7 @@ overrides_filled$Dominant.SP=ifelse(overrides_filled$Dominant.SP %in% c('NCDPI')
 overrides_filled$Dominant.SP=ifelse(grepl("pacific bell", overrides_filled$lowered), "AT&T", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("wisconsin bell", overrides_filled$lowered), "AT&T", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("ventura coe", overrides_filled$lowered), "VCedNet", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(overrides_filled$Dominant.SP %in% c('CSC State and Local Solutions LLC'), "Computer Sciences", overrides_filled$Dominant.SP)
 
 overrides_filled$Dominant.SP=ifelse(grepl("alameda", overrides_filled$lowered), "Alameda Co Office", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("bright", overrides_filled$lowered), "Bright House Net", overrides_filled$Dominant.SP)
@@ -120,6 +121,9 @@ overrides_filled$Dominant.SP=ifelse(grepl("northern illinois", overrides_filled$
 overrides_filled$Dominant.SP=ifelse(grepl("san luis obispo", overrides_filled$lowered), "San Luis Obispo", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("santa cruz", overrides_filled$lowered), "Santa Cruz", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("solano", overrides_filled$lowered), "Solano Co", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(grepl("south carolina net", overrides_filled$lowered), "South Carolina Net", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(grepl("south dakota network", overrides_filled$lowered), "South Dakota Network", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(grepl("xtel", overrides_filled$lowered), "XTel Communications", overrides_filled$Dominant.SP)
 
 ## Add one back
 overrides_filled=overrides_filled[,1:10]
@@ -131,23 +135,10 @@ overrides_filled$Connectivity.goal.override=ifelse(grepl("not meeting", tolower(
                                                    ifelse(overrides_filled$Connectivity.goal.override !="", 'TRUE','NULL'))
 
 #**************************************************************************************************
-## CREATE AND INSERT INTO POSTGRES TABLE - doesn't work, had to use Excel
+## CREATE AND INSERT INTO POSTGRES TABLE 
 
 script <- 
-"CREATE TABLE public.large_mega_dqt_overrides (
-esh_id INTEGER PRIMARY KEY ,
-postal_cd varchar(2),
-name varchar(250),
-district_size varchar(100),
-num_schools integer,
-num_students integer,
-status_2017 varchar(50),
-status_2016 varchar(50),
-service_provider_assignment varchar(250),
-connectivity_goal_override boolean,
-create_dt timestamp NOT NULL,
-end_dt timestamp
-); 
+"delete from public.large_mega_dqt_overrides;
 
 insert into public.large_mega_dqt_overrides values "
 
