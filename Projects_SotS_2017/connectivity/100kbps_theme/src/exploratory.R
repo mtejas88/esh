@@ -29,6 +29,7 @@ for (i in 1:length(packages.to.install)){
 #read in data
 districts_notmeeting <- read.csv("../data/raw/districts_notmeeting.csv", as.is=T, header=T)
 districts_meeting <- read.csv("../data/raw/districts_meeting.csv", as.is=T, header=T)
+districts_newlymeeting <- read.csv("../data/raw/districts_newlymeeting.csv", as.is=T, header=T)
 
 #for t tests - see if anything interesting
 districts_t_test=rbind(districts_notmeeting,districts_meeting)
@@ -66,10 +67,11 @@ t.test(districts_t_test[["ia_monthly_cost_per_mbps"]][districts_t_test$exclude_f
 ## ================================================================
 ## Calulate Haversine distance to nearest school meeting goals
 ## ================================================================
+######### Not meeting to nearest meeting
 #merge in the schools meeting in the state
 districts_notmeeting_expanded=merge(districts_notmeeting,districts_meeting[,c('postal_cd','latitude','longitude')],by='postal_cd',all.x=T)
 
-length(unique(districts_notmeeting_expanded$esh_id)) #682
+length(unique(districts_notmeeting_expanded$esh_id)) #701
 districts_notmeeting_expanded=as.data.table(districts_notmeeting_expanded)
 
 system.time({
@@ -93,5 +95,31 @@ districts_meeting=districts_meeting[c("esh_id","postal_cd","name","county","lati
                                        ,"num_campuses","frl_percent","discount_rate_c1_matrix","service_provider_assignment","frns_0_bid_indicator"         
                                        ,"frns_1_bid_indicator","frns_2p_bid_indicator","latitude.y","longitude.y","distance_hav")]
 names(districts_meeting)=names(districts_notmeeting_final)
-dta=rbind(districts_notmeeting_final,districts_meeting)
+
+######## Newly meeting to already meeting
+#merge in the schools meeting in the state
+districts_meeting_unique=districts_meeting %>% filter(!(esh_id %in% districts_newlymeeting$esh_id))
+
+districts_newmeeting_expanded=merge(districts_newlymeeting,districts_meeting_unique[,c('postal_cd','latitude.x','longitude.x')],by='postal_cd',all.x=T)
+
+length(unique(districts_newmeeting_expanded$esh_id)) #641
+districts_newmeeting_expanded=as.data.table(districts_newmeeting_expanded)
+
+system.time({
+  districts_newmeeting_expanded[,distance_hav := distHaversine(matrix(c(districts_newmeeting_expanded$longitude, districts_newmeeting_expanded$latitude), ncol = 2),
+                                                               matrix(c(districts_newmeeting_expanded$longitude.x, districts_newmeeting_expanded$latitude.x), ncol = 2))]
+  ## convert to miles
+  districts_newmeeting_expanded$distance_hav <- districts_newmeeting_expanded$distance_hav * 0.000621371
+})
+
+districts_newmeeting_final = districts_newmeeting_expanded %>% 
+  group_by(esh_id) %>% 
+  slice(which.min(distance_hav))
+names(districts_newmeeting_final)=names(districts_notmeeting_final)
+
+#merge back
+districts_notmeeting_final$goal_meeting='Not Meeting'
+districts_meeting$goal_meeting='Meeting'
+districts_newmeeting_final$goal_meeting='Newly Meeting'
+dta=rbind(districts_notmeeting_final,districts_meeting,districts_newmeeting_final)
 write.csv(dta, "../data/interim/districts_notmeeting_final.csv", row.names=F)
