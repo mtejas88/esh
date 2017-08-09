@@ -164,6 +164,14 @@ t.primary_sp_percent_of_bandwidth
 from t
 left join public.large_mega_dqt_overrides l
 on t.esh_id::integer=l.esh_id::integer
+union
+select l.esh_id::varchar,
+l.service_provider_assignment as reporting_name,
+NULL as primary_sp_purpose,
+NULL as primary_sp_bandwidth,
+NULL as primary_sp_percent_of_bandwidth
+from  public.large_mega_dqt_overrides l
+where l.esh_id::varchar not in (select esh_id from t)
 
 
 
