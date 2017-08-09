@@ -45,8 +45,8 @@ con <- dbConnect(pgsql, url=qa_url, user=qa_user, password=qa_password)
 options(java.parameters = "-Xmx1000m")
 
 ## retrieve list of all service provider reporting names
-reporting_names=as.data.frame(dbGetQuery(con,"select reporting_name from public.fy2017_services_received_matr group by 1 order by 1;"))
-reporting_names=as.data.frame(reporting_names[2:nrow(reporting_names),])
+reporting_names=as.data.frame(dbGetQuery(con,"select reporting_name from public.esh_service_providers group by 1 order by 1;"))
+#reporting_names=as.data.frame(reporting_names[2:nrow(reporting_names),])
 names(reporting_names)=c("reporting_name")
 
 ## load raw list from DQT
@@ -66,7 +66,7 @@ overrides_filled=overrides %>% filter(Dominant.SP!="")
 overrides_filled$lowered=tolower(gsub("[[:punct:]]", "", overrides_filled$Dominant.SP))
 reporting_names$lowered=tolower(gsub("[[:punct:]]", "", reporting_names$reporting_name))
 
-reporting_names = reporting_names %>% filter(reporting_name!="ATT")
+#reporting_names = reporting_names %>% filter(reporting_name!="ATT")
 
 merged=merge(overrides_filled,reporting_names,by="lowered",all.x=T)
 merged=merged %>% filter(reporting_name != "")
@@ -110,8 +110,8 @@ overrides_filled$Dominant.SP=ifelse(grepl("bright", overrides_filled$lowered), "
 overrides_filled$Dominant.SP=ifelse(grepl("brown county", overrides_filled$lowered), "Brown County", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("butte county", overrides_filled$lowered), "Butte County", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("cablevision", overrides_filled$lowered), "Cablevision", overrides_filled$Dominant.SP)
-overrides_filled$Dominant.SP=ifelse(grepl("centurylink centurytel", overrides_filled$lowered), "CenturyLink", overrides_filled$Dominant.SP)
-overrides_filled$Dominant.SP=ifelse(grepl("centurylink qwest", overrides_filled$lowered), "CenturyLink Qwest", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(grepl("centurylink", overrides_filled$lowered), "CenturyLink", overrides_filled$Dominant.SP)
+#overrides_filled$Dominant.SP=ifelse(grepl("centurylink qwest", overrides_filled$lowered), "CenturyLink Qwest", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("contra costa", overrides_filled$lowered), "Contra Costa", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("foothills", overrides_filled$lowered), "Foothills", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("fresno", overrides_filled$lowered), "Fresno County", overrides_filled$Dominant.SP)
@@ -124,6 +124,7 @@ overrides_filled$Dominant.SP=ifelse(grepl("solano", overrides_filled$lowered), "
 overrides_filled$Dominant.SP=ifelse(grepl("south carolina net", overrides_filled$lowered), "South Carolina Net", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("south dakota network", overrides_filled$lowered), "South Dakota Network", overrides_filled$Dominant.SP)
 overrides_filled$Dominant.SP=ifelse(grepl("xtel", overrides_filled$lowered), "XTel Communications", overrides_filled$Dominant.SP)
+overrides_filled$Dominant.SP=ifelse(grepl("zayo", overrides_filled$lowered), "Zayo Group, LLC", overrides_filled$Dominant.SP)
 
 ## Add one back
 overrides_filled=overrides_filled[,1:10]
@@ -138,7 +139,20 @@ overrides_filled$Connectivity.goal.override=ifelse(grepl("not meeting", tolower(
 ## CREATE AND INSERT INTO POSTGRES TABLE 
 
 script <- 
-"delete from public.large_mega_dqt_overrides;
+"CREATE TABLE public.large_mega_dqt_overrides (
+esh_id INTEGER PRIMARY KEY ,
+postal_cd varchar(2),
+name varchar(250),
+district_size varchar(100),
+num_schools integer,
+num_students integer,
+status_2017 varchar(50),
+status_2016 varchar(50),
+service_provider_assignment varchar(250),
+connectivity_goal_override boolean,
+create_dt timestamp NOT NULL,
+end_dt timestamp
+); 
 
 insert into public.large_mega_dqt_overrides values "
 

@@ -1,4 +1,17 @@
-delete from public.large_mega_dqt_overrides;
+CREATE TABLE public.large_mega_dqt_overrides (
+esh_id INTEGER PRIMARY KEY ,
+postal_cd varchar(2),
+name varchar(250),
+district_size varchar(100),
+num_schools integer,
+num_students integer,
+status_2017 varchar(50),
+status_2016 varchar(50),
+service_provider_assignment varchar(250),
+connectivity_goal_override boolean,
+create_dt timestamp NOT NULL,
+end_dt timestamp
+); 
 
 insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif School District','Large',39,33656,'Dirty','Clean','Alameda Co Office',TRUE,current_timestamp,NULL),
 (882329,'AL','Tuscaloosa City School Dist','Large',23,10249,'Dirty','Clean IA','AT&T',TRUE,current_timestamp,NULL),
@@ -17,7 +30,7 @@ insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif Sc
 (941199,'NJ','Edison Twp School District','Large',19,14669,'Dirty','Clean IA','Cablevision',TRUE,current_timestamp,NULL),
 (941508,'NJ','Passaic City School District','Large',16,13187,'Dirty','Clean','Cablevision',TRUE,current_timestamp,NULL),
 (909712,'LA','Caddo Parish School District','Mega',62,39723,'Clean IA','Dirty','CenturyLink',FALSE,current_timestamp,NULL),
-(883345,'AZ','Deer Valley Unif Sch Dist 97','Large',38,34109,'Dirty','Clean','CenturyLink Qwest',TRUE,current_timestamp,NULL),
+(883345,'AZ','Deer Valley Unif Sch Dist 97','Large',38,34109,'Dirty','Clean','CenturyLink',TRUE,current_timestamp,NULL),
 (881755,'CA','Porterville Unified School District','Large',20,13300,'Dirty','Clean','Charter',TRUE,current_timestamp,NULL),
 (883374,'CA','Garden Grove Unified Sch Dist','Mega',66,46360,'Dirty','Clean','Charter',TRUE,current_timestamp,NULL),
 (883165,'CA','Corona-Norco Unif Sch District','Mega',51,53710,'Dirty','Clean','Charter',TRUE,current_timestamp,NULL),
@@ -117,5 +130,5 @@ insert into public.large_mega_dqt_overrides values (883354,'CA','Fremont Unif Sc
 (984098,'WI','Oshkosh Area School District','Large',19,8595,'Dirty','Dirty','AT&T',NULL,current_timestamp,NULL),
 (984183,'WI','Sheboygan Area School District','Large',16,8289,'Dirty','Dirty','AT&T',TRUE,current_timestamp,NULL),
 (954189,'PA','West Chester Area District','Large',16,11618,'Clean IA','Clean','XTel Communications',FALSE,current_timestamp,NULL),
-(882594,'CA','Alum Rock Union Elem Sch Dist','Large',23,10896,'Dirty','Clean','Zayo',TRUE,current_timestamp,NULL),
+(882594,'CA','Alum Rock Union Elem Sch Dist','Large',23,10896,'Dirty','Clean','Zayo Group, LLC',TRUE,current_timestamp,NULL),
 (949585,'OH','Canton City School District','Large',22,8993,'Clean IA','Clean','OARnet',TRUE,current_timestamp,NULL);
