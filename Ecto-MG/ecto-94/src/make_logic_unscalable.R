@@ -17,6 +17,8 @@ library(dplyr) ## for the arrange function
 dd_2017 <- read.csv("data/raw/2017_deluxe_districts.csv")
 sr_2017 <- read.csv("data/raw/2017_services_recieved.csv")
 uc_2017 <- read.csv("data/raw/2017_unscalable_line_items.csv")
+uc_wan <- read.csv("data/raw/2017_unscalable_wan.csv")
+uc_ia <- read.csv("data/raw/2017_unscalable_ia.csv")
 
 ##**************************************************************************************************************************************************
 
@@ -27,7 +29,9 @@ dd_2017_sub <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE & 
 ## not subsetting to district_type = Traditional since we are including AZ Charters
 sr_2017_sub <- sr_2017[which(sr_2017$recipient_include_in_universe_of_districts == TRUE &
                      sr_2017$recipient_exclude_from_ia_analysis == FALSE &
-                     sr_2017$inclusion_status %in% c('clean_no_cost', 'clean_with_cost')),]
+                     sr_2017$inclusion_status %in% c('clean_no_cost', 'clean_with_cost') &
+                     (!sr_2017$connect_category %in% c('ISP Only', 'Lit Fiber', 'Dark Fiber')) &
+                     sr_2017$purpose %in% c('Internet', 'Upstream', 'WAN')),]
 
 ## format when monthly_circuit_cost_recurring == 0:
 ## use monthly_circuit_cost_total / months_of_service
@@ -36,18 +40,14 @@ sr_2017_sub$monthly_circuit_cost_recurring <- ifelse(sr_2017_sub$monthly_circuit
                                                      sr_2017_sub$monthly_circuit_cost_recurring)
 
 ## create an indicator for ISP (make NA for scalable/unscalable)
-sr_2017_sub$isp_indicator <- ifelse(sr_2017_sub$connect_category == 'ISP Only' | sr_2017_sub$purpose == 'ISP', 1, 0)
+#sr_2017_sub$isp_indicator <- ifelse(sr_2017_sub$connect_category == 'ISP Only' | sr_2017_sub$purpose == 'ISP', 1, 0)
 
 ## create an indicator for Copper services ('DSL', 'T-1', 'Cable', 'Other Copper')
 sr_2017_sub$copper <- ifelse(sr_2017_sub$connect_category %in% c('DSL', 'T-1', 'Cable', 'Other Copper'), 1, 0)
 
 ## create an indicator for scalable vs unscalable
-sr_2017_sub$unscalable_ia <- ifelse(!sr_2017_sub$connect_category %in% c('Lit Fiber', 'Dark Fiber') &
-                                      sr_2017_sub$isp_indicator != 1 &
-                                      sr_2017_sub$purpose %in% c('Internet', 'Upstream'), 1, ifelse(sr_2017_sub$isp_indicator == 1, NA, 0))
-sr_2017_sub$unscalable_wan <- ifelse(!sr_2017_sub$connect_category %in% c('Lit Fiber', 'Dark Fiber') &
-                                      sr_2017_sub$isp_indicator != 1 & sr_2017_sub$purpose == 'WAN', 1,
-                                     ifelse(sr_2017_sub$isp_indicator == 1, NA, 0))
+sr_2017_sub$unscalable_ia <- ifelse(sr_2017_sub$purpose %in% c('Internet', 'Upstream'), 1, 0)
+sr_2017_sub$unscalable_wan <- ifelse(sr_2017_sub$purpose == 'WAN', 1, 0)
 
 ## aggregate the unscalable line items for each district
 district.agg.ia <- aggregate(sr_2017_sub$unscalable_ia, by=list(sr_2017_sub$recipient_id), FUN=sum, na.rm=T)
@@ -123,5 +123,16 @@ combined$wan_compare <- ifelse(is.na(combined$unscalable_wan_line_id) & is.na(co
                                              ifelse(combined$unscalable_wan_line_id == combined$line_item_id_unscalable_wan_qa, "SAME", "NOT"))))
 table(combined$wan_compare)
 
+names(uc_wan) <- paste(names(uc_wan), "_qa", sep="")
+combined_wan <- merge(dta_unscalable_wan[,c('recipient_id', 'unscalable_wan_line_id')],
+                      uc_wan[,c('recipient_id_qa', "line_item_id_unscalable_wan_qa")],
+                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
+combined_wan$diff <- ifelse(combined_wan$unscalable_wan_line_id == combined_wan$line_item_id_unscalable_wan_qa, FALSE, TRUE)
+
+names(uc_ia) <- paste(names(uc_ia), "_qa", sep="")
+combined_ia <- merge(dta_unscalable_ia[,c('recipient_id', 'unscalable_ia_line_id')],
+                      uc_ia[,c('recipient_id_qa', "line_item_id_unscalable_ia_qa")],
+                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
+combined_ia$diff <- ifelse(combined_ia$unscalable_ia_line_id == combined_ia$line_item_id_unscalable_ia_qa, FALSE, TRUE)
 
 
