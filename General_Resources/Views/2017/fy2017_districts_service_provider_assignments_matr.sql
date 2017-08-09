@@ -25,6 +25,14 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'ENA Services, LLC'
 
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
                   then 'Charter'
@@ -89,6 +97,14 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
                 when reporting_name = 'Ed Net of America'
 
                   then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
 
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
@@ -156,7 +172,19 @@ this prevents the creation of the materialized view due to division error of 0*/
 )
 
 select t.esh_id,
-case when l.esh_id is not null then l.service_provider_assignment
+case when l.esh_id is not null then (
+  case
+
+                when l.service_provider_assignment = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when l.service_provider_assignment in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                else l.service_provider_assignment end
+)
 else t.reporting_name end as reporting_name,
 t.primary_sp_purpose,
 t.primary_sp_bandwidth,
@@ -166,7 +194,18 @@ left join public.large_mega_dqt_overrides l
 on t.esh_id::integer=l.esh_id::integer
 union
 select l.esh_id::varchar,
-l.service_provider_assignment as reporting_name,
+  case
+
+                when l.service_provider_assignment = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when l.service_provider_assignment in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                else l.service_provider_assignment end
+as reporting_name,
 NULL as primary_sp_purpose,
 NULL as primary_sp_bandwidth,
 NULL as primary_sp_percent_of_bandwidth
