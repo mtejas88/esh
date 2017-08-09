@@ -118,6 +118,13 @@ case
   then 'Town'
   else locale
 end as locale,
+case 
+	when f.locale = 'Small Town' or f.locale = 'Rural'
+	then 'Rural & Town'
+	when f.locale = 'Urban' or f.locale = 'Suburban'
+	then 'Urban & Suburban'
+	else null
+end as locale_2,
 f.district_size,
 f.frl_percent,
 case
@@ -181,7 +188,8 @@ null as unscalable_campuses,
 null as needs_wifi,
 null as percent_c2_budget_used,
 null as percent_c2_budget_remaining,
-null as c2_prediscount_remaining,
+null as c2_prediscount_remaining, 
+null as c2_postdiscount_remaining,
 
 -- AFFORDABILITY
 null as meeting_knapsack,
@@ -240,6 +248,13 @@ dd.num_students,
 dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
+case
+	when dd.locale = 'Town' or dd.locale = 'Rural'
+	then 'Rural & Town' 
+	when dd.locale = 'Urban' or dd.locale = 'Suburban'
+	then 'Urban & Suburban'
+	else null
+end as locale_2,
 dd.district_size,
 dd.frl_percent,
 case
@@ -343,9 +358,18 @@ case
   then 0
   else null
 end as needs_wifi,
-(dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15 as percent_c2_budget_used,
-1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) as percent_c2_budget_remaining,
+case
+	when dd.c2_prediscount_budget_15 = 0
+	then null
+	else (dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15
+end as percent_c2_budget_used,
+case 
+	when dd.c2_prediscount_budget_15 = 0
+	then null
+	else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) 
+end as percent_c2_budget_remaining,
 dd.c2_prediscount_remaining_16 as c2_prediscount_remaining,
+dd.c2_postdiscount_remaining_16 as c2_postdiscount_remaining,
 
 -- AFFORDABILITY
 case
@@ -448,6 +472,13 @@ dd.num_students,
 dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
+case
+	when dd.locale = 'Town' or dd.locale = 'Rural'
+	then 'Rural & Town' 
+	when dd.locale = 'Urban' or dd.locale = 'Suburban'
+	then 'Urban & Suburban'
+	else null
+end as locale_2,
 dd.district_size,
 dd.frl_percent,
 case
@@ -562,6 +593,7 @@ case
   else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_17)/dd.c2_prediscount_budget_15) 
 end as percent_c2_budget_remaining,
 dd.c2_prediscount_remaining_17 as c2_prediscount_remaining,
+dd.c2_postdiscount_remaining_17 as c2_postdiscount_remaining,
 
 -- AFFORDABILITY
 case

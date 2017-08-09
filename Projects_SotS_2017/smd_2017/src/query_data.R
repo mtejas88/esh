@@ -41,8 +41,11 @@ date <- gsub(" ", "_", date)
 date <- gsub(":", ".", date)
 
 ##**************************************************************************************************************************************************
-## read in outliers
+## READ IN DATA
+
 outlier_output <- read.csv("../../General_Resources/datasets/outlier_output.csv")
+
+##**************************************************************************************************************************************************
 ## QUERY THE DB
 
 ## load PostgreSQL Driver
@@ -58,15 +61,19 @@ querydb <- function(query_name){
 ## Connect to current DB -- ONYX
 con <- dbConnect(pgsql, url=url, user=user, password=password)
 ## State Aggregation
-smd_2017 <- querydb("../../General_Resources/sql_scripts/2017_smd.SQL")
-smd_2016 <- querydb("../../General_Resources/sql_scripts/2016_smd.SQL")
+smd_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_smd.SQL")
+smd_2016 <- querydb("../../General_Resources/sql_scripts/2016/2016_smd.SQL")
 ## Districts Deluxe
-dd_2017 <- querydb("../../General_Resources/sql_scripts/2017_deluxe_districts.SQL")
+dd_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_deluxe_districts.SQL")
 dd_2017 <- correct.dataset(dd_2017, sots.flag=0, services.flag=0)
-dd_2016 <- querydb("../../General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL")
+dd_2016 <- querydb("../../General_Resources/sql_scripts/2016/2016_deluxe_districts_crusher_materialized.SQL")
 dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
+## Snapshot metrics for Rural/Small Town
+rural_small_town <- querydb("../../General_Resources/sql_scripts/2017/snapshots.sql")
+## Top Service Providers not meeting goals
+top_sp <- querydb("../../General_Resources/sql_scripts/2017/state_snapshot_sp_report.sql")
 ## Outlier Flags
-resolved_outliers <- querydb("../../General_Resources/sql_scripts/resolved_outliers_smd.SQL")
+resolved_outliers <- querydb("../../General_Resources/sql_scripts/2017/2017_resolved_outliers_smd.SQL")
 ## Merge outliers
 dd_2017 <- merge(x = dd_2017, y = resolved_outliers, by = "esh_id", all.x = TRUE)
 dd_2017 <- merge(x = dd_2017, y = outlier_output, by = "esh_id", all.x = TRUE)
@@ -76,10 +83,10 @@ dbDisconnect(con)
 
 ## Connect to 2016 Frozen DB -- PINK
 #con <- dbConnect(pgsql, url=url_pink, user=user_pink, password=password_pink)
-#smd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016_smd.SQL")
-#dd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016_deluxe_districts_crusher_materialized.SQL")
+#smd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_smd.SQL")
+#dd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_deluxe_districts_crusher_materialized.SQL")
 #dd_2016_froz <- correct.dataset(dd_2016_froz, sots.flag=0, services.flag=0)
-#dd_2015_froz <- querydb("../../General_Resources/sql_scripts/2015_deluxe_districts_crusher_materialized.SQL")
+#dd_2015_froz <- querydb("../../General_Resources/sql_scripts/2015/2015_deluxe_districts_crusher_materialized.SQL")
 #dd_2015_froz <- correct.dataset(dd_2015_froz, sots.flag=0, services.flag=0)
 ## disconnect from database
 #dbDisconnect(con)
@@ -88,26 +95,28 @@ dbDisconnect(con)
 ## write out the datasets
 
 ## store the datasets daily for now
-if (weekday == 'Monday'){
+#if (weekday == 'Monday'){
   ## State Aggregation
-  write.csv(smd_2017, paste("data/raw/2017_state_aggregation_", date, ".csv", sep=''), row.names=F)
-  write.csv(smd_2016, paste("data/raw/2016_state_aggregation_", date, ".csv", sep=''), row.names=F)
+#  write.csv(smd_2017, paste("data/raw/state_aggregation/2017_state_aggregation_", date, ".csv", sep=''), row.names=F)
+#  write.csv(smd_2016, paste("data/raw/state_aggregation/2016_state_aggregation_", date, ".csv", sep=''), row.names=F)
   ## Districts Deluxe
-  write.csv(dd_2017, paste("data/raw/2017_deluxe_districts_", date, ".csv", sep=''), row.names=F)
-  write.csv(dd_2016, paste("data/raw/2016_deluxe_districts_", date, ".csv", sep=''), row.names=F)
-}
+#  write.csv(dd_2017, paste("data/raw/deluxe_districts/2017_deluxe_districts_", date, ".csv", sep=''), row.names=F)
+#  write.csv(dd_2016, paste("data/raw/deluxe_districts/2016_deluxe_districts_", date, ".csv", sep=''), row.names=F)
+#}
 
 ## write out generically
 ## State Aggregation
-write.csv(smd_2017, "data/raw/2017_state_aggregation.csv", row.names=F)
-write.csv(smd_2016, "data/raw/2016_state_aggregation.csv", row.names=F)
-#write.csv(smd_2016_froz, "data/raw/2016_2015_frozen_state_aggregation.csv", row.names=F)
+write.csv(smd_2017, "data/raw/state_aggregation/2017_state_aggregation.csv", row.names=F)
+write.csv(smd_2016, "data/raw/state_aggregation/2016_state_aggregation.csv", row.names=F)
+write.csv(rural_small_town, "data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", row.names=F)
+
+## Service Providers
+write.csv(top_sp, "data/raw/top_service_providers.csv", row.names=F)
+
 ## Districts Deluxe
-write.csv(dd_2017, "data/raw/2017_deluxe_districts.csv", row.names=F)
-write.csv(dd_2016, "data/raw/2016_deluxe_districts.csv", row.names=F)
-#write.csv(dd_2016_froz, "data/raw/2016_frozen_deluxe_districts.csv", row.names=F)
-#write.csv(dd_2015_froz, "data/raw/2015_frozen_deluxe_districts.csv", row.names=F)
-#write.csv(outlier_output, "data/raw/outlier_output.csv", row.names=F)
+write.csv(dd_2017, "data/raw/deluxe_districts/2017_deluxe_districts.csv", row.names=F)
+write.csv(dd_2016, "data/raw/deluxe_districts/2016_deluxe_districts.csv", row.names=F)
+
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
 names(date.dta) <- 'date'
