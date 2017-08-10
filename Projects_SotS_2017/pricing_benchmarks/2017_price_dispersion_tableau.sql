@@ -44,7 +44,6 @@ sr as (select line_item_id,
 
 select count(sr.line_item_id) as line_items_in_sample,
 sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps,
 '10th' as percentile,
 PERCENTILE_CONT (0.10) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "mrc_unless_null",
@@ -73,14 +72,12 @@ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,
 or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
 
 group by sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps
 
 union 
 
 select count(sr.line_item_id) as line_items_in_sample,
 sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps,
 '25th' as percentile,
 PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "mrc_unless_null",
@@ -108,16 +105,14 @@ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,
 or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
 
 group by sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps
 
 union 
 
 select count(sr.line_item_id) as line_items_in_sample,
 sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps,
-'median' as percentile,
+'Median' as percentile,
 median(sr.monthly_circuit_cost_mrc_unless_null) as "mrc_unless_null",
 case
   when purpose = 'WAN'
@@ -144,14 +139,12 @@ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,
 or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
 
 group by sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps
 
 union 
 
 select count(sr.line_item_id) as line_items_in_sample,
 sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps,
 '75th' as percentile,
 PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "mrc_unless_null",
@@ -180,14 +173,12 @@ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,
 or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
 
 group by sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps
 
 union 
 
 select count(sr.line_item_id) as line_items_in_sample,
 sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps,
 '90th' as percentile,
 PERCENTILE_CONT (0.90) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "mrc_unless_null",
@@ -216,7 +207,6 @@ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,
 or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
 
 group by sr.purpose,
-sr.connect_category,
 sr.bandwidth_in_mbps
 
 order by purpose, bandwidth_in_mbps, mrc_unless_null
