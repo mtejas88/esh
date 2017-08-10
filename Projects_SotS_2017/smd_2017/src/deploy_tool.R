@@ -579,7 +579,7 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 ## Snapshots
 write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 ## also store the snapshots 
-write.csv(snapshots, paste("data/raw/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
+#write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## Date
 write.csv(date, "tool/data/date.csv", row.names=F)
