@@ -1,3 +1,4 @@
+with t as (
 select  recipient_sp_bw_rank.recipient_id as esh_id,
 
 reporting_name,
@@ -23,6 +24,14 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
                 when reporting_name = 'Ed Net of America'
 
                   then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
 
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
@@ -89,6 +98,14 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'ENA Services, LLC'
 
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
 
                   then 'Charter'
@@ -152,7 +169,48 @@ this prevents the creation of the materialized view due to division error of 0*/
 
   and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
 
+)
 
+select t.esh_id,
+case when l.esh_id is not null then (
+  case
+
+                when l.service_provider_assignment = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when l.service_provider_assignment in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                else l.service_provider_assignment end
+)
+else t.reporting_name end as reporting_name,
+t.primary_sp_purpose,
+t.primary_sp_bandwidth,
+t.primary_sp_percent_of_bandwidth
+from t
+left join public.large_mega_dqt_overrides l
+on t.esh_id::integer=l.esh_id::integer
+union
+select l.esh_id::varchar,
+  case
+
+                when l.service_provider_assignment = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when l.service_provider_assignment in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                else l.service_provider_assignment end
+as reporting_name,
+NULL as primary_sp_purpose,
+NULL as primary_sp_bandwidth,
+NULL as primary_sp_percent_of_bandwidth
+from  public.large_mega_dqt_overrides l
+where l.esh_id::varchar not in (select esh_id from t)
 
 
 
@@ -179,5 +237,10 @@ Name of Modifier: Saaim Aslam
 Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise.
+
+Modified Date: 8/9/2017
+Name of Modifier: Sierra Costanza
+Purpose/Methodology: Small modifications to reporting name (if null, use service_provider_name). The same logic was ap[plied to the 2016 view.
+Also applying a table with DQT primary service provider overrides for some mostly dirty Large and Mega districts unique to 2017.
 
 */
