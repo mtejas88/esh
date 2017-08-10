@@ -148,7 +148,7 @@ FROM (
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
-            select distinct name, reporting_name
+            select distinct id, reporting_name
             from public.esh_service_providers
           ) spc
           ON spc.id = li.service_provider_id
