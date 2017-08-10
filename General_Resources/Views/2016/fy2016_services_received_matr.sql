@@ -149,9 +149,9 @@ FROM (
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
             select distinct name, reporting_name
-            from fy2016.service_providers
+            from public.esh_service_providers
           ) spc
-          ON spc.name = li.service_provider_name
+          ON spc.id = li.service_provider_id
           LEFT OUTER JOIN public.fy2016_districts_predeluxe_matr dd
           ON dd.esh_id = lid.district_esh_id
           LEFT OUTER JOIN fy2016.districts d
