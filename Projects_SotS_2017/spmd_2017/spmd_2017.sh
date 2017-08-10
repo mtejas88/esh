@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "$(date)"
-cd ~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/
-echo "Generating State Metrics and Deploying Tool..."
+cd ~/Documents/ESH-Code/ficher/Projects_SotS_2017/spmd_2017/
+echo "Generating Service Provider Metrics and Deploying Tool..."
 echo "Querying Data"
 R CMD BATCH src/query_data.R out_files/query_data.Rout
 echo "Deploying Tool"
