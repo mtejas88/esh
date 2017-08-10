@@ -120,5 +120,9 @@ AND dd_2017.district_type = 'Traditional'
 AND dd_2017.include_in_universe_of_districts = 't'
 AND dd_2017.service_provider_assignment not in ('NC Office', 'State Replacement ', 'OneNet', 'OneNet ', '')
 AND dd_2017.service_provider_assignment is not null
+AND dd_2016.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC', 'AE', 'AP', 'AS', 'MP')
+AND dd_2016.district_type = 'Traditional'
+AND dd_2016.include_in_universe_of_districts = 't'
+AND dd_2016.service_provider_assignment not in ('NC Office', 'State Replacement ', 'OneNet', 'OneNet ', '')
+AND dd_2016.service_provider_assignment is not null
 GROUP BY dd_2017.service_provider_assignment
-

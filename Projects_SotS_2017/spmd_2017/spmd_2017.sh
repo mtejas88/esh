@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "$(date)"
-cd "~/Documents/ESH_Code/ficher/Projects_SotS_2017/spmd_2017/"
+cd ~/Documents/ESH-Code/ficher/Projects_SotS_2017/spmd_2017/
 echo "Generating Service Provider Metrics and Deploying Tool..."
 echo "Querying Data"
 R CMD BATCH src/query_data.R out_files/query_data.Rout

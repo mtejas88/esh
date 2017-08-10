@@ -15,6 +15,10 @@ resource_files:
 - data/snapshots.csv
 - data/tool_colors.csv
 - data/date.csv
+- data/sp16_not_meeting.csv
+- data/sp17_not_meeting.csv
+- data/sp_overlap.csv
+- data/sp_overlap_not_meeting.csv
 
 runtime: shiny
 output:
@@ -43,6 +47,8 @@ library(ggplot2)
 library(DT)
 ## need for html use in code (I think)
 library(htmltools)
+## for interactive plots
+library(plotly)
 ```
 
 
@@ -52,6 +58,8 @@ library(htmltools)
 ## state aggregated metrics for each year
 sp.agg.2017 <- read.csv("data/2017_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 sp.agg.2016 <- read.csv("data/2016_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.overlap <- read.csv("data/sp_overlap.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.overlap.not.meeting <- read.csv("data/sp_overlap_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## click-throughs
 current17_ct <- read.csv("data/current17_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -60,14 +68,21 @@ upgrades_ct <- read.csv("data/upgrades_click_through.csv", as.is=T, header=T, st
 connectivity_ct <- read.csv("data/connectivity_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 fiber_ct <- read.csv("data/fiber_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
 affordability_ct <- read.csv("data/affordability_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+
 ## targets
 connectivity_tar <- read.csv("data/connectivity_targets.csv", as.is=T, header=T, stringsAsFactors=F)
 fiber_tar <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFactors=F)
+
 ## color data
 colors <- suppressWarnings(read.csv("data/tool_colors.csv", as.is=T, header=T, stringsAsFactors=F))
+
 ## date
 date.updated <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
 date.updated <- date.updated$date
+
+## not meeting subsets
+sp16.not.meeting <- read.csv("data/sp16_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
+sp17.not.meeting <- read.csv("data/sp17_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
 ```
 
 
@@ -790,9 +805,127 @@ Target Lists Fiber {.hidden data-orientation=rows}
 })
 ```
 
-Press Stories (Urban) {data-orientation=rows}
+Overview {data-orientation=rows}
 =================================================================================================
 Row 
 ----------------------------------------------------------------------
-### 
+###
+```{r}
+dta <- sp.overlap[,c('service_provider_assignment',
+                     'median_ia_monthly_cost_per_mbps', 'median_ia_monthly_cost_per_mbps_2016',
+                     'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal',
+                     'students_clean_ia_sample', 'students_meeting_2014_bw_goal',
+                     'districts_clean_ia_sample_2016', 'districts_meeting_2014_bw_goal_2016',
+                     'students_clean_ia_sample_2016', 'students_meeting_2014_bw_goal_2016',
+                     'students_not_meeting_2014_bw_goal', 'students_not_meeting_2014_bw_goal_2016',
+                     'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal',
+                     'districts_not_meeting_2014_bw_goal', 'districts_not_meeting_2014_bw_goal_2016')]
+## calculate percentage of students not meeting goal
+dta$students_not_meeting_2014_bw_goal_perc <- dta$students_not_meeting_2014_bw_goal / dta$students_clean_ia_sample
+p <- plot_ly(dta, x=~median_ia_monthly_cost_per_mbps_2016, y=~median_ia_monthly_cost_per_mbps,
+             text=~service_provider_assignment, type='scatter', mode='markers',
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+             marker=list(size = 10)) %>%
+  layout(title = 'Top 50 Service Providers',
+         xaxis = list(showgrid = FALSE, range=c(0,8), title='2016 Median Cost/Mbps'),
+         yaxis = list(showgrid = FALSE, range=c(0,8), title='2017 Median Cost/Mbps'))
+p
+
+#p <- plot_ly(dta, x=~median_ia_monthly_cost_per_mbps_2016, y=~median_ia_monthly_cost_per_mbps,
+#             text=~service_provider_assignment, type='scatter', mode='markers',
+#             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+#             marker=list(size=~(students_clean_ia_sample/50000), opacity=0.7)) %>%
+            #,width=500, height=500) %>%
+#  layout(title = 'Top 20 Service Providers Not Meeting Goals',
+#         xaxis = list(showgrid = FALSE, range=c(0,10), title='2016 Cost/Mbps'),
+#         yaxis = list(showgrid = FALSE, range=c(0,10), title='2017 Cost/Mbps'))
+```
+
+
+###
+```{r}
+
+p <- plot_ly(dta, x=~districts_clean_ia_sample_2016, y=~districts_clean_ia_sample,
+             text=~service_provider_assignment, type='scatter', mode='markers',
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+             marker=list(size = 10)) %>%
+  layout(title = 'Top 50 Service Providers',
+         xaxis = list(showgrid = FALSE, range=c(0,200), title='2016 Districts Served'),
+         yaxis = list(showgrid = FALSE, range=c(0,200), title='2017 Districts Served'))
+p
+```
+
+
+Row
+---------------------------------------------------------------------
+###
+```{r}
+
+## subset to top 20
+sp16.not.meeting$students_not_meeting_2014_bw_goal_perc <- sp16.not.meeting$students_not_meeting_2014_bw_goal / sp16.not.meeting$students_clean_ia_sample
+dta.2016 <- sp16.not.meeting[which(sp16.not.meeting$rank %in% seq(1,20)),]
+dta.2016 <- dta.2016[order(dta.2016$rank, decreasing=F),]
+
+## plot top 20 not meeting goal
+## set margins
+m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
+p3 <- plot_ly(dta.2016, x=~service_provider_assignment,
+             y=~students_not_meeting_2014_bw_goal,
+             type='bar', text=text,
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+  layout(title = 'Top 20 Service Providers Not Meeting Goals (2016)',
+         xaxis = list(showgrid = FALSE, title=''),
+         yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),
+         legend = list(title='Overall Percent of Students Not Meeting Goals'))
+p3
+
+```
+
+
+###
+```{r}
+
+## Top 20 SPs Not Meeting Goals
+names(sp16.not.meeting)[names(sp16.not.meeting) == 'median_ia_monthly_cost_per_mbps'] <- 'median_ia_monthly_cost_per_mbps_2016'
+names(sp16.not.meeting)[names(sp16.not.meeting) == 'rank'] <- 'rank_2016'
+dta <- merge(sp17.not.meeting[,c('service_provider_assignment', 'median_ia_monthly_cost_per_mbps',
+                        'students_clean_ia_sample', 'students_meeting_2014_bw_goal',
+                        'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal', 'rank')],
+             sp16.not.meeting[,c('service_provider_assignment', 'median_ia_monthly_cost_per_mbps_2016', 'rank_2016')],
+             by='service_provider_assignment', all.x=T)
+dta <- dta[which(dta$rank %in% seq(1,20)),]
+## calculate percentage of students not meeting goal
+dta$students_not_meeting_2014_bw_goal <- dta$students_clean_ia_sample - dta$students_meeting_2014_bw_goal
+dta$students_not_meeting_2014_bw_goal_perc <- dta$students_not_meeting_2014_bw_goal / dta$students_clean_ia_sample
+
+## subset to top 20
+dta.2017 <- dta[which(dta$rank %in% seq(1,20)),]
+dta.2017 <- dta.2017[order(dta.2017$rank, decreasing=F),]
+
+## plot top 20 not meeting goal
+#x <- dta.2017$service_provider_assignment
+#dta.2017$x <- factor(dta.2017$service_provider_assignment, levels = x)
+#p2 <- plot_ly(dta.2017, x=~x, y=~students_not_meeting_2014_bw_goal,
+#              type = 'bar', marker = list(color = 'rgb(49,130,189)'),
+#              color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+#      layout(title = 'Top 15 Service Providers Not Meeting Goals',
+#              xaxis = list(showgrid = FALSE, title=''),
+#              yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),
+#              legend = list(title='Overall Percent of Students Not Meeting Goals'))
+
+
+## set margins
+m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
+p2 <- plot_ly(dta.2017, x=~service_provider_assignment,
+             y=~students_not_meeting_2014_bw_goal,
+             type='bar', text=text,
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+             #,width=1000, height=1000) %>%
+  layout(title = 'Top 20 Service Providers Not Meeting Goals (2017)',
+         xaxis = list(showgrid = FALSE, title=''),
+         yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),#, range=c(0,max(dta.2016$students_not_meeting_2014_bw_goal))),
+         legend = list(title='Overall Percent of Students Not Meeting Goals'))
+p2
+
+```
 

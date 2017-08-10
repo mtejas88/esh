@@ -14,7 +14,7 @@ print(Sys.time())
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("flexdashboard", "shiny", "dplyr", "highcharter", "rsconnect", "ggplot2", "DT",
-                         "htmltools", "dotenv", "knitr", "rmarkdown", "DBI")
+                         "htmltools", "dotenv", "knitr", "rmarkdown", "DBI", "plotly")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
@@ -32,6 +32,7 @@ library(dotenv)
 library(knitr)
 library(rmarkdown)
 library(DBI)
+library(plotly)
 
 ## source environment variables
 source("../../General_Resources/common_functions/source_env.R")
@@ -53,6 +54,8 @@ actual.date <- gsub(":", ".", actual.date)
 ## SP Aggregation
 sp_2017 <- read.csv("data/raw/sp_aggregation/2017_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 sp_2016 <- read.csv("data/raw/sp_aggregation/2016_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+sp_2017_overlap <- read.csv("data/raw/sp_aggregation/2017_sp_aggregation_clean_both_years.csv", as.is=T, header=T, stringsAsFactors=F)
+sp_2016_overlap <- read.csv("data/raw/sp_aggregation/2016_sp_aggregation_clean_both_years.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Deluxe Districts
 dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -67,34 +70,53 @@ date <- read.csv("data/raw/date.csv", as.is=T, header=T, stringsAsFactors=F)
 ## make sure to include districts in universe
 dd_2017 <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE),]
 dd_2016 <- dd_2016[which(dd_2016$include_in_universe_of_districts == TRUE),]
-
 ## also subset to Traditional districts
 dd_2017 <- dd_2017[which(dd_2017$district_type == "Traditional"),]
 dd_2016 <- dd_2016[which(dd_2016$district_type == "Traditional"),]
 
-## take out NA SP
-dd_2017 <- dd_2017[!is.na(dd_2017$service_provider_assignment),]
-dd_2016 <- dd_2016[!is.na(dd_2016$service_provider_assignment),]
-sp_2017 <- sp_2017[!is.na(sp_2017$service_provider_assignment),]
-sp_2016 <- sp_2016[!is.na(sp_2016$service_provider_assignment),]
+## take out NA SP -- we do this in the SQL query now
+#dd_2017 <- dd_2017[!is.na(dd_2017$service_provider_assignment),]
+#dd_2016 <- dd_2016[!is.na(dd_2016$service_provider_assignment),]
+#sp_2017 <- sp_2017[!is.na(sp_2017$service_provider_assignment),]
+#sp_2016 <- sp_2016[!is.na(sp_2016$service_provider_assignment),]
+#dd_2017 <- dd_2017[which(dd_2017$service_provider_assignment != ""),]
+#dd_2016 <- dd_2016[which(dd_2016$service_provider_assignment != ""),]
+#sp_2017 <- sp_2017[which(sp_2017$service_provider_assignment != ""),]
+#sp_2016 <- sp_2016[which(sp_2016$service_provider_assignment != ""),]
+## And take out not "real" SPs
+#sp_2017 <- sp_2017[!sp_2017$service_provider_assignment %in% c('NC Office', 'State Replacement ', 'OneNet', 'OneNet '),]
+#sp_2016 <- sp_2016[!sp_2017$service_provider_assignment %in% c('NC Office', 'State Replacement ', 'OneNet', 'OneNet '),]
 
-dd_2017 <- dd_2017[which(dd_2017$service_provider_assignment != ""),]
-dd_2016 <- dd_2016[which(dd_2016$service_provider_assignment != ""),]
-sp_2017 <- sp_2017[which(sp_2017$service_provider_assignment != ""),]
-sp_2016 <- sp_2016[which(sp_2016$service_provider_assignment != ""),]
+## For the overall plots, subset to top SPs not meeting goals
+## 2017
+## rank by not meeting
+sp_2017 <- sp_2017[order(sp_2017$students_not_meeting_2014_bw_goal, decreasing=T),]
+sp_2017_not_meeting <- sp_2017[1:50,]
+sp_2017_not_meeting$rank <- seq(1,50,by=1)
+## 2016
+## rank by not meeting
+sp_2016 <- sp_2016[order(sp_2016$students_not_meeting_2014_bw_goal, decreasing=T),]
+sp_2016_not_meeting <- sp_2016[1:50,]
+sp_2016_not_meeting$rank <- seq(1,50,by=1)
 
-## only subset to Service Providers that overlap in both years
+## For the SMD pages, only subset to Service Providers that overlap in both years
 sp_2017 <- sp_2017[which(sp_2017$service_provider_assignment %in% sp_2016$service_provider_assignment),]
 sp_2016 <- sp_2016[which(sp_2016$service_provider_assignment %in% sp_2017$service_provider_assignment),]
-
 ## rank by top sp's (50)
 sp_2017 <- sp_2017[order(sp_2017$students_population, decreasing=T),]
 sp_2017 <- sp_2017[1:50,]
 sp_2016 <- sp_2016[which(sp_2016$service_provider_assignment %in% sp_2017$service_provider_assignment),]
-
 ## subset deluxe districts to the same service providers
 dd_2016 <- dd_2016[which(dd_2016$service_provider_assignment %in% sp_2016$service_provider_assignment),]
 dd_2017 <- dd_2017[which(dd_2017$service_provider_assignment %in% sp_2017$service_provider_assignment),]
+
+## subset to top SPs that have districts clean in both years
+sp_2017_overlap_not_meeting <- sp_2017_overlap[which(sp_2017_overlap$service_provider_assignment %in% sp_2017_not_meeting$service_provider_assignment),]
+sp_2017_overlap <- sp_2017_overlap[which(sp_2017_overlap$service_provider_assignment %in% sp_2017$service_provider_assignment),]
+## merge in sp_2016_overlap
+names(sp_2016_overlap)[names(sp_2016_overlap) != 'service_provider_assignment'] <- paste(names(sp_2016_overlap)[names(sp_2016_overlap) != 'service_provider_assignment'], "_2016", sep="")
+sp_overlap_not_meeting <- merge(sp_2017_overlap_not_meeting, sp_2016_overlap, by='service_provider_assignment', all.x=T)
+sp_overlap <- merge(sp_2017_overlap, sp_2016_overlap, by='service_provider_assignment', all.x=T)
 
 ##**************************************************************************************************************************************************
 ## SUBSET DATA
@@ -370,6 +392,8 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## State Aggregation
 write.csv(sp_2017, "tool/data/2017_sp_aggregation.csv", row.names=F)
 write.csv(sp_2016, "tool/data/2016_sp_aggregation.csv", row.names=F)
+write.csv(sp_overlap, "tool/data/sp_overlap.csv", row.names=F)
+write.csv(sp_overlap_not_meeting, "tool/data/sp_overlap_not_meeting.csv", row.names=F)
 
 ## Deluxe Districts
 write.csv(dd_2017, "tool/data/2017_deluxe_districts.csv", row.names=F)
@@ -389,6 +413,10 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 
 ## Date
 write.csv(date, "tool/data/date.csv", row.names=F)
+
+## Overall plots subset (not meeting)
+write.csv(sp_2016_not_meeting, "tool/data/sp16_not_meeting.csv", row.names=F)
+write.csv(sp_2017_not_meeting, "tool/data/sp17_not_meeting.csv", row.names=F)
 
 ##**************************************************************************************************************************************************
 ## DEPLOY TOOL

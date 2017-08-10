@@ -105,6 +105,7 @@ sum(CASE WHEN dd_2016.needs_wifi = 'f' THEN dd_2016.num_schools ELSE 0 END) as s
 sum(CASE WHEN dd_2016.needs_wifi = 'f' THEN dd_2016.num_students ELSE 0 END) as students_with_wifi
 
 FROM public.fy2016_districts_deluxe_matr as dd_2016
+left join public.fy2017_districts_deluxe_matr as dd_2017 on dd_2017.esh_id = dd_2016.esh_id
 -- take out non-US states at the end (GU, PR, VI, DC)
 -- also take out states at the school-level (RI, HI, DE)
 WHERE dd_2016.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC', 'AE', 'AP', 'AS', 'MP')
@@ -112,4 +113,10 @@ AND dd_2016.district_type = 'Traditional'
 AND dd_2016.include_in_universe_of_districts = 't'
 AND dd_2016.service_provider_assignment not in ('NC Office', 'State Replacement ', 'OneNet', 'OneNet ', '')
 AND dd_2016.service_provider_assignment is not null
+AND dd_2017.postal_cd NOT IN ('GU', 'PR', 'VI', 'DC', 'AE', 'AP', 'AS', 'MP')
+AND dd_2017.district_type = 'Traditional'
+AND dd_2017.include_in_universe_of_districts = 't'
+AND dd_2017.service_provider_assignment not in ('NC Office', 'State Replacement ', 'OneNet', 'OneNet ', '')
+AND dd_2017.service_provider_assignment is not null
 GROUP BY dd_2016.service_provider_assignment
+

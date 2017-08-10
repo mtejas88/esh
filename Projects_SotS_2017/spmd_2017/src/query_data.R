@@ -58,6 +58,8 @@ con <- dbConnect(pgsql, url=url, user=user, password=password)
 ## SP Aggregation
 sp_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_service_providers_agg.SQL")
 sp_2016 <- querydb("../../General_Resources/sql_scripts/2016/2016_service_providers_agg.SQL")
+sp_2017_overlap <- querydb("../../General_Resources/sql_scripts/2017/2017_service_providers_agg_clean_both_years.SQL")
+sp_2016_overlap <- querydb("../../General_Resources/sql_scripts/2016/2016_service_providers_agg_clean_both_years.SQL")
 
 ## Districts Deluxe
 dd_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_deluxe_districts.SQL")
@@ -94,10 +96,8 @@ dbDisconnect(con)
 ## SP Aggregation
 write.csv(sp_2017, "data/raw/sp_aggregation/2017_sp_aggregation.csv", row.names=F)
 write.csv(sp_2016, "data/raw/sp_aggregation/2016_sp_aggregation.csv", row.names=F)
-#write.csv(rural_small_town, "data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", row.names=F)
-
-## Service Providers
-#write.csv(top_sp, "data/raw/top_service_providers.csv", row.names=F)
+write.csv(sp_2017_overlap, "data/raw/sp_aggregation/2017_sp_aggregation_clean_both_years.csv", row.names=F)
+write.csv(sp_2016_overlap, "data/raw/sp_aggregation/2016_sp_aggregation_clean_both_years.csv", row.names=F)
 
 ## Districts Deluxe
 write.csv(dd_2017, "data/raw/deluxe_districts/2017_deluxe_districts.csv", row.names=F)
