@@ -17,8 +17,8 @@ library(dplyr) ## for the arrange function
 dd_2017 <- read.csv("data/raw/2017_deluxe_districts.csv")
 sr_2017 <- read.csv("data/raw/2017_services_recieved.csv")
 uc_2017 <- read.csv("data/raw/2017_unscalable_line_items.csv")
-uc_wan <- read.csv("data/raw/2017_unscalable_wan.csv")
-uc_ia <- read.csv("data/raw/2017_unscalable_ia.csv")
+#uc_ia <- read.csv("data/raw/2017_unscalable_ia.csv")
+#uc_wan <- read.csv("data/raw/2017_unscalable_wan.csv")
 
 ##**************************************************************************************************************************************************
 
@@ -108,31 +108,54 @@ combined <- merge(dta_unscalable_ia[,c('recipient_id', 'unscalable_ia_line_id')]
 
 ## merge with QA
 names(uc_2017) <- paste(names(uc_2017), "_qa", sep="")
-combined <- merge(combined, uc_2017[,c('recipient_id_qa', "line_item_id_unscalable_ia_qa", "line_item_id_unscalable_wan_qa")],
-                  by.x='recipient_id', by.y='recipient_id_qa', all=T)
-## compare IA/WAN
+combined <- merge(combined, uc_2017[,c('esh_id_qa', "line_item_id_unscalable_ia_qa", "line_item_id_unscalable_wan_qa")],
+                  by.x='recipient_id', by.y='esh_id_qa', all=T)
+## compare IA
 combined$ia_compare <- ifelse(is.na(combined$unscalable_ia_line_id) & is.na(combined$line_item_id_unscalable_ia_qa), NA,
                                ifelse(!is.na(combined$unscalable_ia_line_id) & is.na(combined$line_item_id_unscalable_ia_qa), "NOT",
                                       ifelse(is.na(combined$unscalable_ia_line_id) & !is.na(combined$line_item_id_unscalable_ia_qa), "NOT",
                                              ifelse(combined$unscalable_ia_line_id == combined$line_item_id_unscalable_ia_qa, "SAME", "NOT"))))
 table(combined$ia_compare)
+## confirm that the ones that differ have the same monthly_circuit_cost_recurring and copper indicator
+sub.ia <- combined[which(combined$ia_compare == 'NOT'),]
+sub.agg.ia <- district.agg.ia[which(district.agg.ia$recipient_id %in% sub.ia$recipient_id),]
+for (i in 1:nrow(sub.ia)){
+  sub <- sr_2017_sub_unscalable_ia[which(sr_2017_sub_unscalable_ia$recipient_id == sub.agg.ia$recipient_id[i]),]
+  sub <- sub[sub$line_item_id %in% c(sub.ia$unscalable_ia_line_id[sub.ia$recipient_id == sub.agg.ia$recipient_id[i]],
+                                     sub.ia$line_item_id_unscalable_ia_qa[sub.ia$recipient_id == sub.agg.ia$recipient_id[i]]),]
+  if ((sub$monthly_circuit_cost_recurring[1] != sub$monthly_circuit_cost_recurring[2]) | (sub$copper[1] != sub$copper[2])){
+    print('NOT THE SAME:', sub$recipient_id[i])
+  }
+}
 
+## compare WAN
 combined$wan_compare <- ifelse(is.na(combined$unscalable_wan_line_id) & is.na(combined$line_item_id_unscalable_wan_qa), NA,
                                ifelse(!is.na(combined$unscalable_wan_line_id) & is.na(combined$line_item_id_unscalable_wan_qa), "NOT",
                                       ifelse(is.na(combined$unscalable_wan_line_id) & !is.na(combined$line_item_id_unscalable_wan_qa), "NOT",
                                              ifelse(combined$unscalable_wan_line_id == combined$line_item_id_unscalable_wan_qa, "SAME", "NOT"))))
 table(combined$wan_compare)
+## confirm that the ones that differ have the same monthly_circuit_cost_recurring and copper indicator
+sub.wan <- combined[which(combined$wan_compare == 'NOT'),]
+sub.agg.wan <- district.agg.wan[which(district.agg.wan$recipient_id %in% sub.wan$recipient_id),]
+for (i in 1:nrow(sub.wan)){
+  sub <- sr_2017_sub_unscalable_wan[which(sr_2017_sub_unscalable_wan$recipient_id == sub.agg.wan$recipient_id[i]),]
+  sub <- sub[sub$line_item_id %in% c(sub.wan$unscalable_wan_line_id[sub.wan$recipient_id == sub.agg.wan$recipient_id[i]],
+                                     sub.wan$line_item_id_unscalable_wan_qa[sub.wan$recipient_id == sub.agg.wan$recipient_id[i]]),]
+  if ((sub$monthly_circuit_cost_recurring[1] != sub$monthly_circuit_cost_recurring[2]) | (sub$copper[1] != sub$copper[2])){
+    print('NOT THE SAME:', sub$recipient_id[i])
+  }
+}
 
-names(uc_wan) <- paste(names(uc_wan), "_qa", sep="")
-combined_wan <- merge(dta_unscalable_wan[,c('recipient_id', 'unscalable_wan_line_id')],
-                      uc_wan[,c('recipient_id_qa', "line_item_id_unscalable_wan_qa")],
-                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
-combined_wan$diff <- ifelse(combined_wan$unscalable_wan_line_id == combined_wan$line_item_id_unscalable_wan_qa, FALSE, TRUE)
+#names(uc_wan) <- paste(names(uc_wan), "_qa", sep="")
+#combined_wan <- merge(dta_unscalable_wan[,c('recipient_id', 'unscalable_wan_line_id')],
+#                      uc_wan[,c('recipient_id_qa', "line_item_id_unscalable_wan_qa")],
+#                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
+#combined_wan$diff <- ifelse(combined_wan$unscalable_wan_line_id == combined_wan$line_item_id_unscalable_wan_qa, FALSE, TRUE)
+#table(combined_wan$diff)
 
-names(uc_ia) <- paste(names(uc_ia), "_qa", sep="")
-combined_ia <- merge(dta_unscalable_ia[,c('recipient_id', 'unscalable_ia_line_id')],
-                      uc_ia[,c('recipient_id_qa', "line_item_id_unscalable_ia_qa")],
-                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
-combined_ia$diff <- ifelse(combined_ia$unscalable_ia_line_id == combined_ia$line_item_id_unscalable_ia_qa, FALSE, TRUE)
-
+#names(uc_ia) <- paste(names(uc_ia), "_qa", sep="")
+#combined_ia <- merge(dta_unscalable_ia[,c('recipient_id', 'unscalable_ia_line_id')],
+#                      uc_ia[,c('recipient_id_qa', "line_item_id_unscalable_ia_qa")],
+#                      by.x='recipient_id', by.y='recipient_id_qa', all=T)
+#combined_ia$diff <- ifelse(combined_ia$unscalable_ia_line_id == combined_ia$line_item_id_unscalable_ia_qa, FALSE, TRUE)
 

@@ -60,11 +60,11 @@ sr_2017 <- querydb("../../General_Resources/sql_scripts/2017/2017_services_recei
 sr_2017 <- correct.dataset(sr_2017, sots.flag=0, services.flag=1)
 
 ## also test SQL logic for unscalable
+## merged version
 uc_2017 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_line_items_v01.sql", sep=""))
-
-uc_wan <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_wan.sql", sep=""))
-uc_ia <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_ia.sql", sep=""))
-
+## broken up into two different queries
+#uc_wan <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_wan.sql", sep=""))
+#uc_ia <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_unscalable_ia.sql", sep=""))
 ## also test SQL logic for scalable
 #sc_2017 <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_scalable_line_items_v01.sql", sep=""))
 
@@ -76,7 +76,7 @@ dbDisconnect(con)
 
 write.csv(dd_2017, "data/raw/2017_deluxe_districts.csv", row.names=F)
 write.csv(sr_2017, "data/raw/2017_services_recieved.csv", row.names=F)
-write.csv(uc_wan, "data/raw/2017_unscalable_wan.csv", row.names=F)
-write.csv(uc_ia, "data/raw/2017_unscalable_ia.csv", row.names=F)
 write.csv(uc_2017, "data/raw/2017_unscalable_line_items.csv", row.names=F)
+#write.csv(uc_wan, "data/raw/2017_unscalable_wan.csv", row.names=F)
+#write.csv(uc_ia, "data/raw/2017_unscalable_ia.csv", row.names=F)
 #write.csv(sc_2017, "data/raw/2017_scalable_line_items.csv", row.names=F)
