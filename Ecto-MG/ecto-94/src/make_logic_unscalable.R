@@ -45,7 +45,7 @@ sr_2017_sub$monthly_circuit_cost_recurring <- ifelse(sr_2017_sub$monthly_circuit
 ## create an indicator for Copper services ('DSL', 'T-1', 'Cable', 'Other Copper')
 sr_2017_sub$copper <- ifelse(sr_2017_sub$connect_category %in% c('DSL', 'T-1', 'Cable', 'Other Copper'), 1, 0)
 
-## create an indicator for scalable vs unscalable
+## create an indicator for unscalable IA and WAN
 sr_2017_sub$unscalable_ia <- ifelse(sr_2017_sub$purpose %in% c('Internet', 'Upstream'), 1, 0)
 sr_2017_sub$unscalable_wan <- ifelse(sr_2017_sub$purpose == 'WAN', 1, 0)
 
@@ -57,7 +57,7 @@ district.agg.wan <- aggregate(sr_2017_sub$unscalable_wan, by=list(sr_2017_sub$re
 names(district.agg.wan) <- c('recipient_id', 'unscalable_wan')
 
 ##----------------------------------------------------------------------------------------------------------------------------------
-## UNSCALABLE CIRCUITS (IA and WAN)
+## UNSCALABLE CIRCUITS (IA)
 
 ## subset to only unscalable_ia line items
 sr_2017_sub_unscalable_ia <- sr_2017_sub[which(sr_2017_sub$unscalable_ia == 1),]
@@ -80,6 +80,9 @@ dta_unscalable_ia <- merge(dta_unscalable_ia, sr_2017_sub_unscalable_ia[,c("reci
                                                                            "service_provider_name", "reporting_name")],
                                               by.x=c('recipient_id', 'unscalable_ia_line_id'), by.y=c('recipient_id', 'line_item_id'), all.x=T)
 
+##----------------------------------------------------------------------------------------------------------------------------------
+## UNSCALABLE CIRCUITS (WAN)
+
 ## subset to only unscalable_wan line items
 sr_2017_sub_unscalable_wan <- sr_2017_sub[which(sr_2017_sub$unscalable_wan == 1),]
 ## order by highest cost (decreasing), and copper for each district
@@ -101,6 +104,8 @@ dta_unscalable_wan <- merge(dta_unscalable_wan, sr_2017_sub_unscalable_wan[,c("r
                                                                               "service_provider_name", "reporting_name")],
                                                 by.x=c('recipient_id', 'unscalable_wan_line_id'), by.y=c('recipient_id', 'line_item_id'), all.x=T)
 
+##----------------------------------------------------------------------------------------------------------------------------------
+## QA
 
 ## merge together unscalable ia and wan ids
 combined <- merge(dta_unscalable_ia[,c('recipient_id', 'unscalable_ia_line_id')],
@@ -119,6 +124,7 @@ table(combined$ia_compare)
 ## confirm that the ones that differ have the same monthly_circuit_cost_recurring and copper indicator
 sub.ia <- combined[which(combined$ia_compare == 'NOT'),]
 sub.agg.ia <- district.agg.ia[which(district.agg.ia$recipient_id %in% sub.ia$recipient_id),]
+table(sub.agg.ia$unscalable_ia > 1)
 for (i in 1:nrow(sub.ia)){
   sub <- sr_2017_sub_unscalable_ia[which(sr_2017_sub_unscalable_ia$recipient_id == sub.agg.ia$recipient_id[i]),]
   sub <- sub[sub$line_item_id %in% c(sub.ia$unscalable_ia_line_id[sub.ia$recipient_id == sub.agg.ia$recipient_id[i]],
@@ -137,6 +143,7 @@ table(combined$wan_compare)
 ## confirm that the ones that differ have the same monthly_circuit_cost_recurring and copper indicator
 sub.wan <- combined[which(combined$wan_compare == 'NOT'),]
 sub.agg.wan <- district.agg.wan[which(district.agg.wan$recipient_id %in% sub.wan$recipient_id),]
+table(sub.agg.wan$unscalable_wan > 1)
 for (i in 1:nrow(sub.wan)){
   sub <- sr_2017_sub_unscalable_wan[which(sr_2017_sub_unscalable_wan$recipient_id == sub.agg.wan$recipient_id[i]),]
   sub <- sub[sub$line_item_id %in% c(sub.wan$unscalable_wan_line_id[sub.wan$recipient_id == sub.agg.wan$recipient_id[i]],

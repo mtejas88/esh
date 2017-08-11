@@ -27,102 +27,116 @@ dd_2017_sub <- dd_2017[which(dd_2017$include_in_universe_of_districts == TRUE & 
 ## not subsetting to district_type = Traditional since we are including AZ Charters
 sr_2017_sub <- sr_2017[which(sr_2017$recipient_include_in_universe_of_districts == TRUE &
                                sr_2017$recipient_exclude_from_ia_analysis == FALSE &
-                               sr_2017$inclusion_status %in% c('clean_no_cost', 'clean_with_cost')),]
+                               sr_2017$inclusion_status %in% c('clean_no_cost', 'clean_with_cost') &
+                               (sr_2017$connect_category %in% c('Lit Fiber', 'Dark Fiber')) &
+                               sr_2017$purpose %in% c('Internet', 'Upstream', 'WAN')),]
 
 ## format when monthly_circuit_cost_recurring == 0:
 ## use monthly_circuit_cost_total / months_of_service
 sr_2017_sub$monthly_circuit_cost_recurring <- ifelse(sr_2017_sub$monthly_circuit_cost_recurring == 0,
                                                      sr_2017_sub$monthly_circuit_cost_total,
                                                      sr_2017_sub$monthly_circuit_cost_recurring)
+## create an indicator for scalable IA and WAN
+sr_2017_sub$scalable_ia <- ifelse(sr_2017_sub$purpose %in% c('Internet', 'Upstream'), 1, 0)
+sr_2017_sub$scalable_wan <- ifelse(sr_2017_sub$purpose == 'WAN', 1, 0)
 
-## create an indicator for ISP (make NA for scalable/unscalable)
-sr_2017_sub$isp_indicator <- ifelse(sr_2017_sub$connect_category == 'ISP Only' | sr_2017_sub$purpose == 'ISP', 1, 0)
+## create cost per mbps indicator
+sr_2017_sub$ia_cost_per_mbps_line_item <- sr_2017_sub$monthly_circuit_cost_recurring / sr_2017_sub$bandwidth_in_mbps
 
-## create an indicator for Copper services ('DSL', 'T-1', 'Cable', 'Other Copper')
-sr_2017_sub$copper <- ifelse(sr_2017_sub$connect_category %in% c('DSL', 'T-1', 'Cable', 'Other Copper'), 1, 0)
+## aggregate the scalable line items for each district
+district.agg.ia <- aggregate(sr_2017_sub$scalable_ia, by=list(sr_2017_sub$recipient_id), FUN=sum, na.rm=T)
+names(district.agg.ia) <- c('recipient_id', 'scalable_ia')
 
-## create an indicator for scalable
-sr_2017_sub$scalable_ia <- ifelse(sr_2017_sub$connect_category %in% c('Lit Fiber', 'Dark Fiber') &
-                                    sr_2017_sub$isp_indicator != 1 &
-                                    sr_2017_sub$purpose %in% c('Internet', 'Upstream'), 1, ifelse(sr_2017_sub$isp_indicator == 1, NA, 0))
-sr_2017_sub$scalable_wan <- ifelse(sr_2017_sub$connect_category %in% c('Lit Fiber', 'Dark Fiber') &
-                                     sr_2017_sub$isp_indicator != 1 & sr_2017_sub$purpose == 'WAN', 1,
-                                   ifelse(sr_2017_sub$isp_indicator == 1, NA, 0))
+district.agg.wan <- aggregate(sr_2017_sub$scalable_wan, by=list(sr_2017_sub$recipient_id), FUN=sum, na.rm=T)
+names(district.agg.wan) <- c('recipient_id', 'scalable_wan')
 
 ##----------------------------------------------------------------------------------------------------------------------------------
-## SCALABLE -- Not Ready Yet
+## SCALABLE CIRCUITS (IA)
 
-## subset to districts with no unscalable_ia line items
+## subset to IA line items
 sr_2017_sub_scalable_ia <- sr_2017_sub[which(sr_2017_sub$scalable_ia == 1),]
-## order by highest cost (decreasing), and copper for each district
-sr_2017_sub_scalable_ia <- sr_2017_sub_scalable_ia %>% arrange(recipient_id, bandwidth_in_mbps, monthly_circuit_cost_recurring)
-## collect unique districts
-districts <- unique(sr_2017_sub_scalable_ia$recipient_id)
+## order by lowest cost (increasing)
+sr_2017_sub_scalable_ia <- sr_2017_sub_scalable_ia %>% arrange(recipient_id, ia_cost_per_mbps_line_item)
+## collect unique districts that have a scalable ia line item not equal to 0 cost
+districts <- unique(sr_2017_sub_scalable_ia$recipient_id[sr_2017_sub_scalable_ia$ia_cost_per_mbps_line_item != 0])
 ## create an empty dataset (rows = unique districts)
 dta_scalable_ia <- data.frame(matrix(NA, nrow=length(districts), ncol=2))
 names(dta_scalable_ia) <- c('recipient_id', 'scalable_ia_line_id')
 ## for each district, choose the line that best meets the qualifications above
 for (i in 1:length(districts)){
-  sub <- sr_2017_sub_scalable_ia[which(sr_2017_sub_scalable_ia$recipient_id == districts[i]),]
+  sub <- sr_2017_sub_scalable_ia[which(sr_2017_sub_scalable_ia$recipient_id == districts[i] & sr_2017_sub_scalable_ia$ia_cost_per_mbps_line_item != 0),]
   dta_scalable_ia$recipient_id[i] <- districts[i]
   dta_scalable_ia$scalable_ia_line_id[i] <- sub$line_item_id[1]
 }
 ## merge in other info for the line item
 dta_scalable_ia <- merge(dta_scalable_ia, sr_2017_sub_scalable_ia[,c("recipient_id", "line_item_id", "bandwidth_in_mbps",
                                                                      "monthly_circuit_cost_recurring", "connect_category",
-                                                                     "service_provider_name", "reporting_name")],
+                                                                     "service_provider_name", "reporting_name", "ia_cost_per_mbps_line_item")],
                          by.x=c('recipient_id', 'scalable_ia_line_id'), by.y=c('recipient_id', 'line_item_id'), all.x=T)
 
 
 ##----------------------------------------------------------------------------------------------------------------------------------
-## SCALABLE
-## only calculate for the districts that don't have unscalable lines for each IA and WAN
+## SCALABLE CIRCUITS (WAN)
 
-## for each district, find the "lowest" scalable line item with the following logic:
-## If there are multiple scalable connections:
-##  1) Choose the one with the lowest bandwidth.
-##    If TIE:
-##      2) Choose the lower priced scalable line.
-##        If TIE:
-##          3) Pick one at random.
-
-## subset to districts with no unscalable_ia line items
-sr_2017_sub_scalable_ia <- sr_2017_sub[which(sr_2017_sub$recipient_id %in% district.agg.ia$recipient_id[district.agg.ia$unscalable_ia == 0]),]
-sr_2017_sub_scalable_ia <- sr_2017_sub_scalable_ia[which(sr_2017_sub_scalable_ia$purpose %in% c('Internet', 'ISP', 'Bundled')),]
-districts <- unique(sr_2017_sub_scalable_ia$recipient_id)
+## subset to wan line items
+sr_2017_sub_scalable_wan <- sr_2017_sub[which(sr_2017_sub$scalable_wan == 1),]
+## collect unique districts that have a scalable wan line item
+districts <- unique(sr_2017_sub_scalable_wan$recipient_id)
 ## create an empty dataset (rows = unique districts)
-dta_scalable_ia <- data.frame(matrix(NA, nrow=length(districts), ncol=2))
-names(dta_scalable_ia) <- c('recipient_id', 'scalable_ia_line_id')
-
+dta_scalable_wan <- data.frame(matrix(NA, nrow=length(districts), ncol=2))
+names(dta_scalable_wan) <- c('recipient_id', 'scalable_wan_line_id')
 ## for each district, choose the line that best meets the qualifications above
 for (i in 1:length(districts)){
-  sub <- sr_2017_sub_scalable_ia[which(sr_2017_sub_scalable_ia$recipient_id == districts[i]),]
-  ## if more than 1 line item:
-  if (nrow(sub) > 1){
-    ## select the smallest bw
-    sub <- sub[order(sub$bandwidth_in_mbps, decreasing=F),]
-    ## if a tie between the first and second:
-    if (nrow(sub) >= 2){
-      if (sub$bandwidth_in_mbps[1] == sub$bandwidth_in_mbps[2]){
-        sub <- sub[which(sub$bandwidth_in_mbps == sub$bandwidth_in_mbps[1]),]
-        ## choose the lower priced line
-        min.mrc <- min(sub$monthly_circuit_cost_recurring, na.rm=T)
-        sub <- sub[which(sub$monthly_circuit_cost_recurring == min.mrc),]
-        ## if stil a tie:
-        if (nrow(sub) > 1){
-          ## randomly select 1
-          sub <- sub[sample(1:nrow(sub), 1, replace=F),]
-        }
-      }
-    }
-  }
-  ## now assign whatever's leftover
-  dta_scalable_ia$recipient_id[i] <- districts[i]
-  dta_scalable_ia$scalable_ia_line_id[i] <- sub$line_item_id[1]
+  sub <- sr_2017_sub_scalable_wan[which(sr_2017_sub_scalable_wan$recipient_id == districts[i]),]
+  dta_scalable_wan$recipient_id[i] <- districts[i]
+  dta_scalable_wan$scalable_wan_line_id[i] <- sub$line_item_id[1]
 }
-## merge in other info for the line item -- problem: there are not unique line item ids
-dta_scalable_ia <- merge(dta_scalable_ia, sr_2017_sub_scalable_ia[,c("line_item_id", "recipient_id", "bandwidth_in_mbps",
+## merge in other info for the line item
+dta_scalable_wan <- merge(dta_scalable_wan, sr_2017_sub_scalable_wan[,c("recipient_id", "line_item_id", "bandwidth_in_mbps",
                                                                      "monthly_circuit_cost_recurring", "connect_category",
-                                                                     "service_provider_name")],
-                         by.x=c('scalable_ia_line_id', 'recipient_id'), by.y=c('line_item_id', 'recipient_id'), all.x=T)
+                                                                     "service_provider_name", "reporting_name")],
+                         by.x=c('recipient_id', 'scalable_wan_line_id'), by.y=c('recipient_id', 'line_item_id'), all.x=T)
+
+##----------------------------------------------------------------------------------------------------------------------------------
+## QA
+
+## merge together scalable ia and wan ids
+combined <- merge(dta_scalable_ia[,c('recipient_id', 'scalable_ia_line_id')],
+                  dta_scalable_wan[,c('recipient_id', 'scalable_wan_line_id')], by='recipient_id', all=T)
+
+## merge with QA
+names(sc_2017) <- paste(names(sc_2017), "_qa", sep="")
+combined <- merge(combined, sc_2017[,c('esh_id_qa', "line_item_id_scalable_ia_qa", "line_item_id_scalable_wan_qa")],
+                  by.x='recipient_id', by.y='esh_id_qa', all=T)
+## compare IA
+combined$ia_compare <- ifelse(is.na(combined$scalable_ia_line_id) & is.na(combined$line_item_id_scalable_ia_qa), NA,
+                              ifelse(!is.na(combined$scalable_ia_line_id) & is.na(combined$line_item_id_scalable_ia_qa), "NOT",
+                                     ifelse(is.na(combined$scalable_ia_line_id) & !is.na(combined$line_item_id_scalable_ia_qa), "NOT",
+                                            ifelse(combined$scalable_ia_line_id == combined$line_item_id_scalable_ia_qa, "SAME", "NOT"))))
+table(combined$ia_compare)
+## confirm that the ones that differ have the same ia_cost_per_mbps_line_item
+sub.ia <- combined[which(combined$ia_compare == 'NOT'),]
+sub.agg.ia <- district.agg.ia[which(district.agg.ia$recipient_id %in% sub.ia$recipient_id),]
+table(sub.agg.ia$scalable_ia > 1)
+for (i in 1:nrow(sub.ia)){
+  sub <- sr_2017_sub_scalable_ia[which(sr_2017_sub_scalable_ia$recipient_id == sub.agg.ia$recipient_id[i]),]
+  sub <- sub[sub$line_item_id %in% c(sub.ia$scalable_ia_line_id[sub.ia$recipient_id == sub.agg.ia$recipient_id[i]],
+                                     sub.ia$line_item_id_scalable_ia_qa[sub.ia$recipient_id == sub.agg.ia$recipient_id[i]]),]
+  if (sub$ia_cost_per_mbps_line_item[1] != sub$ia_cost_per_mbps_line_item[2]){
+    print('NOT THE SAME:', sub$recipient_id[i])
+  }
+}
+
+## compare WAN
+combined$wan_compare <- ifelse(is.na(combined$scalable_wan_line_id) & is.na(combined$line_item_id_scalable_wan_qa), NA,
+                               ifelse(!is.na(combined$scalable_wan_line_id) & is.na(combined$line_item_id_scalable_wan_qa), "NOT",
+                                      ifelse(is.na(combined$scalable_wan_line_id) & !is.na(combined$line_item_id_scalable_wan_qa), "NOT",
+                                             ifelse(combined$scalable_wan_line_id == combined$line_item_id_scalable_wan_qa, "SAME", "NOT"))))
+table(combined$wan_compare)
+## confirm that the ones that differ have the same monthly_circuit_cost_recurring and copper indicator
+sub.wan <- combined[which(combined$wan_compare == 'NOT'),]
+table(is.na(sub.wan$scalable_wan_line_id))
+table(is.na(sub.wan$line_item_id_scalable_wan_qa))
+sub.agg.wan <- district.agg.wan[which(district.agg.wan$recipient_id %in% sub.wan$recipient_id),]
+table(sub.agg.wan$scalable_wan > 1)
 
