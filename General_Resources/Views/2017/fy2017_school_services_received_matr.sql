@@ -126,7 +126,9 @@ FROM (
             eb.entity_id AS applicant_id,
             s.campus_id AS recipient_id,
             s.num_students as recipient_num_students,
-            s.postal_cd as recipient_postal_cd
+            s.postal_cd as recipient_postal_cd,
+            d.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
+            d.exclude_from_ia_analysis as recipient_exclude_from_ia_analysis
 
           FROM public.fy2017_lines_to_school_by_line_item_matr lis
           LEFT OUTER JOIN (select * from public.fy2017_esh_line_items_v
@@ -141,6 +143,8 @@ FROM (
           ON spc.id = li.service_provider_id
           join public.fy2017_schools_demog_matr s
           on lis.campus_id = s.campus_id
+          join public.fy2017_districts_deluxe_matr d
+          on s.district_esh_id = d.esh_id
 ) base
 left join (
           select  lsli.line_item_id,
@@ -161,7 +165,7 @@ left join (
           group by lsli.line_item_id
 ) district_info_by_li
 on base.line_item_id=district_info_by_li.line_item_id
-where s.postal_cd in ('HI', 'DE', 'RI')
+where recipient_postal_cd in ('HI', 'DE', 'RI')
 
 
 
@@ -176,5 +180,6 @@ Methodology: Commenting out y2016.districts tables, based on our discussion with
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 might need to add below two additional attributes
 
-Dependencies: [endpoint.fy2017_lines_to_school_by_line_item, fy2017.esh_line_items_v, public.entity_bens]
+Dependencies: [endpoint.fy2017_lines_to_school_by_line_item, fy2017.esh_line_items_v, public.entity_bens, 
+public.fy2017_districts_deluxe]
 */
