@@ -1,0 +1,931 @@
+---
+title: "2017 Service Provider Metrics Dashboard"
+
+resource_files:
+- data/2016_sp_aggregation.csv
+- data/2017_sp_aggregation.csv
+- data/upgrades_click_through.csv
+- data/connectivity_click_through.csv
+- data/fiber_click_through.csv
+- data/affordability_click_through.csv
+- data/current17_click_through.csv
+- data/current16_click_through.csv
+- data/connectivity_targets.csv
+- data/fiber_targets.csv
+- data/snapshots.csv
+- data/tool_colors.csv
+- data/date.csv
+- data/sp16_not_meeting.csv
+- data/sp17_not_meeting.csv
+- data/sp_overlap.csv
+- data/sp_overlap_not_meeting.csv
+
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    smooth_scroll: yes
+    vertical_layout: scroll
+---
+  
+  
+```{r setup, include=FALSE}
+### Importing relevant libraries
+
+## need to run compile this tool
+library(flexdashboard) 
+## need for render functions
+library(shiny)
+## most of the code is written using dplyr functions (e.g. %>% filter(), %>% summarise(), %>% select())
+library(dplyr)
+## need for highchart() vizes (eg. bar charts, box plots, scatter plots)
+library(highcharter)
+## need for supporting R markdown
+library(rsconnect)
+## for ggplot vizes (i.e. square colored box with status suchc as: 36 fiber targets)
+library(ggplot2)
+## need for datatables
+library(DT)
+## need for html use in code (I think)
+library(htmltools)
+## for interactive plots
+library(plotly)
+```
+
+
+```{r global, include = FALSE}
+### Importing relevant data files
+
+## state aggregated metrics for each year
+sp.agg.2017 <- read.csv("data/2017_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.agg.2016 <- read.csv("data/2016_sp_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.overlap <- read.csv("data/sp_overlap.csv", as.is=T, header=T, stringsAsFactors=F)
+sp.overlap.not.meeting <- read.csv("data/sp_overlap_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
+
+## click-throughs
+current17_ct <- read.csv("data/current17_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+current16_ct <- read.csv("data/current16_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+upgrades_ct <- read.csv("data/upgrades_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+connectivity_ct <- read.csv("data/connectivity_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+fiber_ct <- read.csv("data/fiber_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+affordability_ct <- read.csv("data/affordability_click_through.csv", as.is=T, header=T, stringsAsFactors=F)
+
+## targets
+connectivity_tar <- read.csv("data/connectivity_targets.csv", as.is=T, header=T, stringsAsFactors=F)
+fiber_tar <- read.csv("data/fiber_targets.csv", as.is=T, header=T, stringsAsFactors=F)
+
+## color data
+colors <- suppressWarnings(read.csv("data/tool_colors.csv", as.is=T, header=T, stringsAsFactors=F))
+
+## date
+date.updated <- read.csv("data/date.csv", as.is=T, header=T, stringsAsFactors=F)
+date.updated <- date.updated$date
+
+## not meeting subsets
+sp16.not.meeting <- read.csv("data/sp16_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
+sp17.not.meeting <- read.csv("data/sp17_not_meeting.csv", as.is=T, header=T, stringsAsFactors=F)
+```
+
+
+```{r, include = FALSE}
+### Setting up reactive data sets
+
+## sp metrics aggregation
+sp.agg.2016.sub <- reactive({sp.agg.2016 %>% filter(service_provider_assignment %in% input$service_provider_assignment)})
+sp.agg.2017.sub <- reactive({sp.agg.2017 %>% filter(service_provider_assignment %in% input$service_provider_assignment)})
+
+## click-throughs
+current17_ct_sub <- reactive({current17_ct %>% filter(service_provider_assignment %in% input$service_provider_assignment)})
+current16_ct_sub <- reactive({current16_ct %>% filter(service_provider_assignment %in% input$service_provider_assignment)})
+upgrades_ct_sub <- reactive({upgrades_ct %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+connectivity_ct_sub <- reactive({connectivity_ct %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+fiber_ct_sub <- reactive({fiber_ct %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+affordability_ct_sub <- reactive({affordability_ct %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+
+
+## targets
+connectivity_tar_sub <- reactive({connectivity_tar %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+fiber_tar_sub <- reactive({fiber_tar %>% filter(service_provider_assignment_2017 %in% input$service_provider_assignment)})
+```
+
+
+Service Provider Summary {data-orientation=rows}
+======================================================================
+Row 
+----------------------------------------------------------------------
+### 
+```{r}
+renderValueBox({
+  ## sp lookup
+  service_provider_assignment_lookup <- data.frame(cbind(name=sp.agg.2017$service_provider_assignment), code=sp.agg.2017$service_provider_assignment, stringsAsFactors=F)
+  service_provider_assignment_lookup$name_caps <- toupper(service_provider_assignment_lookup$name)
+  ## making this global so we can use it in other sections as well
+  service_provider_assignment_name_caps <<- service_provider_assignment_lookup$name_caps[service_provider_assignment_lookup$code == sp.agg.2017.sub()$service_provider_assignment]
+  valueBox(service_provider_assignment_name_caps, paste("Date Updated:", date.updated, sep=" "))
+})
+```
+
+### 2017 Population of Districts {.no-padding}
+```{r}
+renderValueBox({
+  pop.districts.17 <- format(sp.agg.2017.sub()$districts_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(pop.districts.17, color = colors$color[colors$label == 'districts'])
+})
+```
+
+### 2017 Population of Schools {.no-padding}
+```{r}
+renderValueBox({
+  pop.schools.17 <- format(sp.agg.2017.sub()$schools_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(pop.schools.17, color = colors$color[colors$label == 'schools'])
+})
+```
+
+### 2017 Population of Students {.no-padding}
+```{r}
+renderValueBox({
+  pop.students.17 <- format(sp.agg.2017.sub()$students_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(pop.students.17, color = colors$color[colors$label == 'students'])
+})
+```
+
+Row 
+-----------------------------------------------------------------------
+### Select Service Provider 
+```{r input}
+sp.agg.2017$service_provider_assignment <- as.character(sp.agg.2017$service_provider_assignment)
+selectInput('service_provider_assignment', label="", choices=unique(sp.agg.2017$service_provider_assignment))
+
+#output$downloadData <- downloadHandler(
+#  filename = function(){paste("data/snapshots_", date.updated, ".csv", sep="")},
+#  content = function(file) {
+#  write.csv(snapshots, file, row.names=F)
+#  })
+#downloadLink('downloadData', label = 'Download State Snapshot Data')
+#***
+#NOTE: Underlying Data Download will pull state metrics spreadsheet for all 50 states.
+```
+
+
+
+### SotS 2015: % Clean Districts - N/A
+```{r}
+#renderGauge({
+  #sots15 <- sp.agg.2016.sub()$sots15_districts_sample_perc
+  #gauge(sots15, min = 0, max = 100, symbol = '%', gaugeSectors(success = c(80, 100), warning = c(40, 79), danger = c(0, 39)))})
+```
+
+### [Current 2016: % Clean IA Districts](#deep-dive-current16)
+```{r}
+renderGauge({
+  current16 <- round((sp.agg.2016.sub()$districts_clean_ia_sample / sp.agg.2016.sub()$districts_population)*100, 0)
+  gauge(current16, min = 0, max = 100, symbol = '%', gaugeSectors(success = c(80, 100), warning = c(40, 79), danger = c(0, 39)))})
+```
+
+### [Current 2017: % Clean IA Districts](#deep-dive-current17)
+```{r}
+renderGauge({
+  current17 <- round((sp.agg.2017.sub()$districts_clean_ia_sample / sp.agg.2017.sub()$districts_population)*100, 0)
+  gauge(current17, min = 0, max = 100, symbol = '%', gaugeSectors(success = c(80, 100), warning = c(40, 79), danger = c(0, 39)))})
+```
+
+Row {data-height=350}
+------------------------------------------------------------------------
+### {.no-padding}
+```{r, fig.width=1.5}
+img(src = "figures/upgrades.png", height = "100%", width = "100%")
+```
+
+### [Districts Upgraded](#deep-dive-upgrades) {.no-padding}
+```{r}
+renderPlot({
+  text <- format(sp.agg.2017.sub()$districts_upgraded, big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("of ", format(sp.agg.2017.sub()$districts_clean_upgrades_sample, big.mark = ",", nsmall = 0, scientific = FALSE),
+                 " (", round((sp.agg.2017.sub()$districts_upgraded / sp.agg.2017.sub()$districts_clean_upgrades_sample)*100, 0), "%", ")", sep='')
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.16, label = text, size = 20, color = "white") +
+    annotate("text",  x = 2.5, y = 24.65, label = text2, size = 16, color = "white") +
+    theme(panel.background = element_rect(fill =  rgb(92/255, 0/255, 92/255, 0.8)),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+### Students Upgraded {.no-padding}
+```{r}
+renderPlot({
+  text <- format(sp.agg.2017.sub()$students_upgraded, big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("of ", format(sp.agg.2017.sub()$students_clean_upgrades_sample, big.mark = ",", nsmall = 0, scientific = FALSE),
+                 " (", round((sp.agg.2017.sub()$students_upgraded / sp.agg.2017.sub()$students_clean_upgrades_sample)*100, 0), "%", ")", sep='')
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.16, label = text, size = 17, color = "white") +
+    annotate("text",  x = 2.5, y = 24.65, label = text2, size = 12, color = "white") +
+    theme(panel.background = element_rect(fill = rgb(133/255, 50/255, 133/255, 0.9)),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```  
+
+### Districts Upgraded Now Meeting Goals {.no-padding}
+```{r}
+renderPlot({
+  text <- format(sp.agg.2017.sub()$districts_upgraded_meeting_goals, big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("of ", format(sp.agg.2017.sub()$districts_upgraded, big.mark = ",", nsmall = 0, scientific = FALSE),
+                 " (", round((sp.agg.2017.sub()$districts_upgraded_meeting_goals / sp.agg.2017.sub()$districts_upgraded)*100, 0), "%", ")", sep='')
+  text3 <- paste(format(sp.agg.2017.sub()$students_upgraded_meeting_goals, big.mark = ",", nsmall = 0, scientific = FALSE), " students", sep='')
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.45, label = text, size = 17, color = "white") +
+    annotate("text",  x = 2.5, y = 25.05, label = text2, size = 12, color = "white") +
+    annotate("text",  x = 2.5, y = 24.45, label = text3, size = 12, color = "white") +
+    theme(panel.background = element_rect(fill = rgb(178/255, 102/255, 178/255, 0.9)),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+  
+Row {data-height = 350}
+------------------------------------------------------------------------
+### {.no-padding}
+```{r, fig.width=1.5}
+img(src = "figures/connectivity.png", height = "100%", width = "100%")
+```
+
+### [Districts Meeting Connectivity Goals](#deep-dive-connectivity)
+```{r}
+renderHighchart({
+  highchart() %>% 
+    hc_chart(type = 'column') %>% 
+    hc_xAxis(categories = c(paste('Current 2016 (n=', format(sp.agg.2016.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
+      paste('Current 2017 (n=', format(sp.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
+    hc_yAxis(labels = list(format = '{value}%'), min = 0, max = 100) %>% 
+    hc_add_series(data = c(round((sp.agg.2016.sub()$districts_meeting_2014_bw_goal / sp.agg.2016.sub()$districts_clean_ia_cost_sample)*100, 0),
+      round((sp.agg.2017.sub()$districts_meeting_2014_bw_goal / sp.agg.2017.sub()$districts_clean_ia_cost_sample)*100, 0)),
+      dataLabels = list(enabled = TRUE, format = '{point.y}%')) %>% hc_legend(enabled = FALSE) %>% hc_colors(c(colors$color[colors$label == 'connectivity1']))
+})
+```
+
+### [Connectivity Targets](#target-lists-connectivity) {.no-padding}
+```{r}
+renderPlot({
+  val <- paste("Targets: ", format(sp.agg.2017.sub()$district_bw_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$district_bw_targets / sp.agg.2017.sub()$districts_population)*100, 0), "%)",
+               
+               "\nClean Targets: ", format(sp.agg.2017.sub()$clean_district_bw_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$clean_district_bw_targets / sp.agg.2017.sub()$districts_clean_ia_sample)*100, 0), "%)",
+               
+               "\nPotential Targets: ", format(sp.agg.2017.sub()$district_bw_potential_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$district_bw_potential_targets / sp.agg.2017.sub()$districts_population)*100, 0), "%)",
+               
+               "\nClean Potential Targets: ", format(sp.agg.2017.sub()$clean_district_bw_potential_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$clean_district_bw_potential_targets / sp.agg.2017.sub()$districts_clean_ia_sample)*100, 0), "%)", sep='')
+  
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.15, label = val, size = 10, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'connectivity2']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+### Students Meeting Goal (Extrapolated) {.no-padding}
+```{r}
+renderPlot({
+  ## calculate percentage of students meeting connectivity goal to extrapolate
+  percentage.student.meeting.goal.2017 <- sp.agg.2017.sub()$students_meeting_2014_bw_goal / sp.agg.2017.sub()$students_clean_ia_sample
+  text <- format(round(percentage.student.meeting.goal.2017 * sp.agg.2017.sub()$students_population, 0),
+                 big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("(", round(percentage.student.meeting.goal.2017*100, 0), "%)", sep='') 
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.15, label = text, size = 20, color = "white") +
+    annotate("text",  x = 2.5, y = 24.85, label = text2, size = 15, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'connectivity3']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+Row {data-height = 350}
+----------------------------------------------------------
+### {.no-padding}
+```{r, fig.width=1.5}
+img(src = "figures/fiber.png", height = "100%", width = "100%")
+```
+
+### [Campuses on Fiber](#deep-dive-fiber)
+```{r}
+renderHighchart({
+  ## calculate campuses on fiber
+  highchart() %>% hc_chart(type = 'column') %>% 
+    hc_xAxis(categories = c(paste('Current 2016 (n=', format(sp.agg.2016.sub()$districts_population, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
+      paste('Current 2017 (n=', format(sp.agg.2017.sub()$districts_population, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
+    hc_yAxis(labels = list(format = '{value}%'), min = 0, max = 100) %>% 
+    hc_add_series(data = c(round((sp.agg.2016.sub()$scalable_campuses / sp.agg.2016.sub()$campuses_population)*100, 0),
+                  round((sp.agg.2017.sub()$scalable_campuses / sp.agg.2017.sub()$campuses_population)*100, 0)),
+                  dataLabels = list(enabled = TRUE, format = '{point.y}%')) %>% hc_legend(enabled = FALSE) %>% hc_colors(c(colors$color[colors$label == 'fiber1']))
+})
+```
+
+### [Fiber Targets](#target-lists-fiber) {.no-padding}
+```{r}
+renderPlot({
+  val <- paste("Targets: ", format(sp.agg.2017.sub()$district_fiber_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$campus_fiber_targets / sp.agg.2017.sub()$campuses_population)*100, 0), "%)",
+               
+               "\nClean Targets: ", format(sp.agg.2017.sub()$clean_district_fiber_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$clean_campus_fiber_targets / sp.agg.2017.sub()$campuses_clean_ia_sample)*100, 0), "%)",
+               
+               "\nPotential Targets: ", format(sp.agg.2017.sub()$district_fiber_potential_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$campus_fiber_potential_targets / sp.agg.2017.sub()$campuses_population)*100, 0), "%)",
+               
+               "\nClean Potential Targets: ", format(sp.agg.2017.sub()$clean_district_fiber_potential_targets, big.mark = ",", nsmall = 0, scientific = FALSE),
+               " (", round((sp.agg.2017.sub()$clean_campus_fiber_potential_targets / sp.agg.2017.sub()$campuses_clean_ia_sample)*100, 0), "%)", sep='')
+  ## need to set min and max for y-axis so can label both the number and "targets"
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.15, label = val, size = 10, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'fiber2']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+### Campuses on Fiber (Extrapolated) {.no-padding}
+```{r}
+renderPlot({
+  text <- format(round(sp.agg.2017.sub()$scalable_campuses, 0), big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("of ", format(sp.agg.2017.sub()$campuses_population, big.mark = ",", nsmall = 0, scientific = FALSE), sep='')
+  text3 <- paste("(", format(round(sp.agg.2017.sub()$campuses_population - sp.agg.2017.sub()$scalable_campuses, 0), big.mark = ",", nsmall = 0, scientific = FALSE), " not on fiber)", sep='')
+  text4 <- paste("Average Number of Campuses\n not on Fiber (of Targets): ", sp.agg.2017.sub()$mean_unscalable_campuses_targets, sep="")
+  
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.45, label = text, size = 17, color = "white") +
+    annotate("text",  x = 2.5, y = 25.05, label = text2, size = 12, color = "white") +
+    annotate("text",  x = 2.5, y = 24.75, label = text3, size = 12, color = "white") +
+    annotate("text",  x = 2.5, y = 24.45, label = text4, size = 6, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'fiber3']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+Row {data-height = 350}
+------------------------------------------------------------------------
+### {.no-padding}
+```{r, fig.width=1.5}
+img(src = "figures/affordability.png", height = "100%", width = "100%")
+```
+
+### [Districts Meeting Affordability Goal](#deep-dive-affordability)
+```{r}
+renderHighchart({
+  highchart() %>% 
+    hc_chart(type = 'column') %>% 
+    hc_xAxis(categories = c(paste('Current 2016 (n=', format(sp.agg.2016.sub()$districts_clean_ia_cost_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''),
+      paste('Current 2017 (n=', format(sp.agg.2017.sub()$districts_clean_ia_cost_sample, big.mark = ",", nsmall = 0, scientific = FALSE), ')', sep=''))) %>% 
+    hc_yAxis(labels = list(format = '{value}%'), min = 0, max = 100) %>% 
+    hc_add_series(data = c(round((sp.agg.2016.sub()$districts_meeting_affordability / sp.agg.2016.sub()$districts_clean_ia_cost_sample)*100, 0),
+      round((sp.agg.2017.sub()$districts_meeting_affordability / sp.agg.2017.sub()$districts_clean_ia_cost_sample)*100, 0)),
+      dataLabels = list(enabled = TRUE, format = '{point.y}%')) %>% hc_legend(enabled = FALSE) %>% hc_colors(c(colors$color[colors$label == 'affordability1'])) 
+})
+```
+
+### Median Cost per Mbps {.no-padding}
+```{r}
+renderPlot({
+  text <- paste("2016: $", round(sp.agg.2016.sub()$median_ia_monthly_cost_per_mbps, 2), sep="")
+  text2 <- paste("2017: $", round(sp.agg.2017.sub()$median_ia_monthly_cost_per_mbps, 2), sep="")
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.15, label = text, size = 20, color = "white") +
+    annotate("text",  x = 2.5, y = 24.75, label = text2, size = 20, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'affordability2']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+### Students Meeting Goal (Extrapolated) {.no-padding}
+```{r}
+renderPlot({
+  ## calculate percentage of students meeting afforadability goal to extrapolate
+  percentage.student.meeting.goal.2017 <- sp.agg.2017.sub()$students_meeting_affordability / sp.agg.2017.sub()$students_clean_ia_sample
+  text <- format(round(percentage.student.meeting.goal.2017 * sp.agg.2017.sub()$students_population, 0),
+                 big.mark = ",", nsmall = 0, scientific = FALSE)
+  text2 <- paste("(", round(percentage.student.meeting.goal.2017*100, 0), "%)", sep='')
+  ggplot() + ylim(24, 26) +
+    annotate("text",  x = 2.5, y = 25.15, label = text, size = 20, color = "white") +
+    annotate("text",  x = 2.5, y = 24.85, label = text2, size = 15, color = "white") +
+    theme(panel.background = element_rect(fill = colors$color[colors$label == 'affordability3']),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank())
+})
+```
+
+
+
+Deep Dive Current16 {.hidden data-orientation=rows}
+=====================================================================
+Row 
+---------------------------------------------------------------------
+### 
+```{r}
+renderValueBox(valueBox(service_provider_assignment_name_caps, paste("Date Updated:", date.updated, sep=" ")))
+```
+
+### Current 2016 Districts
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2016.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2016.sub()$districts_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'districts'])
+})
+```
+
+### Current 2016 Schools
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2016.sub()$schools_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2016.sub()$schools_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
+})
+```
+
+### Current 2016 Students
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2016.sub()$students_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2016.sub()$students_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
+})
+```
+
+Row {data-height=350}
+---------------------------------------------------------------------
+### Current 2016 Clean Status {.no-title} 
+```{r}
+renderHighchart({
+  highchart() %>% hc_chart(type = "solidgauge", backgroundColor = "white", marginTop = 50) %>% 
+    hc_title(text = "Current 2016 Clean Status", style = list(fontSize = "24px")) %>% 
+    hc_tooltip(borderWidth = 0, backgroundColor = 'none', shadow = FALSE,style = list(fontSize = '16px'),
+               pointFormat = '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}%</span>',
+               positioner = JS("function (labelWidth, labelHeight) {return{x: 200 - labelWidth / 2, y: 180};}")) %>% 
+    hc_pane(startAngle = 0, endAngle = 360,
+            background = list(list(outerRadius = '112%', innerRadius = '88%',
+                                   backgroundColor = JS("Highcharts.Color('#009296').setOpacity(0.1).get()"), borderWidth =  0),
+        list(outerRadius = '87%', innerRadius = '63%',
+             backgroundColor = JS("Highcharts.Color('#F26B21').setOpacity(0.1).get()"), borderWidth = 0),
+        list(outerRadius = '62%', innerRadius =  '38%',
+             backgroundColor = JS("Highcharts.Color('#FDB913').setOpacity(0.1).get()"), borderWidth = 0))) %>% 
+    hc_yAxis(min = 0, max = 100, lineWidth = 0, tickPositions = list()) %>% 
+    hc_plotOptions(solidgauge = list(borderWidth = '34px', dataLabels = list(enabled = FALSE), linecap = 'round', stickyTracking = FALSE)) %>% 
+    hc_add_series(name = "Districts", borderColor = JS("Highcharts.Color('#009296').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#009296').get()"), radius = "100%", innerRadius = "100%",
+                                   y = round((sp.agg.2016.sub()$districts_clean_ia_sample / sp.agg.2016.sub()$districts_population)*100, 0)))) %>% 
+    hc_add_series(name = "Schools", borderColor = JS("Highcharts.Color('#F26B21').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#F26B21').get()"), radius = "75%", innerRadius = "75%",
+                                   y = round((sp.agg.2016.sub()$schools_clean_ia_sample / sp.agg.2016.sub()$schools_population)*100, 0)))) %>% 
+    hc_add_series(name = "Students", borderColor = JS("Highcharts.Color('#FDB913').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#FDB913').get()"), radius = "50%", innerRadius = "50%",
+                                   y = round((sp.agg.2016.sub()$students_clean_ia_sample / sp.agg.2016.sub()$students_population)*100, 0))))})
+```
+
+Row
+---------------------------------------------------------------------
+```{r}
+#output$downloadData_16_districts <- downloadHandler(filename = function(){paste('current16_districts.csv')},
+#                                                    content = function(file){write.csv(current16_ct_sub(), file, row.names=F)})
+#downloadLink("downloadData_16_districts", label="Download Table")
+
+renderDataTable({
+    datatable(current16_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
+})
+```
+
+
+
+Deep Dive Current17 {.hidden data-orientation=rows}
+=====================================================================
+Row 
+---------------------------------------------------------------------
+### 
+```{r}
+renderValueBox(valueBox(service_provider_assignment_name_caps, paste("Date Updated:", date.updated, sep=" ")))
+```
+
+### Current 2017 Districts
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$districts_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'districts'])
+})
+```
+
+### Current 2017 Schools
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$schools_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$schools_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'schools'])
+})
+```
+
+### Current 2017 Students
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$students_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$students_population, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, "/", val2), color = colors$color[colors$label == 'students'])
+})
+```
+
+Row {data-height=350}
+---------------------------------------------------------------------
+### Current 2017 Clean Status {.no-title} 
+```{r}
+renderHighchart({
+  highchart() %>% hc_chart(type = "solidgauge", backgroundColor = "white", marginTop = 50) %>% 
+    hc_title(text = "Current 2017 Clean Status", style = list(fontSize = "24px")) %>% 
+    hc_tooltip(borderWidth = 0, backgroundColor = 'none', shadow = FALSE,style = list(fontSize = '16px'),
+               pointFormat = '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}%</span>',
+               positioner = JS("function (labelWidth, labelHeight) {return{x: 200 - labelWidth / 2, y: 180};}")) %>% 
+    hc_pane(startAngle = 0, endAngle = 360,
+            background = list(list(outerRadius = '112%', innerRadius = '88%',
+                                   backgroundColor = JS("Highcharts.Color('#009296').setOpacity(0.1).get()"), borderWidth =  0),
+        list(outerRadius = '87%', innerRadius = '63%',
+             backgroundColor = JS("Highcharts.Color('#F26B21').setOpacity(0.1).get()"), borderWidth = 0),
+        list(outerRadius = '62%', innerRadius =  '38%',
+             backgroundColor = JS("Highcharts.Color('#FDB913').setOpacity(0.1).get()"), borderWidth = 0))) %>% 
+    hc_yAxis(min = 0, max = 100, lineWidth = 0, tickPositions = list()) %>% 
+    hc_plotOptions(solidgauge = list(borderWidth = '34px', dataLabels = list(enabled = FALSE), linecap = 'round', stickyTracking = FALSE)) %>% 
+    hc_add_series(name = "Districts", borderColor = JS("Highcharts.Color('#009296').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#009296').get()"), radius = "100%", innerRadius = "100%",
+                                   y = round((sp.agg.2017.sub()$districts_clean_ia_sample / sp.agg.2017.sub()$districts_population)*100, 0)))) %>% 
+    hc_add_series(name = "Schools", borderColor = JS("Highcharts.Color('#F26B21').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#F26B21').get()"), radius = "75%", innerRadius = "75%",
+                                   y = round((sp.agg.2017.sub()$schools_clean_ia_sample / sp.agg.2017.sub()$schools_population)*100, 0)))) %>% 
+    hc_add_series(name = "Students", borderColor = JS("Highcharts.Color('#FDB913').get()"),
+                  data = list(list(color = JS("Highcharts.Color('#FDB913').get()"), radius = "50%", innerRadius = "50%",
+                                   y = round((sp.agg.2017.sub()$students_clean_ia_sample / sp.agg.2017.sub()$students_population)*100, 0))))})
+```
+
+Row
+---------------------------------------------------------------------
+```{r}
+#output$downloadData_17_districts <- downloadHandler(filename = function(){paste('current17_districts.csv')},
+#                                                    content = function(file){write.csv(current17_ct_sub(), file, row.names=F)})
+#downloadLink("downloadData_17_districts", label="Download Table")
+
+renderDataTable({
+    datatable(current17_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
+})
+```
+
+
+Deep Dive Upgrades {.hidden data-orientation=rows}
+===========================================================================
+Row
+---------------------------------------------------------------------
+```{r}
+#output$downloadData_upgrades <- downloadHandler(
+#  filename = function() {paste('upgrades_deep_dive.csv')},
+#  content = function(file) {
+#      write.csv(upgrades_ct_sub(), file, row.names=F)
+#  })
+# downloadLink("downloadData_upgrades", label = "Download Table")
+
+renderDataTable({
+    datatable(upgrades_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
+})
+```
+
+
+
+Deep Dive Connectivity {.hidden data-orientation=rows}
+=====================================================================
+Row 
+---------------------------------------------------------------------
+### 
+```{r}
+renderValueBox(valueBox(service_provider_assignment_name_caps, paste("Date Updated:", date.updated, sep=" ")))
+```
+
+### Current 2017 Districts Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$districts_meeting_2014_bw_goal, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'districts'])
+})
+```
+
+### Current 2017 Schools Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$schools_meeting_2014_bw_goal, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$schools_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'schools'])
+})
+```
+
+### Current 2017 Students Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$students_meeting_2014_bw_goal, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$students_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'students'])
+})
+```
+
+Row
+---------------------------------------------------------------------
+```{r}
+#output$downloadData_connectivity <- downloadHandler(
+#  filename = function() {paste('connectivity_deep_dive.csv')},
+#  content = function(file) {
+#    write.csv(connectivity_ct_sub(), file, row.names=F)})
+#downloadLink("downloadData_connectivity", label="Download Table")
+
+renderDataTable({
+    datatable(connectivity_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
+})
+```
+
+
+Deep Dive Fiber {.hidden data-orientation=columns}
+=====================================================================
+Column
+---------------------------------------------------------------------
+```{r}
+#output$downloadData_fiber <- downloadHandler(
+#  filename = function() {paste('fiber_deep_dive.csv')},
+#  content = function(file) {
+#    write.csv(fiber_ct_sub(), file, row.names=F)
+#  })
+#downloadLink("downloadData_fiber", label="Download Table")
+
+renderDataTable({
+    datatable(fiber_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
+})
+```
+
+
+
+Deep Dive Affordability {.hidden data-orientation=rows}
+=====================================================================
+Row 
+---------------------------------------------------------------------
+### 
+```{r}
+renderValueBox(valueBox(service_provider_assignment_name_caps, paste("Date Updated:", date.updated, sep=" ")))
+```
+
+### Current 2017 Districts Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$districts_meeting_affordability, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$districts_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'districts'])
+})
+```
+
+### Current 2017 Schools Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$schools_meeting_affordability, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$schools_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'schools'])
+})
+```
+
+### Current 2017 Students Meeting Goal
+```{r}
+renderValueBox({
+  val1 <- format(sp.agg.2017.sub()$students_meeting_affordability, big.mark = ",", nsmall = 0, scientific = FALSE)
+  val2 <- format(sp.agg.2017.sub()$students_clean_ia_sample, big.mark = ",", nsmall = 0, scientific = FALSE)
+  valueBox(paste(val1, val2, sep=' / '), color = colors$color[colors$label == 'students'])
+})
+```
+
+Row
+---------------------------------------------------------------------
+###
+```{r}
+ #output$downloadData_affordability <- downloadHandler(
+ #filename = function(){paste('affordability_deep_dive.csv')},
+ #content = function(file){
+ #  write.csv(affordability_ct_sub(), file, row.names=F)})
+ #downloadLink("downloadData_affordability", label = "Download Table")
+
+renderDataTable({
+    datatable(affordability_ct_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE), filter = 'top')
+})
+```
+
+
+Target Lists Connectivity {.hidden data-orientation=rows}
+============================================================================
+
+### Targets and Potential Targets
+```{r}
+ output$downloadData_connectivity <- downloadHandler(
+  filename = function() {paste('connectivity_target_list.csv')},
+  content = function(file){
+    write.csv(connectivity_tar_sub(), file, row.names=F)
+  })
+ downloadLink("downloadData_connectivity", label = "Download Table")
+ 
+ renderDataTable({
+  datatable(connectivity_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+               filter = 'top')
+})
+```
+
+
+
+Target Lists Fiber {.hidden data-orientation=rows}
+============================================================================
+
+### Targets and Potential Targets
+```{r}
+ output$downloadData_fiber <- downloadHandler(
+  filename = function() {paste('fiber_target_list.csv')},
+  content = function(file){
+    write.csv(fiber_tar_sub(), file, row.names=F)
+  })
+ downloadLink("downloadData_fiber", label = "Download Table")
+ 
+ renderDataTable({
+    datatable(fiber_tar_sub(), rownames=FALSE, escape=FALSE, options=list(paging=TRUE, searching=TRUE, scrollX=TRUE, fixed=TRUE),
+                  filter = 'top')
+})
+```
+
+Overview {data-orientation=rows}
+=================================================================================================
+Row 
+----------------------------------------------------------------------
+###
+```{r}
+dta <- sp.overlap[,c('service_provider_assignment',
+                     'median_ia_monthly_cost_per_mbps', 'median_ia_monthly_cost_per_mbps_2016',
+                     'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal',
+                     'students_clean_ia_sample', 'students_meeting_2014_bw_goal',
+                     'districts_clean_ia_sample_2016', 'districts_meeting_2014_bw_goal_2016',
+                     'students_clean_ia_sample_2016', 'students_meeting_2014_bw_goal_2016',
+                     'students_not_meeting_2014_bw_goal', 'students_not_meeting_2014_bw_goal_2016',
+                     'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal',
+                     'districts_not_meeting_2014_bw_goal', 'districts_not_meeting_2014_bw_goal_2016')]
+## calculate percentage of students not meeting goal
+dta$students_not_meeting_2014_bw_goal_perc <- dta$students_not_meeting_2014_bw_goal / dta$students_clean_ia_sample
+p <- plot_ly(dta, x=~median_ia_monthly_cost_per_mbps_2016, y=~median_ia_monthly_cost_per_mbps,
+             text=~service_provider_assignment, type='scatter', mode='markers',
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+             marker=list(size = 10)) %>%
+  layout(title = 'Top 50 Service Providers',
+         xaxis = list(showgrid = FALSE, range=c(0,8), title='2016 Median Cost/Mbps'),
+         yaxis = list(showgrid = FALSE, range=c(0,8), title='2017 Median Cost/Mbps'))
+p
+
+#p <- plot_ly(dta, x=~median_ia_monthly_cost_per_mbps_2016, y=~median_ia_monthly_cost_per_mbps,
+#             text=~service_provider_assignment, type='scatter', mode='markers',
+#             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+#             marker=list(size=~(students_clean_ia_sample/50000), opacity=0.7)) %>%
+            #,width=500, height=500) %>%
+#  layout(title = 'Top 20 Service Providers Not Meeting Goals',
+#         xaxis = list(showgrid = FALSE, range=c(0,10), title='2016 Cost/Mbps'),
+#         yaxis = list(showgrid = FALSE, range=c(0,10), title='2017 Cost/Mbps'))
+```
+
+
+###
+```{r}
+
+p <- plot_ly(dta, x=~districts_clean_ia_sample_2016, y=~districts_clean_ia_sample,
+             text=~service_provider_assignment, type='scatter', mode='markers',
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Reds',
+             marker=list(size = 10)) %>%
+  layout(title = 'Top 50 Service Providers',
+         xaxis = list(showgrid = FALSE, range=c(0,200), title='2016 Districts Served'),
+         yaxis = list(showgrid = FALSE, range=c(0,200), title='2017 Districts Served'))
+p
+```
+
+
+Row
+---------------------------------------------------------------------
+###
+```{r}
+
+## subset to top 20
+sp16.not.meeting$students_not_meeting_2014_bw_goal_perc <- sp16.not.meeting$students_not_meeting_2014_bw_goal / sp16.not.meeting$students_clean_ia_sample
+dta.2016 <- sp16.not.meeting[which(sp16.not.meeting$rank %in% seq(1,20)),]
+dta.2016 <- dta.2016[order(dta.2016$rank, decreasing=F),]
+
+## plot top 20 not meeting goal
+## set margins
+m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
+p3 <- plot_ly(dta.2016, x=~service_provider_assignment,
+             y=~students_not_meeting_2014_bw_goal,
+             type='bar', text=text,
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+  layout(title = 'Top 20 Service Providers Not Meeting Goals (2016)',
+         xaxis = list(showgrid = FALSE, title=''),
+         yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),
+         legend = list(title='Overall Percent of Students Not Meeting Goals'))
+p3
+
+```
+
+
+###
+```{r}
+
+## Top 20 SPs Not Meeting Goals
+names(sp16.not.meeting)[names(sp16.not.meeting) == 'median_ia_monthly_cost_per_mbps'] <- 'median_ia_monthly_cost_per_mbps_2016'
+names(sp16.not.meeting)[names(sp16.not.meeting) == 'rank'] <- 'rank_2016'
+dta <- merge(sp17.not.meeting[,c('service_provider_assignment', 'median_ia_monthly_cost_per_mbps',
+                        'students_clean_ia_sample', 'students_meeting_2014_bw_goal',
+                        'districts_clean_ia_sample', 'districts_meeting_2014_bw_goal', 'rank')],
+             sp16.not.meeting[,c('service_provider_assignment', 'median_ia_monthly_cost_per_mbps_2016', 'rank_2016')],
+             by='service_provider_assignment', all.x=T)
+dta <- dta[which(dta$rank %in% seq(1,20)),]
+## calculate percentage of students not meeting goal
+dta$students_not_meeting_2014_bw_goal <- dta$students_clean_ia_sample - dta$students_meeting_2014_bw_goal
+dta$students_not_meeting_2014_bw_goal_perc <- dta$students_not_meeting_2014_bw_goal / dta$students_clean_ia_sample
+
+## subset to top 20
+dta.2017 <- dta[which(dta$rank %in% seq(1,20)),]
+dta.2017 <- dta.2017[order(dta.2017$rank, decreasing=F),]
+
+## plot top 20 not meeting goal
+#x <- dta.2017$service_provider_assignment
+#dta.2017$x <- factor(dta.2017$service_provider_assignment, levels = x)
+#p2 <- plot_ly(dta.2017, x=~x, y=~students_not_meeting_2014_bw_goal,
+#              type = 'bar', marker = list(color = 'rgb(49,130,189)'),
+#              color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+#      layout(title = 'Top 15 Service Providers Not Meeting Goals',
+#              xaxis = list(showgrid = FALSE, title=''),
+#              yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),
+#              legend = list(title='Overall Percent of Students Not Meeting Goals'))
+
+
+## set margins
+m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
+p2 <- plot_ly(dta.2017, x=~service_provider_assignment,
+             y=~students_not_meeting_2014_bw_goal,
+             type='bar', text=text,
+             color=~students_not_meeting_2014_bw_goal_perc, colors='Blues') %>%
+             #,width=1000, height=1000) %>%
+  layout(title = 'Top 20 Service Providers Not Meeting Goals (2017)',
+         xaxis = list(showgrid = FALSE, title=''),
+         yaxis = list(showgrid = FALSE, title='Number of Students Not Meeting Goals'),#, range=c(0,max(dta.2016$students_not_meeting_2014_bw_goal))),
+         legend = list(title='Overall Percent of Students Not Meeting Goals'))
+p2
+
+```
+

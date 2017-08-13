@@ -10,12 +10,26 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
     from (
       select  recipient_id,
               case
+
                 when reporting_name = 'Ed Net of America'
+
                   then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
                   then 'Charter'
+
                 when reporting_name is null then service_provider_name
                 else reporting_name
+
               end as reporting_name,
               num_students,
               meeting_2014_goal_no_oversub,
@@ -43,12 +57,26 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
     from (
       select  recipient_id,
               case
+
                 when reporting_name = 'Ed Net of America'
+
                   then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
                 when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
                   then 'Charter'
+
                 when reporting_name is null then service_provider_name
                 else reporting_name
+
               end as reporting_name,
               num_students,
               meeting_2014_goal_no_oversub,

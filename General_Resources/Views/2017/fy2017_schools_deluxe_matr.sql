@@ -186,18 +186,122 @@ select
 
 		else false
 
-	end as meeting_knapsack_affordability_target
+	end as meeting_knapsack_affordability_target,
+
+spa.reporting_name as service_provider_assignment,
+spa.primary_sp_purpose as primary_sp_purpose,
+spa.primary_sp_bandwidth as primary_sp_bandwidth,
+spa.primary_sp_percent_of_bandwidth as primary_sp_percent_of_bandwidth
+
 from public.fy2017_schools_metrics_matr sm
 left join public.fy2017_districts_deluxe_matr dd
 on sm.district_esh_id = dd.esh_id
 
 left join state_level_extrap sle
-
 on sle.postal_cd = sm.postal_cd
+
+left join (
+select  recipient_sp_bw_rank.recipient_id as campus_id, 
+reporting_name, 
+recipient_sp_bw_rank.purpose_list as primary_sp_purpose,
+recipient_sp_bw_rank.bandwidth as primary_sp_bandwidth,
+recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_percent_of_bandwidth
+
+  from (
+    select  *,
+            row_number() over (partition by recipient_id order by bandwidth desc ) as bw_rank
+    from (
+      select  recipient_id,
+              case
+
+                when reporting_name = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                when reporting_name is null then service_provider_name
+                else reporting_name
+
+              end as reporting_name,
+              sum(bandwidth_in_mbps * quantity_of_line_items_received_by_district) as bandwidth,
+              sum(case
+                    when purpose = 'Upstream'
+                      then bandwidth_in_mbps * quantity_of_line_items_received_by_district
+                    else 0
+                  end) as upstream_bandwidth,
+              array_agg(distinct purpose order by purpose) as purpose_list
+      from public.fy2017_school_services_received_matr sr
+      where purpose in ('Upstream', 'Internet')
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
+      and recipient_include_in_universe_of_districts
+      and recipient_exclude_from_ia_analysis = false
+      group by 1,2
+    )recipient_sp_bw
+  ) recipient_sp_bw_rank
+  left join (
+    select  recipient_id,
+            sum(bandwidth) as bw_total
+    from (
+      select  recipient_id,
+              case
+
+                when reporting_name = 'Ed Net of America'
+
+                  then 'ENA Services, LLC'
+
+                when reporting_name = 'Zayo'
+
+                  then 'Zayo Group, LLC'
+
+                when reporting_name = 'CenturyLink Qwest'
+
+                  then 'CenturyLink'
+
+                when reporting_name in ('Bright House Net', 'Time Warner Cable Business LLC')
+
+                  then 'Charter'
+
+                when reporting_name is null then service_provider_name
+                else reporting_name
+
+              end as reporting_name,
+              sum(bandwidth_in_mbps * quantity_of_line_items_received_by_district) as bandwidth,
+              sum(case
+                    when purpose = 'Upstream'
+                      then bandwidth_in_mbps * quantity_of_line_items_received_by_district
+                    else 0
+                  end) as upstream_bandwidth
+      from public.fy2017_school_services_received_matr sr
+      where purpose in ('Upstream', 'Internet')
+      and inclusion_status in ('clean_with_cost', 'clean_no_cost')
+      and recipient_include_in_universe_of_districts
+      and recipient_exclude_from_ia_analysis = false
+      group by 1,2
+    )recipient_sp_bw
+
+    group by 1
+  ) recipient_sp_bw_total
+  on recipient_sp_bw_rank.recipient_id = recipient_sp_bw_total.recipient_id
+  where bw_rank = 1
+  and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
+) spa
+
+on sm.campus_id = spa.campus_id
 
 /*
 Author: Jess Seok
 Created On Date: 11/29/2016
-Last Modified Date: 7/31/2017 -- copied from fy2016_schools_deluxe
+Last Modified Date: 8/11/2017 -- copied from fy2016_schools_deluxe, then added service provider assignment
 Name of QAing Analyst(s):Justine Schott
 */

@@ -93,7 +93,7 @@ FROM (
               ELSE 'Not broadband'
             END AS purpose,
             li.broadband AS broadband,
-            lid.allocation_lines AS quantity_of_line_items_received_by_district,
+            lis.allocation_lines AS quantity_of_line_items_received_by_district,
             li.num_lines AS line_item_total_num_lines,
             li.connect_category AS connect_category,
             CASE
@@ -124,34 +124,16 @@ FROM (
             li.service_provider_name AS service_provider_name,
             li.applicant_name AS applicant_name,
             eb.entity_id AS applicant_id,
-            dd.esh_id AS recipient_id,
-            dd.name AS recipient_name,
-            dd.postal_cd AS recipient_postal_cd,
-            dd.ia_monthly_cost_per_mbps AS recipient_ia_monthly_cost_per_mbps,
-            dd.ia_bw_mbps_total AS recipient_ia_bw_mbps_total,
-            dd.ia_bandwidth_per_student_kbps AS recipient_ia_bandwidth_per_student_kbps,
-            dd.num_students AS recipient_num_students,
-            dd.num_schools AS recipient_num_schools,
-            dd.latitude AS recipient_latitude,
-            dd.longitude AS recipient_longitude,
-            dd.locale AS recipient_locale,
-            dd.district_size AS recipient_district_size,
-            dd.exclude_from_ia_analysis AS recipient_exclude_from_ia_analysis,
-            dd.exclude_from_ia_cost_analysis AS recipient_exclude_from_ia_cost_analysis,
-            dd.exclude_from_wan_analysis AS recipient_exclude_from_wan_analysis,
-            dd.exclude_from_wan_cost_analysis AS recipient_exclude_from_wan_cost_analysis,
-            dd.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
-            case when
-            d.consortium_affiliation is null
-            then false
-            else true
-            end as recipient_consortium_member
-          --  d.consortium_member AS recipient_consortium_member commenting out the fy2016 districts column, utilizng district deluxe for consortium member
+            s.campus_id AS recipient_id,
+            s.num_students as recipient_num_students,
+            s.postal_cd as recipient_postal_cd,
+            d.include_in_universe_of_districts as recipient_include_in_universe_of_districts,
+            d.exclude_from_ia_analysis as recipient_exclude_from_ia_analysis
 
-          FROM public.fy2017_lines_to_district_by_line_item_matr lid
+          FROM public.fy2017_lines_to_school_by_line_item_matr lis
           LEFT OUTER JOIN (select * from public.fy2017_esh_line_items_v
             where funding_year = 2017) li
-          ON li.id = lid.line_item_id
+          ON li.id = lis.line_item_id
           LEFT OUTER JOIN public.entity_bens eb
           ON eb.ben = li.applicant_ben
           LEFT OUTER JOIN (
@@ -159,44 +141,31 @@ FROM (
             from public.esh_service_providers
           ) spc
           ON spc.id = li.service_provider_id
-          LEFT OUTER JOIN public.fy2017_districts_predeluxe_matr dd
-          ON dd.esh_id = lid.district_esh_id
-          left join public.fy2017_districts_aggregation_matr d
-
-
-          on dd.esh_id = d.district_esh_id
-
-          --left outer join public.fy2017_districts_deluxe_matr d
-          --on dd.esh_id = d.esh_id
-
-        /*LEFT OUTER JOIN fy2016.districts d
-          --LEFT OUTER JOIN fy2017_districts_deluxe_matr d
-          --ON dd.esh_id::numeric = d.esh_id
-          --WHERE li.broadband --commenting out fy2016 districts table and utilizing districts deluxe for consortum member
-          Dropping district deluxe join as it creates circular dependency and utiliing districts aggregation materialized view
-          for consortium_member field decipher
-*/
-		
+          join public.fy2017_schools_demog_matr s
+          on lis.campus_id = s.campus_id
+          join public.fy2017_districts_deluxe_matr d
+          on s.district_esh_id = d.esh_id
 ) base
 left join (
-          select  ldli.line_item_id,
-                  sum(d.num_students::numeric) as num_students_served
+          select  lsli.line_item_id,
+                  sum(s.num_students::numeric) as num_students_served
 
-          from public.fy2017_lines_to_district_by_line_item_matr ldli
+          from public.fy2017_lines_to_school_by_line_item_matr lsli
 
-          left join public.fy2017_districts_demog_matr d
-          on ldli.district_esh_id = d.esh_id
+          left join public.fy2017_schools_demog_matr s
+          on lsli.campus_id = s.campus_id
 
           left join public.fy2017_esh_line_items_v li
-          on ldli.line_item_id = li.id
+          on lsli.line_item_id = li.id
 
           where (li.consortium_shared=true
              OR li.backbone_conditions_met=true)
+          and s.postal_cd in ('HI', 'DE', 'RI')
 
-          group by ldli.line_item_id
+          group by lsli.line_item_id
 ) district_info_by_li
 on base.line_item_id=district_info_by_li.line_item_id
-
+where recipient_postal_cd in ('HI', 'DE', 'RI')
 
 
 
@@ -204,20 +173,13 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       7/12/2017 - JH added exclude_for_cost_only_unknown tag to be clean_no_cost
+Last Modified Date:       8/11/2017 - JS copied from services_received
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
-Methodology:
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
 Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 might need to add below two additional attributes
---and sfdc.recordtypeid = '01244000000DHd0AAG' --string for schools
---and sfdc.charter__c = false -- not charters
 
-Dependencies: [endpoint.fy2017_lines_to_district_by_line_item, fy2017.esh_line_items_v, public.entity_bens, endpoint.fy2017_districts_predeluxe, 
-salesforce.facilities__c, endpoint.fy2017_districts_demog, endpoint.fy2017_districts_aggregation, fy2017.esh_line_items_v]
+Dependencies: [endpoint.fy2017_lines_to_school_by_line_item, fy2017.esh_line_items_v, public.entity_bens, 
+public.fy2017_districts_deluxe]
 */
