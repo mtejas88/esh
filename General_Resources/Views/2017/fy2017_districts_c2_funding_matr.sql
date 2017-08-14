@@ -83,13 +83,15 @@ with school_calc as (
             alternative_discount_method,
         --c2 budgeting from 2016 from: https://www.fundsforlearning.com/blog/2017/03/category-2-budget-caps-adjusted-for-2017
             case
-              when eb.ben is null then 0
+              when eb.ben is null
+                then  case  when sd.num_students * 153.47 < 9412.80 then 9412.80
+                            else sd.num_students * 153.47
+                      end
               when (case  when number_of_full_time_students is null then 0
                           else number_of_full_time_students::numeric end
                     + case  when total_number_of_part_time_students is null then 0
                             else total_number_of_part_time_students::numeric end)*153.47 < 9412.80
                 then 9412.80
-
               --adding this condition because there are some schools that clearly have user entered mistakes for num students.
               --this condition changes the student count that we use for ~630 schools
               when 5 * sd.num_students < (case  when number_of_full_time_students is null then 0
