@@ -541,9 +541,8 @@ select distinct
 	and dspa.reporting_name=d16.service_provider_assignment then 'Did Not Switch' 
 	end as switcher,
 
-	case when dpd.num_students <= 1000 then 1.5
-	when dpd.num_students between 100 and 10000 then 1
-	when dpd.num_students > 1000 then 0.7 end as setda_concurrency_factor
+	case when dpd.district_size in ('Medium','Large','Mega') then 0.7
+	else 1 end as setda_concurrency_factor
 
 
 
