@@ -24,7 +24,7 @@ with districts_broadband_applications as (
     on sr.applicant_id = eb.entity_id
     where dd.include_in_universe_of_districts
     and dd.district_type = 'Traditional'
-    and sr.applicant_type in ('School', 'District')
+    and li.applicant_type in ('School', 'District')
   ) district_applicants
   left join (
     select  distinct 
