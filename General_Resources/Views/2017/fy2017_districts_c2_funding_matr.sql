@@ -51,11 +51,8 @@ with school_calc as (
                 c2_budget,
                 c2_budget*c2_discount_rate as c2_budget_postdiscount,
                 amount_c2_2015,
-                amount_c2_2015_incl_not_funded,
                 amount_c2_2016,
-                amount_c2_2016_incl_denied,
                 amount_c2_2017,
-                amount_c2_2017_incl_denied,
                 case
                   when c2_budget < amount_c2_2015
                     then 0
@@ -149,139 +146,33 @@ with school_calc as (
         left join (
           select
             "BEN",
-            sum(case
-                  when commitment_status != 'NOT FUNDED'
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)*case
-                                                                      when li.total_cost is null
-                                                                        then a.alloc_cat_2_cost
-                                                                      else li.total_cost
-                                                                    end
-                  else 0
-                end) as amount_c2_2015,
-            sum((ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)* case
-                                                              when li.total_cost is null
-                                                                then a.alloc_cat_2_cost
-                                                              else li.total_cost
-                                                            end) as amount_c2_2015_incl_not_funded
-          from public.fy2015_item21_allocations_by_entities ae
-          left join public.line_items li
-          on concat(ae."FRN",'-',ae."FRN Line Item No") = li.frn_complete
-          left join public.funding_requests fr
-          on ae."FRN" = fr.frn
-          left join (
-            select
-              concat(ae."FRN",'-',ae."FRN Line Item No") as frn_complete,
-              sum(case
-                    when "Cat 2 Cost Alloc" > 0
-                      then "Cat 2 Cost Alloc"
-                    else 0
-                  end) as alloc_cat_2_cost
-              from public.fy2015_item21_allocations_by_entities ae
-              left join public.fy2015_funding_request_key_informations frki
-              on ae."FRN" = frki."FRN"
-              where "Service Type" ilike '%internal%'
-            group by 1
-          ) a
-          on a.frn_complete = li.frn_complete
-          left join public.fy2015_funding_request_key_informations frki
+            sum(ae."Cat 2 Cost Alloc") as amount_c2_2015
+          from fy2015.current_item21_allocations_by_entities ae
+          left join fy2015.current_funding_request_key_informations frki
           on ae."FRN" = frki."FRN"
           where "Service Type" ilike '%internal%'
-          and alloc_cat_2_cost > 0
           group by 1
         ) c2_allocations_2015
         on entities.ben = c2_allocations_2015."BEN"
         left join (
           select
             ros.ben,
-            sum(case
-                  when frn_status not in ('Denied', 'Cancelled')
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (amount::numeric/a.alloc_cat_2_cost)*case
-                                                                when li.total_cost is null
-                                                                  then a.alloc_cat_2_cost
-                                                                else li.total_cost
-                                                              end
-                  else 0
-                end) as amount_c2_2016,
-            sum((amount::numeric/a.alloc_cat_2_cost)* case
-                                                        when li.total_cost is null
-                                                          then a.alloc_cat_2_cost
-                                                        else li.total_cost
-                                                      end) as amount_c2_2016_incl_denied
-          from fy2016.recipients_of_services ros
-          left join fy2016.line_items li
-          on ros.line_item = li.frn_complete
-          left join public.funding_requests_2016_and_later fr
-          on ros.frn = fr.frn
-          left join (
-            select
-              line_item,
-              sum(case
-                    when amount::numeric > 0
-                      then amount::numeric
-                    else 0
-                  end) as alloc_cat_2_cost
-              from fy2016.recipients_of_services ros
-              left join fy2016.basic_informations bi
-              on ros.application_number = bi.application_number
-              where bi.category_of_service::numeric = 2
-            group by 1
-          ) a
-          on a.line_item = li.frn_complete
-          left join fy2016.basic_informations bi
+            sum(amount::numeric) as amount_c2_2016
+          from fy2016.current_recipients_of_services ros
+          left join fy2016.current_basic_informations bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
-          and alloc_cat_2_cost > 0
           group by 1
         ) c2_allocations_2016
         on entities.ben = c2_allocations_2016.ben
         left join (
           select
             ros.ben,
-            sum(case
-                  when frn_status not in ('Denied', 'Cancelled')
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (amount::numeric/a.alloc_cat_2_cost)*case
-                                                                when li.total_cost is null
-                                                                  then a.alloc_cat_2_cost
-                                                                else li.total_cost
-                                                              end
-                  else 0
-                end) as amount_c2_2017,
-            sum((amount::numeric/a.alloc_cat_2_cost)* case
-                                                        when li.total_cost is null
-                                                          then a.alloc_cat_2_cost
-                                                        else li.total_cost
-                                                      end) as amount_c2_2017_incl_denied
-          from fy2017.recipients_of_services ros
-          left join public.esh_line_items li
-          on ros.line_item = li.frn_complete
-          and li.funding_year = 2017
-          left join public.funding_requests_2016_and_later fr
-          on ros.frn = fr.frn
-          left join (
-            select
-              line_item,
-              sum(case
-                    when amount::numeric > 0
-                      then amount::numeric
-                    else 0
-                  end) as alloc_cat_2_cost
-              from fy2017.recipients_of_services ros
-              left join fy2017.basic_informations bi
-              on ros.application_number = bi.application_number
-              where bi.category_of_service::numeric = 2
-            group by 1
-          ) a
-          on a.line_item = li.frn_complete
-          left join fy2017.basic_informations bi
+            sum(amount::numeric) as amount_c2_2017
+          from fy2017.current_recipients_of_services ros
+          left join fy2017.current_basic_informations bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
-          and alloc_cat_2_cost > 0
           group by 1
         ) c2_allocations_2017
         on entities.ben = c2_allocations_2017.ben
