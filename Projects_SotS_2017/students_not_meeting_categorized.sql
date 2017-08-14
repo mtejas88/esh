@@ -18,10 +18,13 @@ with districts_broadband_applications as (
     from fy2017_districts_deluxe_matr dd
     join fy2017_services_received_matr sr
     on dd.esh_id= sr.recipient_id
+    join public.fy2017_esh_line_items_v li
+    on sr.line_item_id = li.id
     join public.entity_bens eb
     on sr.applicant_id = eb.entity_id
     where dd.include_in_universe_of_districts
     and dd.district_type = 'Traditional'
+    and sr.applicant_type in ('School', 'District')
   ) district_applicants
   left join (
     select  distinct 
