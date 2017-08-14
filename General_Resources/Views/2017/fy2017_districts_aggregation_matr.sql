@@ -1047,198 +1047,113 @@ select  		dd.esh_id as district_esh_id,
 --consortium
 
 						array_to_string(array_agg(distinct
-
 													case
-
-														when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
-																and real_applicant_id::varchar!=ldli.district_esh_id
-
-																and real_applicant_type!='School'
-
-																and real_applicant_id::varchar not in (	select esh_id
-
-																							from public.fy2017_districts_demog_matr
-
-																							where include_in_universe_of_districts=true)
-
+														when 	(isp_conditions_met = true OR internet_conditions_met = true OR upstream_conditions_met = true)
+																and eb_entity_id::varchar != ldli.district_esh_id
+																--  when consortia pages get added to SF, we should uncomment the following lines (assuming this is the correct string) and simplify the logic
+																--and real_applicant_id is not null
+																--and real_applicant_type = 'Consortia'
+																and eb_entity_id::varchar not in (	select school_esh_id
+																							from endpoint.fy2017_schools_demog
+																							where district_include_in_universe_of_districts = true)
+																and eb_entity_id::varchar not in (	select esh_id
+																							from endpoint.fy2017_districts_demog
+																							where include_in_universe_of_districts = true)
 																	then applicant_name
-
 														when	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
 																and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-
 																							7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-
 																							8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
-
 																							8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-
 																							10565, 10632, 412)
-
 																	then service_provider_name
-
 													end), ' | ') as consortium_affiliation,
-
 						case
-
 							when ( 	sum(case
-
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
-													and real_applicant_type!='School'
-
-													and real_applicant_id::varchar!=ldli.district_esh_id
-
-													and real_applicant_id::varchar not in (	select esh_id
-
-																				from public.fy2017_districts_demog_matr
-
+													--  when consortia pages get added to SF, we should uncomment the following lines (assuming this is the correct string) and simplify the logic
+													--and real_applicant_id is not null
+													--and real_applicant_type = 'Consortia'
+													and eb_entity_id::varchar not in (	select school_esh_id
+																							from endpoint.fy2017_schools_demog
+																							where district_include_in_universe_of_districts = true)
+													and eb_entity_id::varchar!=ldli.district_esh_id
+													and eb_entity_id::varchar not in (	select esh_id
+																				from endpoint.fy2017_districts_demog
 																				where include_in_universe_of_districts=true)
-
 														then 1
-
 											else 0
-
 										end)>0
-
 								OR
-
 									sum(case
-
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
 													and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-
 																				7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-
 																				8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
-
 																				8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-
 																				10565, 10632, 412)
-
-
 /*can be potentially moved to a function - need to review*/
-
 														then 1
-
 											else 0
-
 										end)>0)
-
 								and sum(case
-
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
-													and real_applicant_id::varchar=ldli.district_esh_id
-
+													and eb_entity_id::varchar=ldli.district_esh_id
 													and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-
 																					7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-
 																					8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
-
 																					8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-
 																					10565, 10632, 412)
-
 														then 1
-
 											else 0
-
 										end)=0
-
 									then 'Consortium-provided'
-
 							when (sum(	case
-
 											when 	(isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
-													and real_applicant_type!='School'
-
-													and real_applicant_id::varchar!=ldli.district_esh_id
-
-													and real_applicant_id::varchar not in (	select esh_id
-
-																				from public.fy2017_districts_demog_matr
-
+													--  when consortia pages get added to SF, we should uncomment the following lines (assuming this is the correct string) and simplify the logic
+													--and real_applicant_id is not null
+													--and real_applicant_type = 'Consortia'
+													and eb_entity_id::varchar not in (	select school_esh_id
+																							from endpoint.fy2017_schools_demog
+																							where include_in_universe_of_districts = true)
+													and eb_entity_id::varchar!=ldli.district_esh_id
+													and eb_entity_id::varchar not in (	select esh_id
+																				from endpoint.fy2017_districts_demog
 																				where include_in_universe_of_districts=true)
-
 														then 1
-
 											else 0
-
 										end)>0
-
 								OR
-
 								sum(case
-
 										when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
 										and service_provider_id in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-
 																	7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-
 																	8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
-
 																	8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-
 																	10565, 10632, 412)
-
-
-
-
 											then 1
-
 										else 0
-
 									end)>0)
-
 								and sum(case
-
 											when (isp_conditions_met=true OR internet_conditions_met=true OR upstream_conditions_met=true)
-
-											and real_applicant_id::varchar=ldli.district_esh_id
-
+											and eb_entity_id::varchar=ldli.district_esh_id
 											and service_provider_id not in (5452, 5997, 6058, 6140, 6396, 6687, 6724, 6889, 6983, 7032,	7150,
-
 																	7277, 7350, 7555, 7672, 7690, 7869, 8008, 8117, 8120, 8157, 8171,
-
 																	8192, 8284, 8294, 8492, 8557, 8588, 8632, 8651, 8735, 8823, 8920,
-
 																	8967, 9361, 9398, 9444, 9708, 9793, 10046, 10091, 10126, 10179, 10276,
-
 																	10565, 10632, 412)
-
-
-
-
 												then 1
-
 											else 0
-
 										end)>0
-
 									then 'Consortium+District'
-
 							when sum(case
-
 									when isp_conditions_met = false
-
 									and backbone_conditions_met = false
-
 									and consortium_shared = false
-
 										then	allocation_lines
-
 									else	0
-
 								end) = 0 then 'Unknown'
-
 							else 'Self-procured'
-
 						end as ia_procurement_type,
 
 --cleanliness
@@ -1439,10 +1354,7 @@ on 	dd.esh_id::varchar = ldli.district_esh_id::varchar --pushing data type to be
 
 left join
 
-
-
   ( SELECT
-
 public.fy2017_esh_line_items_v.id,public.fy2017_esh_line_items_v.frn_complete,public.fy2017_esh_line_items_v.frn,public.fy2017_esh_line_items_v.application_number,public.fy2017_esh_line_items_v.application_type,
 public.fy2017_esh_line_items_v.applicant_ben,public.fy2017_esh_line_items_v.applicant_name,public.fy2017_esh_line_items_v.applicant_postal_cd,public.fy2017_esh_line_items_v.service_provider_id,
 /*public.fy2017_esh_line_items_v.name,*/public.fy2017_esh_line_items_v.service_type,public.fy2017_esh_line_items_v.service_category,public.fy2017_esh_line_items_v.connect_type,
@@ -1453,59 +1365,35 @@ public.fy2017_esh_line_items_v.open_tag_labels,public.fy2017_esh_line_items_v.nu
 public.fy2017_esh_line_items_v.consortium_shared,public.fy2017_esh_line_items_v.isp_conditions_met,public.fy2017_esh_line_items_v.upstream_conditions_met,
 public.fy2017_esh_line_items_v.internet_conditions_met,public.fy2017_esh_line_items_v.wan_conditions_met,/*public.fy2017_esh_line_items_v.exclude,*/public.fy2017_esh_line_items_v.upload_bandwidth_in_mbps,
 public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_items_v.function,
-
-
-           eb.id as real_applicant_id,
-
-           eb.type as real_applicant_type,
+           acc.esh_id__c as real_applicant_id,
+           acc.type as real_applicant_type,
+           eb.entity_id as eb_entity_id,
 
            CASE
-
                WHEN rec_elig_cost > 0 then rec_elig_cost
-
                ELSE one_time_elig_cost/ CASE
-
                                             WHEN months_of_service = 0
-
                                                  OR months_of_service is null then 12
-
                                             ELSE months_of_service
-
                                         END
-
            END AS esh_rec_cost,
-
            --adda.reporting_name
            spc.name as service_provider_name,
-
            frns.discount_rate::numeric/100 as discount_rate
-
-
    FROM public.fy2017_esh_line_items_v -- this is the view name
+   left join public.entity_bens eb
+   on eb.ben = public.fy2017_esh_line_items_v.applicant_ben
 
+   left join salesforce.account acc
+   on acc.esh_id__c::varchar = eb.entity_id::varchar
 
-   left join (
-   		select a.*
-   		from salesforce.account a
-   		join fy2017_districts_demog_matr dd 
-   		on a.esh_id__c::varchar = dd.esh_id
-   	) eb
-
-   on eb.ben__c::varchar = public.fy2017_esh_line_items_v.applicant_ben::varchar
-
-   left join fy2017.frns
-
-   on fy2017_esh_line_items_v.frn = frns.frn
-
+	left join fy2017.frns
+   on public.fy2017_esh_line_items_v.frn = frns.frn
    left join(
-
     select distinct id, reporting_name, name
-
     from public.service_provider_categories  --using the same public table that we used in 2016
-
     ) spc
-
-   on fy2017_esh_line_items_v.service_provider_id::varchar = spc.id::varchar --adding the view name*/
+   on public.fy2017_esh_line_items_v.service_provider_id::varchar = spc.id::varchar --adding the view name*/
 
    WHERE broadband = true
 
@@ -1709,14 +1597,10 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 7/12/2017 - js updated salesforce.account to only join BENs for accounts on districts_demog
+Last Modified Date: 8/14/2017 - jh updated consortium affiliation and ia procurement type
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation
 Methodology: Utilizing other aggregation tables
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
-Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
+
 */
