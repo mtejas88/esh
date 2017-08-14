@@ -109,6 +109,11 @@ select distinct
 
 	meeting_2018_goal_no_oversub,
 
+	case when exclude_from_ia_analysis=false and 
+	((ia_bw_mbps_total*1000)/num_students)/setda_concurrency_factor >= 1000 then true 
+	when exclude_from_ia_analysis=false and 
+	((ia_bw_mbps_total*1000)/num_students)/setda_concurrency_factor < 1000 then false
+	end as
 	meeting_2018_goal_oversub,
 
 	meeting_2018_goal_no_oversub_fcc_25,
@@ -338,7 +343,10 @@ select distinct
 
 	purpose_match,
 
-	switcher
+	switcher,
+
+	setda_concurrency_factor
+
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
 
@@ -355,7 +363,7 @@ on sle.postal_cd = dfpd.postal_cd
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 7/5/2017 -- JH added wifi target status
+Last Modified Date: 8/14/2017 -- SC added 2 SETDA concurrency columns
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
