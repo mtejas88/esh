@@ -539,7 +539,11 @@ select distinct
 	and dspa.reporting_name!=d16.service_provider_assignment then 'Switched' 
 	when dspa.reporting_name is not null and d16.service_provider_assignment is not null
 	and dspa.reporting_name=d16.service_provider_assignment then 'Did Not Switch' 
-	end as switcher
+	end as switcher,
+
+	case when dpd.num_students <= 1000 then 1.5
+	when dpd.num_students between 100 and 10000 then 1
+	when dpd.num_students > 1000 then 0.7 end as setda_concurrency_factor
 
 
 
@@ -569,7 +573,7 @@ on dpd.esh_id::varchar = d16.esh_id::varchar
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 7/11/2017 -- JH fixed affordability calculator to only take integers
+Last Modified Date: 8/14/2017 -- SC added SETDA concurrency factor
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

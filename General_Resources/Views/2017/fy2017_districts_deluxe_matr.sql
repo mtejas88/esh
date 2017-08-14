@@ -338,7 +338,12 @@ select distinct
 
 	purpose_match,
 
-	switcher
+	switcher,
+
+	setda_concurrency_factor,
+
+	ia_bw_mbps_total/setda_concurrency_factor as setda_adj_ia_bw_mbps_total
+
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
 
@@ -355,7 +360,7 @@ on sle.postal_cd = dfpd.postal_cd
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 7/5/2017 -- JH added wifi target status
+Last Modified Date: 8/14/2017 -- SC added 2 SETDA concurrency columns
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
