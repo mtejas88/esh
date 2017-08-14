@@ -541,7 +541,7 @@ select distinct
 	and dspa.reporting_name=d16.service_provider_assignment then 'Did Not Switch' 
 	end as switcher,
 
-	case when dpd.district_size in ('Medium','Large','Mega') then 0.7
+	case when dpd.district_size in ('Medium','Large','Mega') then 0.667
 	else 1 end as setda_concurrency_factor
 
 

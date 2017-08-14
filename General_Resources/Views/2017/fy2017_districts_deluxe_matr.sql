@@ -109,6 +109,11 @@ select distinct
 
 	meeting_2018_goal_no_oversub,
 
+	case when exclude_from_ia_analysis=false and 
+	((ia_bw_mbps_total*1000)/num_students)/setda_concurrency_factor >= 1000 then true 
+	when exclude_from_ia_analysis=false and 
+	((ia_bw_mbps_total*1000)/num_students)/setda_concurrency_factor < 1000 then false
+	end as
 	meeting_2018_goal_oversub,
 
 	meeting_2018_goal_no_oversub_fcc_25,
@@ -340,9 +345,7 @@ select distinct
 
 	switcher,
 
-	setda_concurrency_factor,
-
-	ia_bw_mbps_total/setda_concurrency_factor as setda_adj_ia_bw_mbps_total
+	setda_concurrency_factor
 
 
 from fy2017_districts_fiberpredeluxe_matr dfpd
