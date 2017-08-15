@@ -1,4 +1,108 @@
-with school_calc as (
+with ros_2017 as (
+
+  select 
+    application_number,
+    ben,
+    amount::numeric
+  from fy2017.current_recipients_of_services
+  union
+  select 
+    application_number,
+    ben,
+    amount::numeric
+  from fy2017.recipients_of_services 
+  where line_item not in (
+    select distinct line_item
+    from fy2017.current_recipients_of_services
+  )
+
+),
+
+ros_2016 as (
+  select
+    application_number,
+    ben,
+    amount::numeric
+  from fy2016.current_recipients_of_services
+  union
+  select
+    application_number,
+    ben,
+    amount::numeric
+  from fy2016.recipients_of_services 
+  where line_item not in (
+    select distinct line_item
+    from fy2016.current_recipients_of_services
+  )
+),
+
+ros_2015 as (
+  select
+    "FRN" as frn,
+    "BEN" as ben,
+    "Cat 2 Cost Alloc" as amount
+  from fy2015.current_item21_allocations_by_entities
+  union
+  select
+    "FRN" as frn,
+    "BEN" as ben,
+    "Cat 2 Cost Alloc" as amount
+  from public.fy2015_item21_allocations_by_entities
+  where "FRN" not in (
+    select distinct "FRN"
+    from fy2015.current_item21_allocations_by_entities
+  )
+),
+
+bi_2017 as (
+  select 
+    application_number,
+    category_of_service
+  from fy2017.current_basic_informations 
+  UNION
+  select
+    application_number,
+    category_of_service
+  from fy2017.basic_informations 
+  where application_number not in (
+    select distinct application_number
+    from fy2017.current_basic_informations
+  )
+),
+
+bi_2016 as (
+  select 
+    application_number,
+    category_of_service
+  from fy2016.current_basic_informations 
+  UNION
+  select
+    application_number,
+    category_of_service
+  from fy2016.basic_informations 
+  where application_number not in (
+    select distinct application_number
+    from fy2016.current_basic_informations
+  )
+),
+
+bi_2015 as (
+  select 
+    "FRN" as frn,
+    "Service Type" as service_type
+  from fy2015.current_funding_request_key_informations
+  UNION
+  select
+    "FRN" as frn,
+    "Service Type" as service_type
+  from public.fy2015_funding_request_key_informations
+  where "FRN" not in (
+    select distinct "FRN"
+    from fy2015.current_funding_request_key_informations
+  )
+),
+
+school_calc as (
   select  *,
           budget_remaining_c2_2015*c2_discount_rate as budget_remaining_c2_2015_postdiscount,
           budget_remaining_c2_2016*c2_discount_rate as budget_remaining_c2_2016_postdiscount,
@@ -147,15 +251,15 @@ with school_calc as (
         ) entities
         left join (
           select
-            "BEN",
-            sum(ae."Cat 2 Cost Alloc") as amount_c2_2015
-          from fy2015.current_item21_allocations_by_entities ae
-          left join fy2015.current_funding_request_key_informations frki
-          on ae."FRN" = frki."FRN"
-          where "Service Type" ilike '%internal%'
+            ben,
+            sum(ae.amount) as amount_c2_2015
+          from ros_2015 ae
+          left join bi_2015 frki
+          on ae.frn = frki.frn
+          where service_type ilike '%internal%'
           group by 1
         ) c2_allocations_2015
-        on entities.ben = c2_allocations_2015."BEN"
+        on entities.ben = c2_allocations_2015.ben
         left join (
 --note: allocations are source of truth
 
@@ -171,8 +275,8 @@ with school_calc as (
           select
             ros.ben,
             sum(amount::numeric) as amount_c2_2016
-          from fy2016.current_recipients_of_services ros
-          left join fy2016.current_basic_informations bi
+          from ros_2016 ros
+          left join bi_2016 bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
           group by 1
@@ -182,8 +286,8 @@ with school_calc as (
           select
             ros.ben,
             sum(amount::numeric) as amount_c2_2017
-          from fy2017.current_recipients_of_services ros
-          left join fy2017.current_basic_informations bi
+          from ros_2017 ros
+          left join bi_2017 bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
           group by 1
@@ -215,14 +319,6 @@ budget_remaining_c2_2017,
 budget_remaining_c2_2015_postdiscount,
 budget_remaining_c2_2016_postdiscount,
 budget_remaining_c2_2017_postdiscount,
-.9 * c2_budget as c2_budget_haircut,
-.9 * c2_budget_postdiscount as c2_budget_postdiscount_haircuit,
-.9 * budget_remaining_c2_2015 as budget_remaining_c2_2015_haircut,
-.9 * budget_remaining_c2_2016 as budget_remaining_c2_2016_haircut,
-.9 * budget_remaining_c2_2017 as budget_remaining_c2_2017_haircut,
-.9 * budget_remaining_c2_2015_postdiscount as budget_remaining_c2_2015_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2017_postdiscount_haircut,
 case
   when (c2_budget) > (budget_remaining_c2_2015)
     then true
@@ -272,14 +368,6 @@ select
   sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
   sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
   sum(budget_remaining_c2_2017_postdiscount) as budget_remaining_c2_2017_postdiscount,
-  sum(c2_budget_haircut) as c2_budget_haircut,
-  sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
-  sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
-  sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
-  sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
-  sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
-  sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
-  sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
   case
     when sum(c2_budget) > sum(budget_remaining_c2_2015)
       then true
@@ -320,7 +408,7 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 5/30/2017
-Last Modified Date: 6/23/2017 - JH got rid of rounded c2
+Last Modified Date: 8/15/2017 - JH updated to fix current tables to union with original
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
 Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
