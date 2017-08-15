@@ -68,10 +68,10 @@ select
       then 'no governor commitment'
     when fiber_470_from_current_applicant > 0
       then 'filed 470 for fiber'
-    when meeting_2014_goal_no_oversub = true
-      then 'meeting min bw'
+    when meeting_2014_goal_no_oversub = true and meeting_2018_goal_oversub = false
+      then 'meeting 2014 but not 2018 bw goals'
     when meeting_knapsack_affordability_target = true
-      then 'meeting knapsack'
+      then 'paying affordable prices'
     when procurement != 'District-procured'
       then 'state or regional network'
 /*    when district_size in ('Large', 'Mega')
@@ -81,7 +81,7 @@ select
     when (upstream_bandwidth > 0 and isp_bandwidth > 0 and upstream_bandwidth != isp_bandwidth)
     and (((upstream_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100 or ((isp_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100)
       then 'mismatched ISP/upstream'*/
-    else 'unknown'
+    else 'not enough resources'
   end as diagnosis,
   sum(current_known_unscalable_campuses) as num_unscalable_campuses_sample,
   sum(current_known_unscalable_campuses)/extrapolate_pct as num_unscalable_campuses_extrap
