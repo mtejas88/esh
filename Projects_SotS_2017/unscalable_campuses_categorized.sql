@@ -81,7 +81,9 @@ select
     when (upstream_bandwidth > 0 and isp_bandwidth > 0 and upstream_bandwidth != isp_bandwidth)
     and (((upstream_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100 or ((isp_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100)
       then 'mismatched ISP/upstream'*/
-    else 'not enough resources'
+    when district_size in ('Tiny', 'Small')
+      then 'not enough resources'
+    else 'unknown'
   end as diagnosis,
   sum(current_known_unscalable_campuses) as num_unscalable_campuses_sample,
   sum(current_known_unscalable_campuses)/extrapolate_pct as num_unscalable_campuses_extrap
