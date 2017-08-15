@@ -1403,7 +1403,11 @@ public.fy2017_esh_line_items_v.backbone_conditions_met,public.fy2017_esh_line_it
 
               OR 'exclude' = any(open_flag_labels))
 
-          OR open_flag_labels is null) ) li
+          OR open_flag_labels is null)
+     
+     AND (not('charter_service' = any(open_tag_labels))
+
+     		  OR open_tag_labels is null) ) li
 
 on	ldli.line_item_id	=	li.id
 
@@ -1597,7 +1601,7 @@ group by	dd.esh_id,
 /*
 Author: Justine Schott
 Created On Date: 6/20/2016
-Last Modified Date: 8/14/2017 - jh updated consortium affiliation and ia procurement type
+Last Modified Date: 8/15/2017 - jh added charter service to exclusionary section of line items
 Name of QAing Analyst(s):
 Purpose: Districts' line item aggregation (bw, lines, cost of pieces contributing to metrics),
 as well as school metric, flag/tag, and discount rate aggregation

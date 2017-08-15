@@ -64,7 +64,8 @@ FROM (
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
-                    'video_conferencing' = any(li.open_flag_labels)
+                    'video_conferencing' = any(li.open_flag_labels) or
+                    'charter_service' = any(li.open_tag_labels) 
                 THEN 'dqs_excluded'
               WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
                 OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
@@ -204,14 +205,9 @@ on base.line_item_id=district_info_by_li.line_item_id
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       7/12/2017 - JH added exclude_for_cost_only_unknown tag to be clean_no_cost
+Last Modified Date:       8/15/2017 - JH added charter_service tag to be exclusionary
 Name of QAing Analyst(s):
-Purpose:                  2016 district data in terms of 2016 methodology
-Methodology:
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
-Purpose: Refactoring tables for 2017 data
+Purpose:                  matching line items to recipient districts
 Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
 Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 might need to add below two additional attributes

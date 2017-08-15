@@ -64,7 +64,8 @@ FROM (
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
-                    'video_conferencing' = any(li.open_flag_labels)
+                    'video_conferencing' = any(li.open_flag_labels) or
+                    'charter_service' = any(li.open_tag_labels) 
                 THEN 'dqs_excluded'
               WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
                 OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
@@ -173,7 +174,7 @@ where recipient_postal_cd in ('HI', 'DE', 'RI')
 /*
 Author:                   Justine Schott
 Created On Date:
-Last Modified Date:       8/11/2017 - JS copied from services_received
+Last Modified Date:       8/15/2017 - JH added charter service tag to be exclusionary
 Name of QAing Analyst(s):
 Purpose:                  2016 district data in terms of 2016 methodology
 Methodology: Commenting out y2016.districts tables, based on our discussion with engineering team. Per Justine, this can be eliminated for our version 1 views currently and will need to be refactored after discussing the SFDC loop back feature with engineering and/or Districts team.
