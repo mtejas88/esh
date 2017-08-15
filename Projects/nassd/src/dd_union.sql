@@ -402,11 +402,16 @@ end as ia_monthly_district_total,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700 /* knapsack bandwidth function doesn't work for costs below $700 */  
   else knapsack_bandwidth(dd.ia_monthly_cost_total)
 end as knapsack_bandwidth,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students < 100
+  then 0
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students >= 100
+  then 1 
   when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000/dd.num_students) < 100 
   then 0
   when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000/dd.num_students) >= 100 
@@ -415,6 +420,10 @@ end as knapsack_meeting_2014_goal_no_oversub,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students < 1000
+  then 0
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students >= 1000
+  then 1 
   when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000*dd.ia_oversub_ratio/dd.num_students) < 1000 
   then 0
   when (knapsack_bandwidth(dd.ia_monthly_cost_total)*1000*dd.ia_oversub_ratio/dd.num_students) >= 1000 
@@ -627,11 +636,16 @@ end as ia_monthly_district_total,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700
   else knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)
 end as knapsack_bandwidth,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students < 100
+  then 0
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students >= 100
+  then 1 
   when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000/dd.num_students) < 100 
   then 0
   when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000/dd.num_students) >= 100 
@@ -640,6 +654,10 @@ end as knapsack_meeting_2014_goal_no_oversub,
 case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students < 1000
+  then 0
+  when dd.ia_monthly_cost_total < 700 and ((dd.ia_monthly_cost_total/14)*1000)/dd.num_students >= 1000
+  then 1 
   when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000*dd.ia_oversub_ratio/dd.num_students) < 1000 
   then 0
   when (knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)*1000*dd.ia_oversub_ratio/dd.num_students) >= 1000 
