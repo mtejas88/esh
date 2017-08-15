@@ -1,9 +1,33 @@
-with erate_money as (
-  select 
+with final_basic_informations as (
+  select *
+  from fy2017.current_basic_informations 
+  UNION
+  select *
+  from fy2017.basic_informations 
+  where application_number not in (
+    select application_number
+    from fy2017.current_basic_informations
+  )
+),
+
+final_frns as (
+  select *
+  from fy2017.current_frns 
+  UNION
+  select *
+  from fy2017.frns 
+  where frn not in (
+    select frn
+    from fy2017.current_frns
+  )
+),
+
+erate_money as (
+select 
     bi.postal_cd,
     round(sum(frns.funding_commitment_request::numeric)/1000000,1) as erate_money_no_voice_millions
-  from fy2017.frns 
-  join fy2017.basic_informations bi
+  from final_frns frns 
+  join final_basic_informations bi
   on frns.application_number = bi.application_number
   where bi.applicant_type in ('School', 'School District', 'Consortium')
   and bi.postal_cd not in ('AS', 'DC', 'GU', 'MP', 'PR', 'VI')
