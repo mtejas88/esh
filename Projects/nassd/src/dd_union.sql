@@ -403,6 +403,7 @@ case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
   when dd.ia_monthly_cost_total < 700 /* knapsack bandwidth function doesn't work for costs below $700 */  
+  then dd.ia_monthly_cost_total/14
   else knapsack_bandwidth(dd.ia_monthly_cost_total)
 end as knapsack_bandwidth,
 case
@@ -637,6 +638,7 @@ case
   when dd.exclude_from_ia_cost_analysis = true or dd.exclude_from_ia_analysis = true
   then null
   when dd.ia_monthly_cost_total < 700
+  then dd.ia_monthly_cost_total/14
   else knapsack_bandwidth(dd.ia_monthly_cost_total::numeric)
 end as knapsack_bandwidth,
 case
