@@ -7,7 +7,7 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 #args = commandArgs(trailingOnly=TRUE)
@@ -82,14 +82,14 @@ dbDisconnect(con)
 
 
 ## Connect to 2016 Frozen DB -- PINK
-#con <- dbConnect(pgsql, url=url_pink, user=user_pink, password=password_pink)
-#smd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_smd.SQL")
-#dd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_deluxe_districts_crusher_materialized.SQL")
-#dd_2016_froz <- correct.dataset(dd_2016_froz, sots.flag=0, services.flag=0)
-#dd_2015_froz <- querydb("../../General_Resources/sql_scripts/2015/2015_deluxe_districts_crusher_materialized.SQL")
-#dd_2015_froz <- correct.dataset(dd_2015_froz, sots.flag=0, services.flag=0)
+con <- dbConnect(pgsql, url=url_ice, user=user_ice, password=password_ice)
+smd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_smd.SQL")
+dd_2016_froz <- querydb("../../General_Resources/sql_scripts/2016/2016_deluxe_districts_crusher_materialized.SQL")
+dd_2016_froz <- correct.dataset(dd_2016_froz, sots.flag=0, services.flag=0)
+dd_2015_froz <- querydb("../../General_Resources/sql_scripts/2015/2015_deluxe_districts_crusher_materialized.SQL")
+dd_2015_froz <- correct.dataset(dd_2015_froz, sots.flag=0, services.flag=0)
 ## disconnect from database
-#dbDisconnect(con)
+dbDisconnect(con)
 
 ##**************************************************************************************************************************************************
 ## write out the datasets
