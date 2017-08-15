@@ -157,6 +157,17 @@ with school_calc as (
         ) c2_allocations_2015
         on entities.ben = c2_allocations_2015."BEN"
         left join (
+--note: allocations are source of truth
+
+--example line item 1699013358.008 has less allocations than total cost
+--this was because only half was allocated to BEN 72917 in current data, where half could have been
+--  allocated to BEN 72918 like all the other line items in the FRN
+--even the committed_amount on the funding_requests table shows a committed amount that would include that other half
+--however, the usac budget tool doesn't care that more was committed than was allocated. it only looks at allocations
+
+--example line item 1699010222.001 has more allocations than total cost
+--this was because the original requested amount aligns with the allocations, but only part of that was funded.
+--however, the usac budget tool doesn't care that less was committed than was allocated. it only looks at allocations
           select
             ros.ben,
             sum(amount::numeric) as amount_c2_2016
