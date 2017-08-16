@@ -91,7 +91,22 @@ source_env <- function(path){
   if (Sys.getenv("PASSWORD_PINK") != ""){
     assign("password_pink", Sys.getenv("PASSWORD_PINK"), envir=.GlobalEnv)
   }
- 
+
+  ## FROZEN 2017 -- ICE
+  ## assign url for DB if available
+  if (Sys.getenv("URL_ICE") != ""){
+    assign("url_ice", Sys.getenv("URL_ICE"), envir=.GlobalEnv)
+  }
+  ## assign username for DB if available
+  if (Sys.getenv("USER_ICE") != ""){
+    assign("user_ice", Sys.getenv("USER_ICE"), envir=.GlobalEnv)
+  }
+  ## assign password for DB if available
+  if (Sys.getenv("PASSWORD_ICE") != ""){
+    assign("password_ice", Sys.getenv("PASSWORD_ICE"), envir=.GlobalEnv)
+  }
+
+
   ## SHINY CREDENTIALS (RSTUDIO)
   if (Sys.getenv("RSTUDIO_NAME") != ""){
     assign("rstudio_name", Sys.getenv("RSTUDIO_NAME"), envir=.GlobalEnv)
