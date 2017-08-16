@@ -13,7 +13,7 @@ with current_16 as (SELECT
           fy2016.connectivity_informations ci,
           public.entity_bens eb_parent,
           public.fy2016_districts_demog_matr ddm,
-          endpoint.fy2016_districts_deluxe dd
+          public.fy2016_districts_deluxe_matr dd
       WHERE
           ci.parent_entity_number = eb_parent.ben AND
           eb_parent.entity_id = ddm.esh_id::text::INT AND
@@ -39,7 +39,7 @@ with current_16 as (SELECT
           fy2016.connectivity_informations ci,
           public.entity_bens eb_parent,
           public.fy2016_districts_demog_matr ddm,
-          endpoint.fy2016_districts_deluxe dd
+          public.fy2016_districts_deluxe_matr dd
       WHERE
           ci.parent_entity_number = eb_parent.ben AND
           eb_parent.entity_id = ddm.esh_id::text::INT AND
@@ -91,7 +91,7 @@ current_17 as (SELECT
           fy2017.connectivity_informations ci,
           public.entity_bens eb_parent,
           public.fy2017_districts_demog_matr ddm,
-          endpoint.fy2017_districts_deluxe dd
+          public.fy2017_districts_deluxe_matr dd
       WHERE
           ci.parent_entity_number = eb_parent.ben AND
           eb_parent.entity_id = ddm.esh_id::text::INT AND
@@ -117,7 +117,7 @@ current_17 as (SELECT
           fy2017.connectivity_informations ci,
           public.entity_bens eb_parent,
           public.fy2017_districts_demog_matr ddm,
-          endpoint.fy2017_districts_deluxe dd
+          public.fy2017_districts_deluxe_matr dd
       WHERE
           ci.parent_entity_number = eb_parent.ben AND
           eb_parent.entity_id = ddm.esh_id::text::INT AND

@@ -1,5 +1,8 @@
 /* TEMP TABLE FOR 2015: 
   at this point in time crusher dd15 has everything i want except for discount rate)*/
+  /* commenting out since endpoints do not exist in frozen and discount rates for 2015 are not currently necessary for sots 2017 analysis. 
+
+
   with f as (select c.*,
     case
       when mg.discount_rate_c1::numeric <= 25
@@ -101,7 +104,7 @@
 
     from public.fy2015_districts_deluxe_m c
     left join endpoint.fy2015_districts_deluxe mg
-    on c.esh_id = mg.esh_id)
+    on c.esh_id = mg.esh_id)*/ 
 
 /* 2015 DISTRICT DELUXE */
 
@@ -119,11 +122,11 @@ case
   else locale
 end as locale,
 case 
-	when f.locale = 'Small Town' or f.locale = 'Rural'
-	then 'Rural & Town'
-	when f.locale = 'Urban' or f.locale = 'Suburban'
-	then 'Urban & Suburban'
-	else null
+  when f.locale = 'Small Town' or f.locale = 'Rural'
+  then 'Rural & Town'
+  when f.locale = 'Urban' or f.locale = 'Suburban'
+  then 'Urban & Suburban'
+  else null
 end as locale_2,
 f.district_size,
 f.frl_percent,
@@ -138,8 +141,8 @@ case
 end as frl_percent_grouping,
 
 -- General E-rate/Broadband Info
-f.discount_rate_c1,
-f.discount_rate_c2,
+null as discount_rate_c1,
+null as discount_rate_c2,
 s.org_structure,
 null as ia_procurement_type,
 case
@@ -208,11 +211,7 @@ case
   then f.total_ia_monthly_cost::numeric 
   else null
 end as ia_monthly_cost_total,
-case
-  when f.exclude_from_analysis = false and discount_rate_c1_num > 0
-  then f.total_ia_monthly_cost::numeric*(1-discount_rate_c1_num)
-  else null
-end as ia_monthly_district_total,
+null as ia_monthly_district_total,
 null as knapsack_bandwidth,
 null as knapsack_meeting_2014_goal_no_oversub,
 null as knapsack_meeting_2018_goal_oversub,
@@ -227,8 +226,7 @@ null cohort_16_to_17_connectivity,
 -- SERVICE PROVIDER
 null as service_provider_assignment
 
-
-from f
+from public.fy2015_districts_deluxe_m f 
 join public.states s
 on s.postal_cd = f.postal_cd
 /*Note: do not need to limit to districts in universe because 2015 DD is already limited to that */
@@ -249,11 +247,11 @@ dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
 case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 'Rural & Town' 
-	when dd.locale = 'Urban' or dd.locale = 'Suburban'
-	then 'Urban & Suburban'
-	else null
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 'Rural & Town' 
+  when dd.locale = 'Urban' or dd.locale = 'Suburban'
+  then 'Urban & Suburban'
+  else null
 end as locale_2,
 dd.district_size,
 dd.frl_percent,
@@ -359,14 +357,14 @@ case
   else null
 end as needs_wifi,
 case
-	when dd.c2_prediscount_budget_15 = 0
-	then null
-	else (dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15
+  when dd.c2_prediscount_budget_15 = 0
+  then null
+  else (dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15
 end as percent_c2_budget_used,
 case 
-	when dd.c2_prediscount_budget_15 = 0
-	then null
-	else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) 
+  when dd.c2_prediscount_budget_15 = 0
+  then null
+  else 1-((dd.c2_prediscount_budget_15 - dd.c2_prediscount_remaining_16)/dd.c2_prediscount_budget_15) 
 end as percent_c2_budget_remaining,
 dd.c2_prediscount_remaining_16 as c2_prediscount_remaining,
 dd.c2_postdiscount_remaining_16 as c2_postdiscount_remaining,
@@ -483,11 +481,11 @@ dd.num_schools::numeric,
 dd.num_campuses,
 dd.locale,
 case
-	when dd.locale = 'Town' or dd.locale = 'Rural'
-	then 'Rural & Town' 
-	when dd.locale = 'Urban' or dd.locale = 'Suburban'
-	then 'Urban & Suburban'
-	else null
+  when dd.locale = 'Town' or dd.locale = 'Rural'
+  then 'Rural & Town' 
+  when dd.locale = 'Urban' or dd.locale = 'Suburban'
+  then 'Urban & Suburban'
+  else null
 end as locale_2,
 dd.district_size,
 dd.frl_percent,
