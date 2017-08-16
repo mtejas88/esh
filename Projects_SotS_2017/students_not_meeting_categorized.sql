@@ -50,7 +50,12 @@ extrapolated_students_not_meeting as (
 					when exclude_from_ia_analysis= false
 						then num_students
 					else 0
-				end)/sum(num_students)::numeric as extrapolate_pct
+				end)/sum(num_students)::numeric as extrapolate_pct,
+sum(  case
+          when exclude_from_ia_analysis= false
+            then 1
+          else 0
+        end)/sum(1)::numeric as extrapolate_pct_district
 	from fy2017_districts_deluxe_matr
 	where include_in_universe_of_districts
 	and district_type = 'Traditional'
@@ -87,7 +92,9 @@ select
     else 'unknown'
   end as diagnosis,
   sum(dd.num_students::numeric) as num_students_sample,
-  round((sum(dd.num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill
+  sum(1) as num_districts_sample,
+  round((sum(dd.num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
+  sum(1)/extrapolate_pct_district as num_districts_extrap
 from public.fy2017_districts_deluxe_matr dd
 join public.fy2017_districts_aggregation_matr da
 on dd.esh_id = da.district_esh_id
@@ -101,5 +108,5 @@ where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
 and exclude_from_ia_analysis= false
 and meeting_2014_goal_no_oversub = false
-group by 1, extrapolate_pct
+group by 1, extrapolate_pct, extrapolate_pct_district
 order by 3 desc
