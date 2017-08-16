@@ -108,6 +108,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 select reporting_name as service_provider_assignment,
 postal_cd,
 sum(case when exclude_from_ia_analysis=false and meeting_2014_goal_no_oversub=false and reporting_name is not null then num_students else 0 end) as num_students_not_meeting_clean,
+sum(case when exclude_from_ia_analysis=false and meeting_2014_goal_no_oversub=true and reporting_name is not null then num_students else 0 end) as num_students_meeting_clean,
 sum(case when exclude_from_ia_analysis=false and reporting_name is not null then num_students else 0 end) as num_students_served_clean,
 count(distinct case when reporting_name is not null then dd.esh_id end) as num_districts_served_clean
 from public.fy2016_districts_deluxe_matr dd
