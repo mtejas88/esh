@@ -110,12 +110,10 @@ dd.postal_cd,
 sum(case when dd.exclude_from_ia_analysis=false and dd.meeting_2014_goal_no_oversub=false and reporting_name is not null then dd.num_students else 0 end) as num_students_not_meeting_clean,
 sum(case when dd.exclude_from_ia_analysis=false and dd.meeting_2014_goal_no_oversub=true and reporting_name is not null then dd.num_students else 0 end) as num_students_meeting_clean,
 sum(case when dd.exclude_from_ia_analysis=false and reporting_name is not null then dd.num_students else 0 end) as num_students_served_clean,
-count(distinct case when reporting_name is not null and d.exclude_from_analysis= false then dd.esh_id end) as num_districts_served_clean
+count(distinct case when reporting_name is not null and dd.exclude_from_ia_analysis= false then dd.esh_id end) as num_districts_served_clean
 from public.fy2016_districts_deluxe_matr dd
 left join sp_assignments s
 on dd.esh_id::numeric=s.esh_id::numeric
-left join public.fy2015_districts_deluxe_m d
-on dd.esh_id::numeric=d.esh_id::numeric
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
 and reporting_name in 
