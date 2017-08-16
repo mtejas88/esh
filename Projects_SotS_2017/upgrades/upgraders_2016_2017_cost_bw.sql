@@ -1,5 +1,8 @@
+/*run 2017 #s on 2017 frozen database*/
+
 select
-(select (sum(round(ia_bw_mbps_total)))
+round(avg(ia_bw_mbps_total)) as "monthly_bandwidth_mbps_2017",
+round(avg(ia_monthly_cost_total)) as "monthly_recurring_cost_circuit_2017"
 from
 public.fy2017_districts_deluxe_matr
 where
@@ -7,20 +10,14 @@ include_in_universe_of_districts = 'True'
 and district_type = 'Traditional'
 and upgrade_indicator = 'True'
 and exclude_from_ia_analysis = 'False'
-and exclude_from_ia_cost_analysis = 'False') as "total_bw_mbps_2017",
+and exclude_from_ia_cost_analysis = 'False'
 
-(select
-sum((round(ia_monthly_cost_total)))
-from
-public.fy2017_districts_deluxe_matr
-where
-include_in_universe_of_districts = 'True'
-and district_type = 'Traditional'
-and upgrade_indicator = 'True'
-and exclude_from_ia_analysis = 'False'
-and exclude_from_ia_cost_analysis = 'False') as "total_monthly_cost_mbps_2017",
 
-(select (sum(round(ia_bw_mbps_total)))
+/*run 2016 #s on 2016 frozen database*/
+
+select
+round(avg(ia_bw_mbps_total)) as "monthly_bandwidth_mbps_2016",
+round(avg(ia_monthly_cost_total)) as "monthly_recurring_cost_circuit_2016"
 from
 public.fy2016_districts_deluxe_matr
 where
@@ -28,15 +25,4 @@ include_in_universe_of_districts = 'True'
 and district_type = 'Traditional'
 and upgrade_indicator = 'True'
 and exclude_from_ia_analysis = 'False'
-and exclude_from_ia_cost_analysis = 'False') as "total_bw_mbps_2016",
-
-(select
-sum((round(ia_monthly_cost_total)))
-from
-public.fy2016_districts_deluxe_matr
-where
-include_in_universe_of_districts = 'True'
-and district_type = 'Traditional'
-and upgrade_indicator = 'True'
-and exclude_from_ia_analysis = 'False'
-and exclude_from_ia_cost_analysis = 'False') as "total_monthly_cost_mbps_2016"
+and exclude_from_ia_cost_analysis = 'False'
