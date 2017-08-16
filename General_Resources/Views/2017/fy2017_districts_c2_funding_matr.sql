@@ -89,7 +89,7 @@ bi_2016 as (
 bi_2015 as (
   select 
     "FRN" as frn,
-    "Service Type" as service_type
+    "FRN Service Type" as service_type
   from fy2015.current_funding_request_key_informations
   UNION
   select
