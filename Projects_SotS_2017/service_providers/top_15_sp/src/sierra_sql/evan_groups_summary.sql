@@ -7,7 +7,7 @@ and d.service_provider_assignment=dd.service_provider_assignment then '2017 reta
 when d.service_provider_assignment is not null and dd.service_provider_assignment is not null 
 and d.service_provider_assignment!=dd.service_provider_assignment then '2017 switchers'
 when d.service_provider_assignment is not null and (dd.service_provider_assignment is null 
-or dd.exclude_from_ia_analysis!=false) then 'unknown dirty'
+and dd.exclude_from_ia_analysis!=false) then 'unknown dirty'
 when d.service_provider_assignment is not null and dd.service_provider_assignment is null 
 and (dd.exclude_from_ia_analysis=false) then 'unknown clean'
 end as cohort_group,
@@ -42,7 +42,7 @@ case
 when d.service_provider_assignment is not null and dd.service_provider_assignment is not null 
 and d.service_provider_assignment!=dd.service_provider_assignment then '2017 new customers'
 when dd.service_provider_assignment is not null and (d.service_provider_assignment is null 
-or d.exclude_from_ia_analysis!=false) then 'new/unknown dirty'
+and d.exclude_from_ia_analysis!=false) then 'new/unknown dirty'
 when dd.service_provider_assignment is not null and d.service_provider_assignment is null 
 and (d.exclude_from_ia_analysis=false) then 'new/unknown clean'
 end as cohort_group,
