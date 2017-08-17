@@ -102,7 +102,7 @@ districts_meeting_unique=districts_meeting %>% filter(!(esh_id %in% districts_ne
 
 districts_newmeeting_expanded=merge(districts_newlymeeting,districts_meeting_unique[,c('postal_cd','latitude.x','longitude.x')],by='postal_cd',all.x=T)
 
-length(unique(districts_newmeeting_expanded$esh_id)) #641
+length(unique(districts_newmeeting_expanded$esh_id)) #705
 districts_newmeeting_expanded=as.data.table(districts_newmeeting_expanded)
 
 system.time({
