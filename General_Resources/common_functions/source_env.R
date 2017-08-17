@@ -105,8 +105,7 @@ source_env <- function(path){
   if (Sys.getenv("PASSWORD_ICE") != ""){
     assign("password_ice", Sys.getenv("PASSWORD_ICE"), envir=.GlobalEnv)
   }
-  
-  
+
   ## SHINY CREDENTIALS (RSTUDIO)
   if (Sys.getenv("RSTUDIO_NAME") != ""){
     assign("rstudio_name", Sys.getenv("RSTUDIO_NAME"), envir=.GlobalEnv)
