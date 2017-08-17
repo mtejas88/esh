@@ -1,17 +1,17 @@
 with extrapolated_students_not_meeting as (
-	select sum(	case
-					when exclude_from_ia_analysis= false
-						then num_students
-					else 0
-				end)/sum(num_students)::numeric as extrapolate_pct,
+  select sum( case
+          when exclude_from_ia_analysis= false
+            then num_students
+          else 0
+        end)/sum(num_students)::numeric as extrapolate_pct,
 sum(  case
           when exclude_from_ia_analysis= false
             then 1
           else 0
         end)/sum(1)::numeric as extrapolate_pct_district
-	from fy2017_districts_deluxe_matr
-	where include_in_universe_of_districts
-	and district_type = 'Traditional'
+  from fy2017_districts_deluxe_matr
+  where include_in_universe_of_districts
+  and district_type = 'Traditional'
 
 ), 
 
@@ -21,6 +21,19 @@ scalable_ia_temp as (
   select 
     recipient_id,
     recipient_postal_cd,
+    dd.ulocal as recipient_ulocal,
+    case
+      when district_size = 'Tiny'
+        then 1
+      when district_size = 'Small'
+        then 2
+      when district_size = 'Medium'
+        then 3
+      when district_size = 'Large'
+        then 4
+      when district_size = 'Mega'
+        then 5
+    end as recipient_district_size_number,
     line_item_id as line_item_id_scalable_ia,
     bandwidth_in_mbps as bandwidth_in_mbps_scalable_ia,
     case
@@ -34,7 +47,9 @@ scalable_ia_temp as (
     connect_category as connect_category_scalable_ia,
     service_provider_name as service_provider_name_scalable_ia,
     reporting_name as reporting_name_scalable_ia
-  from public.fy2017_services_received_matr
+  from public.fy2017_services_received_matr sr
+  join public.fy2017_districts_deluxe_matr dd
+  on sr.recipient_id = dd.esh_id
   where recipient_include_in_universe_of_districts = TRUE
   and recipient_exclude_from_ia_analysis = FALSE
   and inclusion_status = 'clean_with_cost'
@@ -46,7 +61,11 @@ districts_peer as (
     count(distinct ia_cost_per_mbps_scalable) as num_prices_to_meet_goals_with_same_budget,
     count(distinct recipient_id) as num_districts_w_prices_to_meet_goals_with_same_budget,
     array_agg(distinct ia_cost_per_mbps_scalable) as prices_to_meet_goals_with_same_budget,
-    array_agg(distinct line_item_id_scalable_ia) as line_items_to_meet_goals_with_same_budget
+    array_agg(distinct line_item_id_scalable_ia) as line_items_to_meet_goals_with_same_budget,
+    count(distinct  case
+                      when abs(dd.ulocal::numeric - scalable_ia_temp.recipient_ulocal::numeric) < 15
+                        then ia_cost_per_mbps_scalable
+                    end) as num_prices_to_meet_goals_with_same_budget_locale_constraint
   from public.fy2017_districts_deluxe_matr dd
   join scalable_ia_temp
 --in the same state
@@ -62,8 +81,6 @@ districts_peer as (
   group by 1
 ),
 
---the districts that fall under "peers" need to have At least one unscalable on cck12. 
-  --problem! "congrats you have fiber" is the message on cck12, so this quantification will always be different
 districts_categorized as (
   select 
     dd.*, 
