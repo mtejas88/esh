@@ -1,17 +1,5 @@
 with districts_2017 as (
-  select *,
-  case
-      when district_size = 'Tiny'
-        then 1
-      when district_size = 'Small'
-        then 2
-      when district_size = 'Medium'
-        then 3
-      when district_size = 'Large'
-        then 4
-      when district_size = 'Mega'
-        then 5
-    end as district_size_number
+  select *
   from fy2017_districts_deluxe_matr
   where include_in_universe_of_districts
   and district_type = 'Traditional'
@@ -29,7 +17,6 @@ sum(  case
           else 0
         end)/sum(1)::numeric as extrapolate_pct_district
   from districts_2017
-
 ), 
 
 -- from https://github.com/educationsuperhighway/ecto/blob/master/db_ecto/material_girl/endpoint/fy2017/fy2017_scalable_line_items_v01.sql
@@ -38,8 +25,6 @@ scalable_ia_temp as (
   select 
     recipient_id,
     recipient_postal_cd,
-    dd.ulocal as recipient_ulocal,
-    dd.district_size_number as recipient_district_size_number,
     line_item_id as line_item_id_scalable_ia,
     bandwidth_in_mbps as bandwidth_in_mbps_scalable_ia,
     case
@@ -64,17 +49,7 @@ scalable_ia_temp as (
 
 districts_peer as (
   select dd.esh_id, 
-    count(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as num_prices_to_meet_goals_with_same_budget,
-    count(distinct recipient_id) as num_districts_w_prices_to_meet_goals_with_same_budget,
-    count(distinct line_item_id_scalable_ia) as num_line_items_to_meet_goals_with_same_budget,
-    array_agg(distinct recipient_id) as districts_w_prices_to_meet_goals_with_same_budget,
-    array_agg(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as prices_to_meet_goals_with_same_budget,
-    array_agg(distinct line_item_id_scalable_ia) as line_items_to_meet_goals_with_same_budget,
-    count(distinct  case
-                      when abs(dd.ulocal::numeric - scalable_ia_temp.recipient_ulocal::numeric) < 15
-                      and abs(dd.district_size_number::numeric - scalable_ia_temp.recipient_district_size_number::numeric) < 15
-                        then round(ia_cost_per_mbps_scalable::numeric,2)
-                    end) as num_prices_to_meet_goals_with_same_budget_demog_constraint
+    count(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as num_prices_to_meet_goals_with_same_budget
   from districts_2017 dd
   join scalable_ia_temp
 --in the same state
@@ -92,12 +67,6 @@ districts_categorized as (
   select 
     dd.*, 
     districts_peer.num_prices_to_meet_goals_with_same_budget,
-    districts_peer.num_districts_w_prices_to_meet_goals_with_same_budget,
-    districts_peer.num_line_items_to_meet_goals_with_same_budget,
-    districts_peer.num_prices_to_meet_goals_with_same_budget_demog_constraint,
-    array_to_string(districts_peer.districts_w_prices_to_meet_goals_with_same_budget,';') as districts_w_prices_to_meet_goals_with_same_budget,
-    array_to_string(districts_peer.prices_to_meet_goals_with_same_budget,';') as prices_to_meet_goals_with_same_budget,
-    array_to_string(districts_peer.line_items_to_meet_goals_with_same_budget,';') as line_items_to_meet_goals_with_same_budget,
     (dd.num_students*.1) as bandwidth_needed,
     case
       when ia_monthly_cost_total > 0
@@ -119,7 +88,22 @@ districts_categorized as (
         then 14*dd.num_students*.1
       else knapsack_budget((dd.num_students*.1)::integer)
     end - ia_monthly_cost_total)*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_incr,
-    ceil((most_recent_ia_contract_end_date - DATE '2017-06-30')/365) as contract_end_time,
+    case
+      when most_recent_ia_contract_end_date <= '2018-06-30'
+        then 1
+      when most_recent_ia_contract_end_date <= '2019-06-30'
+        then 2
+      when most_recent_ia_contract_end_date <= '2020-06-30'
+        then 3
+      when most_recent_ia_contract_end_date <= '2021-06-30'
+        then 4
+      when most_recent_ia_contract_end_date <= '2022-06-30'
+        then 5
+      when most_recent_ia_contract_end_date <= '2023-06-30'
+        then 6
+      when most_recent_ia_contract_end_date <= '2024-06-30'
+        then 7
+    end as contract_end_time,
     case
       when hierarchy_ia_connect_category != 'Fiber'
         then 'get fiber internet'
