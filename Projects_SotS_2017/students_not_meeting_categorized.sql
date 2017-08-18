@@ -104,6 +104,23 @@ districts_categorized as (
         then (ia_bw_mbps_total / (dd.num_students*.1)::numeric) - 1
     end as pct_price_decrease_til_bw_needed,
     case
+      when dd.num_students < 500
+        then 14*dd.num_students*.1
+      else knapsack_budget((dd.num_students*.1)::integer)
+    end*(1-discount_rate_c1_matrix) as knapsack_budget_oop,
+    case
+      when dd.num_students < 500
+        then 14*dd.num_students*.1
+      else knapsack_budget((dd.num_students*.1)::integer)
+    end*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_future,
+    ia_monthly_cost_total*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_curr,
+    (case
+      when dd.num_students < 500
+        then 14*dd.num_students*.1
+      else knapsack_budget((dd.num_students*.1)::integer)
+    end - ia_monthly_cost_total)*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_incr,
+    ceil((most_recent_ia_contract_end_date - DATE '2017-06-30')/365) as contract_end_time,
+    case
       when hierarchy_ia_connect_category != 'Fiber'
         then 'get fiber internet'
       when (case
@@ -128,29 +145,52 @@ districts_categorized as (
 
 select
   diagnosis,
-  median(pct_price_decrease_til_bw_needed) as median_pct_price_decrease_til_bw_needed,
-  median(num_prices_to_meet_goals_with_same_budget) as median_num_prices_to_meet_goals_with_same_budget,
-  sum(case
-        when not(num_prices_to_meet_goals_with_same_budget_demog_constraint > 0)
-          then num_students::numeric
-        else 0
-      end) as num_students_sample_no_prices_demog_constraint,
-  sum(case
-        when num_prices_to_meet_goals_with_same_budget_demog_constraint > 0
-        and num_prices_to_meet_goals_with_same_budget_demog_constraint <= 2
-          then num_students::numeric
-        else 0
-      end) as num_students_sample_12_prices_demog_constraint,
-  sum(case
-        when num_prices_to_meet_goals_with_same_budget_demog_constraint > 0
-        and num_prices_to_meet_goals_with_same_budget_demog_constraint <= 2
-          then 1
-        else 0
-      end) as num_districts_sample_12_prices_demog_constraint,
-  sum(num_students::numeric) as num_students_sample,
   sum(1) as num_districts_sample,
   round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
-  sum(1)/extrapolate_pct_district as num_districts_extrap
+  sum(1)/extrapolate_pct_district as num_districts_extrap,
+  case
+    when diagnosis in ('meet benchmark prices', 'meet the prices available in your state')
+      then median(pct_price_decrease_til_bw_needed)
+  end as median_pct_price_decrease_til_bw_needed,
+  case
+    when diagnosis = 'meet the prices available in your state'
+      then median(num_prices_to_meet_goals_with_same_budget)
+  end as median_num_prices_to_meet_goals_with_same_budget,
+  case
+    when diagnosis = 'meet the prices available in your state'
+      then sum(case
+                when not(num_prices_to_meet_goals_with_same_budget_demog_constraint > 0)
+                  then num_students::numeric
+                else 0
+              end)
+  end as num_students_sample_no_prices_demog_constraint,
+  case
+    when diagnosis = 'meet the prices available in your state'
+      then sum(case
+                when num_prices_to_meet_goals_with_same_budget_demog_constraint > 0
+                and num_prices_to_meet_goals_with_same_budget_demog_constraint <= 2
+                  then num_students::numeric
+                else 0
+              end)
+  end as num_students_sample_12_prices_demog_constraint,
+  case
+    when diagnosis = 'meet the prices available in your state'
+      then sum(case
+                when num_prices_to_meet_goals_with_same_budget_demog_constraint > 0
+                and num_prices_to_meet_goals_with_same_budget_demog_constraint <= 2
+                  then 1
+                else 0
+              end)
+  end as num_districts_sample_12_prices_demog_constraint,
+  case
+    when diagnosis = 'spend more money'
+      then median(oop_per_student_incr)
+  end as median_oop_per_student_incr,
+  case
+    when diagnosis = 'spend more money'
+      then median(oop_per_student_future)
+  end as median_oop_per_student_future,
+  sum(num_students::numeric) as num_students_sample
 from districts_categorized
 join extrapolated_students_not_meeting 
 on true
