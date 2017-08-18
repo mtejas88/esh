@@ -62,3 +62,38 @@ p.contract + geom_histogram(binwidth=1, fill="#009296")+
                  y= ..prop.. ), stat= "count", vjust = -.5)+
   ggtitle("Districts not meeting goals")+ 
   theme(plot.title = element_text(size = 30, face = "bold"))
+
+
+
+##from https://github.com/educationsuperhighway/ficher/blob/new_scalable/Projects_SotS_2017/students_not_meeting_categorized.sql
+##from https://github.com/educationsuperhighway/ficher/blob/new_scalable/Projects_SotS_2017/affordability/oop_per_student_meeting_not_meeting.sql
+n = c(.17, .24, .52, .55) 
+cat = c('spend more $', 'not meeting goals', 'all districts', 'meeting goals') 
+df = data.frame(n, cat)
+df
+
+##bar chart for cost/student
+p.cost.student <- ggplot(df, aes(cat))
+p.cost.student + geom_bar(aes(weight = n), fill="#009296")+
+  ylab("Monthly OOP spend per student")+
+  xlab("")+
+  ggtitle("$/student by category")+ 
+  theme(plot.title = element_text(size = 30, face = "bold"))+
+  coord_flip()+
+  geom_text(aes( label = paste('$',n),
+                 y= n, hjust= 1.1 ), color = 'white')
+
+medians <- districts_with_state_peers %>% 
+  group_by(postal_cd) %>% 
+  summarise(median = median(num_districts_w_prices_to_meet_goals_with_same_budget, na.rm = TRUE),
+            count = n())
+
+##plot of medians
+p.medians <- ggplot(medians, aes(postal_cd))
+p.medians + geom_bar(aes(weight = median), fill="#009296")+
+  ylab("Median Num District Peers")+
+  xlab("")+
+  ggtitle("District peers by state")+ 
+  theme(plot.title = element_text(size = 30, face = "bold"))+
+  coord_flip()
+
