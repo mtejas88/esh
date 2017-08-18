@@ -1,4 +1,108 @@
-with school_calc as (
+with ros_2017 as (
+
+  select 
+    application_number,
+    ben,
+    amount::numeric
+  from fy2017.current_recipients_of_services
+  union
+  select 
+    application_number,
+    ben,
+    amount::numeric
+  from fy2017.recipients_of_services 
+  where line_item not in (
+    select distinct line_item
+    from fy2017.current_recipients_of_services
+  )
+
+),
+
+ros_2016 as (
+  select
+    application_number,
+    ben,
+    amount::numeric
+  from fy2016.current_recipients_of_services
+  union
+  select
+    application_number,
+    ben,
+    amount::numeric
+  from fy2016.recipients_of_services 
+  where line_item not in (
+    select distinct line_item
+    from fy2016.current_recipients_of_services
+  )
+),
+
+ros_2015 as (
+  select
+    "FRN" as frn,
+    "BEN" as ben,
+    "Cat 2 Cost Alloc" as amount
+  from fy2015.current_item21_allocations_by_entities
+  union
+  select
+    "FRN" as frn,
+    "BEN" as ben,
+    "Cat 2 Cost Alloc" as amount
+  from public.fy2015_item21_allocations_by_entities
+  where "FRN" not in (
+    select distinct "FRN"
+    from fy2015.current_item21_allocations_by_entities
+  )
+),
+
+bi_2017 as (
+  select 
+    application_number,
+    category_of_service
+  from fy2017.current_basic_informations 
+  UNION
+  select
+    application_number,
+    category_of_service
+  from fy2017.basic_informations 
+  where application_number not in (
+    select distinct application_number
+    from fy2017.current_basic_informations
+  )
+),
+
+bi_2016 as (
+  select 
+    application_number,
+    category_of_service
+  from fy2016.current_basic_informations 
+  UNION
+  select
+    application_number,
+    category_of_service
+  from fy2016.basic_informations 
+  where application_number not in (
+    select distinct application_number
+    from fy2016.current_basic_informations
+  )
+),
+
+bi_2015 as (
+  select 
+    "FRN" as frn,
+    "FRN Service Type" as service_type
+  from fy2015.current_funding_request_key_informations
+  UNION
+  select
+    "FRN" as frn,
+    "Service Type" as service_type
+  from public.fy2015_funding_request_key_informations
+  where "FRN" not in (
+    select distinct "FRN"
+    from fy2015.current_funding_request_key_informations
+  )
+),
+
+school_calc as (
   select  *,
           budget_remaining_c2_2015*c2_discount_rate as budget_remaining_c2_2015_postdiscount,
           budget_remaining_c2_2016*c2_discount_rate as budget_remaining_c2_2016_postdiscount,
@@ -51,11 +155,8 @@ with school_calc as (
                 c2_budget,
                 c2_budget*c2_discount_rate as c2_budget_postdiscount,
                 amount_c2_2015,
-                amount_c2_2015_incl_not_funded,
                 amount_c2_2016,
-                amount_c2_2016_incl_denied,
                 amount_c2_2017,
-                amount_c2_2017_incl_denied,
                 case
                   when c2_budget < amount_c2_2015
                     then 0
@@ -86,13 +187,15 @@ with school_calc as (
             alternative_discount_method,
         --c2 budgeting from 2016 from: https://www.fundsforlearning.com/blog/2017/03/category-2-budget-caps-adjusted-for-2017
             case
-              when eb.ben is null then 0
+              when eb.ben is null
+                then  case  when sd.num_students * 153.47 < 9412.80 then 9412.80
+                            else sd.num_students * 153.47
+                      end
               when (case  when number_of_full_time_students is null then 0
                           else number_of_full_time_students::numeric end
                     + case  when total_number_of_part_time_students is null then 0
                             else total_number_of_part_time_students::numeric end)*153.47 < 9412.80
                 then 9412.80
-
               --adding this condition because there are some schools that clearly have user entered mistakes for num students.
               --this condition changes the student count that we use for ~630 schools
               when 5 * sd.num_students < (case  when number_of_full_time_students is null then 0
@@ -148,140 +251,45 @@ with school_calc as (
         ) entities
         left join (
           select
-            "BEN",
-            sum(case
-                  when commitment_status != 'NOT FUNDED'
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)*case
-                                                                      when li.total_cost is null
-                                                                        then a.alloc_cat_2_cost
-                                                                      else li.total_cost
-                                                                    end
-                  else 0
-                end) as amount_c2_2015,
-            sum((ae."Cat 2 Cost Alloc"/a.alloc_cat_2_cost)* case
-                                                              when li.total_cost is null
-                                                                then a.alloc_cat_2_cost
-                                                              else li.total_cost
-                                                            end) as amount_c2_2015_incl_not_funded
-          from public.fy2015_item21_allocations_by_entities ae
-          left join public.line_items li
-          on concat(ae."FRN",'-',ae."FRN Line Item No") = li.frn_complete
-          left join public.funding_requests fr
-          on ae."FRN" = fr.frn
-          left join (
-            select
-              concat(ae."FRN",'-',ae."FRN Line Item No") as frn_complete,
-              sum(case
-                    when "Cat 2 Cost Alloc" > 0
-                      then "Cat 2 Cost Alloc"
-                    else 0
-                  end) as alloc_cat_2_cost
-              from public.fy2015_item21_allocations_by_entities ae
-              left join public.fy2015_funding_request_key_informations frki
-              on ae."FRN" = frki."FRN"
-              where "Service Type" ilike '%internal%'
-            group by 1
-          ) a
-          on a.frn_complete = li.frn_complete
-          left join public.fy2015_funding_request_key_informations frki
-          on ae."FRN" = frki."FRN"
-          where "Service Type" ilike '%internal%'
-          and alloc_cat_2_cost > 0
+            ben,
+            sum(ae.amount) as amount_c2_2015
+          from ros_2015 ae
+          left join bi_2015 frki
+          on ae.frn = frki.frn
+          where service_type ilike '%internal%'
           group by 1
         ) c2_allocations_2015
-        on entities.ben = c2_allocations_2015."BEN"
+        on entities.ben = c2_allocations_2015.ben
         left join (
+--note: allocations are source of truth
+
+--example line item 1699013358.008 has less allocations than total cost
+--this was because only half was allocated to BEN 72917 in current data, where half could have been
+--  allocated to BEN 72918 like all the other line items in the FRN
+--even the committed_amount on the funding_requests table shows a committed amount that would include that other half
+--however, the usac budget tool doesn't care that more was committed than was allocated. it only looks at allocations
+
+--example line item 1699010222.001 has more allocations than total cost
+--this was because the original requested amount aligns with the allocations, but only part of that was funded.
+--however, the usac budget tool doesn't care that less was committed than was allocated. it only looks at allocations
           select
             ros.ben,
-            sum(case
-                  when frn_status not in ('Denied', 'Cancelled')
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (amount::numeric/a.alloc_cat_2_cost)*case
-                                                                when li.total_cost is null
-                                                                  then a.alloc_cat_2_cost
-                                                                else li.total_cost
-                                                              end
-                  else 0
-                end) as amount_c2_2016,
-            sum((amount::numeric/a.alloc_cat_2_cost)* case
-                                                        when li.total_cost is null
-                                                          then a.alloc_cat_2_cost
-                                                        else li.total_cost
-                                                      end) as amount_c2_2016_incl_denied
-          from fy2016.recipients_of_services ros
-          left join fy2016.line_items li
-          on ros.line_item = li.frn_complete
-          left join public.funding_requests_2016_and_later fr
-          on ros.frn = fr.frn
-          left join (
-            select
-              line_item,
-              sum(case
-                    when amount::numeric > 0
-                      then amount::numeric
-                    else 0
-                  end) as alloc_cat_2_cost
-              from fy2016.recipients_of_services ros
-              left join fy2016.basic_informations bi
-              on ros.application_number = bi.application_number
-              where bi.category_of_service::numeric = 2
-            group by 1
-          ) a
-          on a.line_item = li.frn_complete
-          left join fy2016.basic_informations bi
+            sum(amount::numeric) as amount_c2_2016
+          from ros_2016 ros
+          left join bi_2016 bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
-          and alloc_cat_2_cost > 0
           group by 1
         ) c2_allocations_2016
         on entities.ben = c2_allocations_2016.ben
         left join (
           select
             ros.ben,
-            sum(case
-                  when frn_status not in ('Denied', 'Cancelled')
-                  --where total_cost is current, the allocations will be proportionate to the new total cost
-                  --where total_cost isn't available, then the allocations will be the total cost
-                    then (amount::numeric/a.alloc_cat_2_cost)*case
-                                                                when li.total_cost is null
-                                                                  then a.alloc_cat_2_cost
-                                                                else li.total_cost
-                                                              end
-                  else 0
-                end) as amount_c2_2017,
-            sum((amount::numeric/a.alloc_cat_2_cost)* case
-                                                        when li.total_cost is null
-                                                          then a.alloc_cat_2_cost
-                                                        else li.total_cost
-                                                      end) as amount_c2_2017_incl_denied
-          from fy2017.recipients_of_services ros
-          left join public.esh_line_items li
-          on ros.line_item = li.frn_complete
-          and li.funding_year = 2017
-          left join public.funding_requests_2016_and_later fr
-          on ros.frn = fr.frn
-          left join (
-            select
-              line_item,
-              sum(case
-                    when amount::numeric > 0
-                      then amount::numeric
-                    else 0
-                  end) as alloc_cat_2_cost
-              from fy2017.recipients_of_services ros
-              left join fy2017.basic_informations bi
-              on ros.application_number = bi.application_number
-              where bi.category_of_service::numeric = 2
-            group by 1
-          ) a
-          on a.line_item = li.frn_complete
-          left join fy2017.basic_informations bi
+            sum(amount::numeric) as amount_c2_2017
+          from ros_2017 ros
+          left join bi_2017 bi
           on ros.application_number = bi.application_number
           where bi.category_of_service::numeric = 2
-          and alloc_cat_2_cost > 0
           group by 1
         ) c2_allocations_2017
         on entities.ben = c2_allocations_2017.ben
@@ -311,14 +319,6 @@ budget_remaining_c2_2017,
 budget_remaining_c2_2015_postdiscount,
 budget_remaining_c2_2016_postdiscount,
 budget_remaining_c2_2017_postdiscount,
-.9 * c2_budget as c2_budget_haircut,
-.9 * c2_budget_postdiscount as c2_budget_postdiscount_haircuit,
-.9 * budget_remaining_c2_2015 as budget_remaining_c2_2015_haircut,
-.9 * budget_remaining_c2_2016 as budget_remaining_c2_2016_haircut,
-.9 * budget_remaining_c2_2017 as budget_remaining_c2_2017_haircut,
-.9 * budget_remaining_c2_2015_postdiscount as budget_remaining_c2_2015_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2016_postdiscount_haircut,
-.9 * budget_remaining_c2_2016_postdiscount as budget_remaining_c2_2017_postdiscount_haircut,
 case
   when (c2_budget) > (budget_remaining_c2_2015)
     then true
@@ -368,14 +368,6 @@ select
   sum(budget_remaining_c2_2015_postdiscount) as budget_remaining_c2_2015_postdiscount,
   sum(budget_remaining_c2_2016_postdiscount) as budget_remaining_c2_2016_postdiscount,
   sum(budget_remaining_c2_2017_postdiscount) as budget_remaining_c2_2017_postdiscount,
-  sum(c2_budget_haircut) as c2_budget_haircut,
-  sum(c2_budget_postdiscount_haircuit) as c2_budget_postdiscount_haircuit,
-  sum(budget_remaining_c2_2015_haircut) as budget_remaining_c2_2015_haircut,
-  sum(budget_remaining_c2_2016_haircut) as budget_remaining_c2_2016_haircut,
-  sum(budget_remaining_c2_2017_haircut) as budget_remaining_c2_2017_haircut,
-  sum(budget_remaining_c2_2015_postdiscount_haircut) as budget_remaining_c2_2015_postdiscount_haircut,
-  sum(budget_remaining_c2_2016_postdiscount_haircut) as budget_remaining_c2_2016_postdiscount_haircut,
-  sum(budget_remaining_c2_2017_postdiscount_haircut) as budget_remaining_c2_2017_postdiscount_haircut,
   case
     when sum(c2_budget) > sum(budget_remaining_c2_2015)
       then true
@@ -416,7 +408,7 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 5/30/2017
-Last Modified Date: 6/23/2017 - JH got rid of rounded c2
+Last Modified Date: 8/15/2017 - JH updated to fix current tables to union with original
 Name of QAing Analyst(s):
 Purpose: 2015 and 2016 line item data for c2 aggregated to determine remaining budget.
 Methodology: Same methodology as 2015 and 2016, but we applied a 90% haircut to the budget and remaining budget given the fact
