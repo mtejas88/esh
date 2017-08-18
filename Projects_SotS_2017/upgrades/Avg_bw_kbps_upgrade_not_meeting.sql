@@ -1,6 +1,6 @@
 select sum(ia_bw_mbps_total) as total_ia, count(esh_id) as total_esh,
 sum(num_students) as total_students,
-((sum(ia_bw_mbps_total))/(sum(num_students)))*1000 as average_ia_kbps_student --2007
+((sum(ia_bw_mbps_total))/(sum(num_students)))*1000 as average_ia_kbps_student 
 from public.fy2017_districts_deluxe_matr
 where
 include_in_universe_of_districts = 'True'
