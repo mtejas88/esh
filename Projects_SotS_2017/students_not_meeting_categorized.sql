@@ -160,8 +160,9 @@ districts_categorized as (
 
 select
   diagnosis,
-  sum(1) as num_districts_sample,
+  sum(num_students::numeric) as num_students_sample,
   round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
+  sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
   case
     when diagnosis in ('meet benchmark prices', 'meet the prices available in your state')
@@ -204,8 +205,7 @@ select
   case
     when diagnosis = 'spend more money'
       then median(oop_per_student_future)
-  end as median_oop_per_student_future,
-  sum(num_students::numeric) as num_students_sample
+  end as median_oop_per_student_future
 from districts_categorized
 join extrapolated_students_not_meeting 
 on true
