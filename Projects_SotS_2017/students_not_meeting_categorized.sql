@@ -119,7 +119,22 @@ districts_categorized as (
         then 14*dd.num_students*.1
       else knapsack_budget((dd.num_students*.1)::integer)
     end - ia_monthly_cost_total)*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_incr,
-    ceil((most_recent_ia_contract_end_date - DATE '2017-06-30')/365) as contract_end_time,
+    case
+      when most_recent_ia_contract_end_date <= '2018-06-30'
+        then 1
+      when most_recent_ia_contract_end_date <= '2019-06-30'
+        then 2
+      when most_recent_ia_contract_end_date <= '2020-06-30'
+        then 3
+      when most_recent_ia_contract_end_date <= '2021-06-30'
+        then 4
+      when most_recent_ia_contract_end_date <= '2022-06-30'
+        then 5
+      when most_recent_ia_contract_end_date <= '2023-06-30'
+        then 6
+      when most_recent_ia_contract_end_date <= '2024-06-30'
+        then 7
+    end as contract_end_time,
     case
       when hierarchy_ia_connect_category != 'Fiber'
         then 'get fiber internet'
