@@ -538,7 +538,7 @@ snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name
                                                         'students_not_meeting_2014_bw_goal_actual', 'students_not_meeting_2014_bw_goal_extrap',
                                                         'districts_not_meeting_2014_bw_goal_actual', 'districts_not_meeting_2014_bw_goal_extrap',
                                                         'num_service_providers_w_students_not_meeting_goals_top_5', 'num_students_not_meeting_goals_served_by_sp_top_5',
-                                                        'total_schools_not_on_fiber', 'schools_not_on_fiber_rural_small_town_perc',
+                                                        'total_schools_on_fiber', 'total_schools_not_on_fiber', 'schools_not_on_fiber_rural_small_town_perc',
                                                         'c2_budget_2015', 'c2_remaining_2017', 'num_districts_c2_remaining',
                                                         'districts_meeting_affordability', 'districts_not_meeting_affordability',
                                                         'districts_clean_ia_sample', 'districts_population',
