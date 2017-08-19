@@ -432,16 +432,16 @@ state_2017$students_meeting_2014_bw_goal_2016_extrap_original_meth <- round((sta
 state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth <- round((state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample)
                                                                             * state_2017$students_population, 0)
 ## calculate differences
-#state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap_original_meth
-#state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap_original_meth
+state_2017$more_districts_connected_extrap_original_meth <- state_2017$districts_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$districts_meeting_2014_bw_goal_2016_extrap_original_meth
+state_2017$more_students_connected_extrap_original_meth <- state_2017$students_meeting_2014_bw_goal_2017_extrap_original_meth - state_2017$students_meeting_2014_bw_goal_2016_extrap_original_meth
 
 ## Upgrade Methodology: how many had a bandwidth upgrade and went from not meeting to meeting goals
-#state_2017$more_students_connected_actual_upgrade_meth <- state_2017$students_upgraded_meeting_goals
-#state_2017$more_students_connected_extrap_upgrade_meth <- round((state_2017$students_upgraded_meeting_goals / state_2017$students_clean_upgrades_2016_not_meeting_sample)
-#                                                                  * state_2017$students_not_meeting_2014_bw_goal_2016_extrap, 0)
-#state_2017$more_districts_connected_actual_upgrade_meth <- state_2017$districts_upgraded_meeting_goals
-#state_2017$more_districts_connected_extrap_upgrade_meth <- round((state_2017$districts_upgraded_meeting_goals / state_2017$districts_clean_upgrades_2016_not_meeting_sample)
-#                                                                * state_2017$districts_not_meeting_2014_bw_goal_2016_extrap, 0)
+state_2017$more_students_connected_actual_upgrade_meth <- state_2017$students_upgraded_meeting_goals
+state_2017$more_students_connected_extrap_upgrade_meth <- round((state_2017$students_upgraded_meeting_goals / state_2017$students_clean_upgrades_2016_not_meeting_sample)
+                                                                  * state_2017$students_not_meeting_2014_bw_goal_2016_extrap, 0)
+state_2017$more_districts_connected_actual_upgrade_meth <- state_2017$districts_upgraded_meeting_goals
+state_2017$more_districts_connected_extrap_upgrade_meth <- round((state_2017$districts_upgraded_meeting_goals / state_2017$districts_clean_upgrades_2016_not_meeting_sample)
+                                                                * state_2017$districts_not_meeting_2014_bw_goal_2016_extrap, 0)
 
 ## 2016 More Students/Districts Connected (From Frozen 2016 Snapshots)
 state_2017 <- merge(state_2017, state_2016_froz[,c('postal_cd', 'num_students_meeting_connectivity_goal_extrap_2016',
@@ -531,6 +531,9 @@ state_2017$state_outline_image <- NA
 snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_millions',
                                                         'state_action_or_state_match', 'gov_pic', 'gov_quote', 'gov_last_name',
                                                         'state_outline_image', 'more_students_connected_2016_snapshot', 'more_districts_connected_2016_snapshot',
+                                                        'more_students_connected_extrap_original_meth', 'more_districts_connected_extrap_original_meth',
+                                                        'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
+                                                        'more_students_connected_actual_upgrade_meth', 'more_districts_connected_actual_upgrade_meth',
                                                         'students_meeting_2014_bw_goal_actual', 'students_meeting_2014_bw_goal_2017_extrap_original_meth',
                                                         'students_meeting_2014_bw_goal_2016_extrap_original_meth',
                                                         'districts_meeting_2014_bw_goal_actual', 'districts_meeting_2014_bw_goal_2017_extrap_original_meth',
