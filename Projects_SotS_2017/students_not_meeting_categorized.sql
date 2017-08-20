@@ -164,6 +164,11 @@ select
   round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
   sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
+  sum(case
+        when locale in ('Town', 'Rural')
+          then 1
+        else 0
+      end)/extrapolate_pct_district as num_rural_districts_extrap,
   median(discount_rate_c1_matrix) as median_discount_rate,
   case
     when diagnosis in ('meet benchmark prices', 'meet the prices available in your state')
