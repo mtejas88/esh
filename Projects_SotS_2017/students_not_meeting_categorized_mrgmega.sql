@@ -29,7 +29,7 @@ sum(  case
           else 0
         end)/sum(1)::numeric as extrapolate_pct_district
   from districts_2017
-
+  where district_size_number > 3
 ), 
 
 -- from https://github.com/educationsuperhighway/ecto/blob/master/db_ecto/material_girl/endpoint/fy2017/fy2017_scalable_line_items_v01.sql
@@ -85,6 +85,7 @@ districts_peer as (
   and dd.num_students * .1 <= scalable_ia_temp.bandwidth_in_mbps_scalable_ia
   where dd.exclude_from_ia_analysis= false
   and dd.meeting_2014_goal_no_oversub = false
+  and dd.district_size_number > 3
   group by 1
 ),
 
@@ -148,13 +149,12 @@ districts_categorized as (
         then 'meet the prices available in your state' 
       else 'spend more money'
     end as diagnosis
-  from public.fy2017_districts_deluxe_matr dd
+  from districts_2017 dd
   left join districts_peer
   on dd.esh_id = districts_peer.esh_id
-  where dd.include_in_universe_of_districts
-  and dd.district_type = 'Traditional'
-  and exclude_from_ia_analysis= false
+  where exclude_from_ia_analysis= false
   and meeting_2014_goal_no_oversub = false
+  and district_size_number > 3
 )
 
 

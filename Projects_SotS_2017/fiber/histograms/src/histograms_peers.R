@@ -11,14 +11,17 @@ rm(list=ls())
 setwd("C:/Users/jesch/OneDrive/Documents/GitHub/ficher/Projects_SotS_2017/fiber/histograms/")
 
 ## load packages (if not already in the environment)
-packages.to.install <- c("dplyr", "ggplot2")
+packages.to.install <- c("dplyr", "ggplot2", "reshape2", "plyr")
 for (i in 1:length(packages.to.install)){
   if (!packages.to.install[i] %in% rownames(installed.packages())){
     install.packages(packages.to.install[i])
   }
 }
 library(dplyr)
+library(plyr)
 library(ggplot2)
+library(reshape2)
+
 
 ##import and filter
 districts_not_meeting_goals <- read.csv("data/districts_not_meeting_goals.csv")
@@ -82,6 +85,28 @@ p.cost.student + geom_bar(aes(weight = n), fill="#009296")+
   coord_flip()+
   geom_text(aes( label = paste('$',n),
                  y= n, hjust= 1.1 ), color = 'white')
+
+##from https://github.com/educationsuperhighway/ficher/blob/new_scalable/Projects_SotS_2017/unscalable_campuses_with_state_match_frequency.sql
+match = c(.04, .03, .06, .08, .14, .04) 
+pending = c(.01, .04, .06, .15, .20, .16) 
+dr = c('40%', '50%', '60%', '70%', '80%', '90%') 
+df2 = data.frame(pending, match, dr)
+df2 <- melt(df2, id.var="dr")
+df2
+
+##bar chart for discounts
+p.discounts <- ggplot(df2, aes(x=dr, y=value, fill=variable)) +
+  geom_bar(stat="identity")+
+  scale_fill_manual(values = c('grey','#009296') )+
+  ylab("% unscalable campuses with state match")+
+  xlab("")+
+  ggtitle("Campuses needing fiber with \nstate match by discount")+ 
+  theme(plot.title = element_text(size = 30, face = "bold")) +
+  annotate("text", x = 3, y = .3, label = "54% of campuses including pending have free fiber builds", color = 'black')+
+  annotate("text", x = 3, y = .28, label = "45% of campuses excluding pending have free fiber builds", color = 'black')+
+  geom_text(aes(label = paste0(sprintf("%.0f", value*100), "%")), position = position_stack(vjust = 0.5), size = 4, color = 'white')
+p.discounts
+
 
 medians <- districts_with_state_peers %>% 
   group_by(postal_cd) %>% 

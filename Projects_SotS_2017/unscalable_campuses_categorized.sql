@@ -48,7 +48,7 @@ with districts_fiber_applications as (
 extrapolated_unscalable_campuses as (
 	select sum(	case
       					when exclude_from_ia_analysis= false and fiber_target_status in ('Target', 'Potential Target')
-      						then current_known_unscalable_campuses
+      						then current_assumed_unscalable_campuses + current_known_unscalable_campuses
       					else 0
       				end)/sum(current_assumed_unscalable_campuses + current_known_unscalable_campuses)::numeric as extrapolate_pct
 	from fy2017_districts_deluxe_matr
@@ -61,8 +61,8 @@ select
   case
     when dd.postal_cd in ('MT', 'MD', 'MA', 'MO', 'NH', 'TX')
       then 'state match fund pending approval'
-    when dd.postal_cd not in ('MT', 'ID', 'MN', 'KS', 'IL', 'MD', 'MA', 'MO', 'NH', 
-                              'AZ', 'VA', 'NC', 'TX', 'CA', 'NM', 'NY', 'OK', 'FL', 'ME')
+    when dd.postal_cd in ('MT', 'ID', 'MN', 'KS', 'IL', 'MD', 'MA', 'MO', 'NH', 
+                          'AZ', 'VA', 'NC', 'TX', 'CA', 'NM', 'NY', 'OK', 'FL', 'ME')
       then 'no state match fund'
     when dd.postal_cd in ('AK', 'NE', 'TN', 'KY', 'FL', 'HI', 'SD')
       then 'no governor commitment'
@@ -74,19 +74,13 @@ select
       then 'paying affordable prices'
     when procurement != 'District-procured'
       then 'state or regional network'
-/*    when district_size in ('Large', 'Mega')
-      then 'more internet bw needed per WAN' 
-    when ia_bw_mbps_total < 1000 and (1000000*dd.fiber_internet_upstream_lines)/num_students::numeric >= 100
-      then 'upgrade fiber to 1G'
-    when (upstream_bandwidth > 0 and isp_bandwidth > 0 and upstream_bandwidth != isp_bandwidth)
-    and (((upstream_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100 or ((isp_bandwidth+internet_bandwidth)*1000)/num_students::numeric >= 100)
-      then 'mismatched ISP/upstream'*/
     when district_size in ('Tiny', 'Small')
       then 'not enough resources'
     else 'unknown'
   end as diagnosis,
-  sum(current_known_unscalable_campuses) as num_unscalable_campuses_sample,
-  sum(current_known_unscalable_campuses)/extrapolate_pct as num_unscalable_campuses_extrap
+  sum(current_assumed_unscalable_campuses + current_known_unscalable_campuses) as num_unscalable_campuses_sample,
+  sum(current_assumed_unscalable_campuses + current_known_unscalable_campuses)/extrapolate_pct 
+    as num_unscalable_campuses_extrap
 from public.fy2017_districts_deluxe_matr dd
 join public.fy2017_districts_aggregation_matr da
 on dd.esh_id = da.district_esh_id
