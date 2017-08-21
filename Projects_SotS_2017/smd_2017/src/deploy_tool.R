@@ -546,6 +546,7 @@ snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name
                                                         'districts_meeting_affordability', 'districts_not_meeting_affordability',
                                                         'districts_clean_ia_sample', 'districts_population',
                                                         'schools_clean_ia_sample', 'schools_population',
+                                                        'campuses_clean_ia_sample', 'campuses_population',
                                                         'students_clean_ia_sample', 'students_population',
                                                         'districts_clean_ia_sample_perc', 'mega_large_clean_perc')]
 
