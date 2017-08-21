@@ -1,8 +1,13 @@
 import requests
 from collections import namedtuple
 
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
+
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
 from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
 
 cost_magnifier = 1.2
