@@ -19,6 +19,7 @@ from classes import distanceCalculator
 sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
 from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
 
+import time
 
 ##connect to onyx and save list of all campuses into pandas dataframe
 myConnection = psycopg2.connect( host=HOST, user=USER, password=PASSWORD, database=DB, port=5432)
@@ -38,6 +39,7 @@ for i in range(0, campuses.shape[0]):
 									campuses['sample_campus_latitude'][i],
 									campuses['sample_campus_longitude'][i]).mapboxRequest()
 	campus_distances.append({'distance': dist_test})
+	time.sleep(1) 
 print("Distances calculated")
 
 ##join distances to campuses and save
