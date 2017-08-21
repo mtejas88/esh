@@ -1,12 +1,17 @@
 from pandas import DataFrame, concat, read_csv
 from numpy import where, arange
 
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
+
 import sys
-sys.path.insert(0, '../features')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
 from classes import buildCostCalculator, cost_magnifier
 
-unscalable_campuses = read_csv('../../data/interim/unscalable_campuses.csv')
+unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
 print("Unscalable campuses imported")
 
 #calculate A-PoP cost for all unscalable campuses and save into pandas dataframe
@@ -33,5 +38,5 @@ print("Costs calculated A-Pop")
 
 campus_costs_apop = DataFrame(campus_costs_apop)
 
-campus_costs_apop.to_csv('../../data/interim/campus_costs_apop.csv')
+campus_costs_apop.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_apop.csv')
 print("File saved")
