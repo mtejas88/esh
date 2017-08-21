@@ -7,7 +7,7 @@
 ## Clearing memory
 rm(list=ls())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 #args = commandArgs(trailingOnly=TRUE)
@@ -154,5 +154,5 @@ write.csv(dd_2016_froz, "data/raw/deluxe_districts/2016_deluxe_districts_frozen.
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
 names(date.dta) <- 'date'
-date.dta$date <- as.Date("2016-08-16")
+date.dta$date <- as.Date("2017-08-16")
 write.csv(date.dta, "data/raw/date_frozen.csv", row.names=F)
