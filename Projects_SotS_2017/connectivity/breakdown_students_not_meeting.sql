@@ -107,14 +107,14 @@ districts_categorized as (
     case
       when hierarchy_ia_connect_category != 'Fiber'
         then 'get fiber internet'
+      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
+        then 'meet the prices available in your state' 
       when (case
               when ia_monthly_cost_total < 14*50 and ia_monthly_cost_total > 0
                 then ia_monthly_cost_total/14
               else knapsack_bandwidth(ia_monthly_cost_total)
             end*1000/dd.num_students) >= 100
         then 'meet benchmark prices'
-      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
-        then 'meet the prices available in your state' 
       else 'spend more money'
     end as diagnosis
   from public.fy2017_districts_deluxe_matr dd
@@ -133,20 +133,24 @@ select
   sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
   case
-    when diagnosis in ('meet benchmark prices', 'meet the prices available in your state')
-      then median(pct_price_decrease_til_bw_needed)
-  end as median_pct_price_decrease_til_bw_needed,
+    when diagnosis = 'get fiber internet'
+      then sum( case
+                  when locale in ('Rural', 'Town')
+                    then 1
+                  else 0
+                end)/sum(1)::numeric 
+  end as pct_districts_rural,
   case
     when diagnosis = 'meet the prices available in your state'
       then median(num_prices_to_meet_goals_with_same_budget)
   end as median_num_prices_to_meet_goals_with_same_budget,
   case
-    when diagnosis = 'spend more money'
-      then median(oop_per_student_incr)
-  end as median_oop_per_student_incr,
+    when diagnosis = 'meet benchmark prices'
+        then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
+  end as weighted_avg_pct_price_decrease_til_bw_needed,
   case
     when diagnosis = 'spend more money'
-      then median(oop_per_student_future)
+      then median(oop_per_student_future)*12
   end as median_oop_per_student_future
 from districts_categorized
 join extrapolated_students_not_meeting 
