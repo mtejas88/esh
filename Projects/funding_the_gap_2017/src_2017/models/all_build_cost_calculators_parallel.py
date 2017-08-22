@@ -54,7 +54,7 @@ def calculateAZ(i):
 									unscalable_campuses['district_longitude'][i]).costquestRequest()
 	return {	'campus_id': unscalable_campuses['campus_id'][i],
 				'esh_id': unscalable_campuses['esh_id'][i],
-				'build_cost_az': cost_test}
+				'build_cost_az': outputs}
 
 def calculateIA(i):
 	global unscalable_districts
