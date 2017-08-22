@@ -14,7 +14,7 @@ from classes import buildCostCalculator, cost_magnifier
 unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
 print("Unscalable campuses imported")
 
-#calculate Z-PoP cost for all unscalable campuses and save into pandas dataframe
+##calculate Z-PoP cost for all unscalable campuses and save into pandas dataframe
 campus_costs_zpop = []
 
 for i in range(0, unscalable_campuses.shape[0]):
@@ -28,7 +28,7 @@ for i in range(0, unscalable_campuses.shape[0]):
 								'esh_id': unscalable_campuses['esh_id'][i],
 								'build_cost_zpop': outputs.build_cost,
 								'build_distance_zpop': outputs.distance})
-	print(outputs, file=open('./costsfile_zpop.csv', 'a'))
+	print(outputs, file=open(GITHUB+'/Projects/funding_the_gap_2017/data/interim/costsfile_zpop.csv', 'a'))
 	if i % 250 == 0:
 		print("Iteration {0} out of {1}".format(i,unscalable_campuses.shape[0]))
 	else:
@@ -36,6 +36,7 @@ for i in range(0, unscalable_campuses.shape[0]):
 
 print("Costs calculated Z-Pop")
 
+## convert and save
 campus_costs_zpop = DataFrame(campus_costs_zpop)
 
 campus_costs_zpop.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_zpop.csv')
