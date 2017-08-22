@@ -34,5 +34,14 @@ select
                                   when exclude_from_ia_analysis = false
                                     then num_teachers
                                   else 0
-                                end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_connected
+                                end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_connected,
+  round(sum(case
+              when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub = false
+                then num_teachers
+              else 0
+            end::numeric)/  sum(case
+                                  when exclude_from_ia_analysis = false
+                                    then num_teachers
+                                  else 0
+                                end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_left
 from districts
