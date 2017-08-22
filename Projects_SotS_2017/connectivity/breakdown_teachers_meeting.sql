@@ -26,6 +26,11 @@ and dd.district_type = 'Traditional'
 )
 
 select
+  sum(case
+        when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub
+          then num_teachers
+        else 0
+      end::numeric) as sample_num_teachers_connected,
   round(sum(case
               when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub
                 then num_teachers
@@ -35,6 +40,11 @@ select
                                     then num_teachers
                                   else 0
                                 end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_connected,
+  sum(case
+        when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub = false
+          then num_teachers
+        else 0 
+      end::numeric) as sample_num_teachers_left,
   round(sum(case
               when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub = false
                 then num_teachers
