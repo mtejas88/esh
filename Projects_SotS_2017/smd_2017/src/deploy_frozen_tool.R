@@ -398,6 +398,31 @@ state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc !=
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
+## Affordability Ranking (by percent of students meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$affordability_ranking <- NA
+state_2017$students_meeting_affordability_perc <- state_2017$students_meeting_affordability / state_2017$students_clean_ia_cost_sample
+state_2017 <- state_2017[order(state_2017$students_meeting_affordability_perc, decreasing=T),]
+state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc == 1] <- 1
+state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Fiber Ranking (by percent of students meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$fiber_ranking <- NA
+state_2017$campuses_on_fiber_perc <- state_2017$unscalable_campuses / state_2017$campuses_clean_ia_sample
+state_2017 <- state_2017[order(state_2017$campuses_on_fiber_perc, decreasing=T),]
+state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc == 1] <- 1
+state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+
 ## Original Methodology: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
 ## merge in 2016 frozen data to 2017
 state_2017 <- merge(state_2017, state_2016_froz[,c('postal_cd', 'current16_districts_mtg2014goal', 'current16_districts_sample',
@@ -562,6 +587,9 @@ for (col in cols){
   }
 }
 
+## subset to just state rankings
+state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'affordability_ranking', 'fiber_ranking')]
+
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
 
@@ -592,6 +620,9 @@ write.csv(fiber.targets, "tool_frozen/data/fiber_targets.csv", row.names=F)
 write.csv(snapshots, "tool_frozen/data/snapshots.csv", row.names=F)
 ## also store the snapshots 
 #write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
+
+## State Rankings
+write.csv(state_rankings, "data/raw/state_rankings.csv")
 
 ## Date
 write.csv(date, "tool_frozen/data/date.csv", row.names=F)
