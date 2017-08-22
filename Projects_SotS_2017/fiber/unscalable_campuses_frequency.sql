@@ -38,9 +38,11 @@ with districts_fiber_applications as (
     left join fy2017.frns 
     on form470s."470 Number" = frns.establishing_fcc_form470::int
     where "Service Type" = 'Internet Access and/or Telecommunications'
-    and "Function" not in ('Internet Access: ISP Service Only', 'Other')
+    and "Function" not in ( 'Internet Access: ISP Service Only', 'Other', 'Cellular Data Plan/Air Card Service', 
+                            'Cellular Voice', 'Voice Service (Analog, Digital, Interconnected VOIP, etc)')
     and ("Function" ilike '%fiber%' 
-        or left("Minimum Capacity",length("Minimum Capacity")-5)::numeric >= 200)
+        or left("Minimum Capacity",length("Minimum Capacity")-5)::numeric >= 200
+        or right("Minimum Capacity",4)= 'Gbps')
   ) fiber_470_applicants
   on district_applicants.applicant_ben = fiber_470_applicants.applicant_ben  
   group by 1
@@ -50,8 +52,7 @@ total_unscalable_campuses as (
 	from fy2017_districts_deluxe_matr
 	where include_in_universe_of_districts
 	and district_type = 'Traditional'
-  and exclude_from_ia_analysis = false
-  and fiber_target_status in ('Target', 'Potential Target')
+  and fiber_target_status = 'Target'
 ),
 districts as (
 select 
@@ -62,8 +63,7 @@ left join districts_fiber_applications dfa
 on dd.esh_id = dfa.esh_id
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
-and exclude_from_ia_analysis = false
-and fiber_target_status in ('Target', 'Potential Target')
+and fiber_target_status = 'Target'
 )
 
 

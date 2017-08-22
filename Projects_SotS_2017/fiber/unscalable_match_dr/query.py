@@ -8,8 +8,7 @@ select *
 from public.fy2017_districts_deluxe_matr dd
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
-and exclude_from_ia_analysis = false
-and fiber_target_status in ('Target', 'Potential Target')
+and fiber_target_status = 'Target'
 and postal_cd in ('MT', 'ID', 'MN', 'KS', 'IL', 'MD', 'MA', 'MO', 'NH', 
                   'AZ', 'VA', 'NC', 'TX', 'CA', 'NM', 'NY', 'OK', 'FL', 'ME')
 ),

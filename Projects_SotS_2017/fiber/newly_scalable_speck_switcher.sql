@@ -1,15 +1,53 @@
-with providers_2017 as (
+with frns_17 as (
+
+  select frn.application_number,
+  frn.frn,
+  frn.frn_status,
+  frn.fiber_sub_type,
+  fli.line_item
+  
+  from fy2017.frns frn
+  
+  left join fy2017.frn_line_items fli
+  on frn.frn = fli.frn
+  
+  where frn.frn not in (
+    select frn
+    from fy2017.current_frns
+  )
+  and frn_status not in ('Cancelled', 'Denied')
+  
+  union
+  
+  select frn.application_number,
+  frn.frn,
+  frn.frn_status,
+  frn.fiber_sub_type,
+  fli.line_item
+  
+  from fy2017.current_frns frn
+  
+  left join fy2017.current_frn_line_items fli
+  on frn.frn = fli.frn
+  
+  where frn.frn_status not in ('Cancelled', 'Denied')
+
+),
+
+providers_2017 as (
   select 
     sr.recipient_id, 
     array_agg(distinct case
                         when fiber_sub_type = 'Special Construction'
+                        or 'special_construction' = any(sr.open_flags) 
+                        OR 'special_construction_tag' = any(sr.open_tags)
                           then sr.reporting_name
                         end) as spec_k_provider_2017, 
     array_agg(distinct case
                         when inclusion_status != 'dqs_excluded'
                           then sr.reporting_name
                         end) as provider_2017
-  from fy2017.frns
+  from frns_17 frns
   full outer join (
     select *
     from public.fy2017_esh_line_items_v 
