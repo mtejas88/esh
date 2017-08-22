@@ -6,17 +6,20 @@ with districts_2017 as (
 ), 
 
 extrapolated_students_not_meeting as (
-  select sum( case
+  select 
+  district_size,
+  sum( case
           when exclude_from_ia_analysis= false
             then num_students
           else 0
         end)/sum(num_students)::numeric as extrapolate_pct,
-sum(  case
+  sum(  case
           when exclude_from_ia_analysis= false
             then 1
           else 0
         end)/sum(1)::numeric as extrapolate_pct_district
   from districts_2017
+  group by 1
 ), 
 
 -- from https://github.com/educationsuperhighway/ecto/blob/master/db_ecto/material_girl/endpoint/fy2017/fy2017_scalable_line_items_v01.sql
@@ -124,14 +127,15 @@ districts_categorized as (
   and dd.district_type = 'Traditional'
   and exclude_from_ia_analysis= false
   and meeting_2014_goal_no_oversub = false
+  and dd.district_size in ('Large', 'Mega')
 )
 
 select
   diagnosis,
   sum(num_students::numeric) as num_students_sample,
-  round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
+  round((sum(num_students::numeric/extrapolate_pct))/1000000,1) as num_students_extrap_mill,
   sum(1) as num_districts_sample,
-  sum(1)/extrapolate_pct_district as num_districts_extrap,
+  sum(1/extrapolate_pct_district) as num_districts_extrap,
   case
     when diagnosis = 'get fiber internet'
       then sum( case
@@ -154,6 +158,6 @@ select
   end as median_oop_per_student_future
 from districts_categorized
 join extrapolated_students_not_meeting 
-on true
-group by 1, extrapolate_pct, extrapolate_pct_district
+on districts_categorized.district_size = extrapolated_students_not_meeting.district_size 
+group by 1
 order by 3 desc
