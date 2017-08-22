@@ -1,7 +1,7 @@
 from pandas import DataFrame, merge, read_csv
 from numpy import NaN, where, logical_or
 
-districts = read_csv('../../data/interim/districts.csv')
+districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
 print("Districts imported")
 
 ##EXTRAPOLATION
@@ -51,11 +51,11 @@ state_metrics_orig['extrapolation_orig'] = state_metrics_orig.extrapolation_orig
 state_metrics = merge(state_metrics_orig, state_metrics, how='outer', on='district_postal_cd')
 print("Extrapolations calculated")
 
-state_metrics.to_csv('../../data/interim/state_extrapolations.csv')
+state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_extrapolations.csv')
 ##WAN COST
 
 #import campus build costs
-campus_build_costs = read_csv('../../data/interim/campus_build_costs.csv')
+campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs.csv')
 print("Campus costs imported")
 
 #determine min and max values
@@ -185,7 +185,7 @@ print("Campus costs extrapolated")
 ##IA COST
 
 #import district build costs
-district_build_costs = read_csv('../../data/interim/district_build_costs.csv')
+district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv')
 print("District costs imported")
 
 #determine cost amounts
@@ -330,7 +330,7 @@ state_metrics['advice_skew'] = where(	logical_or(	(state_metrics['total_cost_az_
 															'high - skew towards minimum',
 															'no insight')
 
-state_metrics.to_csv('../../data/processed/state_metrics.csv')
+state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv')
 print("File saved")
 
 
