@@ -9,7 +9,7 @@ rm(list=ls())
 
 print(Sys.time())
 
-setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
@@ -63,7 +63,11 @@ actual.date <- gsub(":", ".", actual.date)
 
 ## State Aggregation
 #state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2017.new <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+## merge in 2015 budget column that will be missing in the Friday's version
+state_2017 <- merge(state_2017, state_2017.new[,c('postal_cd', 'c2_budget_2015')], by='postal_cd', all.x=T)
+
 #state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016_froz <- read.csv("data/raw/frozen_files/2016_2015_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
