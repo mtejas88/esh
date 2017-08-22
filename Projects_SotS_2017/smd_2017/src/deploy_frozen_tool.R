@@ -413,7 +413,7 @@ state_2017 <- state_2017[order(state_2017$postal_cd),]
 ## Fiber Ranking (by percent of students meeting goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$fiber_ranking <- NA
-state_2017$campuses_on_fiber_perc <- state_2017$unscalable_campuses / state_2017$campuses_clean_ia_sample
+state_2017$campuses_on_fiber_perc <- state_2017$scalable_campuses / state_2017$campuses_population
 state_2017 <- state_2017[order(state_2017$campuses_on_fiber_perc, decreasing=T),]
 state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc == 1] <- 1
 state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc != 1 & state_2017$postal_cd != 'ALL'] <-
@@ -588,7 +588,9 @@ for (col in cols){
 }
 
 ## subset to just state rankings
-state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'affordability_ranking', 'fiber_ranking')]
+state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'students_meeting_2014_bw_goal_perc',
+                                                             'affordability_ranking', 'students_meeting_affordability_perc',
+                                                             'fiber_ranking', 'campuses_on_fiber_perc')]
 
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
