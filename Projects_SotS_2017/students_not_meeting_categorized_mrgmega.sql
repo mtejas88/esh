@@ -139,14 +139,14 @@ districts_categorized as (
     case
       when hierarchy_ia_connect_category != 'Fiber'
         then 'get fiber internet'
+      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
+        then 'meet the prices available in your state' 
       when (case
               when ia_monthly_cost_total < 14*50 and ia_monthly_cost_total > 0
                 then ia_monthly_cost_total/14
               else knapsack_bandwidth(ia_monthly_cost_total)
             end*1000/dd.num_students) >= 100
         then 'meet benchmark prices'
-      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
-        then 'meet the prices available in your state' 
       else 'spend more money'
     end as diagnosis
   from districts_2017 dd
