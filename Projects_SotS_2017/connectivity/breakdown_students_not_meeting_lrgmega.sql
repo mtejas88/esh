@@ -124,6 +124,7 @@ districts_categorized as (
   and dd.district_type = 'Traditional'
   and exclude_from_ia_analysis= false
   and meeting_2014_goal_no_oversub = false
+  and dd.district_size in ('Large', 'Mega')
 )
 
 select
