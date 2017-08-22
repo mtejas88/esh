@@ -43,9 +43,9 @@ sum(num_campuses) as total_num_campuses
         group by 1,2
 union
 SELECT '2015' as year, case when locale in ('Rural','Small Town') then 'Rural/Town' else 'Rest' end as locale,
-9500 unscalable_campuses, sum(num_campuses) as total_num_campuses
+sum(known_nonfiber_campuses+assumed_nonfiber_campuses) as unscalable_campuses, sum(num_campuses) as total_num_campuses
             from public.fy2015_districts_deluxe_m del
-        group by 1,2,3
+        group by 1,2
 order by 1,2)
 
 --select * from meeting_goals_over_time
