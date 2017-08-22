@@ -28,18 +28,19 @@ where
  d17.include_in_universe_of_districts
  and  d17.district_type = 'Traditional'
  and  d17.exclude_from_ia_analysis = 'False'
+ and d16.exclude_from_ia_analysis = 'False'
  and  d17.upgrade_indicator = 'True'
  and  d17.esh_id not in (select * from a)
- and d17.ia_bw_mbps_total >= (d16.ia_bw_mbps_total*1.10)
+ --and d17.ia_bw_mbps_total >= (d16.ia_bw_mbps_total*1.10)
  ) as "unique_upgraders_2017_with_10pc_more_bw",
 
  (select count(esh_id) from
- public.fy2016_districts_deluxe_matr d17
+ public.fy2016_districts_deluxe_matr d16
  where
- d17.include_in_universe_of_districts
- and  d17.district_type = 'Traditional'
- and  d17.exclude_from_ia_analysis = 'False'
- and  d17.upgrade_indicator = 'True'
+ d16.include_in_universe_of_districts
+ and  d16.district_type = 'Traditional'
+ and  d16.exclude_from_ia_analysis = 'False'
+ and  d16.upgrade_indicator = 'True'
  ) as "total_upgraders_2016",
 
  (select
@@ -52,6 +53,7 @@ where
  d16.include_in_universe_of_districts
  and d16.district_type = 'Traditional'
  and d16.exclude_from_ia_analysis = 'False'
+ and d15.exclude_from_analysis = 'False'
  and d16.upgrade_indicator = 'True'
- and d16.ia_bw_mbps_total >= (d15.total_ia_bw_mbps * 1.10)
+ --and d16.ia_bw_mbps_total >= (d15.total_ia_bw_mbps * 1.10)
 ) as "unique_upgraders_2016_with_10pc_more_bw"
