@@ -9,7 +9,7 @@ rm(list=ls())
 
 print(Sys.time())
 
-#setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
+setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/smd_2017/")
 #setwd("~/Documents/R_WORK/ficher/Projects_SotS_2017/smd_2017/")
 
 ## load packages (if not already in the environment)
@@ -62,10 +62,10 @@ actual.date <- gsub(":", ".", actual.date)
 ## READ DATA
 
 ## State Aggregation
-state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
-#state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
-state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
-#state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+#state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+#state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016_froz <- read.csv("data/raw/frozen_files/2016_2015_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -73,10 +73,10 @@ state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_
 top_sp <- read.csv("data/raw/top_service_providers.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Districts Deluxe
-dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
-#dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
-dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
-#dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+#dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+#dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 #dd_2015_froz <- read.csv("data/raw/frozen_files/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -630,7 +630,10 @@ write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 #write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
 
 ## Date
-write.csv(date, "tool/data/date.csv", row.names=F)
+date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
+names(date.dta) <- 'date'
+date.dta$date <- as.Date("2017-08-18")
+write.csv(date.dta, "tool/data/date.csv", row.names=F)
 
 ##**************************************************************************************************************************************************
 ## DEPLOY TOOL
