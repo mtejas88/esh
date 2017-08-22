@@ -11,7 +11,7 @@ and service_provider_assignment in
 
 districts_2017 as (
   select *
-  from fy2017_districts_deluxe_matr
+  from public.fy2017_districts_deluxe_matr
   where include_in_universe_of_districts
   and district_type = 'Traditional'
 ), 
@@ -41,13 +41,13 @@ scalable_ia_temp as (
   and inclusion_status = 'clean_with_cost'
   and connect_category in ('Lit Fiber', 'Dark Fiber')
   and purpose in ('Internet', 'Upstream')
-  and recipient_id not in (select esh_id from districts_notmeeting_2016_top15)
   ),
 
 districts_peer as (
   select dd.esh_id, 
  count( distinct(case when dd.ia_monthly_cost_total <= scalable_ia_temp.monthly_circuit_cost_recurring_scalable_ia
-  and dd.num_students * .1 >= scalable_ia_temp.bandwidth_in_mbps_scalable_ia
+  and dd.ia_bw_mbps_total >= scalable_ia_temp.bandwidth_in_mbps_scalable_ia
+  and dd.esh_id != scalable_ia_temp.recipient_id
    then line_item_id_scalable_ia end)) as peer_deals
   from districts_notmeeting_2016_top15 nm16
   join districts_2017 dd
