@@ -73,6 +73,7 @@ def calculateBuildCosts(func, inputs, outputFile):
 	costs = DataFrame(pool.map(func, inputs))
 	costs.to_csv('../../data/interim/' + outputFile)
 	print("File saved")
+	sys.stdout.flush()
 
 campuses_range = range(0, unscalable_campuses.shape[0])
 districts_range = range(0, unscalable_districts.shape[0])
@@ -80,13 +81,17 @@ districts_range = range(0, unscalable_districts.shape[0])
 pool = mp.Pool(processes = NUMPROCS)
 
 print("Calculating A-PoP")
+sys.stdout.flush()
 calculateBuildCosts(calculateAPop, campuses_range, 'campus_costs_apop.csv')
 
 print("Calculating Z-Pop")
+sys.stdout.flush()
 calculateBuildCosts(calculateZPop, campuses_range, 'campus_costs_zpop.csv')
 
 print("Calculating A-Z")
+sys.stdout.flush()
 calculateBuildCosts(calculateAZ, campuses_range, 'campus_costs_az.csv')
 
 print("Calculating Districts Z-PoP")
+sys.stdout.flush()
 calculateBuildCosts(calculateIA, districts_range, 'district_costs.csv')
