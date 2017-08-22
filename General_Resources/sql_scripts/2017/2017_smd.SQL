@@ -100,6 +100,7 @@ sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_students ELSE 0 END) as students_with_wifi,
 -- Postdiscount C2 Funding (Across Years: 2015, 2016, 2017) (changed from Prediscount)
+sum(dd_2017.c2_prediscount_budget_15) as c2_budget_2015,
 sum(dd_2017.c2_postdiscount_remaining_15) as c2_remaining_2015,
 sum(dd_2017.c2_postdiscount_remaining_16) as c2_remaining_2016,
 sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017,
@@ -217,6 +218,7 @@ sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN sd17.num_schools ELSE 0 END) as schools_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN sd17.num_students ELSE 0 END) as students_with_wifi,
 -- Postdiscount C2 Funding (Across Years: 2015, 2016, 2017) (changed from Prediscount)
+sum(dd_2017.c2_prediscount_budget_15) as c2_budget_2015,
 sum(dd_2017.c2_postdiscount_remaining_15) as c2_remaining_2015,
 sum(dd_2017.c2_postdiscount_remaining_16) as c2_remaining_2016,
 sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017,
@@ -339,6 +341,7 @@ sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN 1 ELSE 0 END) as districts_with_wifi
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_schools ELSE 0 END) as schools_with_wifi,
 sum(CASE WHEN dd_2017.needs_wifi = 'f' THEN dd_2017.num_students ELSE 0 END) as students_with_wifi,
 -- Postdiscount C2 Funding (Across Years: 2015, 2016, 2017) (changed from Prediscount)
+sum(dd_2017.c2_prediscount_budget_15) as c2_budget_2015,
 sum(dd_2017.c2_postdiscount_remaining_15) as c2_remaining_2015,
 sum(dd_2017.c2_postdiscount_remaining_16) as c2_remaining_2016,
 sum(dd_2017.c2_postdiscount_remaining_17) as c2_remaining_2017,
