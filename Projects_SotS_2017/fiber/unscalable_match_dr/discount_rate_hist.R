@@ -40,7 +40,7 @@ p.discounts <- ggplot(summary, aes(x=discount_rate_c1_matrix, y=value, fill=vari
   theme(plot.title = element_text(size = 30, face = "bold"))+ 
   scale_y_continuous(labels = scales::percent)+ 
   scale_x_continuous(labels = scales::percent, breaks = c(.25, .4, .5, .6, .7, .8, .9))+
-  annotate("text", x = .52, y = .3, label = "54% of campuses including pending have free fiber builds", color = 'black')+
+  annotate("text", x = .52, y = .3, label = "58% of campuses including pending have free fiber builds", color = 'black')+
   annotate("text", x = .52, y = .28, label = "45% of campuses excluding pending have free fiber builds", color = 'black')+
   geom_text(aes(label = paste0(sprintf("%.0f", value*100), "%")), position = position_stack(vjust = 0.5), size = 3, color = 'white')
   
