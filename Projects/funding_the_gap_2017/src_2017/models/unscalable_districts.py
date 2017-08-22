@@ -43,7 +43,7 @@ unscalable_districts = unscalable_districts[logical_or(unscalable_districts.dist
 											logical_and(unscalable_districts.district_num_campuses_unscalable > 0, unscalable_districts.distance == 0))]
 unscalable_districts = unscalable_districts.reset_index(drop=True)
 
-#calculate assumed build bw needed based on district's number of students
+##calculate assumed build bw needed based on district's number of students
 unscalable_districts['build_bandwidth'] = where(unscalable_districts['district_num_students']<1000,
 												100,
 												where(	unscalable_districts['district_num_students']<10000,
