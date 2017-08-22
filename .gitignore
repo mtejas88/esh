@@ -5,9 +5,6 @@
 Icon
 **/desktop.ini
 
-## and ignore any API credentials stored in python
-./**/credentials.py
-
 ## ignore ipynb files
 **/*.ipynb*
 
@@ -37,4 +34,10 @@ Icon
 **/.Rhistory
 
 ## and ignore any API credentials stored in python
-./**/credentials.py
+credentials.py
+
+# ignore python compiled files
+*.pyc
+
+# ignore .env files
+.env

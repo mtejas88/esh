@@ -2,23 +2,21 @@ import psycopg2
 from numpy import where, logical_or, logical_and
 from pandas import DataFrame, read_csv, merge
 
-from onyx_queries import getDistricts
-
+import sys
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
-HOST = os.environ.get("HOST")
-USER = os.environ.get("USER")
-PASSWORD = os.environ.get("PASSWORD")
-DB = os.environ.get("DB")
+HOST = os.environ.get("HOST_DENIM")
+USER = os.environ.get("USER_DENIM")
+PASSWORD = os.environ.get("PASSWORD_DENIM")
+DB = os.environ.get("DB_DENIM")
+GITHUB = os.environ.get("GITHUB")
 
 #sys.path.insert(0, '../')
 #from credentials import HOST, USER, PASSWORD, DB
-
-import sys
-sys.path.insert(0, '../features')
-sys.path.insert(0, '../data_creation')
-from onyx_queries import getCampuses
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017/data_creation')
+from onyx_queries import getDistricts, getCampuses
 from classes import distanceCalculator
 
 #connect to onyx and save list of all districts into pandas dataframe
