@@ -63,7 +63,9 @@ actual.date <- gsub(":", ".", actual.date)
 
 ## State Aggregation
 state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+#state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+#state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016_froz <- read.csv("data/raw/frozen_files/2016_2015_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -72,7 +74,9 @@ top_sp <- read.csv("data/raw/top_service_providers.csv", as.is=T, header=T, stri
 
 ## Districts Deluxe
 dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+#dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+#dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 #dd_2015_froz <- read.csv("data/raw/frozen_files/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -398,6 +402,30 @@ state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc !=
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
+## Affordability Ranking (by percent of students meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$affordability_ranking <- NA
+state_2017$students_meeting_affordability_perc <- state_2017$students_meeting_affordability / state_2017$students_clean_ia_cost_sample
+state_2017 <- state_2017[order(state_2017$students_meeting_affordability_perc, decreasing=T),]
+state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc == 1] <- 1
+state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Fiber Ranking (by percent of students meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$fiber_ranking <- NA
+state_2017$campuses_on_fiber_perc <- state_2017$scalable_campuses / state_2017$campuses_population
+state_2017 <- state_2017[order(state_2017$campuses_on_fiber_perc, decreasing=T),]
+state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc == 1] <- 1
+state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$fiber_ranking[state_2017$campuses_on_fiber_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
 ## Original Methodology: use extrapolated number for 2016 districts/students meeting bw goals in 2016 and take difference with extrapolated 2017
 ## merge in 2016 frozen data to 2017
 state_2017 <- merge(state_2017, state_2016_froz[,c('postal_cd', 'current16_districts_mtg2014goal', 'current16_districts_sample',
@@ -562,6 +590,11 @@ for (col in cols){
   }
 }
 
+## subset to just state rankings
+state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'students_meeting_2014_bw_goal_perc',
+                                                             'affordability_ranking', 'students_meeting_affordability_perc',
+                                                             'fiber_ranking', 'campuses_on_fiber_perc')]
+
 ##**************************************************************************************************************************************************
 ## WRITE OUT DATA
 
@@ -592,6 +625,9 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 ## also store the snapshots 
 #write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
+
+## State Rankings
+write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
 
 ## Date
 write.csv(date, "tool/data/date.csv", row.names=F)

@@ -624,7 +624,7 @@ write.csv(snapshots, "tool_frozen/data/snapshots.csv", row.names=F)
 #write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## State Rankings
-write.csv(state_rankings, "data/raw/state_rankings.csv")
+write.csv(state_rankings, "data/raw/frozen_state_rankings.csv")
 
 ## Date
 write.csv(date, "tool_frozen/data/date.csv", row.names=F)
