@@ -1,19 +1,31 @@
 with districts_2017 as (
-  select *
+  select *,
+  case
+    when district_size = 'Tiny'
+      then 5
+    when district_size = 'Small'
+      then 4
+    when district_size = 'Medium'
+      then 3
+    when district_size = 'Large'
+      then 2
+    when district_size = 'Mega'
+      then 1
+  end as district_size_number,
+  left(ulocal,1)::int as locale_number
   from fy2017_districts_deluxe_matr
   where include_in_universe_of_districts
   and district_type = 'Traditional'
 ), 
 
 extrapolated_students_not_meeting as (
-  select 
   district_size,
-  sum( case
+  select sum( case
           when exclude_from_ia_analysis= false
             then num_students
           else 0
         end)/sum(num_students)::numeric as extrapolate_pct,
-  sum(  case
+sum(  case
           when exclude_from_ia_analysis= false
             then 1
           else 0
@@ -40,7 +52,9 @@ scalable_ia_temp as (
     end as ia_cost_per_mbps_scalable,
     connect_category as connect_category_scalable_ia,
     service_provider_name as service_provider_name_scalable_ia,
-    reporting_name as reporting_name_scalable_ia
+    reporting_name as reporting_name_scalable_ia,
+    district_size_number,
+    locale_number
   from public.fy2017_services_received_matr sr
   join districts_2017 dd
   on sr.recipient_id = dd.esh_id
@@ -48,19 +62,32 @@ scalable_ia_temp as (
   and recipient_exclude_from_ia_analysis = FALSE
   and inclusion_status = 'clean_with_cost'
   and connect_category in ('Lit Fiber', 'Dark Fiber')
-  and purpose in ('Internet', 'Upstream')),
+  and purpose in ('Internet', 'Upstream')
+  and line_item_id not in ('739869', '806826', '812008', '863608')),
 
 districts_peer as (
   select dd.esh_id, 
     count(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as num_prices_to_meet_goals_with_same_budget
   from districts_2017 dd
   join scalable_ia_temp
---in the same state
-  on dd.postal_cd = scalable_ia_temp.recipient_postal_cd
+--in the same state unless mega
+  on  case
+        when dd.district_size = 'Mega'
+          then true
+        else dd.postal_cd = scalable_ia_temp.recipient_postal_cd
+      end
 --costs less than or equal to what the district is spending
   and dd.ia_monthly_cost_total >= scalable_ia_temp.monthly_circuit_cost_recurring_scalable_ia
 --bw is more than or equal to what the district needs to meet 100 kbps/student
   and dd.num_students * .1 <= scalable_ia_temp.bandwidth_in_mbps_scalable_ia
+  and dd.district_size_number in (
+    scalable_ia_temp.district_size_number-1,
+    scalable_ia_temp.district_size_number, 
+    scalable_ia_temp.district_size_number+1)
+  and dd.locale_number in (
+    scalable_ia_temp.locale_number-1,
+    scalable_ia_temp.locale_number, 
+    scalable_ia_temp.locale_number+1)
   where dd.exclude_from_ia_analysis= false
   and dd.meeting_2014_goal_no_oversub = false
   group by 1
@@ -108,8 +135,6 @@ districts_categorized as (
         then 7
     end as contract_end_time,
     case
-      when hierarchy_ia_connect_category != 'Fiber'
-        then 'get fiber internet'
       when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
         then 'meet the prices available in your state' 
       when (case
@@ -137,14 +162,6 @@ select
   sum(1) as num_districts_sample,
   sum(1/extrapolate_pct_district) as num_districts_extrap,
   case
-    when diagnosis = 'get fiber internet'
-      then sum( case
-                  when locale in ('Rural', 'Town')
-                    then 1
-                  else 0
-                end)/sum(1)::numeric 
-  end as pct_districts_rural,
-  case
     when diagnosis = 'meet the prices available in your state'
       then median(num_prices_to_meet_goals_with_same_budget)
   end as median_num_prices_to_meet_goals_with_same_budget,
@@ -159,5 +176,5 @@ select
 from districts_categorized
 join extrapolated_students_not_meeting 
 on districts_categorized.district_size = extrapolated_students_not_meeting.district_size 
-group by 1
+group by 1, extrapolate_pct, extrapolate_pct_district
 order by 3 desc
