@@ -2,7 +2,6 @@ with a as (
 
 		/* 2017 FRNs, excluding ones that have been updated/are in current view*/
 		select 2017 as year,
-		f.frn_status,
 		f.frn,
 		f.match_amount
 
@@ -28,15 +27,13 @@ with a as (
 		and f.frn not in (select frn from fy2017.current_frns)
 
 		group by f.frn,
-		f.match_amount,
-		f.frn_status
+		f.match_amount
 
 
 	union 
 
 		/* 2017 FRNs that have been updated/are in current view and are approved*/
 		select 2017 as year,
-		f.frn_status,
 		f.frn,
 		f.match_amount
 
@@ -58,16 +55,16 @@ with a as (
 		/* frn includes at least one line item that is received by districts in our population*/
 		and dd.include_in_universe_of_districts = true
 		and dd.district_type = 'Traditional'
+		
+		and f.frn_status = 'Funded'
 
 		group by f.frn,
-		f.match_amount,
-		f.frn_status
+		f.match_amount
 
 	union 
 
 		/* 2016 FRNs, excluding ones that have been updated/are in current view*/
 		select 2016 as year,
-		f.frn_status,
 		f.frn,
 		f.match_amount
 
@@ -93,17 +90,15 @@ with a as (
 		and f.frn not in (select frn from fy2016.current_frns)
 		
 		group by f.frn,
-		f.match_amount,
-		f.frn_status
+		f.match_amount
 
 	union 
 
 		/* 2017 FRNs that have been updated/are in current view and are approved*/
 		select 2016 as year,
-		f.frn_status,
 		f.frn,
 		f.match_amount
-		
+
 		from fy2016.current_frns  f
 
 		inner join fy2016.line_items eli
@@ -123,16 +118,15 @@ with a as (
 		and dd.include_in_universe_of_districts = true
 		and dd.district_type = 'Traditional'
 		
+		and f.frn_status = 'Funded'
 
 		group by f.frn,
-		f.match_amount,
-		f.frn_status)
+		f.match_amount)
 
 
 select year,
-frn_status,
 sum(match_amount::numeric)
 
 from a 
 
-group by year, frn_status
+group by year
