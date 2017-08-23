@@ -22,7 +22,15 @@ with a as (select
 	where dd.include_in_universe_of_districts = true
 	and dd.district_type = 'Traditional'
 	and dd.exclude_from_ia_cost_analysis = false
-	and dd.exclude_from_ia_analysis = false)
+	and dd.exclude_from_ia_analysis = false
+
+	and dd.esh_id not in (select 
+		distinct recipient_id
+		from public.fy2017_services_received_matr 
+		where erate = false
+		and purpose != 'WAN'
+		and inclusion_status = 'clean_with_cost')
+)
 
 select 
 locale_2,
