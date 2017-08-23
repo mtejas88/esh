@@ -83,6 +83,7 @@ scalable_ia_temp as (
 districts_peer as (
   select dd.esh_id, 
     count(distinct recipient_id) as num_district_peers, 
+    max(ia_cost_per_mbps_scalable) as worst_peer_price, 
     count(distinct  case
                       when scalable_ia_temp.service_provider_name_scalable_ia = any(provider_2017)
                         then recipient_id
@@ -97,7 +98,18 @@ districts_peer as (
                         scalable_ia_temp.locale_number, 
                         scalable_ia_temp.locale_number+1) 
                           then recipient_id
-                    end) as num_district_peers_demog, 
+                    end) as num_district_peers_demog,  
+    max(case
+          when dd.district_size_number in (
+            scalable_ia_temp.district_size_number-1, 
+            scalable_ia_temp.district_size_number, 
+            scalable_ia_temp.district_size_number+1)
+          and dd.locale_number in (
+            scalable_ia_temp.locale_number-1, 
+            scalable_ia_temp.locale_number, 
+            scalable_ia_temp.locale_number+1) 
+              then ia_cost_per_mbps_scalable
+        end) as worst_peer_price_demog,
     count(distinct  case
                       when dd.district_size_number in (
                         scalable_ia_temp.district_size_number-1, 
@@ -115,6 +127,11 @@ districts_peer as (
                       or dd.upstream_services is not null
                           then recipient_id
                     end) as num_district_peers_purpose, 
+    max(case
+          when (dd.upstream_services is null and scalable_ia_temp.purpose_scalable_ia ='Internet')
+          or dd.upstream_services is not null
+              then ia_cost_per_mbps_scalable
+        end) as worst_peer_price_purpose,
     count(distinct  case
                       when ((dd.upstream_services is null and scalable_ia_temp.purpose_scalable_ia ='Internet')
                       or dd.upstream_services is not null)
@@ -142,10 +159,13 @@ districts_categorized as (
   select 
     dd.*, 
     districts_peer.num_district_peers,
+    districts_peer.worst_peer_price,
     districts_peer.num_district_peers_sp,
     districts_peer.num_district_peers_demog,
+    districts_peer.worst_peer_price_demog,
     districts_peer.num_district_peers_demog_sp,
     districts_peer.num_district_peers_purpose,
+    districts_peer.worst_peer_purpose,
     districts_peer.num_district_peers_purpose_sp,
     (dd.num_students*.1) as bandwidth_needed,
     case
@@ -267,8 +287,32 @@ select
                 end)/sum(num_students::numeric)
   end as pct_students_same_sp,
   case
+    when diagnosis_2 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_sp > 0
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_same_sp,
+  case
+    when diagnosis_2 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers <= 3
+                    then num_students::numeric
+                  else 0
+                end)/sum(num_students::numeric)
+  end as pct_students_3_threshold,
+  case
+    when diagnosis_2 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers <= 3
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_3_threshold,
+  case
     when diagnosis_2 = 'meet benchmark prices'
-        then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
+        then (sum(worst_peer_price) / sum(num_students*.1)::numeric) - 1
   end as weighted_avg_pct_price_decrease_til_bw_needed,
   case
     when diagnosis_2 = 'spend more money'
@@ -308,6 +352,30 @@ select
                   else 0
                 end)/sum(num_students::numeric)
   end as pct_students_same_sp,
+  case
+    when diagnosis_3 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_sp > 0
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_same_sp,
+  case
+    when diagnosis_3 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers <= 3
+                    then num_students::numeric
+                  else 0
+                end)/sum(num_students::numeric)
+  end as pct_students_3_threshold,
+  case
+    when diagnosis_3 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers <= 3
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_3_threshold,
   case
     when diagnosis_3 = 'meet benchmark prices'
         then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
@@ -351,6 +419,30 @@ select
                 end)/sum(num_students::numeric)
   end as pct_students_same_sp,
   case
+    when diagnosis_4 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_demog_sp > 0
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_same_sp,
+  case
+    when diagnosis_4 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_demog <= 3
+                    then num_students::numeric
+                  else 0
+                end)/sum(num_students::numeric)
+  end as pct_students_3_threshold,
+  case
+    when diagnosis_4 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_demog <= 3
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_3_threshold,
+  case
     when diagnosis_4 = 'meet benchmark prices'
         then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
   end as weighted_avg_pct_price_decrease_til_bw_needed,
@@ -392,6 +484,30 @@ select
                   else 0
                 end)/sum(num_students::numeric)
   end as pct_students_same_sp,
+  case
+    when diagnosis_5 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_purpose_sp > 0
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_same_sp,
+  case
+    when diagnosis_5 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_purpose <= 3
+                    then num_students::numeric
+                  else 0
+                end)/sum(num_students::numeric)
+  end as pct_students_3_threshold,
+  case
+    when diagnosis_5 = 'meet the prices available in your state'
+      then sum( case
+                  when num_district_peers_purpose <= 3
+                    then 1
+                  else 0
+                end)
+  end as sample_districts_3_threshold,
   case
     when diagnosis_5 = 'meet benchmark prices'
         then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
