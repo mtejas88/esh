@@ -118,7 +118,7 @@ dd_2017_froz <- merge(dd_2017_froz, outlier_output, by="esh_id", all.x=TRUE)
 #  write.csv(dd_2016, paste("data/raw/deluxe_districts/2016_deluxe_districts_", date, ".csv", sep=''), row.names=F)
 #}
 
-## write out generically -- Current
+## write out generically -- Live
 ## State Aggregation
 write.csv(smd_2017, "data/raw/state_aggregation/2017_state_aggregation.csv", row.names=F)
 write.csv(smd_2016, "data/raw/state_aggregation/2016_state_aggregation.csv", row.names=F)

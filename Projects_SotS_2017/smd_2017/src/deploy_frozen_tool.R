@@ -1,8 +1,8 @@
-## =========================================
+## =================================================================
 ##
-## DEPLOY 2017 STATE METRICS TOOL
+## DEPLOY 2017 STATE METRICS TOOL -- FROZEN 8/16/2017 VERSION
 ##
-## =========================================
+## =================================================================
 
 ## Clearing memory
 rm(list=ls())
@@ -74,7 +74,6 @@ top_sp <- read.csv("data/raw/top_service_providers_frozen.csv", as.is=T, header=
 dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
-#dd_2015_froz <- read.csv("data/raw/frozen_files/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Date
 date <- read.csv("data/raw/date_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
