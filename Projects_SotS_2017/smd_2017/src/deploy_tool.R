@@ -394,7 +394,7 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## store state_2017 so we don't keep renames
 state_2017_orig <- state_2017
 
-## Connectivity Ranking (by percent of students meeting BW goal)
+## Connectivity Ranking (by percent of STUDENTS meeting BW goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$connectivity_ranking <- NA
 state_2017$students_meeting_2014_bw_goal_perc <- state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample
@@ -406,7 +406,19 @@ state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc !=
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
-## Affordability Ranking (by percent of students meeting goal)
+## Connectivity Ranking (by percent of DISTRICTS meeting BW goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$connectivity_ranking_districts <- NA
+state_2017$districts_meeting_2014_bw_goal_perc <- state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample
+state_2017 <- state_2017[order(state_2017$districts_meeting_2014_bw_goal_perc, decreasing=T),]
+state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc == 1] <- 1
+state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Affordability Ranking (by percent of STUDENTS meeting goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$affordability_ranking <- NA
 state_2017$students_meeting_affordability_perc <- state_2017$students_meeting_affordability / state_2017$students_clean_ia_cost_sample
@@ -418,7 +430,19 @@ state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc 
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
-## Fiber Ranking (by percent of students meeting goal)
+## Affordability Ranking (by percent of DISTRICTS meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$affordability_ranking_districts <- NA
+state_2017$districts_meeting_affordability_perc <- state_2017$districts_meeting_affordability / state_2017$districts_clean_ia_cost_sample
+state_2017 <- state_2017[order(state_2017$districts_meeting_affordability_perc, decreasing=T),]
+state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc == 1] <- 1
+state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Fiber Ranking (by percent of CAMPUSES meeting goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$fiber_ranking <- NA
 state_2017$campuses_on_fiber_perc <- state_2017$scalable_campuses / state_2017$campuses_population
@@ -596,7 +620,9 @@ for (col in cols){
 
 ## subset to just state rankings
 state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'students_meeting_2014_bw_goal_perc',
+                                                             'connectivity_ranking_districts', 'districts_meeting_2014_bw_goal_perc',
                                                              'affordability_ranking', 'students_meeting_affordability_perc',
+                                                             'affordability_ranking_districts', 'districts_meeting_affordability_perc',
                                                              'fiber_ranking', 'campuses_on_fiber_perc')]
 
 ##**************************************************************************************************************************************************
@@ -631,7 +657,7 @@ write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 #write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## State Rankings
-#write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
+write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
 
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
