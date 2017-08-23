@@ -19,13 +19,14 @@ with districts_2017 as (
 ), 
 
 extrapolated_students_not_meeting as (
+select
   district_size,
-  select sum( case
+  sum( case
           when exclude_from_ia_analysis= false
             then num_students
           else 0
         end)/sum(num_students)::numeric as extrapolate_pct,
-sum(  case
+  sum(  case
           when exclude_from_ia_analysis= false
             then 1
           else 0
