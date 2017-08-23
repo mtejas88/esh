@@ -67,6 +67,9 @@ form_470 <- querydb("../../../General_Resources/sql_scripts/2017/2017_form470s.S
 ## Entity BENs
 bens <- querydb("../../../General_Resources/sql_scripts/2017/2017_entity_bens.SQL")
 
+## FRNs
+frns <- querydb("../../../General_Resources/sql_scripts/2017/2017_frns.SQL")
+
 ## disconnect from database
 dbDisconnect(con)
 
@@ -89,3 +92,6 @@ write.csv(form_470, "data/raw/form_470.csv", row.names=F)
 
 ## BENs
 write.csv(bens, "data/raw/bens.csv", row.names=F)
+
+## FRNs
+write.csv(frns, "data/raw/frns.csv", row.names=F)
