@@ -176,5 +176,5 @@ select
 from districts_categorized
 join extrapolated_students_not_meeting 
 on districts_categorized.district_size = extrapolated_students_not_meeting.district_size 
-group by 1, extrapolate_pct, extrapolate_pct_district
+group by 1
 order by 3 desc
