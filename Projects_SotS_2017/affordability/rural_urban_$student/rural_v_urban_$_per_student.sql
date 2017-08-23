@@ -24,7 +24,7 @@ with a as (select
 	and dd.exclude_from_ia_cost_analysis = false
 	and dd.exclude_from_ia_analysis = false)
 
-select year,
+select 
 locale_2,
 round(median(ia_monthly_cost_total)) as median_ia_monthly_cost_total,
 median(ia_monthly_cost_total_per_student) as median_ia_monthly_cost_total_per_student,
@@ -40,5 +40,4 @@ sum(ia_monthly_district_share)/sum(num_students) as weighted_avg_ia_monthly_dist
 
 from a 
 
-group by year,
-locale_2
+group by locale_2
