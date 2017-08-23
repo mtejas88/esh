@@ -41,7 +41,9 @@ states <- read.csv("../../../General_Resources/datasets/state_statuses.csv", as.
 ## FORMAT DATA
 
 ## subset to only 2016 Targets
-dd_2016 <- dd_2016[which(dd_2016$include_in_universe_of_districts == TRUE & dd_2016$exclude_from_ia_analysis == FALSE),]
+dd_2016 <- dd_2016[which(dd_2016$include_in_universe_of_districts == TRUE &
+                           dd_2016$district_type == 'Traditional' &
+                           dd_2016$exclude_from_ia_analysis == FALSE),]
 ## merge in state info
 dd_2016 <- merge(dd_2016, states, by='postal_cd', all.x=T)
 targets <- dd_2016[which(dd_2016$fiber_target_status == 'Target'),]
@@ -91,8 +93,9 @@ targets$fiber_470 <- ifelse(targets$esh_id %in% districts_fiber, TRUE, FALSE)
 ## also if the district became a Non-Target in 2017, they must have filed a Form 470
 targets$fiber_470 <- ifelse(targets$esh_id %in% dd_2017$esh_id[dd_2017$fiber_target_status == 'Not Target' &
                                                                  dd_2017$include_in_universe_of_districts == TRUE &
+                                                                 dd_2017$district_type == "Traditional" &
                                                                  dd_2017$exclude_from_ia_analysis == FALSE], TRUE, targets$fiber_470)
-## 688/1257 (55%) requested Fiber 470
+## 688/1239 (55%) requested Fiber 470
 table(targets$fiber_470)
 fiber_470 <- targets[which(targets$fiber_470 == TRUE),]
 table(fiber_470$postal_cd)
