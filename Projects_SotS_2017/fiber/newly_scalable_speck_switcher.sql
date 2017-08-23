@@ -36,34 +36,42 @@ with frns_17 as (
 
 providers_2017 as (
   select 
-    sr.recipient_id, 
+    recipient_id, 
     array_agg(distinct case
                         when fiber_sub_type = 'Special Construction'
-                        or 'special_construction' = any(sr.open_flags) 
-                        OR 'special_construction_tag' = any(sr.open_tags)
-                          then sr.reporting_name
+                        or 'special_construction' = any(open_flags) 
+                        OR 'special_construction_tag' = any(open_tags)
+                          then reporting_name
                         end) as spec_k_provider_2017, 
     array_agg(distinct case
                         when inclusion_status != 'dqs_excluded'
-                          then sr.reporting_name
+                          then reporting_name
                         end) as provider_2017
-  from frns_17 frns
-  full outer join (
-    select *
-    from public.fy2017_esh_line_items_v 
-  ) li 
-  on frns.frn = li.frn
-  full outer join public.fy2017_services_received_matr sr
-  on li.id = sr.line_item_id
+  from (
+    select sr.*, frns.fiber_sub_type
+    from frns_17 frns
+    full outer join (
+      select *
+      from public.fy2017_esh_line_items_v 
+    ) li 
+    on frns.frn = li.frn
+    full outer join public.fy2017_services_received_matr sr
+    on li.id = sr.line_item_id
+    order by sr.reporting_name
+  ) ordering
   group by 1
 ),
 
 providers_2016 as (
   select 
-    sr.recipient_id, 
-    array_agg(distinct sr.reporting_name) as provider_2016
-  from public.fy2016_services_received_matr sr
-  where inclusion_status != 'dqs_excluded'
+    recipient_id, 
+    array_agg(distinct reporting_name) as provider_2016
+  from (
+    select *
+    from public.fy2016_services_received_matr sr
+    where inclusion_status != 'dqs_excluded'
+    order by reporting_name
+  ) ordering
   group by 1
 ),
 
