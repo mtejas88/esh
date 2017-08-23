@@ -620,36 +620,36 @@ state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state
 ## WRITE OUT DATA
 
 ## State Aggregation
-write.csv(state_2017_orig, "tool/data/2017_state_aggregation.csv", row.names=F)
-write.csv(state_2016, "tool/data/2016_state_aggregation.csv",row.names=F)
-write.csv(state_2016_froz, "tool/data/2016_2015_sots_state_aggregation.csv",row.names=F)
+write.csv(state_2017_orig, "tool_live/data/2017_state_aggregation.csv", row.names=F)
+write.csv(state_2016, "tool_live/data/2016_state_aggregation.csv",row.names=F)
+write.csv(state_2016_froz, "tool_live/data/2016_2015_sots_state_aggregation.csv",row.names=F)
 
 ## Deluxe Districts
-write.csv(dd_2017, "tool/data/2017_deluxe_districts.csv", row.names=F)
-write.csv(dd_2016, "tool/data/2016_deluxe_districts.csv", row.names=F)
-write.csv(dd_2016_froz, "tool/data/2016_sots_deluxe_districts.csv", row.names=F)
+write.csv(dd_2017, "tool_live/data/2017_deluxe_districts.csv", row.names=F)
+write.csv(dd_2016, "tool_live/data/2016_deluxe_districts.csv", row.names=F)
+write.csv(dd_2016_froz, "tool_live/data/2016_sots_deluxe_districts.csv", row.names=F)
 
 ## Click-Throughs
-write.csv(current17.click.through, "tool/data/current17_click_through.csv", row.names=F)
-write.csv(sots16.click.through, "tool/data/sots16_click_through.csv", row.names=F)
-write.csv(upgrades.click.through, "tool/data/upgrades_click_through.csv", row.names=F)
-write.csv(connectivity.click.through, "tool/data/connectivity_click_through.csv", row.names=F)
-write.csv(fiber.click.through, "tool/data/fiber_click_through.csv", row.names=F)
-write.csv(affordability.click.through, "tool/data/affordability_click_through.csv", row.names=F)
-write.csv(wifi.click.through, "tool/data/wifi_click_through.csv", row.names=F)
+write.csv(current17.click.through, "tool_live/data/current17_click_through.csv", row.names=F)
+write.csv(sots16.click.through, "tool_live/data/sots16_click_through.csv", row.names=F)
+write.csv(upgrades.click.through, "tool_live/data/upgrades_click_through.csv", row.names=F)
+write.csv(connectivity.click.through, "tool_live/data/connectivity_click_through.csv", row.names=F)
+write.csv(fiber.click.through, "tool_live/data/fiber_click_through.csv", row.names=F)
+write.csv(affordability.click.through, "tool_live/data/affordability_click_through.csv", row.names=F)
+write.csv(wifi.click.through, "tool_live/data/wifi_click_through.csv", row.names=F)
 
 ## Targets
-write.csv(connectivity.targets, "tool/data/connectivity_targets.csv", row.names=F)
-write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
+write.csv(connectivity.targets, "tool_live/data/connectivity_targets.csv", row.names=F)
+write.csv(fiber.targets, "tool_live/data/fiber_targets.csv", row.names=F)
 
 ## Snapshots
-write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
+write.csv(snapshots, "tool_live/data/snapshots.csv", row.names=F)
 
 ## State Rankings
 write.csv(state_rankings, "data/raw/state_rankings_live.csv")
 
 ## Date
-write.csv(date, "tool/data/date.csv", row.names=F)
+write.csv(date, "tool_live/data/date.csv", row.names=F)
 
 ##**************************************************************************************************************************************************
 ## DEPLOY TOOL
