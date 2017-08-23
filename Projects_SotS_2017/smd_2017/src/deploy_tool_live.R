@@ -1,8 +1,8 @@
-## ===============================================================
+## =========================================
 ##
-## DEPLOY 2017 STATE METRICS TOOL -- FRIDAY 8/18/2017 VERSION
+## DEPLOY 2017 STATE METRICS TOOL -- LIVE
 ##
-## ===============================================================
+## =========================================
 
 ## Clearing memory
 rm(list=ls())
@@ -62,11 +62,8 @@ actual.date <- gsub(":", ".", actual.date)
 ## READ DATA
 
 ## State Aggregation
-state_2017.new <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
-state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
-## merge in 2015 budget column that will be missing in the Friday's version
-state_2017 <- merge(state_2017, state_2017.new[,c('postal_cd', 'c2_budget_2015')], by='postal_cd', all.x=T)
-state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2017 <- read.csv("data/raw/state_aggregation/2017_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
+state_2016 <- read.csv("data/raw/state_aggregation/2016_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 state_2016_froz <- read.csv("data/raw/frozen_files/2016_2015_frozen_state_aggregation_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_town_state_aggregation.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -74,8 +71,8 @@ state_rural_small_town <- read.csv("data/raw/state_aggregation/2017_rural_small_
 top_sp <- read.csv("data/raw/top_service_providers.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Districts Deluxe
-dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
-dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_2017-08-18_15.00.04.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
+dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Date
@@ -647,17 +644,12 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 
 ## Snapshots
 write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
-## also store the snapshots 
-#write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## State Rankings
-write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
+write.csv(state_rankings, "data/raw/state_rankings_live.csv")
 
 ## Date
-date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
-names(date.dta) <- 'date'
-date.dta$date <- as.Date("2017-08-18")
-write.csv(date.dta, "tool/data/date.csv", row.names=F)
+write.csv(date, "tool/data/date.csv", row.names=F)
 
 ##**************************************************************************************************************************************************
 ## DEPLOY TOOL
@@ -667,5 +659,5 @@ if (deploy == 1){
   rsconnect::setAccountInfo(name=rstudio_name,
                             token=rstudio_token,
                             secret=rstudio_secret)
-  rsconnect::deployDoc("tool/2017_State_Metrics_Dashboard.Rmd")
+  rsconnect::deployDoc("tool_live/2017_Live_State_Metrics_Dashboard.Rmd")
 }

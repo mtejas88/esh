@@ -1,8 +1,8 @@
-## =========================================
+## =================================================================
 ##
-## DEPLOY 2017 STATE METRICS TOOL
+## DEPLOY 2017 STATE METRICS TOOL -- FROZEN 8/16/2017 VERSION
 ##
-## =========================================
+## =================================================================
 
 ## Clearing memory
 rm(list=ls())
@@ -74,7 +74,6 @@ top_sp <- read.csv("data/raw/top_service_providers_frozen.csv", as.is=T, header=
 dd_2017 <- read.csv("data/raw/deluxe_districts/2017_deluxe_districts_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016 <- read.csv("data/raw/deluxe_districts/2016_deluxe_districts_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2016_froz <- read.csv("data/raw/frozen_files/2016_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
-#dd_2015_froz <- read.csv("data/raw/frozen_files/2015_frozen_deluxe_districts_2017-01-13.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## Date
 date <- read.csv("data/raw/date_frozen.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -386,7 +385,7 @@ fiber.targets$irt_link <- paste("<a href='http://irt.educationsuperhighway.org/e
 ## store state_2017 so we don't keep renames
 state_2017_orig <- state_2017
 
-## Connectivity Ranking (by percent of students meeting BW goal)
+## Connectivity Ranking (by percent of STUDENTS meeting BW goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$connectivity_ranking <- NA
 state_2017$students_meeting_2014_bw_goal_perc <- state_2017$students_meeting_2014_bw_goal / state_2017$students_clean_ia_sample
@@ -398,7 +397,19 @@ state_2017$connectivity_ranking[state_2017$students_meeting_2014_bw_goal_perc !=
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
-## Affordability Ranking (by percent of students meeting goal)
+## Connectivity Ranking (by percent of DISTRICTS meeting BW goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$connectivity_ranking_districts <- NA
+state_2017$districts_meeting_2014_bw_goal_perc <- state_2017$districts_meeting_2014_bw_goal / state_2017$districts_clean_ia_sample
+state_2017 <- state_2017[order(state_2017$districts_meeting_2014_bw_goal_perc, decreasing=T),]
+state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc == 1] <- 1
+state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$connectivity_ranking_districts[state_2017$districts_meeting_2014_bw_goal_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Affordability Ranking (by percent of STUDENTS meeting goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$affordability_ranking <- NA
 state_2017$students_meeting_affordability_perc <- state_2017$students_meeting_affordability / state_2017$students_clean_ia_cost_sample
@@ -410,7 +421,19 @@ state_2017$affordability_ranking[state_2017$students_meeting_affordability_perc 
 ## reorder back
 state_2017 <- state_2017[order(state_2017$postal_cd),]
 
-## Fiber Ranking (by percent of students meeting goal)
+## Affordability Ranking (by percent of DISTRICTS meeting goal)
+## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
+state_2017$affordability_ranking_districts <- NA
+state_2017$districts_meeting_affordability_perc <- state_2017$districts_meeting_affordability / state_2017$districts_clean_ia_cost_sample
+state_2017 <- state_2017[order(state_2017$districts_meeting_affordability_perc, decreasing=T),]
+state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc == 1] <- 1
+state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc != 1 & state_2017$postal_cd != 'ALL'] <-
+  seq(length(state_2017$affordability_ranking_districts[state_2017$districts_meeting_affordability_perc == 1]) + 1,
+      nrow(state_2017) - 1)
+## reorder back
+state_2017 <- state_2017[order(state_2017$postal_cd),]
+
+## Fiber Ranking (by percent of CAMPUSES meeting goal)
 ## right now, ranking everyone with 100% as 1st and then anyone after as 9th, 10th, etc.
 state_2017$fiber_ranking <- NA
 state_2017$campuses_on_fiber_perc <- state_2017$scalable_campuses / state_2017$campuses_population
@@ -589,7 +612,9 @@ for (col in cols){
 
 ## subset to just state rankings
 state_rankings <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'students_meeting_2014_bw_goal_perc',
+                                                             'connectivity_ranking_districts', 'districts_meeting_2014_bw_goal_perc',
                                                              'affordability_ranking', 'students_meeting_affordability_perc',
+                                                             'affordability_ranking_districts', 'districts_meeting_affordability_perc',
                                                              'fiber_ranking', 'campuses_on_fiber_perc')]
 
 ##**************************************************************************************************************************************************
