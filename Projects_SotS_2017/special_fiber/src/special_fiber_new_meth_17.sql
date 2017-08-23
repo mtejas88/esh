@@ -128,37 +128,8 @@ and (frns_16.fiber_sub_type = 'Special Construction' OR
     'special_construction' = any(sr.open_flags) OR
     'special_construction_tag' = any(sr.open_tags)
     )
-),
-
-special_fiber_districts as (
-
-  select distinct * from (
-    select * 
-    from results_17
-    union
-    select * 
-    from results_16
-  ) unioned
-
 )
 
-/*
-select 
-count(esh_id) as num_districts,
-sum(num_students) as num_students,
-sum(num_schools) as num_schools,
-count(case when locale in ('Urban', 'Suburban') then esh_id end) as num_urb_suburb_schools,
-count(case when locale in ('Rural', 'Town') then esh_id end) as num_rural_town_schools,
-sum(case when locale in ('Urban', 'Suburban') then num_schools end) as num_urb_suburb_schools,
-sum(case when locale in ('Rural', 'Town') then num_schools end) as num_rural_town_school,
-sum(case when locale in ('Urban', 'Suburban') then num_students end) as num_urb_suburb_students,
-sum(case when locale in ('Rural', 'Town') then num_students end) as num_rural_town_students,
-sum(case when district_size in ('Tiny') then num_students end) as num_tiny_students,
-sum(case when district_size in ('Small') then num_students end) as num_small_students,
-sum(case when district_size in ('Medium') then num_students end) as num_medium_students,
-sum(case when district_size in ('Large') then num_students end) as num_large_students,
-sum(case when district_size in ('Mega') then num_students end) as num_mega_students
-from special_fiber_districts
-*/
-select *
-from special_fiber_districts
+select * 
+from results_17
+
