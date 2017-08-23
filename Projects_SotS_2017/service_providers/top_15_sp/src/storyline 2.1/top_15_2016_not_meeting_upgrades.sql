@@ -11,7 +11,7 @@ and service_provider_assignment in
 
 select 
 dd.switcher,
-dd.upgrade_indicator,
+dd.meeting_2014_goal_no_oversub,
 count(distinct nm16.esh_id) as ndistricts,
 sum(nm16.num_students) as nstudents
 from districts_notmeeting_2016_top15 nm16
@@ -20,3 +20,5 @@ on nm16.esh_id=dd.esh_id
 and dd.exclude_from_ia_analysis=false
 and dd.include_in_universe_of_districts
 group by 1,2 order by 1,2
+
+

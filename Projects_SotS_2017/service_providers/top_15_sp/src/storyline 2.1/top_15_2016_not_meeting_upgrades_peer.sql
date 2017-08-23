@@ -61,7 +61,7 @@ group by 1
 
 --Determine if upgraders got a deal as good as one of their peers
 select  
-dd.upgrade_indicator,
+dd.meeting_2014_goal_no_oversub,
 case when peer_deals > 0 then true else false end as got_peer_deal,
 count(distinct nm16.esh_id) as ndistricts,
 sum(nm16.num_students) as nstudents
