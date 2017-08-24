@@ -147,10 +147,9 @@ districts_categorized as (
       when most_recent_ia_contract_end_date <= '2024-06-30'
         then 7
     end as contract_end_time,
-    case
-      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
-      or dd.esh_id::integer=883628 --LA
-        then 'meet the prices available in your state' 
+    case -- because LAUSD can afford multiple 10G circuits in their budget, they are a peer 
+      when dd.name ilike '%los angeles unified%' or districts_peer.num_prices_to_meet_goals_with_same_budget > 0
+        then 'meet peer prices' 
       when (case
               when ia_monthly_cost_total < 14*50 and ia_monthly_cost_total > 0
                 then ia_monthly_cost_total/14
@@ -174,12 +173,14 @@ select
   round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
   sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
+  median(discount_rate_c1_matrix) as median_discount_rate,
+  median(oop_per_student_curr) as median_oop_per_student_curr,
   case
-    when diagnosis = 'meet the prices available in your state'
+    when diagnosis = 'meet peer prices'
       then avg(num_prices_to_meet_goals_with_same_budget)
   end as avg_peer_deals,
   case
-    when diagnosis = 'meet the prices available in your state'
+    when diagnosis = 'meet peer prices'
       then sum( case
                   when num_prices_to_meet_goals_with_same_budget_sp > 0
                     then 1
@@ -187,17 +188,13 @@ select
                 end)/sum(1)::numeric
   end as pct_districts_peer_deal_same_sp,
   case
-    when diagnosis in ('meet benchmark prices','meet the prices available in your state')
+    when diagnosis in ('meet benchmark prices','meet peer prices')
         then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
   end as weighted_avg_pct_price_decrease_til_bw_needed,
   case
-    when diagnosis in ('meet benchmark prices','meet the prices available in your state')
+    when diagnosis in ('meet benchmark prices','meet peer prices')
         then median((ia_bw_mbps_total / (num_students*.1))::numeric - 1)
-  end as median_pct_price_decrease_til_bw_needed,
-  case
-    when diagnosis in ('meet the prices available in your state','spend more money')
-      then median(oop_per_student_curr)
-  end as median_oop_per_student_curr
+  end as median_pct_price_decrease_til_bw_needed
 from districts_categorized
 join extrapolated_students_not_meeting 
 on true
