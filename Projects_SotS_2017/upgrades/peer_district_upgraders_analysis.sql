@@ -93,7 +93,8 @@ AND dd.include_in_universe_of_districts = TRUE
 AND dd.exclude_from_ia_analysis = FALSE
 AND dd2.include_in_universe_of_districts = TRUE
 AND dd2.exclude_from_ia_analysis = FALSE
-AND dd.upgrade_indicator = TRUE
+AND dd.district_type = 'Traditional'
+AND dd2.district_type = 'Traditional'
 
 )
 
