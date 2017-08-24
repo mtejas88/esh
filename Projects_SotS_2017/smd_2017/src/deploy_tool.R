@@ -578,8 +578,8 @@ state_2017$state_outline_image <- NA
 ## current num districts connected, current num students connected, students still not meeting goals, districts still not meeting goals,
 ## number of service providers to partner with, number of students affected by sp, number of districts that need fiber, % in rural and small towns,
 ## wifi funds remaining, number of districts who still have wifi funds, number of districts not meeting affordability goals
-snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_millions',
-                                                        'state_action_or_state_match', 'gov_pic', 'gov_quote', 'gov_last_name',
+snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'connectivity_ranking_districts',
+                                                        'erate_money_millions', 'state_action_or_state_match', 'gov_pic', 'gov_quote', 'gov_last_name',
                                                         'state_outline_image', 'more_students_connected_2016_snapshot', 'more_districts_connected_2016_snapshot',
                                                         'more_students_connected_extrap_original_meth', 'more_districts_connected_extrap_original_meth',
                                                         'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
@@ -599,6 +599,9 @@ snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name
                                                         'campuses_clean_ia_sample', 'campuses_population',
                                                         'students_clean_ia_sample', 'students_population',
                                                         'districts_clean_ia_sample_perc', 'mega_large_clean_perc')]
+
+## save a raw version of the snapshot
+snapshots.raw <- snapshots
 
 ## add commas for numbers over 1,000
 ## grab only numeric columns
@@ -648,10 +651,10 @@ write.csv(fiber.targets, "tool/data/fiber_targets.csv", row.names=F)
 ## Snapshots
 write.csv(snapshots, "tool/data/snapshots.csv", row.names=F)
 ## also store the snapshots 
-#write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
+write.csv(snapshots.raw, "data/processed/snapshots_raw.csv", row.names=F)
 
 ## State Rankings
-write.csv(state_rankings, "data/raw/state_rankings_2017-08-16.csv")
+write.csv(state_rankings, "data/processed/state_rankings_2017-08-16.csv")
 
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
