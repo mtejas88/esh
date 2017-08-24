@@ -1,4 +1,15 @@
-with districts_2017 as (
+with providers_2017 as (
+  select 
+    sr.recipient_id, 
+    array_agg(distinct sr.reporting_name) as provider_2017
+  from  public.fy2017_services_received_matr sr
+  where inclusion_status ilike '%clean%'
+  and purpose in ('Internet', 'Upstream')
+  and inclusion_status != 'dqs_excluded'
+  group by 1
+),
+
+districts_2017 as (
   select *,
   case
     when district_size = 'Tiny'
@@ -19,18 +30,18 @@ with districts_2017 as (
 ), 
 
 extrapolated_students_not_meeting as (
-select
-  district_size,
-  sum( case
-          when exclude_from_ia_analysis= false
-            then num_students
-          else 0
-        end)/sum(num_students)::numeric as extrapolate_pct,
-  sum(  case
-          when exclude_from_ia_analysis= false
-            then 1
-          else 0
-        end)/sum(1)::numeric as extrapolate_pct_district
+  select
+    district_size,
+    sum( case
+            when exclude_from_ia_analysis= false
+              then num_students
+            else 0
+          end)/sum(num_students)::numeric as extrapolate_pct,
+    sum(  case
+            when exclude_from_ia_analysis= false
+              then 1
+            else 0
+          end)/sum(1)::numeric as extrapolate_pct_district
   from districts_2017
   group by 1
 ), 
@@ -68,8 +79,15 @@ scalable_ia_temp as (
 
 districts_peer as (
   select dd.esh_id, 
-    count(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as num_prices_to_meet_goals_with_same_budget
+    providers_2017.provider_2017,
+    count(distinct round(ia_cost_per_mbps_scalable::numeric,2)) as num_prices_to_meet_goals_with_same_budget,
+    count(distinct  case
+                      when reporting_name_scalable_ia = any(providers_2017.provider_2017)
+                        then round(ia_cost_per_mbps_scalable::numeric,2)
+                    end) as num_prices_to_meet_goals_with_same_budget_sp
   from districts_2017 dd
+  left join providers_2017 
+  on dd.esh_id = providers_2017.recipient_id
   join scalable_ia_temp
 --in the same state unless mega
   on  case
@@ -91,13 +109,15 @@ districts_peer as (
     scalable_ia_temp.locale_number+1)
   where dd.exclude_from_ia_analysis= false
   and dd.meeting_2014_goal_no_oversub = false
-  group by 1
+  group by 1,2
 ),
 
 districts_categorized as (
   select 
     dd.*, 
     districts_peer.num_prices_to_meet_goals_with_same_budget,
+    districts_peer.num_prices_to_meet_goals_with_same_budget_sp,
+    districts_peer.provider_2017,
     (dd.num_students*.1) as bandwidth_needed,
     case
       when ia_monthly_cost_total > 0
@@ -113,12 +133,7 @@ districts_categorized as (
         then 14*dd.num_students*.1
       else knapsack_budget((dd.num_students*.1)::integer)
     end*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_future,
-    ia_monthly_cost_total*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_curr,
-    (case
-      when dd.num_students < 500
-        then 14*dd.num_students*.1
-      else knapsack_budget((dd.num_students*.1)::integer)
-    end - ia_monthly_cost_total)*(1-discount_rate_c1_matrix)/dd.num_students as oop_per_student_incr,
+    (ia_monthly_cost_total - ia_monthly_funding_total)/dd.num_students as oop_per_student_curr,
     case
       when most_recent_ia_contract_end_date <= '2018-06-30'
         then 1
@@ -135,9 +150,9 @@ districts_categorized as (
       when most_recent_ia_contract_end_date <= '2024-06-30'
         then 7
     end as contract_end_time,
-    case
-      when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
-        then 'meet the prices available in your state' 
+    case -- because LAUSD can afford multiple 10G circuits in their budget, they are a peer 
+      when dd.name ilike '%los angeles unified%' or districts_peer.num_prices_to_meet_goals_with_same_budget > 0
+        then 'meet peer prices' 
       when (case
               when ia_monthly_cost_total < 14*50 and ia_monthly_cost_total > 0
                 then ia_monthly_cost_total/14
@@ -162,18 +177,28 @@ select
   round((sum(num_students::numeric/extrapolate_pct))/1000000,1) as num_students_extrap_mill,
   sum(1) as num_districts_sample,
   sum(1/extrapolate_pct_district) as num_districts_extrap,
+  median(discount_rate_c1_matrix) as median_discount_rate,
+  median(oop_per_student_curr) as median_oop_per_student_curr,
   case
-    when diagnosis = 'meet the prices available in your state'
-      then median(num_prices_to_meet_goals_with_same_budget)
-  end as median_num_prices_to_meet_goals_with_same_budget,
+    when diagnosis = 'meet peer prices'
+      then avg(num_prices_to_meet_goals_with_same_budget)
+  end as avg_peer_deals,
   case
-    when diagnosis = 'meet benchmark prices'
+    when diagnosis = 'meet peer prices'
+      then sum( case
+                  when num_prices_to_meet_goals_with_same_budget_sp > 0
+                    then 1
+                  else 0
+                end)/sum(1)::numeric
+  end as pct_districts_peer_deal_same_sp,
+  case
+    when diagnosis in ('meet benchmark prices','meet peer prices')
         then (sum(ia_bw_mbps_total) / sum(num_students*.1)::numeric) - 1
   end as weighted_avg_pct_price_decrease_til_bw_needed,
   case
-    when diagnosis = 'spend more money'
-      then median(oop_per_student_future)*12
-  end as median_oop_per_student_future
+    when diagnosis in ('meet benchmark prices','meet peer prices')
+        then median((ia_bw_mbps_total / (num_students*.1))::numeric - 1)
+  end as median_pct_price_decrease_til_bw_needed
 from districts_categorized
 join extrapolated_students_not_meeting 
 on districts_categorized.district_size = extrapolated_students_not_meeting.district_size 
