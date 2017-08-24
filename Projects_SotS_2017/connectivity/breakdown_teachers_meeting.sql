@@ -17,7 +17,8 @@ select
     when num_teachers <= 0 or num_teachers is null
       then median_teachers_per_student * num_students
     else num_teachers
-  end as num_teachers
+  end as num_teachers,
+  num_schools
 from fy2017_districts_deluxe_matr dd
 join teachers_by_dist_size tds
 on dd.district_size = tds.district_size
@@ -53,5 +54,19 @@ select
                                   when exclude_from_ia_analysis = false
                                     then num_teachers
                                   else 0
-                                end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_left
+                                end)::numeric * sum(num_teachers::numeric) / 1000000,1) as extrapolated_num_teachers_left,
+  sum(case
+        when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub
+          then num_schools
+        else 0
+      end::numeric) as sample_num_schools_connected,
+  sum(case
+        when exclude_from_ia_analysis = false and meeting_2014_goal_no_oversub
+          then num_schools
+        else 0
+      end::numeric)/  sum(case
+                            when exclude_from_ia_analysis = false
+                              then num_schools
+                            else 0
+                          end)::numeric * sum(num_schools::numeric) as extrapolated_num_schools_connected
 from districts
