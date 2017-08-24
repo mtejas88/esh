@@ -1,6 +1,12 @@
 from pandas import DataFrame, merge, read_csv
 from numpy import NaN, where, logical_or
 
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
+
+
 districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
 print("Districts imported")
 
@@ -102,8 +108,10 @@ campus_build_costs['max_build_distance_wan'] = where(	campus_build_costs['total_
 campus_build_costs['builds_az_pop_wan'] = 2 * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_wan'] = campus_build_costs['distance'] * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_pop_wan'] = campus_build_costs['build_distance_az_pop'] * campus_build_costs['build_fraction_wan']
+campus_build_costs.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs_max_min.csv')
+print("Min max calculated")
 
-
+##
 #determine state cost amounts
 state_wan_costs = campus_build_costs.groupby(['district_postal_cd', 'district_exclude_from_ia_analysis']).sum()
 state_wan_costs = state_wan_costs[[	'min_total_cost_wan', 'min_discount_erate_funding_wan', 'min_total_state_funding_wan', 'min_total_erate_funding_wan',
