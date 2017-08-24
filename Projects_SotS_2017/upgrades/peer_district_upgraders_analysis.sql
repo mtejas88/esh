@@ -96,6 +96,7 @@ AND dd2.exclude_from_ia_analysis = FALSE
 AND dd.district_type = 'Traditional'
 AND dd2.district_type = 'Traditional'
 AND dd.ia_bw_mbps_total <= dd2.ia_bw_mbps_total
+AND dd.ia_monthly_cost_total > dd2.ia_monthly_cost_total
 )
 
 SELECT count(distinct primary_districts) from
