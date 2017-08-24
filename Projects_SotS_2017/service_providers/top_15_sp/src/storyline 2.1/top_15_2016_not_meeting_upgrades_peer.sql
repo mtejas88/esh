@@ -39,7 +39,7 @@ scalable_ia_temp as (
   where recipient_include_in_universe_of_districts = TRUE
   and recipient_exclude_from_ia_analysis = FALSE
   and inclusion_status = 'clean_with_cost'
-  and connect_category in ('Lit Fiber', 'Dark Fiber')
+  and connect_category in ('Lit Fiber')
   and purpose in ('Internet', 'Upstream')
   ),
 
@@ -61,7 +61,7 @@ group by 1
 
 --Determine if upgraders got a deal as good as one of their peers
 select  
-dd.upgrade_indicator,
+dd.meeting_2014_goal_no_oversub,
 case when peer_deals > 0 then true else false end as got_peer_deal,
 count(distinct nm16.esh_id) as ndistricts,
 sum(nm16.num_students) as nstudents
