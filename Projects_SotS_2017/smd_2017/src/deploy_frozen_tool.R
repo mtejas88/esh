@@ -576,8 +576,8 @@ state_2017$state_outline_image <- NA
 ## current num districts connected, current num students connected, students still not meeting goals, districts still not meeting goals,
 ## number of service providers to partner with, number of students affected by sp, number of districts that need fiber, % in rural and small towns,
 ## wifi funds remaining, number of districts who still have wifi funds, number of districts not meeting affordability goals
-snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'erate_money_millions',
-                                                        'state_action_or_state_match', 'gov_pic', 'gov_quote', 'gov_last_name',
+snapshots <- state_2017[state_2017$postal_cd != 'ALL',c('postal_cd', 'state_name', 'connectivity_ranking', 'connectivity_ranking_districts',
+                                                        'erate_money_millions', 'state_action_or_state_match', 'gov_pic', 'gov_quote', 'gov_last_name',
                                                         'state_outline_image', 'more_students_connected_2016_snapshot', 'more_districts_connected_2016_snapshot',
                                                         'more_students_connected_extrap_original_meth', 'more_districts_connected_extrap_original_meth',
                                                         'more_students_connected_extrap_upgrade_meth', 'more_districts_connected_extrap_upgrade_meth',
@@ -649,7 +649,7 @@ write.csv(snapshots, "tool_frozen/data/snapshots.csv", row.names=F)
 #write.csv(snapshots, paste("data/processed/2017_snapshots_", actual.date, ".csv", sep=''), row.names=F)
 
 ## State Rankings
-write.csv(state_rankings, "data/raw/frozen_state_rankings.csv")
+write.csv(state_rankings, "data/processed/frozen_state_rankings.csv")
 
 ## Date
 write.csv(date, "tool_frozen/data/date.csv", row.names=F)
