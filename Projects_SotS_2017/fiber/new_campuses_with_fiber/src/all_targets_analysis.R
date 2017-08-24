@@ -14,7 +14,8 @@ setwd("~/Documents/ESH-Code/ficher/Projects_SotS_2017/fiber/new_campuses_with_fi
 ##**************************************************************************************************************************************************
 ## READ IN DATA
 
-qa <- read.csv("~/Downloads/470 stuff.csv")
+#qa <- read.csv("~/Downloads/470 stuff.csv")
+#qa <- read.csv("~/Downloads/filed own 470 and needed fiber 16.csv")
 
 ## Districts Deluxe
 dd_2017 <- read.csv("data/raw/2017_deluxe_districts.csv")
@@ -94,7 +95,10 @@ sr_2017_con <- sr_2017_con[which(sr_2017_con$recipient_include_in_universe_of_di
 ## collect all of the districts served by the consortias that applied for fiber
 districts_fiber <- unique(sr_2017_con$recipient_id)
 ## create an indicator for whether a district had consortia apply for fiber
+## look at whether a district's ben is the recipient in the services received table
 targets$fiber_470 <- ifelse(targets$esh_id %in% districts_fiber, TRUE, FALSE)
+## OR it filed its own 470 (and not a 471, which would mean it's missing from SR)
+targets$fiber_470 <- ifelse(targets$ben %in% dta_470$BEN, TRUE, targets$fiber_470)
 ## also if the district became a Non-Target in 2017, they must have filed a Form 470
 targets$fiber_470 <- ifelse(targets$esh_id %in% dd_2017$esh_id[dd_2017$fiber_target_status == 'Not Target' &
                                                                  dd_2017$include_in_universe_of_districts == TRUE &
@@ -102,13 +106,13 @@ targets$fiber_470 <- ifelse(targets$esh_id %in% dd_2017$esh_id[dd_2017$fiber_tar
                                                                  dd_2017$exclude_from_ia_analysis == FALSE], TRUE, targets$fiber_470)
 
 
-## 602/1228 (49%) Districts requested Fiber 470
+## 605/1228 (49%) Districts requested Fiber 470
 ## only take the unique esh_ids (due to multiple BENs to a District)
 length(unique(targets$esh_id[targets$fiber_470 == TRUE]))
 length(unique(targets$esh_id))
 length(unique(targets$esh_id[targets$fiber_470 == TRUE])) / length(unique(targets$esh_id))
 
-## 2,313/3,940 (59%) Campuses requested Fiber 470
+## 2,321/3,940 (59%) Campuses requested Fiber 470
 ## only take the unique esh_ids (due to multiple BENs to a District)
 sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id[targets$fiber_470 == TRUE])])
 sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id)])
@@ -147,7 +151,7 @@ table(targets$predom_procurement_cat, targets$fiber_470)
 ## LOGIC FOR BIDS ON FIBER 470s
 
 ## for the districts that filed a Fiber 470, what percentage got 0 bids? 
-## only 326 / 680 Districts eligible (means they filed their own form 470)
+## only 329 / 605 Districts eligible (means they filed their own form 470)
 
 ## subset to the districts that filed for themself
 bids_sub <- dta_470[which(dta_470$BEN %in% fiber_470$ben),]
@@ -164,10 +168,15 @@ bids.districts <- targets[which(targets$ben %in% agg.470s.ben$BEN),]
 ## create indicator for 0 bids
 bids.districts$zero_bids <- ifelse(bids.districts$ben %in% agg.470s.ben$BEN[agg.470s.ben$num_bids_received == 0], TRUE, FALSE)
 
-## 34/326 10% of districts received 0 bids
+## 36/329 11% of districts received 0 bids
+length(unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE]))
+length(unique(bids.districts$esh_id))
 length(unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])) / length(unique(bids.districts$esh_id))
+## No Rural Pattern
+table(bids.districts$locale)
+table(bids.districts$locale[bids.districts$zero_bids == TRUE])
 
-## 93/1,449 6% of campuses received 0 bids
+## 99/1,449 7% of campuses received 0 bids
 sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])])
 sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id)])
 sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])]) /
@@ -199,5 +208,5 @@ table(bids.districts$predom_procurement_cat, bids.districts$zero_bids)
 
 
 
-targets$qa_filed_fiber <- ifelse(targets$esh_id %in% qa$esh_id, TRUE, FALSE)
+#targets$qa_filed_fiber <- ifelse(targets$esh_id %in% qa$esh_id, TRUE, FALSE)
 
