@@ -149,6 +149,7 @@ districts_categorized as (
     end as contract_end_time,
     case
       when districts_peer.num_prices_to_meet_goals_with_same_budget > 0
+      or dd.esh_id::integer=883628 --LA
         then 'meet the prices available in your state' 
       when (case
               when ia_monthly_cost_total < 14*50 and ia_monthly_cost_total > 0
