@@ -1,7 +1,7 @@
 select 
   meeting_2014_goal_no_oversub::varchar,
   count(*) as num_districts,
-  median(ia_monthly_cost_total*(1-discount_rate_c1_matrix)/num_students)*12 as oop_per_student,
+  median((ia_monthly_cost_total - ia_monthly_funding_total)/num_students) as oop_per_student,
   median(discount_rate_c1_matrix) as median_discount_rate
 from fy2017_districts_deluxe_matr dd17
 where dd17.include_in_universe_of_districts
@@ -14,7 +14,7 @@ UNION
 select 
   'overall' as meeting_2014_goal_no_oversub,
   count(*) as num_districts,
-  median(ia_monthly_cost_total*(1-discount_rate_c1_matrix)/num_students)*12 as oop_per_student,
+  median((ia_monthly_cost_total - ia_monthly_funding_total)/num_students) as oop_per_student,
   median(discount_rate_c1_matrix) as median_discount_rate
 from fy2017_districts_deluxe_matr dd17
 where dd17.include_in_universe_of_districts
