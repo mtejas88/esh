@@ -1,0 +1,61 @@
+postal_cd,state_name,predom_procurement_cat,org_structure_cat,engagement_status
+AK,Alaska,districts on their own,District-procured,Target
+AL,Alabama,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+AR,Arkansas,state network or state ISP,Special case,Leave Alone
+AZ,Arizona,districts on their own,District-procured,Engaged
+CA,California,state network & regional aggregation,Regional procurement,"Mini Engaged
+State Agency
+Direct to District"
+CO,Colorado,state network or state ISP,District-procured,Engaged
+CT,Connecticut,state network or state ISP,Special case,Leave Alone
+DE,Delaware,state network or state ISP,State procures all,Leave Alone
+FL,Florida,state network or state ISP,District-procured,"Mini Engaged
+State Agency
+Direct to District"
+GA,Georgia,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+HI,Hawaii,state network or state ISP,State procures all,Leave Alone
+IA,Iowa,state network & regional aggregation,Special case,Target
+ID,Idaho,aggregated procurement/master contracts,District-procured,"Target
+Re-engage"
+IL,Illinois,state network or state ISP,District-procured,Engaged
+IN,Indiana,aggregated procurement/master contracts,District-procured,Engaged
+KS,Kansas,state network or state ISP,District-procured,Engaged
+KY,Kentucky,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+LA,Louisiana,districts on their own,District-procured,Engaged
+MA,Massachusetts,districts on their own,District-procured,Engaged
+MD,Maryland,state network or state ISP,District-procured,Engaged
+ME,Maine,state network or state ISP,State procures all,Leave Alone
+MI,Michigan,state network & regional aggregation,Regional procurement,"Target
+Re-engage"
+MN,Minnesota,regional aggregation (existing or planned),Regional procurement,Engaged
+MO,Missouri,state network or state ISP,"State procures IA, District procures WAN",Engaged
+MS,Mississippi,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+MT,Montana,districts on their own,District-procured,Engaged
+NC,North Carolina,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+ND,North Dakota,state network or state ISP,State procures all,Leave Alone
+NE,Nebraska,state network or state ISP,"State procures IA, District procures WAN",Target
+NH,New Hampshire,districts on their own,District-procured,Engaged
+NJ,New Jersey,aggregated procurement/master contracts,District-procured,Engaged
+NM,New Mexico,regional aggregation (existing or planned),District-procured,Engaged
+NV,Nevada,districts on their own,District-procured,Engaged
+NY,New York,regional aggregation (existing or planned),Regional procurement,"Mini Engaged
+State Agency
+Direct to District"
+OH,Ohio,state network or state ISP,Regional procurement,Engaged
+OK,Oklahoma,state network or state ISP,District-procured,Engaged
+OR,Oregon,regional aggregation (existing or planned),Regional procurement,"Mini Engaged
+State Agency
+Direct to District"
+PA,Pennsylvania,regional aggregation (existing or planned),Regional procurement,Target
+RI,Rhode Island,state network or state ISP,Special case,Leave Alone
+SC,South Carolina,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+SD,South Dakota,state network or state ISP,"State procures IA, District procures WAN",Target
+TN,Tennessee,aggregated procurement/master contracts,District-procured,Leave Alone
+TX,Texas,regional aggregation (existing or planned),Regional procurement,Engaged
+UT,Utah,state network or state ISP,Special case,Leave Alone
+VA,Virginia,aggregated procurement/master contracts,District-procured,Engaged
+VT,Vermont,aggregated procurement/master contracts,District-procured,Target
+WA,Washington,state network or state ISP,"State procures IA, District procures WAN",Engaged
+WI,Wisconsin,state network or state ISP,"State procures IA, District procures WAN",Engaged
+WV,West Virginia,state network or state ISP,"State procures IA, District procures WAN",Leave Alone
+WY,Wyoming,state network or state ISP,State procures all,Engaged
