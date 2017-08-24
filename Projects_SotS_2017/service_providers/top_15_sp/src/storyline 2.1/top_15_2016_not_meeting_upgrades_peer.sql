@@ -10,8 +10,21 @@ and service_provider_assignment in
 ),
 
 districts_2017 as (
-  select *
-  from public.fy2017_districts_deluxe_matr
+  select *,
+  case
+    when district_size = 'Tiny'
+      then 5
+    when district_size = 'Small'
+      then 4
+    when district_size = 'Medium'
+      then 3
+    when district_size = 'Large'
+      then 2
+    when district_size = 'Mega'
+      then 1
+  end as district_size_number,
+  left(ulocal,1)::int as locale_number
+  from fy2017_districts_deluxe_matr
   where include_in_universe_of_districts
   and district_type = 'Traditional'
 ), 
@@ -41,6 +54,7 @@ scalable_ia_temp as (
   and inclusion_status = 'clean_with_cost'
   and connect_category in ('Lit Fiber')
   and purpose in ('Internet', 'Upstream')
+  and line_item_id not in ('739869', '806826', '812008', '863608')
   ),
 
 districts_peer as (
@@ -53,8 +67,21 @@ districts_peer as (
   join districts_2017 dd
 on nm16.esh_id=dd.esh_id
   join scalable_ia_temp
---in the same state
-  on dd.postal_cd = scalable_ia_temp.recipient_postal_cd
+--in the same state unless mega
+  on  case
+        when dd.district_size = 'Mega'
+          then true
+        else dd.postal_cd = scalable_ia_temp.recipient_postal_cd
+      end
+  and dd.district_size_number in (
+    scalable_ia_temp.district_size_number-1,
+    scalable_ia_temp.district_size_number, 
+    scalable_ia_temp.district_size_number+1)
+  and dd.locale_number in (
+    scalable_ia_temp.locale_number-1,
+    scalable_ia_temp.locale_number, 
+    scalable_ia_temp.locale_number+1)
+ where dd.exclude_from_ia_analysis= false
 group by 1
   )
 
