@@ -73,7 +73,7 @@ scalable_ia_temp as (
   where recipient_include_in_universe_of_districts = TRUE
   and recipient_exclude_from_ia_analysis = FALSE
   and inclusion_status = 'clean_with_cost'
-  and connect_category in ('Lit Fiber', 'Dark Fiber')
+  and connect_category = 'Lit Fiber'
   and purpose in ('Internet', 'Upstream')
   and line_item_id not in ('739869', '806826', '812008', '863608')),
 
