@@ -21,10 +21,17 @@ actual.date <- gsub(":", ".", actual.date)
 ## READ DATA
 
 ## Snapshots
-live_ss <- read.csv("data/processed/snapshots_raw.csv", as.is=T, header=T, stringsAsFactors=F)
+#live_ss <- read.csv("data/processed/snapshots_raw.csv", as.is=T, header=T, stringsAsFactors=F)
+live_ss <- read.csv("data/processed/2017_snapshots_2017-08-09_15.00.33.csv", as.is=T, header=T, stringsAsFactors=F)
 friday_ss <- read.csv("data/processed/snapshots_raw_live.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ##**************************************************************************************************************************************************
+
+friday_ss <- friday_ss[which(friday_ss$postal_cd %in% live_ss$postal_cd),]
+friday_ss <- friday_ss[,which(names(friday_ss) %in% names(live_ss))]
+
+live_ss <- live_ss[which(live_ss$postal_cd %in% friday_ss$postal_cd),]
+live_ss <- live_ss[,which(names(live_ss) %in% names(friday_ss))]
 
 ## for the numeric columns, calculate the differences
 nums <- sapply(live_ss, is.numeric)
