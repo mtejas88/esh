@@ -80,12 +80,12 @@ d2016=data %>% filter(year=="2016")
 d2017=data %>% filter(year=="2017")
 
 p=ggplot(NULL,aes(x=percentile,y=ia_bandwidth_per_student_kbps)) + 
-geom_bar(aes(fill = "2015"),data=d2015,stat = "identity", alpha=.5) +
-geom_bar(aes(fill = "2016"),data=d2016,stat = "identity", alpha=.3) +
-geom_bar(aes(fill = "2017"),data=d2017,stat = "identity", alpha=.15) + 
+geom_bar(aes(fill = "2017"),data=d2017,stat = "identity") + 
+geom_bar(aes(fill = "2016"),data=d2016,stat = "identity") +
+geom_bar(aes(fill = "2015"),data=d2015,stat = "identity") +
 xlab("Percentile") + ylab("Bandwidth per Student (kbps)") +
 ggtitle("Bandwidth per Student (kbps) Distribution") +
-scale_fill_manual("Year",values =c("#d19328", "#fdb913","#fcd56a")) +
+scale_fill_manual("Year",values =c("#fbe9bc", "#fdb913","#d19328")) +
 scale_y_continuous(breaks=c(100,500, 1000,2000,4000,6000))+
 theme_bw()
 
