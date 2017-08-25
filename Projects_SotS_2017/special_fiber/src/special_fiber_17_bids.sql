@@ -846,7 +846,18 @@ temp as (
   
     select 
     dd.esh_id,
-    sum(frns.num_bids_received::numeric) as num_bids_received
+    sum(frns.num_bids_received::numeric) as num_bids_received,
+    sum(case
+          when frns.num_bids_received::numeric = 0 or frns.num_bids_received is null
+            then 1
+          else 0
+        end) as num_fiber_470_frns_with_0_bids,
+    case
+      when sum(frns.num_bids_received::numeric) = 0
+        or sum(frns.num_bids_received::numeric) is null
+        then 1
+      else 0
+    end as district_received_0_bids
     from fy2017.form470s 
     left join fy2017.frns 
     on form470s."470 Number" = frns.establishing_fcc_form470::int
@@ -871,17 +882,15 @@ temp as (
     group by 1
 )
 
-select count(case when num_bids_received = 0 or num_bids_received is null then temp.esh_id end) as districts_0_bids,
+select count(case when district_received_0_bids = 1 then temp.esh_id end) as districts_0_bids,
   count(temp.esh_id) as total_districts,
-  count(case when num_bids_received > 0 and num_bids_received is not null then temp.esh_id end) as districts_more_than_0_bids,
+  count(case when district_received_0_bids = 0 then temp.esh_id end) as districts_more_than_0_bids,
   count(case 
-        when num_bids_received > 0 
-          and num_bids_received is not null 
+        when district_received_0_bids = 0
           and spek_c.esh_id is not null
           then temp.esh_id end) as spek_c_districts_more_than_0_bids,
   count(case 
-        when (num_bids_received = 0 
-          or num_bids_received is null )
+        when district_received_0_bids = 1
           and spek_c.esh_id is null
           then temp.esh_id end) as not_spek_c_districts_0_bids,
   count(case when spek_c.esh_id is null then temp.esh_id end) as total_districts_no_spik_c_req
