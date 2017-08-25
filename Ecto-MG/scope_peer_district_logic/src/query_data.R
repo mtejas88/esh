@@ -61,6 +61,7 @@ cck12_peer <- querydb("src/fy2017_fiber_ia_suggested_districts_v01.sql")
 
 ## Current SAT peer district logic
 #sat_peer <- querydb("src/fy2017_bandwidth_suggested_districts_sat.sql")
+dta <- querydb("~/Documents/ESH-Code/ecto/db_ecto/material_girl/endpoint/fy2017/fy2017_cck12_district_summary_v07.sql")
 
 ## disconnect from database
 dbDisconnect(con)
