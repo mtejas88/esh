@@ -7,16 +7,16 @@ load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
 
-districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
+districts = read_csv(GITHUB+'/Projects/funding_the_gap/data/interim/districts.csv')
 print("Districts imported")
-state_extrapolations = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_extrapolations.csv')
+state_extrapolations = read_csv(GITHUB+'/Projects/funding_the_gap/data/interim/state_extrapolations.csv')
 print("State Extrapolations imported")
 
 
 ##WAN COST
 
 #import campus build costs
-campus_build_costs = read_csv(GITHUB+'/Projects_SotS_2017/fiber/funding_the_gap_2017/data/interim/campus_build_costs.csv')
+campus_build_costs = read_csv(GITHUB+'/Projects_SotS_2017/fiber/funding_the_gap_2017/data/interim/campus_build_costs_16.csv')
 print("Campus costs imported")
 
 #determine state cost amounts
@@ -47,7 +47,7 @@ print("Campus costs extrapolated")
 ##IA COST
 
 #import district build costs
-district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv')
+district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap/data/interim/district_build_costs.csv')
 print("District costs imported")
 
 #determine cost amounts
@@ -83,7 +83,7 @@ state_metrics['extrapolated_total_district_funding_ia'] = 	state_metrics['extrap
 print("District costs extrapolated")
 
 ##add IA and WAN costs
-#have to multiply all values by 61%. this is the value we had to multiply this methodology by to match the 2016 total cost from the 2016 report. see \GitHub\ficher\Projects_SotS_2017\fiber\funding_the_gap_2017\qa\state_aggregator_medians_2016
+#have to multiply all values by 61%. this is the value we had to multiply this methodology by to match the total cost from the 2016 report.
 state_metrics['extrapolated_total_cost'] = (state_metrics['extrapolated_total_cost_ia'] + state_metrics['extrapolated_total_cost_median_wan']) * .606
 state_metrics['extrapolated_discount_erate_funding'] = (state_metrics['extrapolated_discount_erate_funding_ia'] + state_metrics['extrapolated_discount_erate_funding_median_wan']) * .606
 state_metrics['extrapolated_total_state_funding'] = (state_metrics['extrapolated_total_state_funding_ia'] + state_metrics['extrapolated_total_state_funding_median_wan']) * .606
@@ -92,8 +92,9 @@ state_metrics['extrapolated_total_district_funding'] = 	(state_metrics['extrapol
 
 state_metrics = state_metrics[[	'district_postal_cd', 'extrapolated_total_cost', 'extrapolated_discount_erate_funding', 'extrapolated_total_state_funding', 'extrapolated_total_erate_funding', 'extrapolated_total_district_funding']]
 
+state_metrics  = state_metrics
 
-state_metrics.to_csv(GITHUB+'/Projects_SotS_2017/fiber/funding_the_gap_2017/data/processed/state_metrics.csv')
+state_metrics.to_csv(GITHUB+'/Projects_SotS_2017/fiber/funding_the_gap_2017/data/processed/state_metrics_2016.csv')
 print("File saved")
 
 
