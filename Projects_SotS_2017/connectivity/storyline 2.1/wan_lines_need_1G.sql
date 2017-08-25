@@ -12,7 +12,7 @@ group by 1,2,3,4,5,6,7
 school_campus_summary as (
 
 select *,
-row_number() over (partition by esh_id order by num_students desc) as rank
+row_number() over (partition by esh_id order by num_students desc) as r
 from district_school_lookup
 
 order by  esh_id asc,
@@ -26,7 +26,7 @@ s.recipient_id,
 s.bandwidth_in_mbps,
 s.quantity_of_line_items_received_by_district,
 generate_series(1, quantity_of_line_items_received_by_district) AS c_id,
-row_number() over (partition by s.recipient_id order by s.bandwidth_in_mbps desc) as rank
+row_number() over (partition by s.recipient_id order by s.bandwidth_in_mbps desc) as r
 
 from public.fy2017_services_received_matr s
 
@@ -46,6 +46,20 @@ group by  c_id,
           
 ),
 
+to_exclude as(
+select * from (
+select s.esh_id, 
+max(s.r) as s_rank,
+max(w.r) as w_rank
+
+from school_campus_summary s
+
+join wan_lookup w
+on s.esh_id = w.recipient_id
+group by 1
+having max(w.r) - max(s.r) > 4
+) t
+),
 
 final_table as(
 select s.*,
@@ -58,14 +72,15 @@ from school_campus_summary s
 
 left join wan_lookup w
 on s.esh_id = w.recipient_id
-and s.rank = w.rank
+and s.r = w.r
 
 where s.num_students::integer > 0
 and w.recipient_id is not null
-and s.rank - w.rank <=4
+and s.esh_id not in (select esh_id from to_exclude)
 )
 
 select meeting_2014_goal_no_oversub, count(campus_id) as num_campuses,
 count(case when bandwidth_in_mbps < 1000 and num_students > 100 then campus_id end) as campuses_need_1G
 from final_table
 group by 1
+
