@@ -159,15 +159,46 @@ sum(combine$num_campuses)
 
 ## subset to the districts
 fiber_470 <- targets[which(targets$fiber_470 == TRUE),]
-#fiber_470 <- fiber_470[,c('esh_id', 'num_campuses', 'engagement_status', 'postal_cd', 'predom_procurement_cat')]
-#fiber_470 <- unique(fiber_470)
+#fiber_470_sub <- fiber_470[,c('esh_id', 'num_campuses', 'engagement_status', 'postal_cd', 'predom_procurement_cat')]
+#fiber_470_sub <- unique(fiber_470_sub)
 #table(fiber_470$postal_cd)
 
 ## Engagement Status
 ## create indicator for engaged states
 targets$engaged <- ifelse(targets$engagement_status == 'Engaged', TRUE, FALSE)
-## no pattern
-table(targets$engaged, targets$fiber_470)
+## subset to unique 
+sub <- targets[,c('esh_id', 'num_campuses', 'engaged', 'fiber_470')]
+sub <- unique(sub)
+## subset to only engaged states
+sub.eng <- sub[which(sub$engaged == TRUE),]
+table(sub.eng$fiber_470)
+## 51% of districts in engaged states filed a fiber 470
+nrow(sub.eng[which(sub.eng$fiber_470 == TRUE),]) / length(unique(sub.eng$esh_id))
+## compared to 49% of districts overall
+nrow(sub[which(sub$fiber_470 == TRUE),]) / length(unique(sub$esh_id))
+## 64% of campuses in engaged states filed a fiber 470
+sum(sub.eng$num_campuses[which(sub.eng$fiber_470 == TRUE)]) / sum(sub.eng$num_campuses)
+## compared to 59% of campuses overall
+sum(sub$num_campuses[which(sub$fiber_470 == TRUE)]) / sum(sub$num_campuses)
+
+## States that have a fiber match program: CA, NY, NM, MA, ID, VA, TX, OK, AZ, MT, NV
+## create indicator for match states
+targets$match <- ifelse(targets$postal_cd %in% c('CA', 'NY', 'NM', 'MA', 'ID', 'VA', 'TX', 'OK', 'AZ', 'MT', 'NV'), TRUE, FALSE)
+## subset to unique
+sub <- targets[,c('esh_id', 'num_campuses', 'match', 'fiber_470')]
+sub <- unique(sub)
+## subset to only match states
+sub.match <- sub[which(sub$match == TRUE),]
+table(sub.match$fiber_470)
+## 51% of districts in states with match programs filed a fiber 470
+nrow(sub.match[which(sub.match$fiber_470 == TRUE),]) / length(unique(sub.match$esh_id))
+## compared to 49% of districts overall
+nrow(sub[which(sub$fiber_470 == TRUE),]) / length(unique(sub$esh_id))
+## 64% of campuses in states with a match program filed a fiber 470
+sum(sub.match$num_campuses[which(sub.match$fiber_470 == TRUE)]) / sum(sub.match$num_campuses)
+## compared to 59% of campuses overall
+sum(sub$num_campuses[which(sub$fiber_470 == TRUE)]) / sum(sub$num_campuses)
+
 
 ## State Pattern
 ## aggregate by state
@@ -179,7 +210,7 @@ agg.states.filed <- aggregate(targets$counter, by=list(targets$postal_cd), FUN=s
 names(agg.states.filed) <- c('postal_cd', 'filed_fiber_470')
 ## merge
 agg.states <- merge(agg.states, agg.states.filed, by='postal_cd', all.x=T)
-agg.states$filed_fiber_470_perc <- agg.states$filed_fiber_470 / agg.states$total
+agg.states$filed_fiber_470_perc <- round((agg.states$filed_fiber_470 / agg.states$total)*100, 0)
 ## order by decreasing percentage
 agg.states <- agg.states[order(agg.states$filed_fiber_470_perc, decreasing=T),]
 
@@ -242,7 +273,9 @@ agg.states <- agg.states[order(agg.states$filed_zero_bids_perc, decreasing=T),]
 ## Procurement Pattern
 table(bids.districts$predom_procurement_cat, bids.districts$zero_bids)
 
-
-
 #targets$qa_filed_fiber <- ifelse(targets$esh_id %in% qa$esh_id, TRUE, FALSE)
 
+##**************************************************************************************************************************************************
+## write out data
+
+write.csv(agg.states, "data/raw/aggregate_states.csv", row.names=F)
