@@ -91,3 +91,51 @@ theme_bw()
 
 p
 
+##********************************************************************************
+## RATES OF CHANGE
+##********************************************************************************
+
+##merge d2015 and d2016 on percentile, compute YOY % change
+merged=merge(d2015,d2016,by=c("percentile"), all.x=TRUE)
+todrop=c("year.x","year.y")
+merged=merged %>% select(-one_of(todrop)) %>%
+  mutate(pct_change=(ia_bandwidth_per_student_kbps.y - ia_bandwidth_per_student_kbps.x)/(ia_bandwidth_per_student_kbps.x))
+names(merged) = c('percentile','ia_bandwidth_per_student_kbps.2015','ia_bandwidth_per_student_kbps.2016','pct_change.2016')
+
+##merge in d2017 on percentile, compute YOY % change
+merged=merge(merged,d2017,by=c("percentile"), all.x=TRUE)
+todrop=c("year")
+merged=merged %>% select(-one_of(todrop)) %>%
+  mutate(pct_change.2017=(ia_bandwidth_per_student_kbps - ia_bandwidth_per_student_kbps.2016)/(ia_bandwidth_per_student_kbps.2016))
+
+##compute average rate of change for each quartile for each year (2016 and 2017)
+merged$quartile <- ifelse(merged$percentile<=25, '0-25th', 
+                          ifelse(((merged$percentile> 25) & (merged$percentile<= 50)), '25-50th',
+                                 ifelse(((merged$percentile> 50) & (merged$percentile<= 75)), '50-75th','75-98th')))
+
+grouped_16 = merged %>% group_by(quartile) %>% 
+  summarise(count=n(),avg_pct_change=mean(pct_change.2016)) %>%
+  mutate(Year="2016")
+grouped_17 = merged %>% group_by(quartile) %>% 
+  summarise(count=n(),avg_pct_change=mean(pct_change.2017)) %>%
+  mutate(Year="2017")
+grouped_all=rbind(grouped_16,grouped_17)
+
+##plot on line chart
+q=ggplot(data=grouped_all,aes(x=quartile,y=avg_pct_change,color=Year, group=Year)) +
+  geom_line() + 
+  geom_point(size=4) + 
+  xlab("BW per Student Percentiles") + ylab("Average YOY% Change in BW per Student") +
+  ggtitle("Rate of Change in BW per Student") +
+  scale_color_manual("Year",values =c("#fcd56a","#d19328")) +
+  scale_y_continuous(breaks=c(.1,.15, .2,.25,.3,.35),labels=scales::percent)+
+  geom_text(aes(y=avg_pct_change, label = paste0(round(avg_pct_change*100,0), '%')),    # prettify
+            hjust = 0, nudge_x = 0.05, 
+            size = 3.5) +
+  theme_bw()
+
+q
+
+
+
+
