@@ -36,18 +36,18 @@ source_env <- function(path){
     assign("password", Sys.getenv("PASSWORD"), envir=.GlobalEnv)
   }
   
-  ## ML Mass Update
+  ## TEMP DB (FOR QA)
   ## assign url for DB if available
-  if (Sys.getenv("URL_ML_Mass_Update") != ""){
-    assign("url_ml_mass_update", Sys.getenv("URL_ML_Mass_Update"), envir=.GlobalEnv)
+  if (Sys.getenv("URL_TEMP") != ""){
+    assign("url_temp", Sys.getenv("URL_TEMP"), envir=.GlobalEnv)
   }
   ## assign username for DB if available
-  if (Sys.getenv("USER_ML_Mass_Update") != ""){
-    assign("user_ml_mass_update", Sys.getenv("USER_ML_Mass_Update"), envir=.GlobalEnv)
+  if (Sys.getenv("USER_TEMP") != ""){
+    assign("user_temp", Sys.getenv("USER_TEMP"), envir=.GlobalEnv)
   }
   ## assign password for DB if available
-  if (Sys.getenv("PASSWORD_ML_Mass_Update") != ""){
-    assign("password_ml_mass_update", Sys.getenv("PASSWORD_ML_Mass_Update"), envir=.GlobalEnv)
+  if (Sys.getenv("PASSWORD_TEMP") != ""){
+    assign("password_temp", Sys.getenv("PASSWORD_TEMP"), envir=.GlobalEnv)
   }
   
   ## PRISTINE 2016
