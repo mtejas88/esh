@@ -38,7 +38,7 @@ select  2017 as funding_year,
             then 'c2'
           else 'broadband'
         end as category,
-        sum(funding_commitment_request::numeric)/1000000000 as funding_commitment_request
+        sum(funding_commitment_request::numeric)/1000000000 as funding_commitment_request_$B
 from fy2017.frns
 group by 1, 2
 order by funding_year, category
