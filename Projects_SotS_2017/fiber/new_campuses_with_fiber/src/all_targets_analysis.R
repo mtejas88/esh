@@ -105,23 +105,62 @@ targets$fiber_470 <- ifelse(targets$esh_id %in% dd_2017$esh_id[dd_2017$fiber_tar
                                                                  dd_2017$district_type == "Traditional" &
                                                                  dd_2017$exclude_from_ia_analysis == FALSE], TRUE, targets$fiber_470)
 
+## total districts: 1,228
+length(unique(targets$esh_id))
+## total campuses: 4,098
+targets.sub <- targets[,c('esh_id', 'num_campuses')]
+targets.sub <- unique(targets.sub)
+sum(targets.sub$num_campuses)
+
+## count how many districts in each bucket
+## filed their own Form 470:
+sub <- targets[which(targets$ben %in% dta_470$BEN),]
+## 329 districts, 27%
+length(unique(sub$esh_id))
+sub2 <- sub[,c('esh_id', 'num_campuses')]
+sub2 <- unique(sub2)
+## 1,503 campuses, 37%
+sum(sub2$num_campuses)
+
+## consortia filed their Form 470:
+sub3 <- targets[which(targets$esh_id %in% districts_fiber),]
+sub3 <- sub3[which(!sub3$esh_id %in% sub$esh_id),]
+## 155 districts, 13%
+length(unique(sub3$esh_id))
+sub4 <- sub3[,c('esh_id', 'num_campuses')]
+sub4 <- unique(sub4)
+## 501 campuses, 12%
+sum(sub4$num_campuses)
+
+## assumed they filed their Form 470:
+sub5 <- targets[which(targets$esh_id %in% dd_2017$esh_id[dd_2017$fiber_target_status == 'Not Target' &
+                                                         dd_2017$include_in_universe_of_districts == TRUE &
+                                                         dd_2017$district_type == "Traditional" &
+                                                         dd_2017$exclude_from_ia_analysis == FALSE]),]
+sub5 <- sub5[which(!sub5$esh_id %in% c(sub3$esh_id, sub$esh_id)),]
+## 121 districts, 10%
+length(unique(sub5$esh_id))
+sub6 <- sub5[,c('esh_id', 'num_campuses')]
+sub6 <- unique(sub6)
+## 406 campuses, 10%
+sum(sub6$num_campuses)
 
 ## 605/1228 (49%) Districts requested Fiber 470
-## only take the unique esh_ids (due to multiple BENs to a District)
-length(unique(targets$esh_id[targets$fiber_470 == TRUE]))
-length(unique(targets$esh_id))
-length(unique(targets$esh_id[targets$fiber_470 == TRUE])) / length(unique(targets$esh_id))
+combine <- rbind(sub, sub3, sub5)
+length(unique(combine$esh_id))
 
-## 2,321/3,940 (59%) Campuses requested Fiber 470
-## only take the unique esh_ids (due to multiple BENs to a District)
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id[targets$fiber_470 == TRUE])])
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id)])
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id[targets$fiber_470 == TRUE])]) /
-  sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(targets$esh_id)])
+## 2,410/4,098 (59%) Campuses requested Fiber 470
+combine <- combine[,c('esh_id', 'num_campuses')]
+combine <- unique(combine)
+sum(combine$num_campuses)
 
+##**************************************************************************************************************************************************
+## investigate patterns
 
 ## subset to the districts
 fiber_470 <- targets[which(targets$fiber_470 == TRUE),]
+#fiber_470 <- fiber_470[,c('esh_id', 'num_campuses', 'engagement_status', 'postal_cd', 'predom_procurement_cat')]
+#fiber_470 <- unique(fiber_470)
 #table(fiber_470$postal_cd)
 
 ## Engagement Status
@@ -158,8 +197,6 @@ bids_sub <- dta_470[which(dta_470$BEN %in% fiber_470$ben),]
 ## there may be different num_bids_received for the same Form 470
 agg.470s.ben <- aggregate(bids_sub$num_bids_received, by=list(bids_sub$BEN), FUN=sum, na.rm=T)
 names(agg.470s.ben) <- c('BEN', 'num_bids_received')
-## replace NAs with 0
-#agg.470s.ben$num_bids_received[is.na(agg.470s.ben$num_bids_received)] <- 0
 ## take out NAs
 agg.470s.ben <- agg.470s.ben[!is.na(agg.470s.ben$num_bids_received),]
 
@@ -169,18 +206,17 @@ bids.districts <- targets[which(targets$ben %in% agg.470s.ben$BEN),]
 bids.districts$zero_bids <- ifelse(bids.districts$ben %in% agg.470s.ben$BEN[agg.470s.ben$num_bids_received == 0], TRUE, FALSE)
 
 ## 36/329 11% of districts received 0 bids
-length(unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE]))
+length(unique(bids.districts$esh_id[which(bids.districts$zero_bids == TRUE)]))
 length(unique(bids.districts$esh_id))
-length(unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])) / length(unique(bids.districts$esh_id))
+length(unique(bids.districts$esh_id[which(bids.districts$zero_bids == TRUE)])) / length(unique(bids.districts$esh_id))
 ## No Rural Pattern
 table(bids.districts$locale)
 table(bids.districts$locale[bids.districts$zero_bids == TRUE])
 
-## 99/1,449 7% of campuses received 0 bids
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])])
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id)])
-sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id[bids.districts$zero_bids == TRUE])]) /
-  sum(dd_2017$num_campuses[dd_2017$esh_id %in% unique(bids.districts$esh_id)])
+## 106/1,503 7% of campuses received 0 bids
+sum(bids.districts$num_campuses[which(bids.districts$zero_bids == TRUE)])
+sum(bids.districts$num_campuses)
+sum(bids.districts$num_campuses[which(bids.districts$zero_bids == TRUE)]) / sum(bids.districts$num_campuses)
 
 
 ## Engagement Status
