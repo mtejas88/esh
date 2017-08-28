@@ -5,44 +5,44 @@ with frns_17 as (
   frn.frn_status,
   frn.fiber_sub_type,
   fli.line_item
-  
+
   from fy2017.frns frn
-  
+
   left join fy2017.frn_line_items fli
   on frn.frn = fli.frn
-  
+
   where frn.frn not in (
     select frn
     from fy2017.current_frns
   )
   and frn_status not in ('Cancelled', 'Denied')
-  
+
   union
-  
+
   select frn.application_number,
   frn.frn,
   frn.frn_status,
   frn.fiber_sub_type,
   fli.line_item
-  
+
   from fy2017.current_frns frn
-  
+
   left join fy2017.current_frn_line_items fli
   on frn.frn = fli.frn
-  
+
   where frn.frn_status not in ('Cancelled', 'Denied')
 
 ),
 
 providers_2017 as (
-  select 
-    recipient_id, 
+  select
+    recipient_id,
     array_agg(distinct case
                         when fiber_sub_type = 'Special Construction'
-                        or 'special_construction' = any(open_flags) 
+                        or 'special_construction' = any(open_flags)
                         OR 'special_construction_tag' = any(open_tags)
                           then reporting_name
-                        end) as spec_k_provider_2017, 
+                        end) as spec_k_provider_2017,
     array_agg(distinct case
                         when inclusion_status != 'dqs_excluded'
                           then reporting_name
@@ -52,8 +52,8 @@ providers_2017 as (
     from frns_17 frns
     full outer join (
       select *
-      from public.fy2017_esh_line_items_v 
-    ) li 
+      from public.fy2017_esh_line_items_v
+    ) li
     on frns.frn = li.frn
     full outer join public.fy2017_services_received_matr sr
     on li.id = sr.line_item_id
@@ -63,8 +63,8 @@ providers_2017 as (
 ),
 
 providers_2016 as (
-  select 
-    recipient_id, 
+  select
+    recipient_id,
     array_agg(distinct reporting_name) as provider_2016
   from (
     select *
@@ -89,7 +89,7 @@ dist_2016 as (
 dist_2017 as (
   select dd.*,
     current_assumed_unscalable_campuses + current_known_unscalable_campuses as unscalable_campuses,
-    array_to_string(providers_2017.spec_k_provider_2017,';') != '' 
+    array_to_string(providers_2017.spec_k_provider_2017,';') != ''
     and providers_2017.spec_k_provider_2017 is not null as spec_k_2017,
     providers_2017.spec_k_provider_2017,
     providers_2017.provider_2017
@@ -103,6 +103,8 @@ dist_2017 as (
 comparison as (
   select
     dist_2017.esh_id,
+    dist_2017.name,
+    dist_2017.postal_cd,
     dist_2017.locale,
     dist_2017.exclude_from_ia_analysis as exclude_from_ia_analysis_2017,
     dist_2016.exclude_from_ia_analysis as exclude_from_ia_analysis_2016,
@@ -121,22 +123,22 @@ comparison as (
     case
       when dist_2017.meeting_2014_goal_no_oversub is null
         then false
-      else dist_2017.meeting_2014_goal_no_oversub 
-    end as meeting_2014_goal_no_oversub_2017, 
+      else dist_2017.meeting_2014_goal_no_oversub
+    end as meeting_2014_goal_no_oversub_2017,
     dist_2017.ia_monthly_cost_total + dist_2017.wan_monthly_cost_total as monthly_cost_total_2017,
     dist_2016.ia_monthly_cost_total + dist_2016.wan_monthly_cost_total as monthly_cost_total_2016,
     dist_2017.unscalable_campuses,
     case
-      when dist_2017.unscalable_campuses is null 
+      when dist_2017.unscalable_campuses is null
         then dist_2016.unscalable_campuses
-      when dist_2016.unscalable_campuses is null 
+      when dist_2016.unscalable_campuses is null
         then -dist_2017.unscalable_campuses
       else dist_2016.unscalable_campuses - dist_2017.unscalable_campuses
-    end as lost_unscalable_campuses,  
+    end as lost_unscalable_campuses,
     case
-      when dist_2017.num_campuses is null 
+      when dist_2017.num_campuses is null
         then dist_2016.num_campuses
-      when dist_2016.num_campuses is null or dist_2016.num_campuses - dist_2017.num_campuses < 0 
+      when dist_2016.num_campuses is null or dist_2016.num_campuses - dist_2017.num_campuses < 0
         then 0
       else dist_2016.num_campuses - dist_2017.num_campuses
     end as lost_campuses
@@ -147,8 +149,8 @@ comparison as (
 
 extrapolated_unscalable_campuses as (
 	select sum(	case
-      					when exclude_from_ia_analysis_2017= false 
-                and exclude_from_ia_analysis_2016= false 
+      					when exclude_from_ia_analysis_2017= false
+                and exclude_from_ia_analysis_2016= false
                 and fiber_target_status_2016 = 'Target'
                 and fiber_target_status_2017 = 'Not Target'
       						then  case
@@ -160,8 +162,8 @@ extrapolated_unscalable_campuses as (
                         end
       					else 0
       				end)/1674 as extrapolate_pct
---note: frozen sots 2016 unscalable - frozen sots 2017 unscalable 
---=3723-2049 = 1674 
+--note: frozen sots 2016 unscalable - frozen sots 2017 unscalable
+--=3723-2049 = 1674
 	from comparison
 ),
 
@@ -180,8 +182,8 @@ districts_categorized as (
     else not(provider_2017 = provider_2016)
   end overall_switcher
   from comparison
-  where exclude_from_ia_analysis_2017= false 
-  and exclude_from_ia_analysis_2016= false 
+  where exclude_from_ia_analysis_2017= false
+  and exclude_from_ia_analysis_2016= false
   and fiber_target_status_2016 = 'Target'
   and fiber_target_status_2017 = 'Not Target'
 )
@@ -210,6 +212,6 @@ select
         else 0
       end)/extrapolate_pct as new_fiber_campuses_same_sp_extrap
 from districts_categorized
-join extrapolated_unscalable_campuses 
+join extrapolated_unscalable_campuses
 on true
 group by 1, extrapolate_pct
