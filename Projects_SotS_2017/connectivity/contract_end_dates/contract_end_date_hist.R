@@ -34,17 +34,3 @@ p.contract + geom_histogram(binwidth=1, fill="#009296")+
                  y= ..prop.. ), stat= "count", vjust = -.5)+
   ggtitle("Districts not meeting goals")+ 
   theme(plot.title = element_text(size = 30, face = "bold"))
-
-#create new categories
-districts_not_meeting_goals$within_2020 <- ifelse(districts_not_meeting_goals$contract_end_time <= 3, 1, 2)
-
-##histogram of contract end time
-p.contract.2 <- ggplot(districts_not_meeting_goals, aes(within_2020))
-p.contract.2 + geom_histogram(binwidth=.5, fill="#009296")+
-  ylab("Number of districts")+
-  xlab("Contract expiring within 2020")+
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7))+ 
-  geom_text(aes( label = scales::percent(..prop..),
-                 y= ..prop.. ), stat= "count", vjust = -.5)+
-  ggtitle("Districts not meeting goals")+ 
-  theme(plot.title = element_text(size = 30, face = "bold"))
