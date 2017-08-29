@@ -12,7 +12,8 @@ setwd("~/Documents/ESH-Code/ficher/Ecto-MG/ecto-103_resolve_ficher_mg/")
 ##**************************************************************************************************************************************************
 ## read data
 
-dd_2017 <- read.csv("data/raw/2017_deluxe_districts_2017-08-25_15.00.04.csv", as.is=T, header=T)
+#dd_2017 <- read.csv("data/raw/2017_deluxe_districts_2017-08-25_15.00.04.csv", as.is=T, header=T)
+dd_2017 <- read.csv("data/raw/2017_deluxe_districts_ficher.csv", as.is=T, header=T)
 dd_2017_end <- read.csv("data/raw/2017_deluxe_districts_endpoint.csv", as.is=T, header=T)
 
 ##**************************************************************************************************************************************************
