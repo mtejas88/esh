@@ -201,18 +201,40 @@ sum(sub$num_campuses[which(sub$fiber_470 == TRUE)]) / sum(sub$num_campuses)
 
 
 ## State Pattern
+## subset to unique
+sub <- targets[,c('esh_id', 'num_campuses', 'postal_cd', 'fiber_470')]
+sub <- unique(sub)
 ## aggregate by state
-targets$counter <- 1
-agg.states <- aggregate(targets$counter, by=list(targets$postal_cd), FUN=sum)
-names(agg.states) <- c('postal_cd', 'total')
-targets$counter <- ifelse(targets$fiber_470 == TRUE, 1, 0)
-agg.states.filed <- aggregate(targets$counter, by=list(targets$postal_cd), FUN=sum)
-names(agg.states.filed) <- c('postal_cd', 'filed_fiber_470')
+sub$counter <- 1
+agg.states <- aggregate(sub$counter, by=list(sub$postal_cd), FUN=sum)
+names(agg.states) <- c('postal_cd', 'total_districts')
+sub$counter <- ifelse(sub$fiber_470 == TRUE, 1, 0)
+agg.states.filed <- aggregate(sub$counter, by=list(sub$postal_cd), FUN=sum)
+names(agg.states.filed) <- c('postal_cd', 'districts_filed_fiber_470')
 ## merge
 agg.states <- merge(agg.states, agg.states.filed, by='postal_cd', all.x=T)
-agg.states$filed_fiber_470_perc <- round((agg.states$filed_fiber_470 / agg.states$total)*100, 0)
+agg.states$districts_filed_fiber_470_perc <- round((agg.states$districts_filed_fiber_470 / agg.states$total_districts)*100, 0)
 ## order by decreasing percentage
-agg.states <- agg.states[order(agg.states$filed_fiber_470_perc, decreasing=T),]
+agg.states <- agg.states[order(agg.states$districts_filed_fiber_470_perc, decreasing=T),]
+
+## campuses
+## aggregate by state
+sub$counter <- 1
+agg.states.c <- aggregate(sub$counter*sub$num_campuses, by=list(sub$postal_cd), FUN=sum)
+names(agg.states.c) <- c('postal_cd', 'total_campuses')
+sub$counter <- ifelse(sub$fiber_470 == TRUE, 1, 0)
+agg.states.filed.c <- aggregate(sub$counter*sub$num_campuses, by=list(sub$postal_cd), FUN=sum)
+names(agg.states.filed.c) <- c('postal_cd', 'campuses_filed_fiber_470')
+## merge
+agg.states.c <- merge(agg.states.c, agg.states.filed.c, by='postal_cd', all.x=T)
+agg.states.c$campuses_filed_fiber_470_perc <- round((agg.states.c$campuses_filed_fiber_470 / agg.states.c$total_campuses)*100, 0)
+
+## merge
+agg.states <- merge(agg.states, agg.states.c, by='postal_cd', all.x=T)
+
+## also create an indicator for engaged and fiber match program:
+agg.states$engaged_state <- ifelse(agg.states$postal_cd %in% unique(targets$postal_cd[targets$engagement_status == 'Engaged']), TRUE, FALSE)
+agg.states$fiber_match <- ifelse(agg.states$postal_cd %in% c('CA', 'NY', 'NM', 'MA', 'ID', 'VA', 'TX', 'OK', 'AZ', 'MT', 'NV'), TRUE, FALSE)
 
 ## Procurement Pattern
 table(targets$predom_procurement_cat, targets$fiber_470)
@@ -253,27 +275,58 @@ sum(bids.districts$num_campuses[which(bids.districts$zero_bids == TRUE)]) / sum(
 ## Engagement Status
 ## create indicator for engaged states
 bids.districts$engaged <- ifelse(bids.districts$engagement_status == 'Engaged', TRUE, FALSE)
-## possible pattern
+## no evidence of a pattern
 table(bids.districts$engaged, bids.districts$zero_bids)
+## subset to only engaged states
+sub.eng <- bids.districts[which(bids.districts$engaged == TRUE),]
+table(sub.eng$zero_bids)
+## 12% of districts in engaged states received 0 bids
+nrow(sub.eng[which(sub.eng$zero_bids == TRUE),]) / length(unique(sub.eng$esh_id))
+## compared to 11% of districts overall
+nrow(bids.districts[which(bids.districts$zero_bids == TRUE),]) / length(unique(bids.districts$esh_id))
+
+## Fiber Match program
+bids.districts$match_program <- ifelse(bids.districts$postal_cd %in% c('CA', 'NY', 'NM', 'MA', 'ID', 'VA', 'TX', 'OK', 'AZ', 'MT', 'NV'), TRUE, FALSE)
+## subset to only match states
+sub.match <- bids.districts[which(bids.districts$match == TRUE),]
+table(sub.match$zero_bids)
+## 9% of districts in states with match programs received 0 bids
+nrow(sub.match[which(sub.match$zero_bids == TRUE),]) / length(unique(sub.match$esh_id))
+## compared to 11% of districts overall
+nrow(bids.districts[which(bids.districts$zero_bids == TRUE),]) / length(unique(bids.districts$esh_id))
 
 ## State Pattern
 ## aggregate by state
-bids.districts$counter <- 1
-agg.states <- aggregate(bids.districts$counter, by=list(bids.districts$postal_cd), FUN=sum)
-names(agg.states) <- c('postal_cd', 'total')
-bids.districts$counter <- ifelse(bids.districts$zero_bids == TRUE, 1, 0)
-agg.states.filed <- aggregate(bids.districts$counter, by=list(bids.districts$postal_cd), FUN=sum)
-names(agg.states.filed) <- c('postal_cd', 'filed_zero_bids')
+#bids.districts$counter <- 1
+#agg.states <- aggregate(bids.districts$counter, by=list(bids.districts$postal_cd), FUN=sum)
+#names(agg.states) <- c('postal_cd', 'total')
+#bids.districts$counter <- ifelse(bids.districts$zero_bids == TRUE, 1, 0)
+#agg.states.filed <- aggregate(bids.districts$counter, by=list(bids.districts$postal_cd), FUN=sum)
+#names(agg.states.filed) <- c('postal_cd', 'filed_zero_bids')
 ## merge
-agg.states <- merge(agg.states, agg.states.filed, by='postal_cd', all.x=T)
-agg.states$filed_zero_bids_perc <- agg.states$filed_zero_bids / agg.states$total
+#agg.states <- merge(agg.states, agg.states.filed, by='postal_cd', all.x=T)
+#agg.states$filed_zero_bids_perc <- round((agg.states$filed_zero_bids / agg.states$total)*100, 0)
 ## order by decreasing percentage
-agg.states <- agg.states[order(agg.states$filed_zero_bids_perc, decreasing=T),]
+#agg.states <- agg.states[order(agg.states$filed_zero_bids_perc, decreasing=T),]
 
 ## Procurement Pattern
 table(bids.districts$predom_procurement_cat, bids.districts$zero_bids)
 
-#targets$qa_filed_fiber <- ifelse(targets$esh_id %in% qa$esh_id, TRUE, FALSE)
+
+## look at the districts that received more than 0 bids: 293 (248 clean)
+sub.bid <- dd_2017[which(dd_2017$esh_id %in% bids.districts$esh_id[bids.districts$zero_bids == FALSE]),]
+## are they still Fiber Targets in 2017?
+## 143 (58%) are still Fiber Targets
+table(sub.bid$fiber_target_status)
+table(sub.bid$discount_rate_c1)
+table(bids.districts$discount_rate_c1)
+
+## 70 (28%) districts still have no fiber
+sub.bid$total_fiber_lines <- sub.bid$fiber_wan_lines + sub.bid$fiber_internet_upstream_lines
+table(sub.bid$total_fiber_lines[sub.bid$exclude_from_ia_analysis == FALSE] == 0)
+
+table(bids.districts$engaged)
+
 
 ##**************************************************************************************************************************************************
 ## write out data
