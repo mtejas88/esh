@@ -325,6 +325,8 @@ table(bids.districts$discount_rate_c1)
 sub.bid$total_fiber_lines <- sub.bid$fiber_wan_lines + sub.bid$fiber_internet_upstream_lines
 table(sub.bid$total_fiber_lines[sub.bid$exclude_from_ia_analysis == FALSE] == 0)
 
+pass.to.dqt <- sub.bid[which(sub.bid$total_fiber_lines == 0 &
+                             sub.bid$exclude_from_ia_analysis == FALSE),]
 table(bids.districts$engaged)
 
 
