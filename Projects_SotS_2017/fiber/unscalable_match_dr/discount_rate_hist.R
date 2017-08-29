@@ -57,18 +57,17 @@ summary_2 <- summary_2 %>% group_by(variable, discount_group)
 summary_2 <- summary_2 %>% summarise(value = sum(value))
 
 summary_2 <- summary_2[order(summary_2$variable, decreasing = T),]
-
+summary_2$variable <- relevel(summary_2$variable, 'match pending')
 
 ##bar chart for discounts -- designers
-p.discounts.2 <- ggplot(summary_2, aes(x=discount_group, y=value, fill=variable)) +
+p.discounts.2 <- ggplot( summary_2, aes(x=discount_group, y=value, fill=variable)) +
   geom_bar(stat="identity")+
-  scale_fill_manual(values = c('#009296','grey') )+
+  scale_fill_manual(values = c('grey','#009296') )+
   ylab("% unscalable campuses with state match")+
   xlab("")+
   ggtitle("Campuses needing fiber with \nstate match by discount")+ 
   theme(plot.title = element_text(size = 30, face = "bold"))+
-  annotate("text", x = .55, y = .45, label = "51% of campuses including pending have free fiber builds", color = 'black', hjust = 0)+
-  annotate("text", x = .55, y = .42, label = "40% of campuses excluding pending have free fiber builds", color = 'black', hjust = 0)
+  geom_text(aes(label = paste0(sprintf("%.0f", value*100), "%")), position = position_stack(vjust = .5), size = 4, color = 'white')
 
 p.discounts.2
 
