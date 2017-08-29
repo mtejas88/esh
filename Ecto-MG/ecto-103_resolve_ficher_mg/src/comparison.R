@@ -73,14 +73,14 @@ compare <- function(dta, dta_end, id_col){
 compare(dd_2017, dd_2017_end, "esh_id")
 dta.diff <- data.frame(cols=cols_diff, num_diff=num_entries_diff)
 
-sub <- dta[which(dd_comparison$district_size == FALSE),]
-sub.end <- dta_end[which(dd_comparison$district_size == FALSE),]
+sub <- dta[which(dd_comparison$current_assumed_scalable_campuses == FALSE),]
+sub.end <- dta_end[which(dd_comparison$current_assumed_scalable_campuses == FALSE),]
 
-sub <- dta[which(dd_comparison$name == FALSE),]
-sub.end <- dta_end[which(dd_comparison$name == FALSE),]
+sub <- dta[which(dd_comparison$bundled_internet_services == FALSE),]
+sub.end <- dta_end[which(dd_comparison$bundled_internet_services == FALSE),]
 
-sub <- dta[which(dd_comparison$exclude_from_ia_analysis == FALSE),]
-sub.end <- dta_end[which(dd_comparison$exclude_from_ia_analysis == FALSE),]
+sub <- dta[which(dd_comparison$c2_prediscount_remaining_15 == FALSE),111]
+sub.end <- dta_end[which(dd_comparison$c2_prediscount_remaining_15 == FALSE),111]
 
 
 #compare(sr_2017, sr_2017_end, "line_item_id")
