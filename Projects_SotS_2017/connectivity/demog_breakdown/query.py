@@ -1,3 +1,8 @@
+from pandas import DataFrame
+
+def getDemogBreakdown( conn ) :
+    cur = conn.cursor()
+    cur.execute( """\
 with districts as (
   select *,
   case
@@ -269,4 +274,7 @@ on true
 where exclude_from_ia_analysis = false
 group by tr_sample, tr_population
 
-order by 2
+order by 2;""" )
+    names = [ x[0] for x in cur.description]
+    rows = cur.fetchall()
+    return DataFrame( rows, columns=names)
