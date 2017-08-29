@@ -16,6 +16,7 @@ with frns_17 as (
     from fy2017.current_frns
   )
   and frn_status not in ('Cancelled', 'Denied')
+  and line_item != '1799060913.001'
   
   union
   
@@ -31,6 +32,7 @@ with frns_17 as (
   on frn.frn = fli.frn
   
   where frn.frn_status not in ('Cancelled', 'Denied')
+  and line_item != '1799060913.001'
 
 ),
 
@@ -52,6 +54,19 @@ frns_16 as (
     from fy2016.current_frns
   )
   and frn_status not in ('Cancelled', 'Denied')
+  and line_item not in (
+    '1699138492.001',
+    '1699138389.001',
+    '1699138534.001',
+    '1699139419.001',
+    '1699137400.001',
+    '1699139453.001',
+    '1699138480.001',
+    '1699138580.001',
+    '1699139324.001',
+    '1699139322.001',
+    '1699138486.001'
+  )
   
   union
   
@@ -67,6 +82,19 @@ frns_16 as (
   on frn.frn = fli.frn
   
   where frn.frn_status not in ('Cancelled', 'Denied')
+  and line_item not in (
+    '1699138492.001',
+    '1699138389.001',
+    '1699138534.001',
+    '1699139419.001',
+    '1699137400.001',
+    '1699139453.001',
+    '1699138480.001',
+    '1699138580.001',
+    '1699139324.001',
+    '1699139322.001',
+    '1699138486.001'
+  )
 
 ),
 
