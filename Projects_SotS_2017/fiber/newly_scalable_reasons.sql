@@ -281,7 +281,11 @@ group by 1, 2
 UNION
 
 select
-	'Urban' as locale,
+  case
+    when locale in ('Rural', 'Town')
+      then 'Rural'
+    else 'Urban'
+  end as locale,
 	'switch provider' as category,
 	sum(case
 			when overall_switcher
@@ -289,7 +293,6 @@ select
 			else 0
 		end)/sum(unscalable_campuses_moved_to_fiber) as pct_unscalable_campuses_moved_to_fiber
 from districts_categorized
-where locale not in ('Rural', 'Town')
 group by 1, 2
 
 
