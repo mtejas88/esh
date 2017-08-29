@@ -174,8 +174,11 @@ select
   sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
   median(discount_rate_c1_matrix) as median_discount_rate,
+  avg(discount_rate_c1_matrix) as average_discount_rate,
   median(oop_per_student_curr) as median_oop_per_student_curr_monthly,
   median(oop_per_student_future)*12 as median_oop_per_student_future_annual,
+  sum(oop_per_student_curr*12*num_students)/sum(num_students::numeric) as agg_oop_per_student_curr_annual,
+  sum(oop_per_student_future*12*num_students)/sum(num_students::numeric) as agg_oop_per_student_future_annual,
   case
     when diagnosis = 'meet peer prices'
       then avg(num_prices_to_meet_goals_with_same_budget)
