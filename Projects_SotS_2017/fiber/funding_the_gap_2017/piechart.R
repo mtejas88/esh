@@ -40,13 +40,13 @@ funding_the_gap <- state_costs %>% summarise(state = sum(extrapolated_total_stat
 ##reshape
 funding_the_gap <- melt(funding_the_gap)
 
-##bar chart for discounts -- evan
-p.discounts.1 <- ggplot(funding_the_gap, aes(x="", y=value, fill=variable)) +
+##pie chart with same as last yr
+p.1 <- ggplot(funding_the_gap, aes(x="", y=value, fill=variable)) +
   geom_bar(stat="identity")+
   ylab("")+
   xlab("")+
   ggtitle("Funding the remaining \nnonfiber campuses")
-p.discounts.1 + 
+p.1 + 
   coord_polar("y", start=0) +  
   scale_fill_brewer("Blues") +
   blank_theme +
@@ -56,4 +56,43 @@ p.discounts.1 +
   theme(plot.title = element_text(size = 30, face = "bold"))
 
 
+##data -- state pays allocation or minimum
+variable = c("state", "erate", "district")
+value = c(105.9, 607.6, 58.4)
+funding_the_gap2 = data.frame(variable, value)
+
+#pie chart
+p.2 <- ggplot(funding_the_gap2, aes(x="", y=value, fill=variable)) +
+  geom_bar(stat="identity")+
+  ylab("")+
+  xlab("")+
+  ggtitle("Funding the remaining \nnonfiber campuses")
+p.2 + 
+  coord_polar("y", start=0) +  
+  scale_fill_brewer("Blues") +
+  blank_theme +
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), 
+                label = paste('$',value,'M', sep="")), size=4)+ 
+  theme(plot.title = element_text(size = 30, face = "bold"))
+
+##data -- state pays allocation or minimum
+variable = c("state", "erate")
+value = c(137.9, 634)
+funding_the_gap3 = data.frame(variable, value)
+
+#pie chart
+p.3 <- ggplot(funding_the_gap3, aes(x="", y=value, fill=variable)) +
+  geom_bar(stat="identity")+
+  ylab("")+
+  xlab("")+
+  ggtitle("Funding the remaining \nnonfiber campuses")
+p.3 + 
+  coord_polar("y", start=0) +  
+  scale_fill_brewer("Blues") +
+  blank_theme +
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), 
+                label = paste('$',value,'M', sep="")), size=4.5)+ 
+  theme(plot.title = element_text(size = 30, face = "bold"))
 
