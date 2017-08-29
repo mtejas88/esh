@@ -2,37 +2,37 @@ with districts as (
   select *,
   case
     when "AM"::numeric > 0
-      then num_students*"AM"::numeric/"MEMBER"::numeric
+      then num_students*("AM"::numeric-"AMPKM"::numeric-"AMPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as am_students,
   case
     when "AS"::numeric > 0 
-      then num_students*"AS"::numeric/"MEMBER"::numeric
+      then num_students*("AS"::numeric-"ASPKM"::numeric-"ASPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as as_students,
   case
     when "HI"::numeric > 0
-      then num_students*"HI"::numeric/"MEMBER"::numeric
+      then num_students*("HI"::numeric-"HIPKM"::numeric-"HIPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as hi_students,
   case
     when "BL"::numeric > 0
-      then num_students*"BL"::numeric/"MEMBER"::numeric
+      then num_students*("BL"::numeric-"BLPKM"::numeric-"BLPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as bl_students,
   case
     when "WH"::numeric > 0
-      then num_students*"WH"::numeric/"MEMBER"::numeric
+      then num_students*("WH"::numeric-"WHPKM"::numeric-"WHPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as wh_students,
   case
     when "HP"::numeric > 0
-      then num_students*"HP"::numeric/"MEMBER"::numeric
+      then num_students*("HP"::numeric-"HPPKM"::numeric-"HPPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as hp_students,
   case
     when "TR"::numeric > 0
-      then num_students*"TR"::numeric/"MEMBER"::numeric
+      then num_students*("TR"::numeric-"TRPKM"::numeric-"TRPKF"::numeric)/("MEMBER"::numeric-"PK"::numeric)
     else 0
   end as tr_students
   from fy2017_districts_deluxe_matr dd
