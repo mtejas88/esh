@@ -2,7 +2,7 @@
 
 Author: Jamie Barnes
 Date: 8/28/2017
-Purpose: To QA the benchmark percentile location to each circuit size in 2016 PINK Frozen
+Purpose: To QA the benchmark percentile location to each circuit size in 2017 Frozen
 
 */
 
