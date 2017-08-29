@@ -1,6 +1,6 @@
 from pandas import DataFrame
 
-def getDemogBreakdown( conn ) :
+def getCampusesNotMeeting( conn ) :
     cur = conn.cursor()
     cur.execute( """\
 with districts as (
