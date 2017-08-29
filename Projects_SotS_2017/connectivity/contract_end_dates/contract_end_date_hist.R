@@ -58,20 +58,34 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## create the plot
 
-## subset to just the first 3 years
-subset_for_graph <- districts_not_meeting_goals[which(districts_not_meeting_goals$contract_end_time <= 3),]
+## take out NULL contract_end_time
+districts_not_meeting_goals <- districts_not_meeting_goals[which(!is.na(districts_not_meeting_goals$contract_end_time)),]
+districts_not_meeting_goals$contract_end_year <- ifelse(districts_not_meeting_goals$contract_end_time == 1, 2018,
+                                                  ifelse(districts_not_meeting_goals$contract_end_time == 2, 2019,
+                                                    ifelse(districts_not_meeting_goals$contract_end_time == 3, 2020, NA)))
 
+districts_not_meeting_goals$counter <- 1
+
+agg_year <- aggregate(districts_not_meeting_goals$counter, by=list(districts_not_meeting_goals$contract_end_year), FUN=sum, na.rm=T)
+names(agg_year) <- c('year', 'count')
+agg_year$total <- sum(districts_not_meeting_goals$counter)
+agg_year$perc <- round((agg_year$count / agg_year$total) * 100, 0)
 
 ## histogram of contract end time
-p.contract <- ggplot(districts_not_meeting_goals, aes(contract_end_time))
-p.contract + geom_histogram(binwidth=1, fill="#009296")+
+pdf("contract_end_date_districts_not_meting.pdf", height=5, width=7)
+p.contract <- ggplot(agg_year, aes(x=year, y=count))
+p.contract + geom_bar(stat = "identity", fill="#009296") +
   ylab("Number of districts")+
   #xlab("Years until contract end of soonest expiring internet contract")+
-  xlab("Contract End Date")+
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7))+ 
-  geom_text(aes( label = scales::percent(..prop..),
-                 y= ..prop.. ), stat= "count", vjust = -.5)+
-  ggtitle("Districts not meeting goals")+ 
-  theme(plot.title = element_text(size = 30, face = "bold"))
-
-
+  xlab("Contract End Year")+
+  scale_x_continuous(breaks = c(2018,2019,2020))+ 
+  ylim(c(0,420))+
+  geom_text(aes(label = paste(perc, "%", sep=" ")), vjust = -.5) +
+  #geom_text(aes(label = scales::percent(..prop..),
+  #               y= ..prop.. ), stat= "count", vjust = -.5)+
+  ggtitle("Districts Not Meeting Goals") +
+  theme_bw()+
+  theme(plot.title = element_text(size = 15, face = "bold"),
+        panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+dev.off()
