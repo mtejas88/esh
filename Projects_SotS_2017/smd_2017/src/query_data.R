@@ -118,7 +118,7 @@ dd_2017_froz <- merge(dd_2017_froz, outlier_output, by="esh_id", all.x=TRUE)
 #  write.csv(dd_2016, paste("data/raw/deluxe_districts/2016_deluxe_districts_", date, ".csv", sep=''), row.names=F)
 #}
 
-## write out generically -- Current
+## write out generically -- Live
 ## State Aggregation
 write.csv(smd_2017, "data/raw/state_aggregation/2017_state_aggregation.csv", row.names=F)
 write.csv(smd_2016, "data/raw/state_aggregation/2016_state_aggregation.csv", row.names=F)
@@ -154,5 +154,5 @@ write.csv(dd_2016_froz, "data/raw/deluxe_districts/2016_deluxe_districts_frozen.
 ## Date
 date.dta <- data.frame(matrix(NA, nrow=1, ncol=1))
 names(date.dta) <- 'date'
-date.dta$date <- as.Date("2016-08-16")
+date.dta$date <- as.Date("2017-08-16")
 write.csv(date.dta, "data/raw/date_frozen.csv", row.names=F)

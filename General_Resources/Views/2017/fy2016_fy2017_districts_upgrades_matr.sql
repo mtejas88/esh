@@ -15,7 +15,7 @@ select  distinct dd17.esh_id as esh_id_2017,
 
           when d16.ia_bw_mbps_total > 0
             then ((dd17.ia_bw_mbps_total - d16.ia_bw_mbps_total)/d16.ia_bw_mbps_total) >= .11 --added minus sign
-                  or ( (dd17.ia_bw_mbps_total - d16.ia_bw_mbps_total) * .50 = 0
+                  or ( (dd17.ia_bw_mbps_total - d16.ia_bw_mbps_total)::numeric % 50 = 0
                         and (dd17.ia_bw_mbps_total - d16.ia_bw_mbps_total) > 0)
 
           when d16.ia_bw_mbps_total = 0
@@ -51,14 +51,11 @@ where d16.esh_id is not null
 
 Author: Justine Schott
 Created On Date: 12/9/2017
-Last Modified Date:
+Last Modified Date: 8/21/17 - JH fixed upgrade indicator so increment of 50 mbps is an upgrade
 Name of QAing Analyst(s):
 Purpose: 2017 district data in terms of 2017 methodology with targeting assumptions built in
 Methodology:
 
-Modified Date: 4/27/2017
-Name of Modifier: Saaim Aslam
-Name of QAing Analyst(s):
 Purpose: Refactoring tables for 2017 data
 Methodology: Using updated tables names for 2017 underline tables, as per discussion with engineering. Utilizing the same architecture currently for this exercise
 

@@ -171,14 +171,6 @@ select * from (
 select postal_cd, 
 service_provider_assignment,
 num_students_not_meeting_clean,
-case when num_students_served_clean > 0 then 
-(num_students_not_meeting_clean::numeric/num_students_served_clean)*num_students_served_total 
-else 0 end as extrap_num_students_not_meeting,
-num_districts_served_clean,
-case when (num_districts_served_mega_large_dirty+num_districts_served_mega_large_clean) > 0
-then num_districts_served_mega_large_clean::numeric/
-(num_districts_served_mega_large_dirty+num_districts_served_mega_large_clean) end as pct_mega_large_clean,
-num_districts_served_total,
 ROW_NUMBER() OVER (PARTITION BY postal_cd ORDER BY num_students_not_meeting_clean desc) AS r
 from(
 
@@ -201,7 +193,34 @@ group by 1,2) a
 where num_students_not_meeting_clean > 0
 and service_provider_assignment !='District Owned'
 )
-
 as t
---where r <=5
+where r <=5
+and postal_cd not in ('RI','DE')
+
+union
+
+select * from (
+
+select postal_cd, 
+service_provider_assignment,
+num_students_not_meeting_clean,
+ROW_NUMBER() OVER (PARTITION BY postal_cd ORDER BY num_students_not_meeting_clean desc) AS r
+from(
+
+select sd.postal_cd, 
+sd.service_provider_assignment,
+sum(case when sd.exclude_from_ia_analysis=false and sd.meeting_2014_goal_no_oversub=false and sd.service_provider_assignment is not null then sd.num_students else 0 end) as num_students_not_meeting_clean
+from public.fy2017_schools_deluxe_matr sd
+left join public.fy2017_districts_deluxe_matr dd
+on sd.district_esh_id = dd.esh_id
+where dd.include_in_universe_of_districts
+and dd.district_type = 'Traditional'
+group by 1,2) a
+where num_students_not_meeting_clean > 0
+and service_provider_assignment !='District Owned'
+and service_provider_assignment is not null
+)
+as t
+where r <=5
+and postal_cd in ('RI','DE')
 order by postal_cd
