@@ -336,6 +336,12 @@ pass.to.dqt <- merge(pass.to.dqt, urls.470, by='X470.Number', all.x=T)
 ## RFP urls (unique)
 urls.rfp <- unique(urls[,c('X470.Number', 'RFP.URL')])
 pass.to.dqt <- merge(pass.to.dqt, urls.rfp, by='X470.Number', all.x=T)
+## merge in esh_id
+pass.to.dqt <- merge(pass.to.dqt, sub.bid[,c('esh_id', 'ben')], by.x='BEN', by.y='ben', all.x=T)
+
+pass.to.dqt <- unique(pass.to.dqt)
+pass.to.dqt <- pass.to.dqt[,c('esh_id', 'BEN', 'X470.Number', 'Fund.Year', 'Billed.Entity.Name', 'num_bids_received', 'Form.470.URL', 'RFP.URL')]
+pass.to.dqt <- unique(pass.to.dqt)
 
 ##**************************************************************************************************************************************************
 ## write out data
