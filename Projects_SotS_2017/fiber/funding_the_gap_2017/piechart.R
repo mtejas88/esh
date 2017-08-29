@@ -57,6 +57,7 @@ p.1 +
 
 
 ##data -- state pays allocation or minimum
+##from \Google Drive\ESH Main Share\Strategic Analysis Team\2017\Org-Wide Projects\State of the States 17\Methodology\Funding the Gap State Review.xlsx
 variable = c("state", "erate", "district")
 value = c(105.9, 607.6, 58.4)
 funding_the_gap2 = data.frame(variable, value)
@@ -77,6 +78,7 @@ p.2 +
   theme(plot.title = element_text(size = 30, face = "bold"))
 
 ##data -- state pays allocation or minimum
+##from \Google Drive\ESH Main Share\Strategic Analysis Team\2017\Org-Wide Projects\State of the States 17\Methodology\Funding the Gap State Review.xlsx
 variable = c("state", "erate")
 value = c(137.9, 634)
 funding_the_gap3 = data.frame(variable, value)
