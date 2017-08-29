@@ -30,6 +30,8 @@ bids_470 <- read.csv("data/raw/bids_470.csv")
 
 ## Form 470s
 form_470 <- read.csv("data/raw/form_470.csv", as.is=T, header=T, stringsAsFactors=F)
+## urls
+urls <- read.csv("data/raw/form_470_rfps.csv", as.is=T, header=T, stringsAsFactors=F)
 
 ## BENs
 bens <- read.csv("data/raw/bens.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -325,12 +327,18 @@ table(bids.districts$discount_rate_c1)
 sub.bid$total_fiber_lines <- sub.bid$fiber_wan_lines + sub.bid$fiber_internet_upstream_lines
 table(sub.bid$total_fiber_lines[sub.bid$exclude_from_ia_analysis == FALSE] == 0)
 
-pass.to.dqt <- sub.bid[which(sub.bid$total_fiber_lines == 0 &
-                             sub.bid$exclude_from_ia_analysis == FALSE),]
-table(bids.districts$engaged)
-
+## merge in BEN and urls
+sub.bid <- merge(sub.bid, bens[,c('entity_id', 'ben')], by.x='esh_id', by.y='entity_id', all.x=T)
+pass.to.dqt <- bids_sub[which(bids_sub$BEN %in% sub.bid$ben[sub.bid$total_fiber_lines == 0 & sub.bid$exclude_from_ia_analysis == FALSE]),]
+## Form 470 urls (unique)
+urls.470 <- unique(urls[,c('X470.Number', 'Form.470.URL')])
+pass.to.dqt <- merge(pass.to.dqt, urls.470, by='X470.Number', all.x=T)
+## RFP urls (unique)
+urls.rfp <- unique(urls[,c('X470.Number', 'RFP.URL')])
+pass.to.dqt <- merge(pass.to.dqt, urls.rfp, by='X470.Number', all.x=T)
 
 ##**************************************************************************************************************************************************
 ## write out data
 
 write.csv(agg.states, "data/raw/aggregate_states.csv", row.names=F)
+write.csv(pass.to.dqt, "data/raw/dqt_form_470s.csv", row.names=F)

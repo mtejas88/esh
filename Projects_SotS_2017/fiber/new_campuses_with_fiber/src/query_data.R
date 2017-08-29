@@ -63,6 +63,7 @@ bids_470 <- correct.dataset(bids_470, sots.flag=0, services.flag=0)
 
 ## Form 470
 form_470 <- querydb("../../../General_Resources/sql_scripts/2017/2017_form470s.SQL")
+form_470_rfps <- querydb("../../../General_Resources/sql_scripts/2017/2017_form470_rfps.SQL")
 
 ## Entity BENs
 bens <- querydb("../../../General_Resources/sql_scripts/2017/2017_entity_bens.SQL")
@@ -89,6 +90,7 @@ write.csv(bids_470, "data/raw/bids_470.csv", row.names=F)
 
 ## Form 470s
 write.csv(form_470, "data/raw/form_470.csv", row.names=F)
+write.csv(form_470_rfps, "data/raw/form_470_rfps.csv", row.names=F)
 
 ## BENs
 write.csv(bens, "data/raw/bens.csv", row.names=F)
