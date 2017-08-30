@@ -92,7 +92,7 @@ on sr.recipient_id = dd.esh_id
 
 where dd.include_in_universe_of_districts = true
 and dd.district_type = 'Traditional'
-and sr.inclusion_status != 'dqs_excluded'
+--and sr.inclusion_status != 'dqs_excluded'
 and (frns_17.fiber_sub_type = 'Special Construction' OR 
     'special_construction' = any(sr.open_flags) OR
     'special_construction_tag' = any(sr.open_tags)
@@ -122,7 +122,7 @@ on sr.recipient_id = dd.esh_id
 
 where dd.include_in_universe_of_districts = true
 and dd.district_type = 'Traditional'
-and sr.inclusion_status != 'dqs_excluded'
+--and sr.inclusion_status != 'dqs_excluded'
 --check subtype
 and (frns_16.fiber_sub_type = 'Special Construction' OR 
     'special_construction' = any(sr.open_flags) OR
