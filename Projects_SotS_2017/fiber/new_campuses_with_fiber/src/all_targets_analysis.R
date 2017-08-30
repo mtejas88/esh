@@ -259,14 +259,28 @@ agg.470s.ben <- agg.470s.ben[!is.na(agg.470s.ben$num_bids_received),]
 bids.districts <- targets[which(targets$ben %in% agg.470s.ben$BEN),]
 ## create indicator for 0 bids
 bids.districts$zero_bids <- ifelse(bids.districts$ben %in% agg.470s.ben$BEN[agg.470s.ben$num_bids_received == 0], TRUE, FALSE)
+## also override with anyone who may have gotten a bid but also still doesn't have fiber
+dd_2017$total_fiber_lines <- dd_2017$fiber_wan_lines + dd_2017$fiber_internet_upstream_lines
+## merge in bids.districts
+bids.districts <- merge(bids.districts, dd_2017[,c('esh_id', 'total_fiber_lines', 'exclude_from_ia_analysis')], by='esh_id', all.x=T)
+bids.districts$zero_bids_adjusted <- ifelse(bids.districts$total_fiber_lines == 0 & bids.districts$exclude_from_ia_analysis.y == FALSE, TRUE, bids.districts$zero_bids)
+
+## adjusted percentage:
+## 106/329 32% of districts received 0 bids
+length(unique(bids.districts$esh_id[which(bids.districts$zero_bids_adjusted == TRUE)]))
+length(unique(bids.districts$esh_id))
+length(unique(bids.districts$esh_id[which(bids.districts$zero_bids_adjusted == TRUE)])) / length(unique(bids.districts$esh_id))
 
 ## 36/329 11% of districts received 0 bids
 length(unique(bids.districts$esh_id[which(bids.districts$zero_bids == TRUE)]))
 length(unique(bids.districts$esh_id))
 length(unique(bids.districts$esh_id[which(bids.districts$zero_bids == TRUE)])) / length(unique(bids.districts$esh_id))
 ## No Rural Pattern
-table(bids.districts$locale)
-table(bids.districts$locale[bids.districts$zero_bids == TRUE])
+## create an indicator for Rural/Town
+bids.districts$rural.town <- ifelse(bids.districts$locale %in% c('Rural', 'Town'), 1, 0)
+table(bids.districts$locale, bids.districts$zero_bids_adjusted)
+table(bids.districts$locale[bids.districts$zero_bids_adjusted == TRUE])
+table(bids.districts$zero_bids_adjusted, bids.districts$rural.town)
 
 ## 106/1,503 7% of campuses received 0 bids
 sum(bids.districts$num_campuses[which(bids.districts$zero_bids == TRUE)])
