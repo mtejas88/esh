@@ -171,11 +171,24 @@ select
   diagnosis,
   sum(num_students::numeric) as num_students_sample,
   round((sum(num_students::numeric)/extrapolate_pct)/1000000,1) as num_students_extrap_mill,
+  round((sum( case
+                when locale in ('Rural', 'Town')
+                  then num_students::numeric
+                else 0
+              end)/extrapolate_pct)/1000000,2) as num_rural_students_extrap_mill,
   sum(1) as num_districts_sample,
   sum(1)/extrapolate_pct_district as num_districts_extrap,
+  sum(case
+        when locale in ('Rural', 'Town')
+          then 1
+        else 0
+      end)/extrapolate_pct_district as num_rural_districts_extrap,
   median(discount_rate_c1_matrix) as median_discount_rate,
+  avg(discount_rate_c1_matrix) as average_discount_rate,
   median(oop_per_student_curr) as median_oop_per_student_curr_monthly,
   median(oop_per_student_future)*12 as median_oop_per_student_future_annual,
+  sum(oop_per_student_curr*12*num_students)/sum(num_students::numeric) as agg_oop_per_student_curr_annual,
+  sum(oop_per_student_future*12*num_students)/sum(num_students::numeric) as agg_oop_per_student_future_annual,
   case
     when diagnosis = 'meet peer prices'
       then avg(num_prices_to_meet_goals_with_same_budget)
