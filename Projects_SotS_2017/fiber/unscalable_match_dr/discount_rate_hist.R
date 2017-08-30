@@ -48,28 +48,4 @@ p.discounts.1 <- ggplot(summary_1, aes(x=discount_rate_c1_matrix, y=value, fill=
 p.discounts.1
 
 
-summary_2 <- summary  
-summary_2$discount_group <- ifelse(summary_2$discount_rate_c1_matrix < .8, 'half or more free', 'free')
-summary_2 <- select(summary_2, 'match approved', 'match pending', 'discount_group')
-summary_2 <- melt(summary_2, id.var="discount_group")
-
-summary_2 <- summary_2 %>% group_by(variable, discount_group)
-summary_2 <- summary_2 %>% summarise(value = sum(value))
-
-summary_2 <- summary_2[order(summary_2$variable, decreasing = T),]
-summary_2$variable <- relevel(summary_2$variable, 'match pending')
-
-##bar chart for discounts -- designers
-p.discounts.2 <- ggplot( summary_2, aes(x=discount_group, y=value, fill=variable)) +
-  geom_bar(stat="identity")+
-  scale_fill_manual(values = c('grey','#009296') )+
-  ylab("% unscalable campuses with state match")+
-  xlab("")+
-  ggtitle("Campuses needing fiber with \nstate match by discount")+ 
-  theme(plot.title = element_text(size = 30, face = "bold"))+
-  geom_text(aes(label = paste0(sprintf("%.0f", value*100), "%")), position = position_stack(vjust = .5), size = 4, color = 'white')
-
-p.discounts.2
-
-
 
