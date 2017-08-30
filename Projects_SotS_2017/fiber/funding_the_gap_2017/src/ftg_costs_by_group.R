@@ -30,11 +30,11 @@ wan_costs <-
   mutate(locale = case_when(sample_campus_locale == 'Unknown' ~ as.character(district_locale),
                             sample_campus_locale != 'Unknown' ~ as.character(sample_campus_locale)))
 
-wan_costs <- select(wan_costs, locale, c1_discount_rate_or_state_avg, build_fraction_wan, total_cost_median)
-ia_costs <- select(ia_costs, district_locale, c1_discount_rate_or_state_avg, build_fraction_ia, total_cost_ia)
+wan_costs <- select(wan_costs, locale, c1_discount_rate_or_state_avg, build_fraction_wan, total_cost_median, total_district_funding_median)
+ia_costs <- select(ia_costs, district_locale, c1_discount_rate_or_state_avg, build_fraction_ia, total_cost_ia, discount_erate_funding_ia)
 
-names(wan_costs) <- c("locale", "discount", "builds", "cost")
-names(ia_costs) <- c("locale", "discount", "builds", "cost")
+names(wan_costs) <- c("locale", "discount", "builds", "cost", "oop")
+names(ia_costs) <- c("locale", "discount", "builds", "cost", "oop")
 
 costs <- rbind(wan_costs, ia_costs)
 
@@ -52,17 +52,20 @@ discount <-
   costs %>% 
   group_by(discount) %>% 
   summarise(pct_cost = sum(cost)/sum(costs$cost),
-            avg_cost = sum(cost)/sum(builds))
+            avg_cost = sum(cost)/sum(builds),
+            avg_oop = sum(oop)/sum(builds))
 
 locale <- 
   costs %>% 
   group_by(locale) %>% 
   summarise(pct_cost = sum(cost)/sum(costs$cost),
-            avg_cost = sum(cost)/sum(builds))
+            avg_cost = sum(cost)/sum(builds),
+            avg_oop = sum(oop)/sum(builds))
 
 locale_discount <- 
   costs %>% 
   group_by(locale, discount) %>% 
   summarise(pct_cost = sum(cost)/sum(costs$cost),
-            avg_cost = sum(cost)/sum(builds))
+            avg_cost = sum(cost)/sum(builds),
+            avg_oop = sum(oop)/sum(builds))
 
