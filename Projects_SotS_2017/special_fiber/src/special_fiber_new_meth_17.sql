@@ -77,7 +77,8 @@ select distinct dd.esh_id,
   dd.num_students,
   dd.num_schools,
   dd.district_size,
-  dd.discount_rate_c1_matrix
+  dd.discount_rate_c1_matrix,
+  sum(sr.line_item_district_monthly_cost_total * 12) as total_cost
 from frns_17
 
 join public.esh_line_items eli
@@ -97,6 +98,9 @@ and (frns_17.fiber_sub_type = 'Special Construction' OR
     'special_construction' = any(sr.open_flags) OR
     'special_construction_tag' = any(sr.open_tags)
     )
+
+group by 1,2,3,4,5,6
+
 ),
 
 results_16 as (
