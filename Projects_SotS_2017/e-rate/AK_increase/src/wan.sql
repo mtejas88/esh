@@ -17,7 +17,7 @@ with wan_lines as (
   and sr.inclusion_status = 'clean_with_cost'
   and connect_category = 'Lit Fiber'
   and bandwidth_in_mbps in (1000, 10000)
-  and sr.erate = true
+  --and sr.erate = true
   and (not 'special_construction_tag' = any(sr.open_tags) or sr.open_tags is null)
   and sr.monthly_circuit_cost_total != 0
   and d.postal_cd != 'AK'

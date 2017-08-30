@@ -23,7 +23,7 @@ with li_lookup as (
   and dd.exclude_from_ia_analysis = false
   and dd.exclude_from_ia_cost_analysis = false
   and inclusion_status != 'dqs_excluded'
-  and erate = true
+  --and erate = true
   and broadband = true
   --and the district doesn't have any restricted cost line items
   and sr.recipient_id not in (
