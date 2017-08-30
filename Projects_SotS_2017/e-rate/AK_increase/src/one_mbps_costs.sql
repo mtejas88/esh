@@ -22,7 +22,7 @@ with ia_lines as (
   and sr.inclusion_status = 'clean_with_cost'
   and connect_category = 'Lit Fiber'
   and bandwidth_in_mbps in (50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
-  and sr.erate = true
+  --and sr.erate = true
   and (not 'special_construction_tag' = any(sr.open_tags) or sr.open_tags is null)
   and sr.monthly_circuit_cost_total != 0
   and d.postal_cd != 'AK'
