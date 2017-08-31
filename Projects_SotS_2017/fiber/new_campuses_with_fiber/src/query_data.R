@@ -55,12 +55,6 @@ dd_2016 <- correct.dataset(dd_2016, sots.flag=0, services.flag=0)
 sr_2017 <- querydb("../../../General_Resources/sql_scripts/2017/2017_services_received_crusher_materialized.SQL")
 sr_2017 <- correct.dataset(sr_2017, sots.flag=0, services.flag=1)
 
-## Fiber Campuses
-campuses_on_fiber <- querydb("src/campuses_getting_fiber.sql")
-campuses_on_fiber <- correct.dataset(campuses_on_fiber, sots.flag=0, services.flag=0)
-bids_470 <- querydb("src/districts_470_bids.sql")
-bids_470 <- correct.dataset(bids_470, sots.flag=0, services.flag=0)
-
 ## Form 470
 form_470 <- querydb("../../../General_Resources/sql_scripts/2017/2017_form470s.SQL")
 form_470_rfps <- querydb("../../../General_Resources/sql_scripts/2017/2017_form470_rfps.SQL")
@@ -83,10 +77,6 @@ write.csv(dd_2016, "data/raw/2016_deluxe_districts.csv", row.names=F)
 
 ## Services Received
 write.csv(sr_2017, "data/raw/2017_services_received.csv", row.names=F)
-
-## Fiber Campuses
-write.csv(campuses_on_fiber, "data/raw/campuses_on_fiber.csv", row.names=F)
-write.csv(bids_470, "data/raw/bids_470.csv", row.names=F)
 
 ## Form 470s
 write.csv(form_470, "data/raw/form_470.csv", row.names=F)
