@@ -7,7 +7,7 @@ with li_lookup as (
       then 'WAN' 
     else 'Internet' 
   end as purpose_adj,
-  line_item_district_mrc_unless_null
+  line_item_district_mrc_unless_null  * discount_rate_c1_matrix as line_item_district_mrc_unless_null
   
   from public.fy2017_services_received_matr sr
   join public.fy2017_districts_deluxe_matr dd
@@ -50,7 +50,7 @@ lines as (
   select (dd.postal_cd = 'AK') as postal_cd_AK,
     line_item_id,
     recipient_id,
-    line_item_district_mrc_unless_null
+    line_item_district_mrc_unless_null * discount_rate_c1_matrix as line_item_district_mrc_unless_null
 
   from public.fy2017_services_received_matr sr
 

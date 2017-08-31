@@ -4,9 +4,9 @@ with wan_lines as (
     bandwidth_in_mbps,
     case 
       when sr.monthly_circuit_cost_recurring = 0
-        then sr.monthly_circuit_cost_total
-      else sr.monthly_circuit_cost_recurring
-    end as monthly_circuit_cost_mrc_unless_null
+        then sr.monthly_circuit_cost_total * discount_rate_c1_matrix
+      else sr.monthly_circuit_cost_recurring * discount_rate_c1_matrix
+    end as monthly_circuit_cost_mrc_unless_null 
     
   from public.fy2017_services_received_matr sr
   join public.fy2017_districts_deluxe_matr d
