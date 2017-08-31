@@ -34,12 +34,15 @@ modified_districts=merge(x = sfdc_s,
   modified_districts_all=merge(x = modified_districts, 
                          y = dd_2016, 
                          by.x = "district_esh_id", by.y="esh_id")
+## deduplicate
+  modified_districts_all=as.data.frame(
+    unique(modified_districts_all[,c("district_esh_id","num_students.x","num_students.y" )]))
 
   ## 2017 students
-  sum(modified_districts_all$num_students.x) #39000332
+  sum(modified_districts_all$num_students.x) #4667062
   ## 2016 students
-  sum(modified_districts_all$num_students.y) #42264407
+  sum(modified_districts_all$num_students.y) #4860423
   
   #diff
-  42264407 - 39000332
-  #3,264,075
+  4860423 - 4667062
+  #193,361
