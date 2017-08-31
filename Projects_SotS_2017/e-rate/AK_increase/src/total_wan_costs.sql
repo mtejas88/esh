@@ -1,15 +1,24 @@
 with li_lookup as (
   select (dd.postal_cd = 'AK') as postal_cd_AK,
-  line_item_id, 
-  recipient_id,
+  sr.line_item_id, 
+  sr.recipient_id,
   case 
-    when purpose = 'WAN' 
+    when sr.purpose = 'WAN' 
       then 'WAN' 
     else 'Internet' 
   end as purpose_adj,
-  line_item_district_mrc_unless_null  * discount_rate_c1_matrix as line_item_district_mrc_unless_null
+  sr.line_item_district_mrc_unless_null  * fy2017.frns.discount_rate::numeric/100 as line_item_district_mrc_unless_null
   
   from public.fy2017_services_received_matr sr
+  left join public.esh_line_items eli
+  on sr.line_item_id = eli.id
+  and eli.funding_year = 2017
+
+  left join fy2017.frn_line_items fli
+  on eli.frn_complete = fli.line_item
+
+  left join fy2017.frns
+  on fli.frn = fy2017.frns.frn
   join public.fy2017_districts_deluxe_matr dd
   on sr.recipient_id = dd.esh_id
   
@@ -17,9 +26,9 @@ with li_lookup as (
   and dd.district_type = 'Traditional'
   and dd.exclude_from_ia_analysis = false
   and dd.exclude_from_ia_cost_analysis = false
-  and inclusion_status != 'dqs_excluded'
-  --and erate = true
-  and broadband = true
+  and sr.inclusion_status != 'dqs_excluded'
+  and sr.erate = true
+  and sr.broadband = true
   --and the district doesn't have any restricted cost line items
   and sr.recipient_id not in (
     select distinct recipient_id
@@ -48,18 +57,29 @@ perc as (
 lines as (
 
   select (dd.postal_cd = 'AK') as postal_cd_AK,
-    line_item_id,
-    recipient_id,
-    line_item_district_mrc_unless_null * discount_rate_c1_matrix as line_item_district_mrc_unless_null
+    sr.line_item_id,
+    sr.recipient_id,
+    line_item_district_mrc_unless_null * fy2017.frns.discount_rate::numeric/100 as line_item_district_mrc_unless_null
 
   from public.fy2017_services_received_matr sr
+
+  left join public.esh_line_items eli
+  on sr.line_item_id = eli.id
+  and eli.funding_year = 2017
+
+  left join fy2017.frn_line_items fli
+  on eli.frn_complete = fli.line_item
+
+  left join fy2017.frns
+  on fli.frn = fy2017.frns.frn
 
   join public.fy2017_districts_deluxe_matr dd
   on sr.recipient_id = dd.esh_id
 
-  where inclusion_status != 'dqs_excluded'
+  where sr.inclusion_status != 'dqs_excluded'
   and dd.include_in_universe_of_districts = true
   and dd.district_type = 'Traditional'
+  and sr.erate = true
 
 ),
 
