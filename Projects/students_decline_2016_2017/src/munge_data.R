@@ -35,7 +35,11 @@ modified_districts=merge(x = sfdc_s,
                          y = dd_2016, 
                          by.x = "district_esh_id", by.y="esh_id")
 
-  ## define a column for student differences
-  modified_districts_all$diff = modified_districts_all$num_students.y - modified_districts_all$num_students.x
+  ## 2017 students
+  sum(modified_districts_all$num_students.x) #39000332
+  ## 2016 students
+  sum(modified_districts_all$num_students.y) #42264407
   
-  sum(modified_districts_all$diff)
+  #diff
+  42264407 - 39000332
+  #3,264,075

@@ -77,7 +77,7 @@ and dd.district_type = 'Traditional'
 ")
 
 schools_demog = dbGetQuery(con, 
-"select * from public.fy2017_schools_demog_matr
+"select * from public.fy2016_schools_demog_matr
 ")
 
 ## disconnect from database
