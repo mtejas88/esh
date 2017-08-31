@@ -77,8 +77,8 @@ col.to.compare <- "name"
 col.to.compare <- "c2_prediscount_remaining_15"
 
 
-#sub <- dta[which(dd_comparison[,col.to.compare] == FALSE),]
-#sub.end <- dta_end[which(dd_comparison[,col.to.compare] == FALSE),]
+sub <- dta[which(dd_comparison[,col.to.compare] == FALSE),]
+sub.end <- dta_end[which(dd_comparison[,col.to.compare] == FALSE),]
 
 
 #cols.greater.than.100.diff <- as.character.factor(dta.diff$cols[which(dta.diff$num_diff > 100)])
