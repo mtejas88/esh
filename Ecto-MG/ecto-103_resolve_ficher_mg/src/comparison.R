@@ -12,7 +12,6 @@ setwd("~/Documents/ESH-Code/ficher/Ecto-MG/ecto-103_resolve_ficher_mg/")
 ##**************************************************************************************************************************************************
 ## read data
 
-#dd_2017 <- read.csv("data/raw/2017_deluxe_districts_2017-08-25_15.00.04.csv", as.is=T, header=T)
 dd_2017 <- read.csv("data/raw/2017_deluxe_districts_ficher.csv", as.is=T, header=T, stringsAsFactors=F)
 dd_2017_end <- read.csv("data/raw/2017_deluxe_districts_endpoint.csv", as.is=T, header=T, stringsAsFactors=F)
 
@@ -73,36 +72,22 @@ compare <- function(dta, dta_end, id_col){
 compare(dd_2017, dd_2017_end, "esh_id")
 dta.diff <- data.frame(cols=cols_diff, num_diff=num_entries_diff)
 
-sub <- dta[which(dd_comparison$current_assumed_scalable_campuses == FALSE),]
-sub.end <- dta_end[which(dd_comparison$current_assumed_scalable_campuses == FALSE),]
-
-sub <- dta[which(dd_comparison$bundled_internet_services == FALSE),]
-sub.end <- dta_end[which(dd_comparison$bundled_internet_services == FALSE),]
-
-sub <- dta[which(dd_comparison$c2_prediscount_remaining_15 == FALSE),111]
-sub.end <- dta_end[which(dd_comparison$c2_prediscount_remaining_15 == FALSE),111]
+## write name of column you want to look at
+col.to.compare <- "name"
+col.to.compare <- "c2_prediscount_remaining_15"
 
 
-cols.greater.than.100.diff <- as.character.factor(dta.diff$cols[which(dta.diff$num_diff > 100)])
-cols.c2 <- cols.greater.than.100.diff[grepl("c2", cols.greater.than.100.diff)]
-cols.greater.than.100.diff <- cols.greater.than.100.diff[!grepl("c2", cols.greater.than.100.diff)]
-cols.greater.than.100.diff <- append(cols.greater.than.100.diff, "c2_prediscount_remaining_15")
-
-for (i in 1:length(cols.greater.than.100.diff)){
-  
-}
+#sub <- dta[which(dd_comparison[,col.to.compare] == FALSE),]
+#sub.end <- dta_end[which(dd_comparison[,col.to.compare] == FALSE),]
 
 
-#compare(sr_2017, sr_2017_end, "line_item_id")
-
-#dta <- dd_2017
-#dta_end <- dd_2017_end
+#cols.greater.than.100.diff <- as.character.factor(dta.diff$cols[which(dta.diff$num_diff > 100)])
+#cols.c2 <- cols.greater.than.100.diff[grepl("c2", cols.greater.than.100.diff)]
+#cols.greater.than.100.diff <- cols.greater.than.100.diff[!grepl("c2", cols.greater.than.100.diff)]
+#cols.greater.than.100.diff <- append(cols.greater.than.100.diff, "c2_prediscount_remaining_15")
 
 ##**************************************************************************************************************************************************
 ## write out data
 
 write.csv(dta.diff, "data/processed/all_columns_differences.csv", row.names=F)
-
-
-
 
