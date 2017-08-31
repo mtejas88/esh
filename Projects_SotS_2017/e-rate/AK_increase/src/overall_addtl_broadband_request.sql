@@ -28,10 +28,32 @@ frn_line_items_2017 as (
   join fy2017.current_frns cfrns 
   on cfli.frn = cfrns.frn 
   where frn_status not in ('Denied', 'Cancelled')
+),
+
+basic_informations_2017 as (
+  select *
+  from fy2017.basic_informations 
+  where application_number not in (
+    select application_number
+    from fy2017.current_basic_informations 
+  )
+
+  UNION
+
+  select cbi.*
+  from fy2017.current_basic_informations cbi
+  join fy2017.current_frns cfrns 
+  on cbi.application_number = cfrns.application_number 
+  where frn_status not in ('Denied', 'Cancelled')
 )
 
 select
   'services not received or excluded' as category,
+  case
+    when bi.applicant_type not ilike '%library%' and bi.billed_entity_name ilike '%library%'
+      then 'Library System'
+    else bi.applicant_type
+  end as applicant_type,
   sum(case
         when fli.total_eligible_recurring_costs::numeric > 0
           then fli.total_eligible_recurring_costs::numeric
@@ -40,7 +62,9 @@ select
 from frn_line_items_2017 fli
 join frns_2017 frns
 on fli.frn = frns.frn
-and fli.line_item not in (
+join basic_informations_2017 bi
+on frns.application_number = bi.application_number
+where fli.line_item not in (
   select distinct frn_complete
   from fy2017_services_received_matr sr
   join fy2017_districts_deluxe_matr dd
@@ -54,6 +78,9 @@ and fli.line_item not in (
 and service_type != 'Voice'
 and not(service_type ilike '%internal%')
 and fiber_sub_type is null
+and function not in ('Switches','Connectors/Couplers','Cabling','UPS',
+                      'Cabinets','Patch Panels', 'Routers')
+group by 2
 
 UNION
 
