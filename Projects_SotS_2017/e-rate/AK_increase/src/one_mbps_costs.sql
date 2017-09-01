@@ -5,24 +5,35 @@
 
 with ia_lines as (
   select 
-    distinct line_item_id,
-    bandwidth_in_mbps,
+    distinct sr.line_item_id,
+    sr.bandwidth_in_mbps,
     case 
       when sr.monthly_circuit_cost_recurring = 0
-        then sr.monthly_circuit_cost_total
-      else sr.monthly_circuit_cost_recurring
-    end as monthly_circuit_cost_mrc_unless_null
+        then sr.monthly_circuit_cost_total * fy2017.frns.discount_rate::numeric/100
+      else sr.monthly_circuit_cost_recurring * fy2017.frns.discount_rate::numeric/100
+    end as monthly_circuit_cost_mrc_unless_null 
     
   from public.fy2017_services_received_matr sr
+
+  left join public.esh_line_items eli
+  on sr.line_item_id = eli.id
+  and eli.funding_year = 2017
+
+  left join fy2017.frn_line_items fli
+  on eli.frn_complete = fli.line_item
+
+  left join fy2017.frns
+  on fli.frn = fy2017.frns.frn
+
   join public.fy2017_districts_deluxe_matr d
   on sr.recipient_id = d.esh_id
   where d.include_in_universe_of_districts = true
   and d.district_type = 'Traditional'
   and sr.purpose = 'Internet'
   and sr.inclusion_status = 'clean_with_cost'
-  and connect_category = 'Lit Fiber'
-  and bandwidth_in_mbps in (50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
-  --and sr.erate = true
+  and sr.connect_category = 'Lit Fiber'
+  and sr.bandwidth_in_mbps in (50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
+  and sr.erate = true
   and (not 'special_construction_tag' = any(sr.open_tags) or sr.open_tags is null)
   and sr.monthly_circuit_cost_total != 0
   and d.postal_cd != 'AK'
