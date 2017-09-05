@@ -9,7 +9,11 @@ dd_2017 <- read.csv("../data/interim/dd_2017.csv", as.is=T, header=T, stringsAsF
 schools_demog <- read.csv("../data/interim/schools_demog.csv", as.is=T, header=T, stringsAsFactors=F)
 sfdc <- read.csv("../data/interim/sfdc.csv", as.is=T, header=T, stringsAsFactors=F)
 
-length(unique(sfdc$Facility.ESHID)) # 2496
+#filter for changes before the data freeze
+library(dplyr)
+sfdc$Updated.Date = as.Date(sfdc$Updated.Date)
+sfdc = sfdc %>% filter(Updated.Date < "2017-08-14")
+length(unique(sfdc$Facility.ESHID)) # 2458
 unique_facilities = as.data.frame(unique(sfdc[, c("Facility.ESHID")]))
 names(unique_facilities) = c("Facility.ESHID")
 
@@ -18,10 +22,6 @@ names(unique_facilities) = c("Facility.ESHID")
 sfdc_s=merge(x = unique_facilities, 
              y = schools_demog[ , c("district_esh_id", "school_esh_id")], 
              by.x = "Facility.ESHID", by.y="school_esh_id")
-  # districts?
-sfdc_d=merge(x = unique_facilities, 
-             y = schools_demog[ , c("district_esh_id", "school_esh_id")], 
-             by.x = "Facility.ESHID", by.y="district_esh_id")
 
 
 ## merge above dataset with 2017 districts
@@ -39,10 +39,10 @@ modified_districts=merge(x = sfdc_s,
     unique(modified_districts_all[,c("district_esh_id","num_students.x","num_students.y" )]))
 
   ## 2017 students
-  sum(modified_districts_all$num_students.x) #4667062
+  sum(modified_districts_all$num_students.x) #4603523
   ## 2016 students
-  sum(modified_districts_all$num_students.y) #4860423
+  sum(modified_districts_all$num_students.y) #4796402
   
   #diff
-  4860423 - 4667062
-  #193,361
+  4796402 - 4603523
+  #192,879
