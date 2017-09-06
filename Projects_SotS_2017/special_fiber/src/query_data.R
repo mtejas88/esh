@@ -50,7 +50,7 @@ querydb <- function(query_name){
 special_fiber_new_meth <- querydb("src/special_fiber_new_meth.sql")
 special_fiber_16 <- querydb("src/special_fiber_new_meth_16.sql")
 special_fiber_17 <- querydb("src/special_fiber_new_meth_17.sql")
-bids <- querydb("src/bids_special_fiber.sql")
+bids <- querydb("src/special_fiber_17_bids.sql")
 
 ## disconnect from database
 dbDisconnect(con)

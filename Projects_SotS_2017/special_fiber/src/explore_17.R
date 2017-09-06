@@ -53,4 +53,5 @@ ggplot(by.size, aes(district_size, students, label = paste(round(students/1000,1
 ##BIDS
 
 head(bids)
-no.bids.final.meth <- (bids$districts_0_bids + bids$spek_c_districts_more_than_0_bids) / bids$total_districts
+no.bids.final.meth <- (bids$districts_0_bids + bids$spek_c_districts_more_than_0_bids + bids$no_fiber) / bids$total_districts
+had.bids <- 1 - no.bids.final.meth

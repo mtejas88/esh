@@ -893,7 +893,13 @@ select count(case when district_received_0_bids = 1 then temp.esh_id end) as dis
         when district_received_0_bids = 1
           and spek_c.esh_id is null
           then temp.esh_id end) as not_spek_c_districts_0_bids,
-  count(case when spek_c.esh_id is null then temp.esh_id end) as total_districts_no_spik_c_req
+  count(case when spek_c.esh_id is null then temp.esh_id end) as total_districts_no_spik_c_req,
+  count(temp.esh_id) *
+    count(case when district_received_0_bids = 0
+                and spek_c.esh_id is null
+                and d17.exclude_from_ia_analysis = false
+                and d17.fiber_internet_upstream_lines_w_dirty + d17.fiber_wan_lines_w_dirty = 0 then temp.esh_id end) / 
+          count(case when d17.exclude_from_ia_analysis = false then d17.esh_id end) as no_fiber
   
 from temp 
 
@@ -902,3 +908,6 @@ on temp.esh_id = base_pop.esh_id
 
 left join spek_c
 on temp.esh_id = spek_c.esh_id
+
+left join public.fy2017_districts_deluxe_matr d17
+on temp.esh_id = d17.esh_id
