@@ -1,8 +1,13 @@
-import requests
+import requests, time
 from collections import namedtuple
 
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
+
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
 from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
 
 cost_magnifier = 1.2
@@ -16,19 +21,24 @@ class distanceCalculator():
 		self.lon_b = lon_b
 
 	def mapboxRequest(self):
-		MAPBOX_URL = 'https://api.mapbox.com/directions/v5/mapbox/driving/'
-		MAPBOX_URL_PARAMS = {'access_token': MAPBOX_ACCESS_TOKEN}
-
-		r = requests.get("{0}{1},{2};{3},{4}.json".format(	MAPBOX_URL,
-															self.lon_a,
-															self.lat_a,
-															self.lon_b,
-															self.lat_b), params = MAPBOX_URL_PARAMS)
+		r = self.sendRequest()
+		while r.status_code != 200:
+			time.sleep(15)
+			r = self.sendRequest()
 		if r.json()['code'] == 'Ok':
 		   distance = r.json()['routes'][0]['distance'] *  0.000621371
 		else: #distance too close to calculate route
 		   distance = -1
 		return distance
+
+	def sendRequest(self):
+		MAPBOX_URL = 'https://api.mapbox.com/directions/v5/mapbox/driving/'
+		MAPBOX_URL_PARAMS = {'access_token': MAPBOX_ACCESS_TOKEN}
+		return requests.get("{0}{1},{2};{3},{4}.json".format(	MAPBOX_URL,
+																self.lon_a,
+																self.lat_a,
+																self.lon_b,
+																self.lat_b), params = MAPBOX_URL_PARAMS)
 
 class buildCostCalculator():
 
