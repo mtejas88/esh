@@ -45,7 +45,9 @@ scalable_ia_temp as (
     end as ia_cost_per_mbps_scalable,
     connect_category as connect_category_scalable_ia,
     service_provider_name as service_provider_name_scalable_ia,
-    reporting_name as reporting_name_scalable_ia
+    reporting_name as reporting_name_scalable_ia,
+    district_size_number,
+    locale_number
   from public.fy2017_services_received_matr sr
   join districts_2017 dd
   on sr.recipient_id = dd.esh_id
