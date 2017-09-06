@@ -14,6 +14,7 @@ library(ggplot2)
 ## READ IN DATA
 
 sf <- read.csv("data/raw/special_fiber_new_meth_17.csv", as.is=T, header=T, stringsAsFactors=F)
+bids <- read.csv("data/raw/bids.csv", as.is=T, header=T, stringsAsFactors=F)
 head(sf)
 
 total.num.students = sum(sf$num_students)
@@ -48,3 +49,9 @@ ggplot(by.size, aes(district_size, students, label = paste(round(students/1000,1
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
 
 
+##**************************************************************************************************************************************************
+##BIDS
+
+head(bids)
+no.bids.final.meth <- (bids$districts_0_bids + bids$spek_c_districts_more_than_0_bids + bids$no_fiber) / bids$total_districts
+had.bids <- 1 - no.bids.final.meth

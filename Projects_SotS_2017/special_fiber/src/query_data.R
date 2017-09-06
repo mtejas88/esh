@@ -50,6 +50,7 @@ querydb <- function(query_name){
 special_fiber_new_meth <- querydb("src/special_fiber_new_meth.sql")
 special_fiber_16 <- querydb("src/special_fiber_new_meth_16.sql")
 special_fiber_17 <- querydb("src/special_fiber_new_meth_17.sql")
+bids <- querydb("src/special_fiber_17_bids.sql")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -59,5 +60,6 @@ dbDisconnect(con)
 write.csv(special_fiber_new_meth, "data/raw/special_fiber_new_meth.csv", row.names=F)
 write.csv(special_fiber_16, "data/raw/special_fiber_new_meth_16.csv", row.names=F)
 write.csv(special_fiber_17, "data/raw/special_fiber_new_meth_17.csv", row.names=F)
+write.csv(bids, "data/raw/bids.csv", row.names=F)
 
 
