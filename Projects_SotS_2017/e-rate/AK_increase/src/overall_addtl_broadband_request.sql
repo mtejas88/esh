@@ -109,3 +109,31 @@ from (
   and broadband
   group by 1,2,3,4,5,6
 ) snr
+
+UNION
+
+select
+  'voice overall' as category,
+  sum(case
+        when fli.total_eligible_recurring_costs::numeric > 0
+          then fli.total_eligible_recurring_costs::numeric
+        else fli.total_eligible_one_time_costs::numeric
+      end * (frns.discount_rate::numeric / 100)) as funding_commitment_request
+from frn_line_items_2017 fli
+join frns_2017 frns
+on fli.frn = frns.frn
+where service_type = 'Voice'
+
+UNION
+
+select
+  'c2 overall' as category,
+  sum(case
+        when fli.total_eligible_recurring_costs::numeric > 0
+          then fli.total_eligible_recurring_costs::numeric
+        else fli.total_eligible_one_time_costs::numeric
+      end * (frns.discount_rate::numeric / 100)) as funding_commitment_request
+from frn_line_items_2017 fli
+join frns_2017 frns
+on fli.frn = frns.frn
+where service_type ilike '%internal%'
