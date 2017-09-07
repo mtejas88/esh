@@ -52,19 +52,18 @@ case
   then null
   when bandwidth_in_mbps = 100
   then 1200
-  when bandwidth_in_mbps = 200
-  then 1800
   when bandwidth_in_mbps = 500
   then 2750
   when bandwidth_in_mbps = 1000
   then 3000
   when bandwidth_in_mbps = 10000
   then 7500
+  else null
 end as benchmarks
 
 from sr 
 
-where (purpose = 'Internet' and bandwidth_in_mbps in (100,200,500,1000,10000))
+where (purpose = 'Internet' and bandwidth_in_mbps in (100,500,1000,10000))
 or (purpose = 'WAN' and bandwidth_in_mbps in (100,1000,10000))
 
 group by sr.purpose,
