@@ -20,6 +20,8 @@ head(sf)
 total.num.students = sum(sf$num_students)
 total.num.schools = sum(sf$num_schools)
 total.num.districts = nrow(sf)
+total.cost = sum(sf$total_cost)
+total.cost.oop = sum(sf$total_cost_oop)
 
 by.locale <- group_by(sf, locale) %>% 
   summarise(districts = n(), 
