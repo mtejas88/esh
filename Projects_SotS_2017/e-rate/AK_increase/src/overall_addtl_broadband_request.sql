@@ -137,3 +137,5 @@ from frn_line_items_2017 fli
 join frns_2017 frns
 on fli.frn = frns.frn
 where service_type ilike '%internal%'
+or function in ('Switches','Connectors/Couplers','Cabling','UPS',
+                      'Cabinets','Patch Panels', 'Routers')
