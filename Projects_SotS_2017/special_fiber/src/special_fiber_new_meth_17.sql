@@ -78,12 +78,19 @@ select distinct dd.esh_id,
   dd.num_schools,
   dd.district_size,
   dd.discount_rate_c1_matrix,
-  sum(sr.line_item_district_monthly_cost_total * 12) as total_cost
+  sum(sr.line_item_district_monthly_cost_total * 12) as total_cost,
+  sum(sr.line_item_district_monthly_cost_total * 12 * fy2017.frns.discount_rate::numeric/100) as total_cost_oop
 from frns_17
 
 join public.esh_line_items eli
 on frns_17.line_item = eli.frn_complete
 and eli.funding_year = 2017
+
+left join fy2017.frn_line_items fli
+on eli.frn_complete = fli.line_item
+
+left join fy2017.frns
+on fli.frn = fy2017.frns.frn
 
 join public.fy2017_services_received_matr sr
 on eli.id = sr.line_item_id
