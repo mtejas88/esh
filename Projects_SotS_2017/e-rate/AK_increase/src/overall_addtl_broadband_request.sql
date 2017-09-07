@@ -49,11 +49,6 @@ basic_informations_2017 as (
 
 select
   'services not received or excluded' as category,
-  case
-    when bi.applicant_type not ilike '%library%' and bi.billed_entity_name ilike '%library%'
-      then 'Library System'
-    else bi.applicant_type
-  end as applicant_type,
   sum(case
         when fli.total_eligible_recurring_costs::numeric > 0
           then fli.total_eligible_recurring_costs::numeric
@@ -80,7 +75,6 @@ and not(service_type ilike '%internal%')
 and fiber_sub_type is null
 and function not in ('Switches','Connectors/Couplers','Cabling','UPS',
                       'Cabinets','Patch Panels', 'Routers')
-group by 2
 
 UNION
 
@@ -115,3 +109,33 @@ from (
   and broadband
   group by 1,2,3,4,5,6
 ) snr
+
+UNION
+
+select
+  'voice overall' as category,
+  sum(case
+        when fli.total_eligible_recurring_costs::numeric > 0
+          then fli.total_eligible_recurring_costs::numeric
+        else fli.total_eligible_one_time_costs::numeric
+      end * (frns.discount_rate::numeric / 100)) as funding_commitment_request
+from frn_line_items_2017 fli
+join frns_2017 frns
+on fli.frn = frns.frn
+where service_type = 'Voice'
+
+UNION
+
+select
+  'c2 overall' as category,
+  sum(case
+        when fli.total_eligible_recurring_costs::numeric > 0
+          then fli.total_eligible_recurring_costs::numeric
+        else fli.total_eligible_one_time_costs::numeric
+      end * (frns.discount_rate::numeric / 100)) as funding_commitment_request
+from frn_line_items_2017 fli
+join frns_2017 frns
+on fli.frn = frns.frn
+where service_type ilike '%internal%'
+or function in ('Switches','Connectors/Couplers','Cabling','UPS',
+                      'Cabinets','Patch Panels', 'Routers')
