@@ -49,11 +49,6 @@ basic_informations_2017 as (
 
 select
   'services not received or excluded' as category,
-  case
-    when bi.applicant_type not ilike '%library%' and bi.billed_entity_name ilike '%library%'
-      then 'Library System'
-    else bi.applicant_type
-  end as applicant_type,
   sum(case
         when fli.total_eligible_recurring_costs::numeric > 0
           then fli.total_eligible_recurring_costs::numeric
@@ -80,7 +75,6 @@ and not(service_type ilike '%internal%')
 and fiber_sub_type is null
 and function not in ('Switches','Connectors/Couplers','Cabling','UPS',
                       'Cabinets','Patch Panels', 'Routers')
-group by 2
 
 UNION
 
