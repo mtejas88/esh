@@ -50,35 +50,17 @@ PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless
 median(sr.monthly_circuit_cost_mrc_unless_null) as "median_mrc_unless_null",
 PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "75th_percentile_mrc_unless_null",
 PERCENTILE_CONT (0.90) WITHIN GROUP (ORDER BY sr.monthly_circuit_cost_mrc_unless_null) AS "90th_percentile_mrc_unless_null",
-case
-  when purpose = 'WAN'
-  then null
-  when bandwidth_in_mbps = 50
-  then 700
-  when bandwidth_in_mbps = 100
-  then 1200
-  when bandwidth_in_mbps = 200
-  then 1800
-  when bandwidth_in_mbps = 500
-  then 2750
-  when bandwidth_in_mbps = 1000
-  then 3000
-  when bandwidth_in_mbps = 10000
-  then 7500
-  else null
-end as mrc_benchmarks,
 /*$ Mbps*/
 PERCENTILE_CONT (0.10) WITHIN GROUP (ORDER BY sr.mrc_unless_null_per_mbps) AS "10th_percentile_mrc_unless_null_per_mbps",
 PERCENTILE_CONT (0.25) WITHIN GROUP (ORDER BY sr.mrc_unless_null_per_mbps) AS "25th_percentile_mrc_unless_null_per_mbps",
 median(sr.mrc_unless_null_per_mbps) as "median_mrc_unless_null_per_mbps",
 PERCENTILE_CONT (0.75) WITHIN GROUP (ORDER BY sr.mrc_unless_null_per_mbps) AS "75th_percentile_mrc_unless_null_per_mbps",
 PERCENTILE_CONT (0.90) WITHIN GROUP (ORDER BY sr.mrc_unless_null_per_mbps) AS "90th_percentile_mrc_unless_null_per_mbps"
-
  
  from sr 
  
- where (purpose = 'Internet' and bandwidth_in_mbps in (50,100,200,500,1000,10000)) /*limiting to only look at BWs we have historically graphed in sots*/
- or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100))
+ where (purpose = 'Internet' and bandwidth_in_mbps in (1000,100,500,200,300,2000,50,10000,250))
+ or (purpose = 'WAN' and bandwidth_in_mbps in (1000,10000,100,500,2000,200))
  
  group by sr.purpose,
  sr.connect_category,
