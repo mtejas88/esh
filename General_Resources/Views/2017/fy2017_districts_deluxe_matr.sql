@@ -77,11 +77,13 @@ select distinct
 
 	exclude_from_ia_cost_analysis,
 
-	exclude_from_wan_analysis,
+	dfpd.exclude_from_wan_analysis,
 
 	exclude_from_wan_cost_analysis,
 
 	exclude_from_current_fiber_analysis,
+
+	exclude_from_campus_analysis,
 
 	fiber_metric_calc_group,
 
@@ -319,7 +321,7 @@ select distinct
 
 	budget_used_c2_17,
 
-	fiber_target_status,
+	dfpd.fiber_target_status,
 
   	bw_target_status,
 
@@ -354,6 +356,10 @@ left join state_level_extrap sle
 
 on sle.postal_cd = dfpd.postal_cd
 
+left join public.fy2017_clean_to_campus_matr c
+on dfpd.esh_id = c.district_esh_id
+
+
 
 
 
@@ -363,7 +369,7 @@ on sle.postal_cd = dfpd.postal_cd
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 8/14/2017 -- SC added 2 SETDA concurrency columns
+Last Modified Date: 9/8/2017 -- JH added exclude from campus analysis
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
