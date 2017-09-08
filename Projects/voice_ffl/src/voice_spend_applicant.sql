@@ -71,7 +71,7 @@ frn_line_items_2015 as (
     "Serv Type",
     a."Application Number",
     b.discount_rate,
-    "FRN Line Item No"
+    concat("FRN", '-', "FRN Line Item No") as line_item
   
   from public.fy2015_item21_services_and_costs a
 
@@ -90,6 +90,40 @@ frn_line_items_2015 as (
   ) b
   on a."Application Number" = b."Application Number"
   
+  where "FRN" not in (
+    select "FRN"
+    from fy2015.current_item21_services_and_costs
+  )
+  
+  UNION
+  
+  select
+    "FRN",
+    "Total Cost",
+    "Rec Elig Cost",
+    "One-time Elig Cost",
+    "Serv/Conn Type" as "Serv Type",
+    a."Application Number",
+    b.discount_rate,
+    concat("FRN", '-', "FRN Line Item No") as line_item
+  
+  from fy2015.current_item21_services_and_costs a
+  
+  left join (
+    --to get the discount rate in 2015, usac took just the rounded average of any recipient that had "Full/Part Count" not null
+    --see examples here https://sltools.universalservice.org/portal-external/form471/view/external/
+    select "Application Number",
+      round(avg("Cat 1 Disc Rate"::numeric),0) as discount_rate
+    
+    from fy2015.current_discount_calculations
+    
+    where "Full/Part Count" is not null
+    
+    group by 1
+  ) b
+  on a."Application Number" = b."Application Number"
+  
+  
 ),
 
 frns_2015 as (
@@ -98,6 +132,16 @@ frns_2015 as (
     "BEN"
   
   from public.fy2015_basic_information_and_certifications
+  
+  where "Application Number" not in (select "Application Number" from fy2015.current_basic_information_and_certifications)
+  
+  UNION 
+  
+  select
+    "Application Number",
+    "BEN"
+  
+  from fy2015.current_basic_information_and_certifications
   
 ),
 
@@ -132,7 +176,7 @@ results_15 as (
 select
   2015 as year,
   frns."BEN" as ben,
-  count(fli."FRN Line Item No") as num_line_items,
+  count(fli.line_item) as num_line_items,
   count(distinct fli."Application Number") as num_applications,
   sum(case
         when fli."One-time Elig Cost"::numeric = 0
