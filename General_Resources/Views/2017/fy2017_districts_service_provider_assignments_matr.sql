@@ -72,8 +72,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
       and recipient_include_in_universe_of_districts
 
-      and district_type = 'Traditional'
-
       and recipient_exclude_from_ia_analysis = false
 
       group by 1,2,3,4
@@ -142,8 +140,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       and inclusion_status in ('clean_with_cost', 'clean_no_cost')
 
       and recipient_include_in_universe_of_districts
-
-      and district_type = 'Traditional'
 
       and recipient_exclude_from_ia_analysis = false
 
@@ -246,6 +242,6 @@ Also applying a table with DQT primary service provider overrides for some mostl
 
 Modified Date: 9/6/2017
 Name of Modifier: Jamie Barnes
-Purpose/Methodology: slight tweak to deal with instances where reporting_name = ''
+Purpose/Methodology: slight tweak to deal with instances where reporting_name = '' and open up to AZ Charters
 
 */
