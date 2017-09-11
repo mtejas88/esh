@@ -45,6 +45,7 @@ with campus_level as (
   where d.include_in_universe_of_districts = true
 
 )
+
 select s.district_esh_id,
 s.campus_id,
 d.exclude_from_wan_analysis,
