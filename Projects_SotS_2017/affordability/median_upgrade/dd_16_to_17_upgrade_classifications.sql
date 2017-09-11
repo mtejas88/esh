@@ -1,3 +1,13 @@
+/*
+Author: Jamie Barnes
+Created On Date: 8/17/2017
+Last Modified Date: 
+Name of QAing Analyst(s): HAS NOT BEEN QA-ED
+Purpose: exploratory SotS analysis to look at affordabilty changes for districts for districts that upgraded in some fashion from 2016 to 2017
+Methodology: limited to districts in our universe, clean for cost for both years
+*/
+
+
 select 
 2017 as year,
 dd.esh_id,

@@ -1,7 +1,11 @@
 select 
 2016 as year,
 line_item_id,
-reporting_name,
+case 
+  when reporting_name is null or reporting_name = ''
+  then service_provider_name
+  else reporting_name
+end as reporting_name,
 line_item_total_num_lines::numeric,
 case
   when reporting_name in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
@@ -14,8 +18,6 @@ case
   then 'Consortia'
   when reporting_name = 'District Owned'
   then 'District Owned'
-  when reporting_name is null
-  then null
   else 'Regular'
 end as service_provider_assignment_type,
 case
@@ -59,11 +61,11 @@ on dd.esh_id = sr.recipient_id
 where sr.inclusion_status like 'clean%'
 and dd.district_type = 'Traditional'
 and dd.include_in_universe_of_districts = true
-and reporting_name != ''
 and bandwidth_in_mbps > 0
 
 group by line_item_id,
 reporting_name,
+service_provider_name,
 line_item_total_num_lines,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
@@ -79,7 +81,11 @@ union
 select 
 2017 as year,
 line_item_id,
-reporting_name,
+case 
+  when reporting_name is null or reporting_name = ''
+  then service_provider_name
+  else reporting_name
+end as reporting_name,
 line_item_total_num_lines::numeric,
 case
   when reporting_name in ('Connecticut Education Network', 'County of Clackamas', 'Douglas Sevices Inc', 'Eastern Suffolk', 'EDLINK12', 'ESA Region 20', 
@@ -92,8 +98,6 @@ case
   then 'Consortia'
   when reporting_name = 'District Owned'
   then 'District Owned'
-  when reporting_name is null
-  then null
   else 'Regular'
 end as service_provider_assignment_type,
 case
@@ -137,12 +141,11 @@ on dd.esh_id = sr.recipient_id
 where sr.inclusion_status like 'clean%'
 and dd.district_type = 'Traditional'
 and dd.include_in_universe_of_districts = true
-and line_item_id != 873578 /* removing line item that goes to OK and TX districts */
-and reporting_name != ''
 and bandwidth_in_mbps > 0
 
 group by line_item_id,
 reporting_name,
+service_provider_name,
 recipient_postal_cd,
 monthly_circuit_cost_recurring,
 monthly_circuit_cost_total,

@@ -457,7 +457,11 @@ end as cohort_16_to_17_connectivity,
 -- SWITCHER
 
 -- SERVICE PROVIDER
-dd.service_provider_assignment
+case
+  when dd.exclude_from_ia_analysis = true or dd.service_provider_assignment = '' 
+  then null
+  else dd.service_provider_assignment
+end as service_provider_assignment
 
 from public.fy2016_districts_deluxe_matr dd
 left join public.fy2015_districts_deluxe_m d
@@ -692,7 +696,11 @@ end as cohort_16_to_17_connectivity,
 -- SWITCHER
 
 -- SERVICE PROVIDER
-dd.service_provider_assignment
+case
+  when dd.exclude_from_ia_analysis = true or dd.service_provider_assignment = '' 
+  then null
+  else dd.service_provider_assignment
+end as service_provider_assignment
 
 from public.fy2017_districts_deluxe_matr dd
 left join public.fy2016_districts_deluxe_matr d
