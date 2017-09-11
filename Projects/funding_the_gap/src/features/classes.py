@@ -2,8 +2,10 @@ import requests, time
 from collections import namedtuple
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+HOST = os.environ.get("HOST")
+USER = os.environ.get("USER")
+PASSWORD = os.environ.get("PASSWORD")
+DB = os.environ.get("DB")
 GITHUB = os.environ.get("GITHUB")
 
 import sys
