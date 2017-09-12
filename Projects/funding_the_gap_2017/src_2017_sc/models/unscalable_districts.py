@@ -3,12 +3,12 @@ from numpy import where, logical_or, logical_and
 from pandas import DataFrame, read_csv, merge
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
-HOST = os.environ.get("HOST_DENIM")
-USER = os.environ.get("USER_DENIM")
-PASSWORD = os.environ.get("PASSWORD_DENIM")
-DB = os.environ.get("DB_DENIM")
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
+HOST = os.environ.get("HOST")
+USER = os.environ.get("USER")
+PASSWORD = os.environ.get("PASSWORD")
+DB = os.environ.get("DB")
 GITHUB = os.environ.get("GITHUB")
 
 import sys

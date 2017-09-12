@@ -15,10 +15,10 @@ district_postal_cd = []
 for z in range(0,len(state_metrics)):
 	#add total_state_funding, total_erate_funding, total_district_funding, build_distance strings and numbers arrays
 	methodology_base = ['min', 'min', 'max', 'max', 'az', 'az_pop']
-	cut_base = ['overall', 'wan', 'overall', 'wan', 'wan', 'wan']
+	cut_base = ['overall', 'wan', 'ia', 'overall', 'wan', 'ia', 'wan', 'wan']
 
 	for y in ['total_cost', 'total_state_funding', 'total_erate_funding', 'total_district_funding', 'build_distance']:
-		for x in range(0, 6):
+		for x in range(0, 8):
 			value.append(y)
 			district_postal_cd.append(state_metrics['district_postal_cd'][z])
 
@@ -28,8 +28,10 @@ for z in range(0,len(state_metrics)):
 		numbers = append(numbers,
 			[state_metrics['min_' + y][z],
 			state_metrics['min_' + y + '_wan'][z],
+			state_metrics['min_' + y + '_ia'][z],
 			state_metrics['max_' + y][z],
 			state_metrics['max_' + y + '_wan'][z],
+			state_metrics['max_' + y + '_ia'][z],
 			state_metrics[y + '_az_wan'][z],
 			state_metrics[y + '_az_pop_wan'][z]])
 

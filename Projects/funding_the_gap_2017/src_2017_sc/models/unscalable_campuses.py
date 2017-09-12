@@ -3,8 +3,8 @@ from pandas import DataFrame, concat, read_csv
 from numpy import where
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
 campuses_distances = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campuses_distances.csv')

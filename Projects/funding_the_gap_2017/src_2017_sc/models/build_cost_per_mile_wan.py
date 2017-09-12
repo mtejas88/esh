@@ -2,8 +2,8 @@ from pandas import read_csv, merge
 from numpy import where, logical_or
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
 import sys

@@ -2,8 +2,8 @@ from pandas import DataFrame, merge, read_csv
 from numpy import NaN, where, logical_or
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
 
