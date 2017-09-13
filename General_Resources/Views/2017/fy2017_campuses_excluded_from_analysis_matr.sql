@@ -101,3 +101,19 @@ on c.district_esh_id = n.district_esh_id
 
 left join district_summary ds
 on d.esh_id = ds.esh_id
+
+/*
+Author: Jeremy Holtzman
+Created On Date: 9/8/2017
+Name of QAing Analyst(s):
+Purpose: to list out which campuses are clean to the campus and which are not
+Methodology:
+hierarchy:
+1. If district is fit for campus analysis, then the campuses are good
+2. If a non-fiber line goes to the district BEN, then the campus is not fit for campus analysis
+3. If the district is not fit for wan analysis, then the campus is not fit for campus analysis
+4. If the campus receives no services, then the campus is not fit for campus analysis
+5. If the district is a target but there is no nonfiber, then the campus is not fit for campus analysis
+6. If the campus has any incorrectly allocated line, then the campus is not fit for campus analysis
+7. If the campus has correctly allocated fiber or non-fiber, then the campus IS fit for campus analysis
+*/
