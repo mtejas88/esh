@@ -46,7 +46,8 @@ with campus_level as (
 
 )
 
-select s.district_esh_id,
+select distinct
+s.district_esh_id,
 s.campus_id,
 d.exclude_from_wan_analysis,
 d.fiber_target_status,
@@ -88,6 +89,7 @@ where d.include_in_universe_of_districts = true
 /*
 Author: Jeremy Holtzman
 Created On Date: 9/8/2017
+Updated On: 9/13/2017 - JH removed duplicate campuses
 Name of QAing Analyst(s):
 Purpose: aggregate the services each campus receives as an intermediate step to determine if the campus is fit for campus analysis
 Methodology:
