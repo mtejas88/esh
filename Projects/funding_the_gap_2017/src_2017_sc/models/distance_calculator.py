@@ -1,6 +1,6 @@
 ##imports and definitions
 import psycopg2
-from pandas import DataFrame, concat
+from pandas import DataFrame, concat, read_csv, merge
 
 import os
 ##from dotenv import load_dotenv, find_dotenv
@@ -31,37 +31,44 @@ print("Campuses pulled from database")
 campuses = campuses[(campuses.denomination == '1: Fit for FTG, Target')]
 campuses = campuses.reset_index(drop=True)
 
+##store
+#campuses.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/raw/campuses.csv')
+
+##permanent distances file
+campuses_distances = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/raw/campuses_distances.csv',index_col=0, dtype={'esh_id': str, 'campus_id': str})
+
+##determine any new campuses/districts
+campuses = merge(campuses, campuses_distances[['esh_id', 'campus_id','distance']], how='left', on=['esh_id','campus_id'])
+
+newcampuses = campuses[(campuses.distance.isnull())]
+newcampuses = newcampuses.drop('distance', axis=1)
+newcampuses.sample_campus_latitude=newcampuses.sample_campus_latitude.astype(float)
+newcampuses.sample_campus_longitude=newcampuses.sample_campus_longitude.astype(float)
+
+campuses = campuses[(campuses.distance.notnull())]
+
+print("Length of new campuses is: " + str(newcampuses.shape[0]))
+
 ##calculate distance between all campuses and its district office and save into pandas dataframe
 campus_distances = []
-for i in range(4718, campuses.shape[0]):
-	dist_test = distanceCalculator(	campuses['district_latitude'][i],
-									campuses['district_longitude'][i],
-									campuses['sample_campus_latitude'][i],
-									campuses['sample_campus_longitude'][i]).mapboxRequest()
+for i in range(newcampuses.shape[0]):
+	dist_test = distanceCalculator(	newcampuses['district_latitude'][i],
+									newcampuses['district_longitude'][i],
+									newcampuses['sample_campus_latitude'][i],
+									newcampuses['sample_campus_longitude'][i]).mapboxRequest()
 	campus_distances.append({'distance': dist_test})
 	time.sleep(2) # rate limit is 60 requests per minute
 print("Distances calculated")
 
-## for testing only
-import requests
-import sys
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
-from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
-MAPBOX_URL = 'https://api.mapbox.com/directions/v5/mapbox/driving/'
-MAPBOX_URL_PARAMS = {'access_token': MAPBOX_ACCESS_TOKEN}
-r = requests.get("{0}{1},{2};{3},{4}.json".format(	MAPBOX_URL,
-													campuses['district_longitude'][i],
-													campuses['district_latitude'][i],
-													campuses['sample_campus_longitude'][i],
-													campuses['sample_campus_latitude'][i]), params = MAPBOX_URL_PARAMS)
-print(r.json())
-print(r.json()['code'])
-
-
 
 ##join distances to campuses and save
 campus_distances_df = DataFrame(campus_distances)
-campuses_distances = concat([campuses, campus_distances_df], axis=1)
+newcampuses_distances = concat([newcampuses, campus_distances_df], axis=1)
 
+##combine onto known distances
+campuses_distances = concat([campuses, newcampuses_distances], axis=0)
+campuses_distances = campuses_distances.reset_index(drop=True)
+
+campuses_distances.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/raw/campuses_distances.csv')
 campuses_distances.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campuses_distances.csv')
 print("File saved")
