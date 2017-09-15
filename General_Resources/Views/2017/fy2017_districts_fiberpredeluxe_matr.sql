@@ -316,6 +316,36 @@ select distinct
 
 	dpd.meeting_2018_goal_no_oversub_fcc_25,
 
+	 case
+    -- calculate for any district that has a num_students > 0
+    when dpd.num_students is not null and dpd.num_students != 0 then
+    case
+      when dpd.setda_concurrency_factor > 0 then
+	      case when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 28.5 then 25
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 34 then 30
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 56 then 50
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 111 then 100
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 221 then 200
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 331 then 300
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 551 then 500
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 1101 then 1000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 2201 then 2000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 3301 then 3000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 5501 then 5000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 11001 then 10000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 22001 then 20000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 33001 then 30000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 44001 then 40000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 55001 then 50000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 110001 then 100000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 220001 then 200000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 330001 then 300000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 550001 then 500000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) >= 550001 then 1000000
+			  end
+	  end
+  	end as projected_bw_fy2018_cck12,
+
 	dpd.at_least_one_line_not_meeting_broadband_goal,
 
 	dpd.ia_monthly_cost_per_mbps,
@@ -716,7 +746,7 @@ on dpd.esh_id = suff.esh_id
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 9/15/2017 -- JH added wifi sufficiency from SOTS 17
+Last Modified Date: 9/15/2017 -- JH added wifi sufficiency from SOTS 17 and cck12 2018 rounded bw
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

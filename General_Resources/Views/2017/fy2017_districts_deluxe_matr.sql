@@ -60,6 +60,11 @@ select distinct
 		 and ((ia_bw_mbps_total*1000)/num_students)/setda_concurrency_factor < 1000 
 		 	then false
 	end as meeting_2018_goal_oversub,
+	projected_bw_fy2018_cck12,
+	case
+ 	  when exclude_from_ia_analysis=false and projected_bw_fy2018_cck12 >= 1000 then true 
+ 	  when exclude_from_ia_analysis=false and projected_bw_fy2018_cck12 < 1000 then false
+ 	end as meeting_2018_goal_oversub_cck12,
 	meeting_knapsack_affordability_target,
 	
 	--primary sp, upgrade, switcher, contract expiry
@@ -201,7 +206,7 @@ order by include_in_universe_of_districts desc, district_type desc, postal_cd as
 /*
 Author: Justine Schott, Jamie Barnes
 Created On Date: 8/15/2016
-Last Modified Date: 9/8/2017 -- JH reorganized and added wifi suffienciy sots
+Last Modified Date: 9/8/2017 -- JH reorganized, added wifi suffienciy sots, and cck12 projected bw 2018
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting and fiber metric extrapolation assumptions built in
 Methodology:
