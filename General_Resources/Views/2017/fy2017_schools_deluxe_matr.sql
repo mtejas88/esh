@@ -41,11 +41,6 @@ select
 			then false
 		else true
    end as exclude_from_ia_analysis,
-   case
-   		when dd.exclude_from_current_fiber_analysis = false
-			then false
-		else true
-   end as exclude_from_current_fiber_analysis,
 	sm.ia_bandwidth_per_student_kbps,
 	case
 		when sm.ia_bandwidth_per_student_kbps >= 100
@@ -302,6 +297,6 @@ on sm.campus_id = spa.campus_id
 /*
 Author: Jess Seok
 Created On Date: 11/29/2016
-Last Modified Date: 8/11/2017 -- copied from fy2016_schools_deluxe, then added service provider assignment
+Last Modified Date: 9/15/2017 -- jh got rid of some fields
 Name of QAing Analyst(s):Justine Schott
 */
