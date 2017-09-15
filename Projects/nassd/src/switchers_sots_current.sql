@@ -99,7 +99,7 @@ end as meeting_1m_goal,
 case
   when d.exclude_from_analysis = true
   then null
-  when d.meeting_2018_goal_no_oversub = true 
+  when d.meeting_2018_goal_oversub = true 
   then 1
   else 0
 end as meeting_1m_goal_16,
@@ -114,7 +114,12 @@ case
   then false
   else null
 end as upgrade_indicator,
+case
+  when dd.exclude_from_ia_analysis = false then dd.upgrade_indicator
+  else null
+end as upgrade_indicator2,
 case when dd.exclude_from_ia_analysis = false and dd.exclude_from_ia_cost_analysis = false then dd.meeting_knapsack_affordability_target end as meeting_knapsack_affordability_target,
+case when d.exclude_from_analysis = false then d.meeting_knapsack_affordability_target end as meeting_knapsack_affordability_target_16,
 case 
   when ddd.fiber_target_status = 'Not Target' and dd.fiber_target_status = 'Target' 
   then 1
@@ -125,6 +130,11 @@ case
   then 1
   else null
 end as cohort_16_to_17_connectivity,
+case
+  when ddd.exclude_from_ia_analysis = false and dd.exclude_from_ia_analysis = false and ddd.meeting_2018_goal_oversub = true and dd.meeting_2018_goal_oversub = false
+  then 1
+  else null
+end as cohort_16_to_17_connectivity_1m,
 dd.service_provider_assignment as dominant_sp,
 dd.primary_sp_bandwidth,
 dd.primary_sp_percent_of_bandwidth,
@@ -146,7 +156,7 @@ left join public.fy2017_districts_deluxe_matr ddd
 on ddd.esh_id::numeric = dd.esh_id::numeric
 left join public.states s
 on dd.postal_cd = s.postal_cd
-left join (select recipient_id, reporting_name, min(contract_end_date) as earliest_contract_end_date
+left join (select recipient_id, case when reporting_name is null then service_provider_name else reporting_name end as reporting_name, min(contract_end_date) as earliest_contract_end_date
 from public.fy2015_services_received_m
 group by 1,2) sr15
 on dd.esh_id::numeric=sr15.recipient_id::numeric
@@ -263,7 +273,7 @@ end as meeting_1m_goal,
 case
   when d.exclude_from_ia_analysis = true
   then null
-  when d.meeting_2018_goal_no_oversub = true 
+  when d.meeting_2018_goal_oversub = true 
   then 1
   else 0
 end as meeting_1m_goal_16,
@@ -278,7 +288,12 @@ case
   then false
   else null
 end as upgrade_indicator,
+case
+  when dd.exclude_from_ia_analysis = false then dd.upgrade_indicator
+  else null
+end as upgrade_indicator2,
 case when dd.exclude_from_ia_analysis = false and dd.exclude_from_ia_cost_analysis = false then dd.meeting_knapsack_affordability_target end as meeting_knapsack_affordability_target,
+case when d.exclude_from_ia_analysis = false and d.exclude_from_ia_cost_analysis = false then d.meeting_knapsack_affordability_target end as meeting_knapsack_affordability_target_16,
 case 
   when dd.fiber_target_status = 'Not Target' and d.fiber_target_status = 'Target' 
   then 1
@@ -289,6 +304,11 @@ case
   then 1
   else null
 end as cohort_16_to_17_connectivity,
+case
+  when dd.exclude_from_ia_analysis = false and d.exclude_from_ia_analysis = false and dd.meeting_2018_goal_oversub = true and d.meeting_2018_goal_oversub = false
+  then 1
+  else null
+end as cohort_16_to_17_connectivity_1m,
 dd.service_provider_assignment as dominant_sp,
 dd.primary_sp_bandwidth,
 dd.primary_sp_percent_of_bandwidth,
@@ -308,7 +328,7 @@ left join public.fy2016_districts_deluxe_matr d
 on dd.esh_id::numeric = d.esh_id::numeric
 left join public.states s
 on dd.postal_cd = s.postal_cd
-left join (select recipient_id, reporting_name, min(contract_end_date) as earliest_contract_end_date
+left join (select recipient_id, case when reporting_name is null then service_provider_name else reporting_name end as reporting_name, min(contract_end_date) as earliest_contract_end_date
 from public.fy2016_services_received_matr
 group by 1,2) sr16
 on dd.esh_id::numeric=sr16.recipient_id::numeric
