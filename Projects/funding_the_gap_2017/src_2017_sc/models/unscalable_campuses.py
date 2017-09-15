@@ -7,7 +7,7 @@ import os
 #load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
-campuses_distances = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campuses_distances.csv')
+campuses_distances = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campuses_distances.csv',index_col=0)
 print("Campuses with distances imported")
 
 ##create parameter input if arg=1 then csv else rerun with default as csv

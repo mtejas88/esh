@@ -25,7 +25,7 @@ class distanceCalculator():
 	def mapboxRequest(self):
 		r = self.sendRequest()
 		while r.status_code != 200:
-			time.sleep(15)
+			time.sleep(5)
 			r = self.sendRequest()
 		if r.json()['code'] == 'Ok':
 		   distance = r.json()['routes'][0]['distance'] *  0.000621371

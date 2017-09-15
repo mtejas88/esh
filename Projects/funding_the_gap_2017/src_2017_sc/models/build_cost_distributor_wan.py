@@ -12,8 +12,8 @@ sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
 from classes import cost_magnifier
 
-campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs_before_distribution.csv')
-state_cost_per_mile = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_cost_per_mile.csv')
+campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs_before_distribution.csv',index_col=0)
+state_cost_per_mile = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_cost_per_mile.csv',index_col=0)
 print("Campuses costs imported")
 
 ##fill in cost/mile for campuses without cost calculated

@@ -25,8 +25,8 @@ myConnection.close()
 districts.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
 print("Districts pulled from database and saved")
 
-districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
-unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
+districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
+unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
 print("Unscalable campuses imported")
 
 unscalable_districts_with_0_wan_builds = unscalable_campuses.groupby(['esh_id']).sum()

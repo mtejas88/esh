@@ -7,7 +7,7 @@ import os
 GITHUB = os.environ.get("GITHUB")
 
 
-districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
+districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
 print("Districts imported")
 
 ##EXTRAPOLATION
@@ -61,7 +61,7 @@ state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_e
 ##WAN COST
 
 #import campus build costs
-campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs.csv')
+campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs.csv',index_col=0)
 print("Campus costs imported")
 
 #determine min and max values
@@ -103,6 +103,7 @@ campus_build_costs['max_builds_wan'] = where(	campus_build_costs['total_cost_az_
 campus_build_costs['max_build_distance_wan'] = where(	campus_build_costs['total_cost_az_wan']<=campus_build_costs['total_cost_az_pop_wan'],
 														campus_build_costs['build_distance_az_pop'] * campus_build_costs['build_fraction_wan'],
 														campus_build_costs['distance'] * campus_build_costs['build_fraction_wan'])
+campus_build_costs['builds_wan'] = campus_build_costs['build_fraction_wan']
 
 #create factors for a-->z and a-->pop-->z aggregation
 campus_build_costs['builds_az_pop_wan'] = 2 * campus_build_costs['build_fraction_wan']
@@ -115,7 +116,7 @@ print("Min max calculated")
 #determine state cost amounts
 state_wan_costs = campus_build_costs.groupby(['district_postal_cd', 'district_exclude_from_ia_analysis']).sum()
 state_wan_costs = state_wan_costs[[	'min_total_cost_wan', 'min_discount_erate_funding_wan', 'min_total_state_funding_wan', 'min_total_erate_funding_wan',
-									'min_total_district_funding_wan', 'min_builds_wan', 'min_build_distance_wan',
+									'min_total_district_funding_wan', 'min_builds_wan', 'min_build_distance_wan', 'builds_wan',
 									'max_total_cost_wan', 'max_discount_erate_funding_wan', 'max_total_state_funding_wan', 'max_total_erate_funding_wan',
 									'max_total_district_funding_wan',  'max_builds_wan', 'max_build_distance_wan',
 									'total_cost_az_wan', 'discount_erate_funding_az_wan', 'total_state_funding_az_wan', 'total_erate_funding_az_wan',
@@ -140,6 +141,7 @@ state_metrics['extrapolated_max_total_state_funding_wan'] = state_metrics['max_t
 state_metrics['extrapolated_max_total_erate_funding_wan'] = state_metrics['max_total_erate_funding_wan'] * state_metrics['extrapolation']
 state_metrics['extrapolated_max_total_district_funding_wan'] = state_metrics['max_total_district_funding_wan'] * state_metrics['extrapolation']
 state_metrics['extrapolated_max_builds_wan'] = state_metrics['max_builds_wan'] * state_metrics['extrapolation']
+state_metrics['extrapolated_builds_wan'] = state_metrics['builds_wan'] * state_metrics['extrapolation']
 state_metrics['extrapolated_max_build_distance_wan'] = state_metrics['max_build_distance_wan'] * state_metrics['extrapolation']
 state_metrics['extrapolated_total_cost_az_wan'] = state_metrics['total_cost_az_wan'] * state_metrics['extrapolation']
 state_metrics['extrapolated_discount_erate_funding_az_wan'] = state_metrics['discount_erate_funding_az_wan'] * state_metrics['extrapolation']
@@ -172,6 +174,7 @@ state_metrics['extrapolated_max_total_state_funding_wan'] = state_metrics['extra
 state_metrics['extrapolated_max_total_erate_funding_wan'] = state_metrics['extrapolated_max_total_erate_funding_wan'].replace(NaN, 0) + state_metrics['max_total_erate_funding_wan_y'].replace(NaN, 0)
 state_metrics['extrapolated_max_total_district_funding_wan'] = 	state_metrics['extrapolated_max_total_district_funding_wan'].replace(NaN, 0) + state_metrics['max_total_district_funding_wan_y'].replace(NaN, 0)
 state_metrics['extrapolated_max_builds_wan'] = 	state_metrics['extrapolated_max_builds_wan'].replace(NaN, 0) + (state_metrics['max_builds_wan_y'].replace(NaN, 0) * 2)
+state_metrics['extrapolated_builds_wan'] = 	state_metrics['extrapolated_builds_wan'].replace(NaN, 0) + (state_metrics['builds_wan_y'].replace(NaN, 0))
 state_metrics['extrapolated_max_build_distance_wan'] = 	state_metrics['extrapolated_max_build_distance_wan'].replace(NaN, 0) + state_metrics['max_build_distance_wan_y'].replace(NaN, 0)
 state_metrics['extrapolated_total_cost_az_wan'] = state_metrics['extrapolated_total_cost_az_wan'].replace(NaN, 0) + state_metrics['total_cost_az_wan_y'].replace(NaN, 0)
 state_metrics['extrapolated_discount_erate_funding_az_wan'] = state_metrics['extrapolated_discount_erate_funding_az_wan'].replace(NaN, 0) + state_metrics['discount_erate_funding_az_wan_y'].replace(NaN, 0)
@@ -193,7 +196,7 @@ print("Campus costs extrapolated")
 ##IA COST
 
 #import district build costs
-district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv')
+district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv',index_col=0)
 print("District costs imported")
 
 #determine cost amounts
@@ -280,9 +283,11 @@ state_metrics['extrapolated_min_total_state_funding'] = state_metrics['extrapola
 state_metrics['extrapolated_min_total_erate_funding'] = state_metrics['extrapolated_min_total_erate_funding_ia'] + state_metrics['extrapolated_min_total_erate_funding_wan']
 state_metrics['extrapolated_min_total_district_funding'] = 	state_metrics['extrapolated_min_total_district_funding_ia'] + state_metrics['extrapolated_min_total_district_funding_wan']
 state_metrics['extrapolated_min_builds'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['extrapolated_min_builds_wan']
+state_metrics['extrapolated_min_builds_1'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['extrapolated_builds_wan']
 state_metrics['extrapolated_min_build_distance'] = 	state_metrics['extrapolated_min_build_distance_ia'] + state_metrics['extrapolated_min_build_distance_wan']
 state_metrics['min_total_cost_per_mile'] = 	state_metrics['extrapolated_min_total_cost'] / state_metrics['extrapolated_min_build_distance']
 state_metrics['min_miles_per_build'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['extrapolated_min_builds']
+state_metrics['min_miles_per_build_1'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['extrapolated_min_builds_1']
 
 state_metrics['extrapolated_max_total_cost'] = state_metrics['extrapolated_max_total_cost_ia'] + state_metrics['extrapolated_max_total_cost_wan']
 state_metrics['extrapolated_max_discount_erate_funding'] = state_metrics['extrapolated_max_discount_erate_funding_ia'] + state_metrics['extrapolated_max_discount_erate_funding_wan']
@@ -290,18 +295,24 @@ state_metrics['extrapolated_max_total_state_funding'] = state_metrics['extrapola
 state_metrics['extrapolated_max_total_erate_funding'] = state_metrics['extrapolated_max_total_erate_funding_ia'] + state_metrics['extrapolated_max_total_erate_funding_wan']
 state_metrics['extrapolated_max_total_district_funding'] = 	state_metrics['extrapolated_max_total_district_funding_ia'] + state_metrics['extrapolated_max_total_district_funding_wan']
 state_metrics['extrapolated_max_builds'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['extrapolated_max_builds_wan']
+state_metrics['extrapolated_max_builds_1'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['extrapolated_builds_wan']
 state_metrics['extrapolated_max_build_distance'] = 	state_metrics['extrapolated_max_build_distance_ia'] + state_metrics['extrapolated_max_build_distance_wan']
 state_metrics['max_total_cost_per_mile'] = 	state_metrics['extrapolated_max_total_cost'] / state_metrics['extrapolated_max_build_distance']
 state_metrics['max_miles_per_build'] = 	state_metrics['extrapolated_max_build_distance'] / state_metrics['extrapolated_max_builds']
+state_metrics['max_miles_per_build_1'] = 	state_metrics['extrapolated_max_build_distance'] / state_metrics['extrapolated_max_builds_1']
 
 state_metrics = state_metrics[[	'district_postal_cd', 'extrapolated_min_total_cost', 'extrapolated_min_total_state_funding', 'extrapolated_min_total_erate_funding',
-								'extrapolated_min_total_district_funding', 'extrapolated_min_builds', 'extrapolated_min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build',
+								'extrapolated_min_total_district_funding', 'extrapolated_min_builds','extrapolated_min_builds_1', 'extrapolated_min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build','min_miles_per_build_1',
 								'extrapolated_max_total_cost', 'extrapolated_max_total_state_funding', 'extrapolated_max_total_erate_funding',
-								'extrapolated_max_total_district_funding', 'extrapolated_max_builds', 'extrapolated_max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build',
+								'extrapolated_max_total_district_funding', 'extrapolated_max_builds', 'extrapolated_max_builds_1','extrapolated_max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build','max_miles_per_build_1',
 								'extrapolated_max_total_cost_wan', 'extrapolated_max_total_state_funding_wan', 'extrapolated_max_total_erate_funding_wan',
 								'extrapolated_max_total_district_funding_wan', 'extrapolated_max_builds_wan', 'extrapolated_max_build_distance_wan',
+								'extrapolated_max_total_cost_ia', 'extrapolated_max_total_state_funding_ia', 'extrapolated_max_total_erate_funding_ia',
+								'extrapolated_max_total_district_funding_ia', 'extrapolated_max_build_distance_ia',
 								'extrapolated_min_total_cost_wan', 'extrapolated_min_total_state_funding_wan', 'extrapolated_min_total_erate_funding_wan',
 								'extrapolated_min_total_district_funding_wan', 'extrapolated_min_builds_wan', 'extrapolated_min_build_distance_wan',
+								'extrapolated_min_total_cost_ia', 'extrapolated_min_total_state_funding_ia', 'extrapolated_min_total_erate_funding_ia',
+								'extrapolated_min_total_district_funding_ia', 'extrapolated_min_build_distance_ia',
 								'extrapolated_total_cost_az_wan', 'extrapolated_total_state_funding_az_wan', 'extrapolated_total_erate_funding_az_wan',
 								'extrapolated_total_district_funding_az_wan', 'extrapolated_builds_az_wan', 'extrapolated_build_distance_az_wan',
 								'extrapolated_total_cost_az_pop_wan', 'extrapolated_total_state_funding_az_pop_wan', 'extrapolated_total_erate_funding_az_pop_wan',
@@ -310,13 +321,17 @@ state_metrics = state_metrics[[	'district_postal_cd', 'extrapolated_min_total_co
 								]]
 
 state_metrics.columns = [	'district_postal_cd', 'min_total_cost', 'min_total_state_funding', 'min_total_erate_funding',
-							'min_total_district_funding', 'min_builds', 'min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build',
+							'min_total_district_funding', 'min_builds','min_builds_1', 'min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build', 'min_miles_per_build_1',
 							'max_total_cost', 'max_total_state_funding', 'max_total_erate_funding',
-							'max_total_district_funding', 'max_builds', 'max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build',
+							'max_total_district_funding', 'max_builds','max_builds_1', 'max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build', 'max_miles_per_build_1',
 							'max_total_cost_wan', 'max_total_state_funding_wan', 'max_total_erate_funding_wan',
 							'max_total_district_funding_wan', 'max_builds_wan', 'max_build_distance_wan',
+							'max_total_cost_ia', 'max_total_state_funding_ia', 'max_total_erate_funding_ia',
+							'max_total_district_funding_ia', 'max_build_distance_ia',
 							'min_total_cost_wan', 'min_total_state_funding_wan', 'min_total_erate_funding_wan',
 							'min_total_district_funding_wan', 'min_builds_wan', 'min_build_distance_wan',
+							'min_total_cost_ia', 'min_total_state_funding_ia', 'min_total_erate_funding_ia',
+							'min_total_district_funding_ia', 'min_build_distance_ia',
 							'total_cost_az_wan', 'total_state_funding_az_wan', 'total_erate_funding_az_wan',
 							'total_district_funding_az_wan', 'builds_az_wan', 'build_distance_az_wan',
 							'total_cost_az_pop_wan', 'total_state_funding_az_pop_wan', 'total_erate_funding_az_pop_wan',

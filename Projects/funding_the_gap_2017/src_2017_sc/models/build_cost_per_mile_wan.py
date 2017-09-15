@@ -9,10 +9,10 @@ GITHUB = os.environ.get("GITHUB")
 import sys
 sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
-campus_costs_apop = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_apop.csv')
-campus_costs_zpop = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_zpop.csv')
-campus_costs_az = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_az.csv')
-unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
+campus_costs_apop = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_apop.csv',index_col=0)
+campus_costs_zpop = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_zpop.csv',index_col=0)
+campus_costs_az = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_costs_az.csv',index_col=0)
+unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
 print("Campuses costs imported")
 
 campus_build_costs = unscalable_campuses.merge(campus_costs_apop, left_on=['campus_id','esh_id'], right_on=['campus_id','esh_id'], how='outer')

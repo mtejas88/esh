@@ -49,6 +49,9 @@ campuses = campuses[(campuses.distance.notnull())]
 
 print("Length of new campuses is: " + str(newcampuses.shape[0]))
 
+newcampuses = newcampuses.reset_index(drop=True)
+campuses = campuses.reset_index(drop=True)
+
 ##calculate distance between all campuses and its district office and save into pandas dataframe
 campus_distances = []
 for i in range(newcampuses.shape[0]):
@@ -58,6 +61,11 @@ for i in range(newcampuses.shape[0]):
 									newcampuses['sample_campus_longitude'][i]).mapboxRequest()
 	campus_distances.append({'distance': dist_test})
 	time.sleep(2) # rate limit is 60 requests per minute
+	if i % 50 == 0:
+		print("Iteration {0} out of {1}".format(i,newcampuses.shape[0]))
+	else:
+		continue
+
 print("Distances calculated")
 
 

@@ -11,7 +11,7 @@ sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
 from classes import buildCostCalculator, cost_magnifier
 
-unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
+unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
 print("Unscalable campuses imported")
 
 ##calculate A-Z cost for all unscalable campuses and save into pandas dataframe
@@ -27,7 +27,7 @@ for i in range(0, unscalable_campuses.shape[0]):
 	campus_costs_az.append({	'campus_id': unscalable_campuses['campus_id'][i],
 								'esh_id': unscalable_campuses['esh_id'][i],
 								'build_cost_az': cost_test})
-	print(cost_test, file=open(GITHUB+'/Projects/funding_the_gap_2017/data/interim/costsfile_az.csv', 'a'))
+	#print(cost_test, file=open(GITHUB+'/Projects/funding_the_gap_2017/data/interim/costsfile_az.csv', 'a'))
 	if i % 250 == 0:
 		print("Iteration {0} out of {1}".format(i,unscalable_campuses.shape[0]))
 	else:

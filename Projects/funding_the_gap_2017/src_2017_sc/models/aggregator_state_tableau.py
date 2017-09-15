@@ -1,7 +1,10 @@
 from pandas import DataFrame, read_csv
 from numpy import append, column_stack
 
-state_metrics = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv')
+import os 
+
+GITHUB = os.environ.get("GITHUB")
+state_metrics = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv',index_col=0)
 print("State metrics imported")
 
 #create empty arrays and base arrays
@@ -14,7 +17,7 @@ district_postal_cd = []
 #loop metrics creation throughout each state
 for z in range(0,len(state_metrics)):
 	#add total_state_funding, total_erate_funding, total_district_funding, build_distance strings and numbers arrays
-	methodology_base = ['min', 'min', 'max', 'max', 'az', 'az_pop']
+	methodology_base = ['min', 'min', 'min', 'max', 'max', 'max', 'az', 'az_pop']
 	cut_base = ['overall', 'wan', 'ia', 'overall', 'wan', 'ia', 'wan', 'wan']
 
 	for y in ['total_cost', 'total_state_funding', 'total_erate_funding', 'total_district_funding', 'build_distance']:
@@ -34,13 +37,13 @@ for z in range(0,len(state_metrics)):
 			state_metrics['max_' + y + '_ia'][z],
 			state_metrics[y + '_az_wan'][z],
 			state_metrics[y + '_az_pop_wan'][z]])
-
+	
 
 	#add total_cost_per_mile, total_miles_per_build strings and numbers arrays
 	methodology_base = ['min', 'max']
 	cut_base = ['overall', 'overall']
 
-	for y in ['total_cost_per_mile', 'miles_per_build']:
+	for y in ['total_cost_per_mile', 'miles_per_build', 'miles_per_build_1']:
 		for x in range(0, 2):
 			value.append(y)
 			district_postal_cd.append(state_metrics['district_postal_cd'][z])
@@ -53,18 +56,20 @@ for z in range(0,len(state_metrics)):
 			state_metrics['max_' + y][z]])
 
 	#add builds strings and numbers arrays
-	for x in range(0, 8):
+	for x in range(0, 10):
 		value.append('builds')
 		district_postal_cd.append(state_metrics['district_postal_cd'][z])
 
-	methodology = append(methodology, ['min', 'min', 'min', 'max', 'max', 'max', 'az', 'az_pop'])
-	cut = append(cut, ['overall', 'wan', 'ia', 'overall', 'wan', 'ia', 'wan', 'wan'])
+	methodology = append(methodology, ['min', 'min', 'min', 'min','max', 'max', 'max','max', 'az', 'az_pop'])
+	cut = append(cut, ['overall', 'overall', 'wan', 'ia', 'overall', 'overall', 'wan', 'ia', 'wan', 'wan'])
 
 	numbers = append(numbers,
 		[state_metrics['min_builds'][z],
+		state_metrics['min_builds_1'][z],
 		state_metrics['min_builds_wan'][z],
 		state_metrics['min_builds_ia'][z],
 		state_metrics['max_builds'][z],
+		state_metrics['max_builds_1'][z],
 		state_metrics['max_builds_wan'][z],
 		state_metrics['max_builds_ia'][z],
 		state_metrics['builds_az_wan'][z],
