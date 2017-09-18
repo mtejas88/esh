@@ -14,13 +14,22 @@ from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
 
 cost_magnifier = 1.2
 
+def getAPIKey():
+	keys = MAPBOX_ACCESS_TOKEN
+	while True:
+		for key in keys:
+			yield key
+
 class distanceCalculator():
 
-	def __init__(self, lat_a, lon_a, lat_b, lon_b):
+	def __init__(self, lat_a, lon_a, lat_b, lon_b, key_gen):
 		self.lat_a = lat_a
 		self.lon_a = lon_a
 		self.lat_b = lat_b
 		self.lon_b = lon_b
+		#print "Init called with {},{} and {},{}".format(lat_a, lon_a,lat_b, lon_b)
+		self.key_gen = key_gen
+
 
 	def mapboxRequest(self):
 		r = self.sendRequest()
@@ -31,16 +40,23 @@ class distanceCalculator():
 		   distance = r.json()['routes'][0]['distance'] *  0.000621371
 		else: #distance too close to calculate route
 		   distance = -1
+		   print r.json()
 		return distance
 
 	def sendRequest(self):
 		MAPBOX_URL = 'https://api.mapbox.com/directions/v5/mapbox/driving/'
-		MAPBOX_URL_PARAMS = {'access_token': MAPBOX_ACCESS_TOKEN}
-		return requests.get("{0}{1},{2};{3},{4}.json".format(	MAPBOX_URL,
+		key = next(self.key_gen)
+		MAPBOX_URL_PARAMS = {'access_token': key}
+		try:
+			result =requests.get("{0}{1},{2};{3},{4}.json".format(	MAPBOX_URL,
 																self.lon_a,
 																self.lat_a,
 																self.lon_b,
 																self.lat_b), params = MAPBOX_URL_PARAMS)
+			return result
+		except:
+			raise
+
 
 class buildCostCalculator():
 
