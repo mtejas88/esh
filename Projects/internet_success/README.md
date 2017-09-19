@@ -1,0 +1,3 @@
+# Internet Success: Measuring Broadband's effect on Student Performance
+
+## As a state team member I would like to have data that shows districts not meeting goals, the benefits of meeting goals. Now that we have data for multiple years, it would be great to see if we can measure success from increases in broadband. Success could be considered GPA's, Graduation Rates, enrollment in types of classes. A stretch goal would be some type of impact on the community.
