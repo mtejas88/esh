@@ -1,4 +1,143 @@
---district fiberpredeluxe
+with wifi_status as (
+	--suffiency as of 7/24
+	--copy of wifi connectivity informations except only using tags pre-7/24
+
+	select 	ci.postal_cd,
+			ci.parent_entity_name,
+
+	(select distinct (eb_parent.entity_id) as parent_entity_id),
+			--eb_parent.entity_id as parent_entity_id, using distinct entity id above and commenting non unique column
+			sum(case
+					when t.label = 'sufficient_wifi'
+					  then 0
+					when t.label = 'insufficient_wifi'
+					  then 1
+					when child_wifi in ('Sometimes','Never')
+						then 1
+					else 0
+				end) as count_wifi_needed
+
+	from fy2017.connectivity_informations ci
+
+
+	left join public.entity_bens eb_parent
+
+	on ci.parent_entity_number = eb_parent.ben
+
+	left join public.fy2017_districts_demog_matr dd
+
+	on eb_parent.entity_id = dd.esh_id::text::int
+
+	left join public.tags t
+	on dd.esh_id::text::int = t.taggable_id
+	and t.label in ('sufficient_wifi', 'insufficient_wifi')
+	and t.deleted_at is null
+	and t.funding_year = 2017
+	and t.created_at::date <= '2017-07-24'::date
+
+	left join public.entity_bens eb_child   /*no funding year column in this*/
+	on ci.child_entity_number = eb_child.ben
+
+	left join public.fy2017_schools_demog_matr sd
+	on eb_child.entity_id = sd.school_esh_id::text::int
+
+	where dd.esh_id is not null
+	and sd.school_esh_id is not null
+
+	group by 	ci.postal_cd,
+				ci.parent_entity_name,
+				eb_parent.entity_id
+
+),
+
+temp as (
+
+	select 
+		d17.esh_id,
+		d17.postal_cd,
+		d17.num_students,
+		d17.num_schools,
+		d16.needs_wifi as needs_wifi_16,
+		d17.needs_wifi as needs_wifi_17,
+		CASE 	WHEN w.count_wifi_needed > 0 THEN true
+	   			WHEN w.count_wifi_needed = 0 THEN false
+	        	ELSE null
+			   	END as needs_wifi_updated_17
+
+
+	from public.fy2017_districts_predeluxe_matr d17
+
+	join public.fy2016_districts_predeluxe_matr d16
+	on d17.esh_id = d16.esh_id
+
+	left join wifi_status w
+	on d17.esh_id = w.parent_entity_id::varchar
+
+	where d17.include_in_universe_of_districts
+	and d17.district_type = 'Traditional'
+
+),
+
+temp_2 as (
+
+select
+	esh_id,
+	postal_cd,
+	num_students,
+	num_schools,
+	case 
+	    when needs_wifi_16 = false
+	      then 'Sufficient'
+	    when needs_wifi_16 = true
+	      then 'Insufficient'
+	    else 'No response'
+	  end as dd_response_16,
+  	case 
+	    when needs_wifi_updated_17 = false
+	      then 'Sufficient'
+	    when needs_wifi_updated_17 = true
+	      then 'Insufficient'
+	    else 'No response'
+	  end as dd_response_17
+
+from temp
+
+
+),
+
+suff as (
+
+	select distinct 
+		*,
+		case
+			when dd_response_17 = 'Sufficient' 
+			 and dd_response_16 = 'Sufficient'
+			 	then 0.944
+			when dd_response_17 = 'Insufficient' 
+			 and dd_response_16 = 'Insufficient'
+			 	then .756
+			when dd_response_17 = 'No response'
+				then 	case
+							when dd_response_16 = 'Sufficient'
+								then 1
+							else 0
+						end
+			when dd_response_16 = 'No response'
+				then 	case
+							when dd_response_17 = 'Sufficient'
+								then 1
+							else 0
+						end
+			when dd_response_17 = 'Sufficient'
+				then 1
+			else 0
+		end as sufficient_district
+
+	from temp_2
+
+	where not(dd_response_16 = 'No response' and dd_response_17 = 'No response')
+
+)
 
 
 select distinct
@@ -176,6 +315,36 @@ select distinct
 	dpd.meeting_2018_goal_oversub,
 
 	dpd.meeting_2018_goal_no_oversub_fcc_25,
+
+	 case
+    -- calculate for any district that has a num_students > 0
+    when dpd.num_students is not null and dpd.num_students != 0 then
+    case
+      when dpd.setda_concurrency_factor > 0 then
+	      case when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 28.5 then 25
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 34 then 30
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 56 then 50
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 111 then 100
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 221 then 200
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 331 then 300
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 551 then 500
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 1101 then 1000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 2201 then 2000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 3301 then 3000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 5501 then 5000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 11001 then 10000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 22001 then 20000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 33001 then 30000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 44001 then 40000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 55001 then 50000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 110001 then 100000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 220001 then 200000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 330001 then 300000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) < 550001 then 500000
+					   when (dpd.num_students::numeric * dpd.setda_concurrency_factor) >= 550001 then 1000000
+			  end
+	  end
+  	end as projected_bw_fy2018_cck12,
 
 	dpd.at_least_one_line_not_meeting_broadband_goal,
 
@@ -473,6 +642,8 @@ select distinct
 
 	dpd.needs_wifi,
 
+	suff.sufficient_district as wifi_suff_sots_17,
+
 	dpd.c2_prediscount_budget_15,
 
 	dpd.c2_prediscount_remaining_15,
@@ -541,8 +712,7 @@ select distinct
 	and dspa.reporting_name=d16.service_provider_assignment then 'Did Not Switch' 
 	end as switcher,
 
-	case when dpd.district_size in ('Medium','Large','Mega') then 0.7
-	else 1 end as setda_concurrency_factor
+	dpd.setda_concurrency_factor
 
 
 
@@ -566,13 +736,16 @@ left join public.fy2016_districts_deluxe_matr d16
 
 on dpd.esh_id::varchar = d16.esh_id::varchar
 
+left join suff
+on dpd.esh_id = suff.esh_id
+
 
 
 
 /*
 Author: Justine Schott
 Created On Date: 8/15/2016
-Last Modified Date: 8/14/2017 -- SC added SETDA concurrency factor
+Last Modified Date: 9/15/2017 -- JH added wifi sufficiency from SOTS 17 and cck12 2018 rounded bw
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology with targeting assumptions built in but prior to fiber metric extrapolation
 Methodology:

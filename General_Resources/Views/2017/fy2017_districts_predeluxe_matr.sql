@@ -392,7 +392,13 @@ select distinct
 
 	ia_monthly_cost_other_applied,
 
-	ia_monthly_funding_total
+	ia_monthly_funding_total,
+
+	case 
+		when district_size in ('Medium','Large','Mega') 
+			then 0.7
+		else 1 
+	end as setda_concurrency_factor
 
 
 
