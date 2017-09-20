@@ -21,7 +21,6 @@ fcdl.set_index('frn')
 denied = fcdl[fcdl['frn_status'] == 'Denied']
 
 ##making the comments lowercase
-denied['test'] = denied['fcdl_comment_for_frn']
 fcdl_comment_cleaned = denied['fcdl_comment_for_frn'].str.lower()
 
 ##removing trailing and leading whitespaces
@@ -33,88 +32,26 @@ def punct_re(s):
     return punct.sub(' ', s)
 fcdl_comment_cleaned = fcdl_comment_cleaned.apply(lambda x: punct_re(x))
 
-##---------------------------------------------------------------------------------
-##spell checker..seems intense
-##source: https://github.com/norvig/pytudes/blob/master/spell.py
-def words(text): return re.findall(r'\w+', text.lower())
-
-WORDS = Counter(words(open('fcdl_data/big.txt').read()))
-
-def P(word, N=sum(WORDS.values())): 
-    "Probability of `word`."
-    return WORDS[word] / N
-
-def correction(word): 
-    "Most probable spelling correction for word."
-    return max(candidates(word), key=P)
-
-def candidates(word): 
-    "Generate possible spelling corrections for word."
-    return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
-
-def known(words): 
-    "The subset of `words` that appear in the dictionary of WORDS."
-    return set(w for w in words if w in WORDS)
-
-def edits1(word):
-    "All edits that are one edit away from `word`."
-    letters    = 'abcdefghijklmnopqrstuvwxyz'
-    splits     = [(word[:i], word[i:])    for i in range(len(word) + 1)]
-    deletes    = [L + R[1:]               for L, R in splits if R]
-    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R)>1]
-    replaces   = [L + c + R[1:]           for L, R in splits if R for c in letters]
-    inserts    = [L + c + R               for L, R in splits for c in letters]
-    return set(deletes + transposes + replaces + inserts)
-
-def edits2(word): 
-    "All edits that are two edits away from `word`."
-    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
-
-print(correction('speling'))
-print(correction('korrectud'))
-print(correction('kajsfaslkfj'))
-
-#fcdl_comment_cleaned = fcdl_comment_cleaned.apply(lambda x: correction(x))
-
-#---------------------------------------------------------------------------------
-
-
+##creating new column in dataframe that is the cleaned up text
 denied['fcdl_comment_cleaned'] = fcdl_comment_cleaned
 
-
-#print(denied.iloc[0]['fcdl_comment_for_frn'])
-print('---------------------')
-print(denied.iloc[0]['fcdl_comment_cleaned'])
-
-##USE re.search to find if it exists at all (result.group(0) is the string is found)
+##creating a new columns array of all the words
+denied['fcdl_comment_array'] = denied['fcdl_comment_cleaned'].apply(lambda x: x.split())
 
 ##removing stop words
 from nltk.corpus import stopwords, PlaintextCorpusReader
 
 stops = stopwords.words("english")
-#print(stops)
-#words = [w for w in denied.loc[:,'fcdl_comment_cleaned'] if not w in stops]
-
-denied['fcdl_comment_array'] = denied['fcdl_comment_cleaned'].apply(lambda x: x.split())
 
 def remove_stops(text):
 	return [item for item in text if item not in stops]
 
-print(remove_stops(['this', 'is', 'in', 'a', 'jeremy', 'hello']))
-
-print('pre stops')
-print(denied.iloc[0]['fcdl_comment_array'])
 denied['fcdl_comment_array'] = denied['fcdl_comment_array'].apply(lambda x: remove_stops(x))
-print('post stops')
-print(denied.iloc[0]['fcdl_comment_array'])
 
-
+##re-creating the cleaned column after removing stop words
 denied['fcdl_comment_cleaned'] = denied['fcdl_comment_array'].apply(lambda x: ' '.join(x))
-print(denied.iloc[0]['fcdl_comment_cleaned'])
-
 
 #---------------------------------------------------------------------------------
-print("Creating the bag of words...\n")
 from sklearn.feature_extraction.text import CountVectorizer
 
 # Initialize the "CountVectorizer" object, which is scikit-learn's
@@ -131,31 +68,28 @@ vectorizer = CountVectorizer(analyzer = "word",   \
 # strings.
 train_data_features = vectorizer.fit_transform(denied.loc[:,'fcdl_comment_cleaned'])
 
-# Numpy arrays are easy to work with, so convert the result to an 
-# array
+# Convert the result to an array
 train_data_features = train_data_features.toarray()
-print(train_data_features.shape)
 vocab = vectorizer.get_feature_names()
-#print(vocab)
 
 # Sum up the counts of each vocabulary word
 dist = np.sum(train_data_features, axis=0)
 
 # For each, print the vocabulary word and the number of times it 
 # appears in the training set
-##Add this back
 a = []
 b = []
 for tag, count in zip(vocab, dist):
     a.append(count)
     b.append(tag)
 
-word_counts = pd.DataFrame({'text': b, 'num': a})
+word_counts = pd.DataFrame({'text': b, 'count': a})
+word_counts = word_counts.set_index('text')
 
-print(word_counts.sort_values('num', ascending = False).head(20))
+print(word_counts.sort_values('count', ascending = False).head(20))
 
 #---------------------------------------------------------------------------------
-##bigrams
+##bigrams & trigrams
 
 from collections import Counter
 from itertools import tee, islice
@@ -172,17 +106,42 @@ def ngrams(lst, n):
     else:
       break
 
-test = re.findall("\w+", 
-   "the quick person did not realize his speed and the quick person bumped")
-
-print(Counter(ngrams(test, 3)))
-
 denied['bigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 2)))
 denied['trigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 3)))
 
-print(denied.iloc[0]['bigram_array'])
-print('-----------')
-print(denied.iloc[0]['trigram_array'])
+##bigrams
+all_bigrams = pd.Series()
+for row in denied['bigram_array']:
+  s = pd.Series(row, name = 'bigrams')
+  all_bigrams = all_bigrams.append(s)
 
-all_bigrams = pd.DataFrame.from_dict(denied['bigram_array'], orient='index')
+print(type(all_bigrams))
+all_bigrams = pd.DataFrame(all_bigrams)
 
+print('----------')
+all_bigrams.index.names = ['bigram']
+all_bigrams.columns = ['count']
+all_bigrams = all_bigrams.groupby(['bigram']).sum()
+print(all_bigrams.sort_values('count', ascending = False).head(20))
+
+##trigrams
+all_trigrams = pd.Series()
+for row in denied['trigram_array']:
+  t = pd.Series(row, name = 'trigrams')
+  all_trigrams = all_trigrams.append(t)
+
+print(type(all_trigrams))
+all_trigrams = pd.DataFrame(all_trigrams)
+
+print('----------')
+all_trigrams.index.names = ['trigram']
+all_trigrams.columns = ['count']
+all_trigrams = all_trigrams.groupby(['trigram']).sum()
+print(all_trigrams.sort_values('count', ascending = False).head(20))
+
+##---------------------------------------------------------------------------------
+##write results to CSVs
+
+word_counts.sort_values('count', ascending = False).to_csv('fcdl_data/single_words.csv')
+all_bigrams.sort_values('count', ascending = False).to_csv('fcdl_data/bigrams.csv')
+all_trigrams.sort_values('count', ascending = False).to_csv('fcdl_data/trigrams.csv')
