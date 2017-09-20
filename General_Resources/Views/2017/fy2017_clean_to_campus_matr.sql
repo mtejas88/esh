@@ -54,11 +54,15 @@ select
   c.exclude_from_wan_analysis,
   case
     --for districts that aren't targets, they just need to be fit for wan to be fit for campus
+    --and have num_lines >= num_campuses
     when c.exclude_from_wan_analysis = false
      and c.fiber_target_status != 'Target'
+     and da.lines_w_dirty >= dm.num_campuses
       then false
     --for all districts, if they are not fit for wan analysis then they are not fit for campus
+    --or if they have less lines than campuses
     when c.exclude_from_wan_analysis = true
+      or da.lines_w_dirty < dm.num_campuses
       then true
     --for targets, if they have any category = Incorrect Non-fiber or 'Correct Non-fiber and Incorrect Fiber' then they are not fit for campus
     when count(
@@ -87,22 +91,32 @@ from public.fy2017_campus_summary_matr c
 left join nonfiber_district d
 on c.district_esh_id = d.district_esh_id
 
+left join public.fy2017_districts_aggregation_matr da
+on c.district_esh_id = da.district_esh_id
+
+left join public.fy2017_districts_metrics_matr dm
+on c.district_esh_id = dm.esh_id
+
 
 group by 
   c.district_esh_id,
   d.district_esh_id,
   c.non_fiber_lines_w_dirty,
   c.exclude_from_wan_analysis,
+  da.lines_w_dirty,
+  dm.num_campuses,
   c.fiber_target_status
 
 
 /*
 Author: Jeremy Holtzman
 Created On Date: 9/8/2017
+Modied: 9/20/17 - JH need at least as many lines than campuses to be fit for campus analysis
 Name of QAing Analyst(s):
 Purpose: use the campus summary to determine if fit for campus analysis
 Methodology:
-1. All districts that are not fiber targets and are fit for WAN analysis are fit for campus analysis
+1. All districts that are not fiber targets and are fit for WAN analysis 
+   and at least as many lines as campuses are fit for campus analysis
 2. All districts that are not fit for WAN analysis are NOT fit for campus analysis
 3. Remaining districts that have any incorrectly allocated non-fiber, non-fiber to the district, 
     or a campus with Correct non-fiber and incorrect fiber are NOT fit for campus analysis
