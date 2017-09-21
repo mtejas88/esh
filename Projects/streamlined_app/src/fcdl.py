@@ -18,7 +18,14 @@ print(fcdl['frn_status'].unique())
 fcdl.set_index('frn')
 
 ##creating dataframe of denied comments
-denied = fcdl[fcdl['frn_status'] == 'Denied']
+denied = fcdl[fcdl['frn_status'] == 'Denied'].copy()
+
+##new - fix the settingwithcopy
+denied.loc[:,'fcdl_comment_for_frn'].str.lower()
+print('READ ME')
+print(denied['fcdl_comment_for_frn'])
+denied['test2'] = denied.fcdl_comment_for_frn.copy().str.lower()
+#print(denied['test2'].head())
 
 ##making the comments lowercase
 fcdl_comment_cleaned = denied['fcdl_comment_for_frn'].str.lower()
@@ -106,7 +113,27 @@ def ngrams(lst, n):
     else:
       break
 
+def ngrams2(comment, n):
+  
+  for i in range(0,len(comment)):
+    grams = list()
+    if i < (len(comment) - n + 1):
+      grams.append(comment[i])
+      counter = 0
+      while counter < (n - 1):
+        grams.append(comment[i + 1 + counter])
+        counter += 1
+
+  return grams
+    
+
+
+    #comment[i], comment[i + 1]
+
+
 denied['bigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 2)))
+denied['bigram_array_test'] = denied['fcdl_comment_array'].apply(lambda x: ngrams2(x, 2))
+print(denied.head())
 denied['trigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 3)))
 
 ##bigrams
@@ -138,6 +165,10 @@ all_trigrams.index.names = ['trigram']
 all_trigrams.columns = ['count']
 all_trigrams = all_trigrams.groupby(['trigram']).sum()
 print(all_trigrams.sort_values('count', ascending = False).head(20))
+
+print('result of new n grams with adrianna')
+print(denied.iloc[0]['fcdl_comment_array'])
+print(ngrams2(denied.iloc[0]['fcdl_comment_array'],2))
 
 ##---------------------------------------------------------------------------------
 ##write results to CSVs
