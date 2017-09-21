@@ -118,12 +118,11 @@ def ngrams2(comment, n):
   for i in range(0,len(comment)):
     grams = list()
     if i < (len(comment) - n + 1):
-      grams.append(comment[i])
+      grams = grams.append(comment[i])
       counter = 0
       while counter < (n - 1):
-        grams.append(comment[i + 1 + counter])
+        grams = grams.append(comment[i + 1 + counter])
         counter += 1
-
   return grams
     
 
