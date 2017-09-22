@@ -67,6 +67,7 @@ select distinct
 		        flag_array is null
 		    )  
 	        and ia_bandwidth_per_student_kbps > 0
+	        and incomplete_upstream_isp = false
 	    then false
 	    else true
 	    end as exclude_from_ia_analysis,
@@ -80,6 +81,7 @@ select distinct
 	 		)
 			and ia_no_cost_lines = 0
 			and ia_bandwidth_per_student_kbps > 0
+			and incomplete_upstream_isp = false
 		then false
 		else true
 	end as exclude_from_ia_cost_analysis,
@@ -419,7 +421,7 @@ on ldi.esh_id::varchar = dm.esh_id
 /*
 Author: Justine Schott
 Created On Date: 12/1/2016
-Last Modified Date: 7/28/2017 -- JMB fixing dirty_wan flag name, changing exclude_from_ia_cost_analysis to have same bw/student rule, fixing clean_categorization
+Last Modified Date: 9/22/2017 -- JMB using incomplete_upstream_isp to make clean districts that aren't receiving both upstream and isp dirty, primarily charter bug
 Name of QAing Analyst(s):
 Purpose: 2016 district data in terms of 2016 methodology for longitudinal analysis
 Methodology:

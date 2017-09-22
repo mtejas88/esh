@@ -26,6 +26,13 @@ select	dd.*,
 
 				da.tag_array,
 
+				case 
+					when (upstream_bandwidth = 0 and isp_bandwidth != 0)
+						or (upstream_bandwidth != 0 and isp_bandwidth = 0 and com_info_bandwidth = 0)
+					then true
+					else false 
+				end as incomplete_upstream_isp,
+
 				broadband_internet_upstream_lines,
 
 				not_broadband_internet_upstream_lines,
@@ -522,7 +529,7 @@ Author: Justine Schott
 
 Created On Date: 6/20/2016
 
-Last Modified Date: 6/23/17 added adjusted discount rate
+Last Modified Date: 9/22/17 JMB adding incomplete_upstream_isp to eventually be used to make clean districts that aren't receiving both upstream and isp dirty
 
 Name of QAing Analyst(s):
 
