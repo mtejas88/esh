@@ -81,8 +81,14 @@ perc.low.17 <- low.17 / spend[spend$year == 2017, c('pre_discount')]
 
 
 head(spend.applicant)
-spend.applicant$oop.less <- spend.applicant$erate_request_17 <= spend.applicant$erate_request_15
-spend.applicant$savings <- spend.applicant$erate_request_15 - spend.applicant$erate_request_17
+spend.applicant$oop_17 <- spend.applicant$pre_discount_17 - spend.applicant$erate_request_17
+spend.applicant$oop_15 <- spend.applicant$pre_discount_15 - spend.applicant$erate_request_15
+spend.applicant$oop.less <- spend.applicant$oop_17 <= spend.applicant$oop_15
+#old incorrect way - this was the erate share
+#spend.applicant$oop.less <- spend.applicant$erate_request_17 <= spend.applicant$erate_request_15
+spend.applicant$savings <- spend.applicant$oop_15 - spend.applicant$oop_17
+#old incorrect way - this was the erate share
+#spend.applicant$savings <- spend.applicant$erate_request_15 - spend.applicant$erate_request_17
 table(spend.applicant$oop.less)
 perc.oop.less <- nrow(spend.applicant[spend.applicant$oop.less == T,]) / nrow(spend.applicant)
 sum(spend.applicant$pre_discount_17, na.rm = T)
@@ -93,4 +99,7 @@ saving.avg <- mean(saving$savings, na.rm = T)
 expensive <- filter(spend.applicant, oop.less == FALSE)
 expensive.loss.avg <- mean(expensive$savings, na.rm = T)
 
-total.savings <- sum(spend.applicant$savings, na.rm = T)
+total.district.savings <- sum(spend.applicant$savings, na.rm = T)
+total.erate.savings <- sum(spend.applicant$erate_request_15 - spend.applicant$erate_request_17, na.rm = T)
+total.savings <- sum(spend.applicant$pre_discount_15 - spend.applicant$pre_discount_17, na.rm = T)
+
