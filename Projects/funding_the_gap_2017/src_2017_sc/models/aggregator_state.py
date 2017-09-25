@@ -302,7 +302,7 @@ state_metrics['max_miles_per_build'] = 	state_metrics['extrapolated_max_build_di
 state_metrics['max_miles_per_build_1'] = 	state_metrics['extrapolated_max_build_distance'] / state_metrics['extrapolated_max_builds_1']
 
 state_metrics = state_metrics[[	'district_postal_cd', 'extrapolated_min_total_cost', 'extrapolated_min_total_state_funding', 'extrapolated_min_total_erate_funding',
-								'extrapolated_min_total_district_funding', 'extrapolated_min_builds','extrapolated_min_builds_1', 'extrapolated_min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build','min_miles_per_build_1',
+								'extrapolated_min_total_district_funding', 'extrapolated_builds_wan', 'extrapolated_min_builds','extrapolated_min_builds_1', 'extrapolated_min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build','min_miles_per_build_1',
 								'extrapolated_max_total_cost', 'extrapolated_max_total_state_funding', 'extrapolated_max_total_erate_funding',
 								'extrapolated_max_total_district_funding', 'extrapolated_max_builds', 'extrapolated_max_builds_1','extrapolated_max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build','max_miles_per_build_1',
 								'extrapolated_max_total_cost_wan', 'extrapolated_max_total_state_funding_wan', 'extrapolated_max_total_erate_funding_wan',
@@ -321,7 +321,7 @@ state_metrics = state_metrics[[	'district_postal_cd', 'extrapolated_min_total_co
 								]]
 
 state_metrics.columns = [	'district_postal_cd', 'min_total_cost', 'min_total_state_funding', 'min_total_erate_funding',
-							'min_total_district_funding', 'min_builds','min_builds_1', 'min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build', 'min_miles_per_build_1',
+							'min_total_district_funding', 'builds_wan', 'min_builds','min_builds_1', 'min_build_distance', 'min_total_cost_per_mile', 'min_miles_per_build', 'min_miles_per_build_1',
 							'max_total_cost', 'max_total_state_funding', 'max_total_erate_funding',
 							'max_total_district_funding', 'max_builds','max_builds_1', 'max_build_distance', 'max_total_cost_per_mile', 'max_miles_per_build', 'max_miles_per_build_1',
 							'max_total_cost_wan', 'max_total_state_funding_wan', 'max_total_erate_funding_wan',

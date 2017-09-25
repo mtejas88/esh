@@ -56,12 +56,12 @@ for z in range(0,len(state_metrics)):
 			state_metrics['max_' + y][z]])
 
 	#add builds strings and numbers arrays
-	for x in range(0, 10):
+	for x in range(0, 11):
 		value.append('builds')
 		district_postal_cd.append(state_metrics['district_postal_cd'][z])
 
 	methodology = append(methodology, ['min', 'min', 'min', 'min','max', 'max', 'max','max', 'az', 'az_pop'])
-	cut = append(cut, ['overall', 'overall', 'wan', 'ia', 'overall', 'overall', 'wan', 'ia', 'wan', 'wan'])
+	cut = append(cut, ['overall', 'overall', 'wan', 'ia', 'overall', 'overall', 'wan', 'ia', 'wan','wan', 'wan'])
 
 	numbers = append(numbers,
 		[state_metrics['min_builds'][z],
@@ -72,6 +72,7 @@ for z in range(0,len(state_metrics)):
 		state_metrics['max_builds_1'][z],
 		state_metrics['max_builds_wan'][z],
 		state_metrics['max_builds_ia'][z],
+		state_metrics['builds_wan'][z],
 		state_metrics['builds_az_wan'][z],
 		state_metrics['builds_az_pop_wan'][z]])
 

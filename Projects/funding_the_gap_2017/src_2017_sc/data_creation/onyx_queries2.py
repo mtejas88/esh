@@ -33,37 +33,18 @@ def getCampuses( conn ) :
                   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses as district_num_campuses_unscalable,
                   dd.hierarchy_ia_connect_category as district_hierarchy_ia_connect_category,
                   case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.campus_id
-                  else campus_schools.campus_id end as campus_id,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then 1 else 0 end as correct_match,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.campus_school_names
-                  else campus_schools.campus_school_names end as campus_school_names,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.campus_school_nces_cds
-                  else campus_schools.campus_school_nces_cds end as campus_school_nces_cds,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.sample_campus_nces_cd
-                  else campus_schools.sample_campus_nces_cd end as sample_campus_nces_cd,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.campus_school_count
-                  else campus_schools.campus_school_count end as campus_school_count,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.campus_student_count
-                  else campus_schools.campus_student_count end as campus_student_count,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.sample_campus_latitude
-                  else campus_schools.sample_campus_latitude end as sample_campus_latitude,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.sample_campus_longitude
-                  else campus_schools.sample_campus_longitude end as sample_campus_longitude,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.sample_campus_locale
-                  else campus_schools.sample_campus_locale end as sample_campus_locale,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  then correct_nonfiber.sample_campus_ulocal
-                  else campus_schools.sample_campus_ulocal end as sample_campus_ulocal
+                  and campus_schools.campus_id = correct_nonfiber.campus_id
+                  then 1 else 0 end as correct_match,                  
+                  campus_schools.campus_id,
+                  campus_schools.campus_school_names,
+                  campus_schools.campus_school_nces_cds,
+                  campus_schools.sample_campus_nces_cd,
+                  campus_schools.campus_school_count,
+                  campus_schools.campus_student_count,
+                  campus_schools.sample_campus_latitude,
+                  campus_schools.sample_campus_longitude,
+                  campus_schools.sample_campus_locale,
+                  campus_schools.sample_campus_ulocal
 
 from public.fy2017_districts_deluxe_matr dd
 left join (
@@ -101,25 +82,11 @@ left join (
 on dd.esh_id = campus_schools.district_esh_id
 
 left join (
-select ce.district_esh_id, ce.campus_id,
-         array_agg(name) as campus_school_names,
-         array_agg(school_nces_code) as campus_school_nces_cds,
-         max(school_nces_code) as sample_campus_nces_cd,
-         count(*) as campus_school_count,
-         sum(num_students) as campus_student_count,
-         min("LATCOD") as sample_campus_latitude,
-         min("LONCOD") as sample_campus_longitude,
-         min(locale) as sample_campus_locale,
-         min("ULOCAL") as sample_campus_ulocal
--- 11/2 discussion recap min/max rule for identifying sample value for each campus is somewhat arbitrary
--- let's either document that it's arbitrary (or it wasn't but unclear of Greg's decisions) or
--- re-do it by assigning row number
+select ce.district_esh_id, ce.campus_id
   from public.fy2017_campuses_excluded_from_analysis_matr ce
   join public.fy2017_schools_demog_matr  sd
   on ce.district_esh_id = sd.district_esh_id
   and ce.campus_id = sd.campus_id
-  left join public.sc141a sc
-  on sd.school_nces_code = sc."NCESSCH"
   where district_include_in_universe_of_districts
   and exclude_from_campus_analysis = false
   and category='Correct Non-fiber'
@@ -127,6 +94,7 @@ select ce.district_esh_id, ce.campus_id,
   group by ce.district_esh_id, ce.campus_id
   ) correct_nonfiber
 on dd.esh_id = correct_nonfiber.district_esh_id
+and campus_schools.campus_id = correct_nonfiber.campus_id
 
 left join (
   select
