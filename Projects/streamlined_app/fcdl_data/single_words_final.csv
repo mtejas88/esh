@@ -1,0 +1,2370 @@
+,text,count,category_arrays
+0,frn,4643,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'c']"
+1,services,3513,"['Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Duplicate FRN', 'No signed contract in place', 'No 470', 'Missing documentation needed to determine eligible service']"
+2,fcc,2887,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+3,dr1,2726,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Missing form 470', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+4,service,2497,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Duplicate FRN', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Category 2 budget exceeded', 'c']"
+5,denied,2157,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+6,documentation,2014,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Missing form 470', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+7,applicant,1700,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+8,voice,1593,"['Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+9,funding,1512,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Ineligible Service', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'No 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+10,rules,1279,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'No 470', 'Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Fiber review failure']"
+11,provided,1206,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Missing form 470', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+12,form,1191,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Ineligible Service', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+13,therefore,1180,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+14,order,1170,"['470 / 471 Mismatch', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Ineligible Service']"
+15,request,1085,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+16,support,1073,"['Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+17,determine,1013,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+18,year,978,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Duplicate FRN', 'No signed contract in place', 'No 470', 'Missing documentation needed to determine eligible service']"
+19,program,920,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor', 'Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Fiber review failure']"
+20,470,892,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Ineligible Service', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+21,competitive,872,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', '470 / 471 Mismatch', 'Missing documentation to determin competitive bidding']"
+22,bidding,869,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', '470 / 471 Mismatch', 'Missing documentation to determin competitive bidding']"
+23,needed,833,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+24,sufficient,820,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Category 2 budget exceeded', 'Missing form 470', 'Competitive Bidding Violation - price not primary factor', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+25,rate,807,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure']"
+26,eligibility,789,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+27,item,775,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'c']"
+28,14,775,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding', 'Ineligible Service']"
+29,following,763,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', 'Missing required fields on 471', 'Missing form 470', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+30,99,750,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Fiber review failure', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+31,requested,749,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Ineligible Service', 'No signed contract in place', 'No 470', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service', 'Applicant ineligible', 'c']"
+32,subject,721,"['Voice - no discount remaining', 'Competitive Bidding Violation']"
+33,eligible,720,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+34,cost,716,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service', 'Fiber review failure']"
+35,month,710,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'No 470', 'Missing documentation needed to determine eligible service']"
+36,type,704,"['Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch']"
+37,discount,676,"['Applicant ineligible', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Ineligible Service']"
+38,according,676,"['Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Competitive Bidding Violation']"
+39,2015,656,"['Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure']"
+40,phase,656,['Voice - no discount remaining']
+41,beginning,650,['Voice - no discount remaining']
+42,reduced,648,"['Voice - no discount remaining', 'Missing documentation needed to determine eligible service']"
+43,require,645,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Applicant ineligible', 'Fiber review failure']"
+44,provide,625,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+45,products,611,"['Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Duplicate FRN', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+46,ineligible,594,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible']"
+47,process,591,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', '470 / 471 Mismatch']"
+48,bidders,591,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+49,provider,581,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', '470 / 471 Mismatch']"
+50,failed,578,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+51,rfp,571,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+52,bid,559,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch', 'Missing documentation to determin competitive bidding']"
+53,information,555,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+54,vendor,534,"['Competitive Bidding Violation', 'Applicant ineligible', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+55,based,487,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible']"
+56,entity,476,"['Applicant ineligible', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+57,must,468,"['470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+58,since,468,"['470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'No signed contract in place', 'Ineligible Service', 'Category 2 budget exceeded', 'Applicant ineligible', 'c', 'Missing documentation needed to determine eligible service']"
+59,mr1,465,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+60,applicants,464,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470']"
+61,data,454,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+62,fiber,452,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+63,entities,450,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+64,effective,440,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Fiber review failure']"
+65,review,434,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Applicant ineligible', 'Missing documentation to determin competitive bidding']"
+66,per,427,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+67,schools,421,"['Applicant ineligible', 'Ineligible Service', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+68,evaluation,361,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+69,471,354,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+70,modified,347,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Red light rule violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'c', 'Missing documentation needed to determine eligible service']"
+71,dr2,310,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+72,agree,309,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Red light rule violation', 'Ineligible Service', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'c', 'Missing documentation needed to determine eligible service']"
+73,required,302,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+74,requirements,302,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Red light rule violation', 'Ineligible Service', 'Fiber review failure']"
+75,specific,300,"['Competitive Bidding Violation', 'No signed contract in place', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'c']"
+76,prospective,296,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+77,respond,293,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Competitive Bidding Violation - price not primary factor']"
+78,posted,288,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'No 470']"
+79,accurate,288,['Competitive Bidding Violation']
+80,providers,281,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+81,met,277,"['Competitive Bidding Violation', 'No signed contract in place', 'Missing documentation to determin competitive bidding', 'Fiber review failure']"
+82,requirement,273,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'Applicant ineligible', 'Fiber review failure']"
+83,application,269,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Missing documentation needed to determine eligible service']"
+84,demonstrate,266,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service']"
+85,individual,262,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+86,bids,257,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+87,price,253,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+88,plans,248,['Ineligible Service']
+89,contract,246,"['470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+90,current,245,"['Competitive Bidding Violation', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+91,bona,240,"['470 / 471 Mismatch', 'Competitive Bidding Violation']"
+92,fide,240,"['470 / 471 Mismatch', 'Competitive Bidding Violation']"
+93,school,238,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+94,evaluate,235,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+95,potential,235,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+96,libraries,231,"['Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+97,prices,225,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+98,use,224,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+99,network,222,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service']"
+100,requesting,214,"['Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+101,chooses,214,['Competitive Bidding Violation']
+102,local,213,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+103,dark,213,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure']"
+104,associated,207,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+105,changed,207,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+106,accordance,203,"['Competitive Bidding Violation', 'Missing documentation to determin competitive bidding']"
+107,requests,199,"['Category 2 budget exceeded', 'Competitive Bidding Violation']"
+108,either,192,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+109,meet,191,"['Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation']"
+110,receive,189,"['Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+111,submit,177,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service']"
+112,solution,176,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+113,factor,175,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+114,possible,174,"['Ineligible Service', 'Competitive Bidding Violation']"
+115,stated,171,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+116,usac,167,"['Competitive Bidding Violation', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470']"
+117,universal,167,"['Applicant ineligible', 'Competitive Bidding Violation']"
+118,used,167,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+119,administrator,165,"['Competitive Bidding Violation', 'Ineligible Service', 'Fiber review failure', 'Missing documentation to determin competitive bidding']"
+120,violated,165,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+121,included,164,"['470 / 471 Mismatch', 'Competitive Bidding Violation']"
+122,line,162,"['Red light rule violation', 'Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor', 'c']"
+123,within,160,"['Applicant ineligible', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Ineligible Service', 'c']"
+124,amount,157,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service', 'c']"
+125,product,156,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Duplicate FRN', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+126,mr2,156,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+127,proposal,156,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+128,28,151,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+129,needs,149,['Competitive Bidding Violation']
+130,solicitation,144,['Competitive Bidding Violation']
+131,pertinent,144,['Competitive Bidding Violation']
+132,160029101,144,['Competitive Bidding Violation']
+133,defining,143,['Competitive Bidding Violation']
+134,basis,142,['Competitive Bidding Violation']
+135,date,142,"['Missing required fields on 471', 'Competitive Bidding Violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+136,consortium,142,['Competitive Bidding Violation']
+137,lower,142,['Competitive Bidding Violation']
+138,option,140,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+139,new,137,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', '470 / 471 Mismatch', 'Missing documentation to determin competitive bidding']"
+140,authority,137,"['Ineligible Service', 'Applicant ineligible']"
+141,available,136,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure']"
+142,fall,135,"['Ineligible Service', 'Applicant ineligible']"
+143,2016,134,"['Red light rule violation', 'Competitive Bidding Violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure']"
+144,primary,133,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+145,wireless,133,['Ineligible Service']
+146,equipment,132,"['Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+147,includes,131,"['Ineligible Service', 'Voice - no discount remaining']"
+148,internet,129,"['Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+149,tariff,127,"['No 470', 'Competitive Bidding Violation']"
+150,demonstrated,127,['Ineligible Service']
+151,selective,126,"['Competitive Bidding Violation', 'Missing documentation to determin competitive bidding']"
+152,percent,125,"['Ineligible Service', 'Voice - no discount remaining']"
+153,thirty,125,"['Ineligible Service', 'Voice - no discount remaining']"
+154,oya,124,[]
+155,violation,123,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+156,two,122,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service', 'c']"
+157,winning,121,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+158,created,120,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', '470 / 471 Mismatch']"
+159,00,117,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'Applicant ineligible', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+160,asked,117,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+161,access,115,['Missing documentation needed to determine eligible service']
+162,selected,114,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+163,questions,114,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+164,years,112,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+165,number,112,"['Missing required fields on 471', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470']"
+166,04,108,"['Ineligible Service', 'Voice - no discount remaining', 'Red light rule violation', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+167,contains,108,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+168,may,107,"['470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+169,selection,107,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+170,one,107,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470']"
+171,cards,105,['Ineligible Service']
+172,air,105,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+173,area,104,['Ineligible Service']
+174,determined,103,['Competitive Bidding Violation']
+175,agreement,103,"['Competitive Bidding Violation', 'No signed contract in place']"
+176,part,102,"['Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+177,physically,102,['Ineligible Service']
+178,duplicative,102,"['Duplicate FRN', 'Missing documentation needed to determine eligible service']"
+179,unless,102,['Ineligible Service']
+180,installing,102,['Ineligible Service']
+181,13,102,"['Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Red light rule violation', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+182,alone,101,['Competitive Bidding Violation']
+183,location,100,['Duplicate FRN']
+184,16049708,100,['Ineligible Service']
+185,uncommon,100,['Ineligible Service']
+186,make,99,"['470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+187,legally,99,"['Competitive Bidding Violation', 'No signed contract in place']"
+188,binding,99,"['Competitive Bidding Violation', 'No signed contract in place']"
+189,academy,97,"['Category 2 budget exceeded', 'c']"
+190,fund,96,"['Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Ineligible Service', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'No 470', 'Missing documentation needed to determine eligible service', 'c']"
+191,fy2016,96,"['Competitive Bidding Violation', 'No 470']"
+192,certifications,95,"['Competitive Bidding Violation', 'Missing documentation to determin competitive bidding']"
+193,document,95,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Missing form 470', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+194,description,95,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation']"
+195,remove,94,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+196,cellular,93,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+197,receiving,93,['Competitive Bidding Violation']
+198,referenced,93,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+199,long,92,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+200,total,92,"['Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+201,effectiveness,91,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure']"
+202,prohibit,91,['Duplicate FRN']
+203,however,91,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch']"
+204,proposals,90,['Competitive Bidding Violation']
+205,distance,89,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+206,act,89,"['470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+207,better,89,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation']"
+208,submitting,89,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+209,due,88,['Competitive Bidding Violation']
+210,applies,88,['Ineligible Service']
+211,nifs,88,['Missing documentation needed to determine eligible service']
+212,also,87,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+213,amp,86,"['Ineligible Service', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+214,lit,86,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', 'Missing required fields on 471', '470 / 471 Mismatch', 'Missing form 470', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+215,conduct,85,"['Voice - no discount remaining', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+216,lines,85,"['Ineligible Service', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+217,fair,85,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+218,select,85,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding']"
+219,choose,84,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+220,connection,84,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+221,open,84,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+222,signed,83,"['Competitive Bidding Violation', 'No signed contract in place']"
+223,could,83,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation']"
+224,internal,82,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch']"
+225,connected,82,['Missing documentation needed to determine eligible service']
+226,result,81,"['Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+227,telephone,80,['Competitive Bidding Violation']
+228,competing,80,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+229,phone,80,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+230,prior,80,['No signed contract in place']
+231,items,79,"['Ineligible Service', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+232,complete,79,['Competitive Bidding Violation']
+233,ral,78,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation to determin competitive bidding']"
+234,changes,78,['Competitive Bidding Violation']
+235,site,78,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Applicant ineligible', 'c']"
+236,selecting,77,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure']"
+237,certification,77,"['Competitive Bidding Violation', 'No signed contract in place', 'Missing documentation to determin competitive bidding']"
+238,secondary,77,['Applicant ineligible']
+239,seek,77,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+240,sought,77,['Competitive Bidding Violation']
+241,special,77,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure']"
+242,member,76,['Applicant ineligible']
+243,free,76,['Competitive Bidding Violation']
+244,mtm,76,"['470 / 471 Mismatch', 'Competitive Bidding Violation']"
+245,statutory,75,['Applicant ineligible']
+246,elementary,75,['Applicant ineligible']
+247,instance,74,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+248,occurred,74,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+249,ysleta,74,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+250,would,74,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+251,explained,74,['Competitive Bidding Violation']
+252,deemed,74,['Competitive Bidding Violation']
+253,single,73,['Competitive Bidding Violation']
+254,intended,73,"['Competitive Bidding Violation', 'Fiber review failure']"
+255,individually,73,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+256,definition,73,['Applicant ineligible']
+257,choosing,73,['Competitive Bidding Violation']
+258,ago,73,['Competitive Bidding Violation']
+259,forms,72,['Competitive Bidding Violation']
+260,upon,72,['Competitive Bidding Violation']
+261,ensure,72,['Competitive Bidding Violation']
+262,valid,72,"['Applicant ineligible', 'Missing required fields on 471', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+263,accountability,72,['Competitive Bidding Violation']
+264,effectively,72,['Competitive Bidding Violation']
+265,elaborated,72,['Competitive Bidding Violation']
+266,guideline,72,['Competitive Bidding Violation']
+267,expiration,72,"['Missing required fields on 471', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+268,transmission,72,['Missing documentation needed to determine eligible service']
+269,was,72,['Competitive Bidding Violation']
+270,instructions,72,['Competitive Bidding Violation']
+271,essential,72,['Competitive Bidding Violation']
+272,way,72,['Competitive Bidding Violation']
+273,competitively,72,['Competitive Bidding Violation']
+274,messaging,72,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+275,components,72,['Competitive Bidding Violation']
+276,stand,72,['Competitive Bidding Violation']
+277,mr,72,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+278,merely,72,['Competitive Bidding Violation']
+279,necessary,72,['Competitive Bidding Violation']
+280,congress,72,['Competitive Bidding Violation']
+281,meaning,72,['Competitive Bidding Violation']
+282,closed,72,['Applicant ineligible']
+283,malavé,72,[]
+284,detail,72,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+285,discounted,72,['Competitive Bidding Violation']
+286,answered,72,['Competitive Bidding Violation']
+287,assessments,72,['Competitive Bidding Violation']
+288,forming,71,['Competitive Bidding Violation']
+289,bidded,71,['Competitive Bidding Violation']
+290,considerations,71,['Competitive Bidding Violation']
+291,not,71,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+292,telecommunication,71,['Competitive Bidding Violation']
+293,relates,71,['Competitive Bidding Violation']
+294,exact,71,['Competitive Bidding Violation']
+295,2017,71,"['Competitive Bidding Violation', 'Red light rule violation']"
+296,shared,71,['Competitive Bidding Violation']
+297,regulations,71,['Competitive Bidding Violation']
+298,promote,71,['Competitive Bidding Violation']
+299,benefits,71,['Competitive Bidding Violation']
+300,goal,71,['Competitive Bidding Violation']
+301,because,71,['Competitive Bidding Violation']
+302,specified,71,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+303,many,71,['Competitive Bidding Violation']
+304,facilities,71,['Competitive Bidding Violation']
+305,aggregate,71,['Competitive Bidding Violation']
+306,efficient,71,['Competitive Bidding Violation']
+307,method,71,['Competitive Bidding Violation']
+308,demand,71,['Competitive Bidding Violation']
+309,handled,71,['Competitive Bidding Violation']
+310,moreover,71,['Competitive Bidding Violation']
+311,fact,71,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+312,library,70,['Applicant ineligible']
+313,weighted,69,[]
+314,time,69,"['Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'No signed contract in place', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+315,72,68,"['Ineligible Service', 'Applicant ineligible', 'Red light rule violation', 'Category 2 budget exceeded', '470 / 471 Mismatch']"
+316,day,68,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch']"
+317,collection,67,['Red light rule violation']
+318,debt,66,['Red light rule violation']
+319,april,66,"['Red light rule violation', 'Competitive Bidding Violation']"
+320,2004,66,['Red light rule violation']
+321,1996,66,['Red light rule violation']
+322,light,66,"['Red light rule violation', 'Ineligible Service']"
+323,improvement,66,['Red light rule violation']
+324,listed,66,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', '470 / 471 Mismatch']"
+325,red,66,"['Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Ineligible Service']"
+326,noncompliance,66,['Red light rule violation']
+327,implements,66,['Red light rule violation']
+328,rule,66,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Fiber review failure']"
+329,leased,65,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+330,category,65,"['Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+331,entered,63,['No signed contract in place']
+332,text,62,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+333,1699138580,62,[]
+334,youth,62,[]
+335,1699145599,62,[]
+336,period,62,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'No signed contract in place']"
+337,consider,61,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+338,filed,61,"['Competitive Bidding Violation', 'No signed contract in place']"
+339,criteria,60,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+340,factors,60,['Competitive Bidding Violation - price not primary factor']
+341,monthly,59,"['Voice - no discount remaining', 'Ineligible Service', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+342,filing,58,"['470 / 471 Mismatch', 'No signed contract in place', 'Competitive Bidding Violation']"
+343,state,58,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Applicant ineligible']"
+344,unable,58,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+345,productivity,58,['Competitive Bidding Violation - 28 day failure']
+346,yes,57,"['Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+347,portal,57,['Competitive Bidding Violation - 28 day failure']
+348,equivalent,56,['Competitive Bidding Violation - specified vendor in 470']
+349,ies,55,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+350,cannot,55,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+351,solutions,55,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+352,validate,53,[]
+353,additional,51,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+354,12,51,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Fiber review failure', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+355,uploaded,50,['Competitive Bidding Violation - 28 day failure']
+356,waiting,49,['Competitive Bidding Violation']
+357,submitted,49,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+358,opportunity,49,['Competitive Bidding Violation - specified vendor in 470']
+359,award,49,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+360,maintenance,49,"['Competitive Bidding Violation', 'Ineligible Service']"
+361,place,48,"['Competitive Bidding Violation', 'No signed contract in place']"
+362,days,48,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure']"
+363,spin,48,"['Missing required fields on 471', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+364,10,48,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'No signed contract in place', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Ineligible Service']"
+365,mr3,48,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+366,recipient,47,"['Missing required fields on 471', 'Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+367,without,47,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+368,recipients,47,"['Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+369,removed,46,"['Missing required fields on 471', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+370,posting,46,[]
+371,provisioned,46,['470 / 471 Mismatch']
+372,self,46,['470 / 471 Mismatch']
+373,campus,45,[]
+374,sheet,45,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+375,fy2017,43,[]
+376,procedures,42,['Competitive Bidding Violation - 28 day failure']
+377,response,42,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+378,split,42,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Fiber review failure', '470 / 471 Mismatch']"
+379,no,41,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+380,regarding,41,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+381,retain,40,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+382,web,40,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation']"
+383,compliance,40,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation']"
+384,parent,40,"['Applicant ineligible', 'Missing required fields on 471', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+385,construction,40,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Fiber review failure']"
+386,agency,40,['Applicant ineligible']
+387,violates,40,['Competitive Bidding Violation - price not primary factor']
+388,weighting,39,[]
+389,center,39,[]
+390,ten,39,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+391,significant,39,['Competitive Bidding Violation - 28 day failure']
+392,computed,38,[]
+393,change,38,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+394,county,37,[]
+395,21,37,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+396,different,37,"['470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+397,value,36,['Missing documentation to determin competitive bidding']
+398,cited,36,['Competitive Bidding Violation - specified vendor in 470']
+399,pri,36,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'c']"
+400,child,36,"['Applicant ineligible', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+401,less,36,"['Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Competitive Bidding Violation']"
+402,expensive,36,['Competitive Bidding Violation - specified vendor in 470']
+403,technology,35,['Applicant ineligible']
+404,llc,34,['Voice - no discount remaining']
+405,98,34,"['470 / 471 Mismatch', 'Ineligible Service', 'Applicant ineligible']"
+406,original,34,"['Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure']"
+407,001,33,"['Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+408,offered,33,[]
+409,hub,33,[]
+410,heavily,33,[]
+411,added,32,[]
+412,58,32,"['470 / 471 Mismatch', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470']"
+413,substantially,32,['470 / 471 Mismatch']
+414,inc,32,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+415,17010501,31,[]
+416,16039828,31,[]
+417,16042682,31,[]
+418,17012378,31,[]
+419,51,31,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Applicant ineligible']"
+420,bella,31,[]
+421,terra,31,[]
+422,success,31,[]
+423,17010500,31,[]
+424,sobrato,31,[]
+425,south,31,['Applicant ineligible']
+426,53,31,"['Ineligible Service', 'Category 2 budget exceeded']"
+427,washington,31,[]
+428,17010499,31,[]
+429,quantity,31,['Red light rule violation']
+430,name,31,['Competitive Bidding Violation - specified vendor in 470']
+431,17010498,31,[]
+432,including,31,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+433,consultation,31,['Competitive Bidding Violation']
+434,relationship,30,['Applicant ineligible']
+435,446,30,[]
+436,435,30,[]
+437,made,30,['Competitive Bidding Violation - 28 day failure']
+438,supporting,30,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+439,specifically,29,"['No signed contract in place', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470']"
+440,30,29,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', '470 / 471 Mismatch']"
+441,equal,29,[]
+442,providing,29,"['Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+443,greatest,29,[]
+444,charges,29,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+445,establishing,29,"['Ineligible Service', 'Competitive Bidding Violation']"
+446,administrative,28,['Applicant ineligible']
+447,separate,28,[]
+448,dated,28,['No signed contract in place']
+449,validation,28,"['Applicant ineligible', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+450,start,28,[]
+451,received,28,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+452,district,27,['Ineligible Service']
+453,able,27,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service', 'c']"
+454,include,27,"['Ineligible Service', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470']"
+455,20,27,"['Ineligible Service', 'Applicant ineligible', 'Voice - no discount remaining', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Competitive Bidding Violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+456,thus,27,"['No signed contract in place', 'Competitive Bidding Violation - price not primary factor']"
+457,recurring,27,"['Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service']"
+458,contained,27,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+459,64,26,['Missing documentation needed to determine eligible service']
+460,contact,26,['Competitive Bidding Violation - specified vendor in 470']
+461,demonstrates,26,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+462,established,26,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch']"
+463,mobile,26,['Missing documentation needed to determine eligible service']
+464,annual,26,[]
+465,describe,25,"['Competitive Bidding Violation', '470 / 471 Mismatch']"
+466,pots,25,[]
+467,modifying,25,['Competitive Bidding Violation - 28 day failure']
+468,assistance,24,['Applicant ineligible']
+469,fee,24,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure']"
+470,operation,24,[]
+471,planned,24,['470 / 471 Mismatch']
+472,considered,24,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+473,indicated,23,[]
+474,vendors,23,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+475,highest,23,[]
+476,carefully,23,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+477,score,23,['Competitive Bidding Violation']
+478,discounts,23,['Ineligible Service']
+479,particular,23,['Competitive Bidding Violation - specified vendor in 470']
+480,oc,23,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Duplicate FRN', 'Red light rule violation', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+481,student,23,"['Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+482,isdn,22,['Ineligible Service']
+483,dr3,22,"['Applicant ineligible', 'Competitive Bidding Violation']"
+484,96,22,"['Ineligible Service', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Red light rule violation', 'Applicant ineligible', '470 / 471 Mismatch']"
+485,lsta,22,['Applicant ineligible']
+486,full,22,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+487,24,21,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Competitive Bidding Violation - 28 day failure', 'Missing required fields on 471']"
+488,adhere,21,['Competitive Bidding Violation']
+489,described,21,['Competitive Bidding Violation']
+490,mo,21,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Applicant ineligible', 'c']"
+491,40,20,"['470 / 471 Mismatch', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded']"
+492,education,20,[]
+493,brand,20,['Competitive Bidding Violation - specified vendor in 470']
+494,responses,20,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+495,or,20,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Missing form 470', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+496,15,20,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Applicant ineligible']"
+497,manufacturer,20,['Competitive Bidding Violation - specified vendor in 470']
+498,mail,20,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+499,purchase,19,['Competitive Bidding Violation - specified vendor in 470']
+500,broadband,19,['Missing documentation needed to determine eligible service']
+501,012,19,['Missing documentation needed to determine eligible service']
+502,issued,19,['Competitive Bidding Violation']
+503,well,19,[]
+504,duplicates,19,[]
+505,awarded,19,['Competitive Bidding Violation - price not primary factor']
+506,ben,19,"['Category 2 budget exceeded', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+507,voip,19,[]
+508,22,19,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Red light rule violation', '470 / 471 Mismatch']"
+509,addenda,18,[]
+510,puerto,18,[]
+511,rico,18,[]
+512,counts,18,"['Ineligible Service', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+513,eliminating,18,['Competitive Bidding Violation - specified vendor in 470']
+514,indication,18,['Competitive Bidding Violation - specified vendor in 470']
+515,undermines,18,['Competitive Bidding Violation - specified vendor in 470']
+516,allowing,18,['Competitive Bidding Violation - specified vendor in 470']
+517,apparent,18,['Competitive Bidding Violation']
+518,specifying,18,['Competitive Bidding Violation - specified vendor in 470']
+519,operations,18,[]
+520,call,18,"['Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'No signed contract in place', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470']"
+521,non,17,"['Red light rule violation', 'Competitive Bidding Violation']"
+522,16,17,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Voice - no discount remaining', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+523,community,17,[]
+524,justified,17,[]
+525,charter,17,[]
+526,project,17,['Competitive Bidding Violation - 28 day failure']
+527,technical,17,['Competitive Bidding Violation - specified vendor in 470']
+528,applications,17,[]
+529,sufficiently,17,['Ineligible Service']
+530,documents,17,['Competitive Bidding Violation - specified vendor in 470']
+531,26,17,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Red light rule violation']"
+532,accordingly,17,[]
+533,addendum,17,['Competitive Bidding Violation - 28 day failure']
+534,students,16,[]
+535,reflect,16,[]
+536,801,16,['Ineligible Service']
+537,16078738,16,[]
+538,95,16,"['Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service']"
+539,action,16,[]
+540,independent,16,"['Voice - no discount remaining', 'Missing documentation needed to determine eligible service']"
+541,id,16,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+542,024,16,['Missing required fields on 471']
+543,modem,16,[]
+544,1699100956,16,[]
+545,50,16,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+546,worksheet,16,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+547,cable,16,['Missing documentation needed to determine eligible service']
+548,correct,15,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+549,inform,15,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+550,failure,15,['Competitive Bidding Violation']
+551,communications,15,['Competitive Bidding Violation - specified vendor in 470']
+552,caller,15,[]
+553,unit,14,['Competitive Bidding Violation - specified vendor in 470']
+554,speed,14,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+555,16056957,14,[]
+556,2000,14,['Competitive Bidding Violation - price not primary factor']
+557,given,14,[]
+558,heartland,14,[]
+559,connections,14,"['Competitive Bidding Violation', 'Ineligible Service', '470 / 471 Mismatch']"
+560,36,14,"['Ineligible Service', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor']"
+561,early,14,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+562,advance,14,['Competitive Bidding Violation - price not primary factor']
+563,verification,14,['No signed contract in place']
+564,email,14,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+565,question,13,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+566,answer,13,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+567,60,13,"['Ineligible Service', 'Applicant ineligible', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor', 'c']"
+568,bus,13,[]
+569,participates,13,['Competitive Bidding Violation - specified vendor in 470']
+570,clearly,13,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+571,16082813,12,[]
+572,16085064,12,[]
+573,16078530,12,[]
+574,16078529,12,[]
+575,16078532,12,[]
+576,programs,12,[]
+577,16078528,12,[]
+578,16078527,12,[]
+579,ojibwe,12,[]
+580,solicit,12,['Competitive Bidding Violation']
+581,16076588,12,[]
+582,16078533,12,[]
+583,16078531,12,[]
+584,800,12,[]
+585,costs,12,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+586,band,12,['Missing documentation needed to determine eligible service']
+587,leech,12,[]
+588,lake,12,[]
+589,80,12,"['Competitive Bidding Violation', 'Ineligible Service', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+590,11,12,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+591,17006787,12,[]
+592,count,12,"['Applicant ineligible', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Ineligible Service', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+593,comply,12,[]
+594,childhood,12,[]
+595,charge,12,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+596,centro,12,[]
+597,brevard,12,[]
+598,70,11,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Ineligible Service', 'Missing form 470', 'Applicant ineligible', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+599,allocation,11,[]
+600,although,11,[]
+601,occurs,11,['Competitive Bidding Violation - specified vendor in 470']
+602,plan,11,"['470 / 471 Mismatch', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+603,interconnected,11,[]
+604,least,11,[]
+605,registration,11,[]
+606,iru,11,[]
+607,submission,11,['Competitive Bidding Violation']
+608,warner,11,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+609,wait,11,['Competitive Bidding Violation']
+610,portion,10,[]
+611,listing,10,['Competitive Bidding Violation']
+612,enable,10,[]
+613,building,10,['Ineligible Service']
+614,supports,10,['Ineligible Service']
+615,apply,10,[]
+616,details,10,[]
+617,department,10,[]
+618,analysis,10,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+619,25,10,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Ineligible Service', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+620,certified,10,[]
+621,extension,10,['Missing documentation needed to determine eligible service']
+622,nslp,10,[]
+623,usage,10,['Missing documentation needed to determine eligible service']
+624,promedia,10,[]
+625,18,10,"['470 / 471 Mismatch', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+626,utilized,10,[]
+627,frame,10,[]
+628,clear,10,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+629,143004851,10,[]
+630,813,10,[]
+631,functions,10,[]
+632,rn,10,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'c']"
+633,31,10,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+634,billed,9,[]
+635,contain,9,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+636,business,9,[]
+637,pricing,9,[]
+638,contractual,9,"['470 / 471 Mismatch', 'Competitive Bidding Violation']"
+639,corrections,9,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+640,supply,9,"['Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+641,offering,9,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+642,celerity,9,[]
+643,200,9,"['Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'Missing documentation needed to determine eligible service']"
+644,signing,9,[]
+645,bill,9,['Competitive Bidding Violation']
+646,unmatched,9,[]
+647,17004590,9,[]
+648,tecnológico,9,[]
+649,90,9,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+650,32,9,"['Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+651,respective,9,"['Voice - no discount remaining', 'Competitive Bidding Violation']"
+652,scoring,9,['Competitive Bidding Violation']
+653,addition,9,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+654,florida,9,[]
+655,allowable,9,"['470 / 471 Mismatch', 'Category 2 budget exceeded', 'Competitive Bidding Violation', 'c']"
+656,evaluated,9,['Competitive Bidding Violation - price not primary factor']
+657,three,9,['Competitive Bidding Violation - price not primary factor']
+658,points,9,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor']"
+659,shows,9,['Competitive Bidding Violation - price not primary factor']
+660,website,9,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation']"
+661,entering,9,[]
+662,lease,9,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+663,400,8,['Category 2 budget exceeded']
+664,hotline,8,['Missing documentation needed to determine eligible service']
+665,toll,8,[]
+666,100,8,"['Competitive Bidding Violation', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+667,furthermore,8,[]
+668,starkey,8,[]
+669,operational,8,[]
+670,station,8,[]
+671,ethernet,8,[]
+672,titled,8,[]
+673,law,8,[]
+674,direct,8,['Competitive Bidding Violation']
+675,head,8,[]
+676,interferes,8,['Competitive Bidding Violation - specified vendor in 470']
+677,existed,8,[]
+678,deters,8,[]
+679,telecom,8,['Competitive Bidding Violation']
+680,times,8,['Competitive Bidding Violation - price not primary factor']
+681,homework,8,['Missing documentation needed to determine eligible service']
+682,advise,8,[]
+683,responsive,8,['Competitive Bidding Violation - price not primary factor']
+684,179905760,8,[]
+685,bristol,8,[]
+686,wytheville,8,[]
+687,public,8,['Competitive Bidding Violation']
+688,029,8,['Competitive Bidding Violation']
+689,pursue,8,[]
+690,004,8,"['Ineligible Service', 'Red light rule violation', 'Missing documentation needed to determine eligible service']"
+691,profile,8,"['Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+692,specifications,8,['Competitive Bidding Violation - price not primary factor']
+693,003,8,['Applicant ineligible']
+694,88,8,"['Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded']"
+695,verizon,8,[]
+696,share,8,['Competitive Bidding Violation']
+697,789,8,[]
+698,another,8,['Competitive Bidding Violation - price not primary factor']
+699,applicable,7,['Missing documentation needed to determine eligible service']
+700,bell,7,[]
+701,learning,7,['Ineligible Service']
+702,unlimited,7,[]
+703,23,7,"['Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+704,post,7,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'No 470']"
+705,appear,7,[]
+706,releasing,7,[]
+707,allocations,7,[]
+708,address,7,[]
+709,frns,7,['Missing documentation needed to determine eligible service']
+710,ineligibles,7,[]
+711,indicates,7,"['Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+712,75,7,"['Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Ineligible Service']"
+713,84,7,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+714,17,7,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Applicant ineligible', 'Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Ineligible Service', 'Red light rule violation']"
+715,biblioteca,7,[]
+716,extended,7,['Missing documentation needed to determine eligible service']
+717,copies,7,[]
+718,43,7,"['Competitive Bidding Violation', 'Ineligible Service', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+719,citing,7,['Missing required fields on 471']
+720,45,7,"['Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', 'c']"
+721,de,7,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Missing form 470', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+722,overall,7,[]
+723,164,7,[]
+724,036,7,[]
+725,500,7,"['Category 2 budget exceeded', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+726,communicated,6,['Competitive Bidding Violation - price not primary factor']
+727,verify,6,['Missing documentation needed to determine eligible service']
+728,wire,6,['Ineligible Service']
+729,group,6,[]
+730,commitment,6,[]
+731,video,6,['Ineligible Service']
+732,copper,6,[]
+733,company,6,[]
+734,002,6,"['Competitive Bidding Violation', 'Missing required fields on 471', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+735,005,6,['Competitive Bidding Violation - specified vendor in 470']
+736,circumstances,6,['Competitive Bidding Violation - price not primary factor']
+737,webby,6,[]
+738,extenuating,6,['Competitive Bidding Violation - price not primary factor']
+739,charley,6,[]
+740,dsl,6,[]
+741,05,6,"['Ineligible Service', 'Applicant ineligible', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'c', 'Missing documentation needed to determine eligible service']"
+742,download,6,['Competitive Bidding Violation - price not primary factor']
+743,upload,6,"['Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+744,41,6,"['Category 2 budget exceeded', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Missing documentation needed to determine eligible service']"
+745,56,6,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+746,basic,6,"['Competitive Bidding Violation', 'Ineligible Service']"
+747,dedicated,6,['Competitive Bidding Violation - price not primary factor']
+748,enterprises,6,[]
+749,approved,6,['470 / 471 Mismatch']
+750,criterions,6,['Competitive Bidding Violation - price not primary factor']
+751,37,6,"['Voice - no discount remaining', 'Category 2 budget exceeded']"
+752,02,6,"['Category 2 budget exceeded', 'Competitive Bidding Violation', 'Ineligible Service', 'Missing required fields on 471', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+753,court,6,[]
+754,voicemail,6,['Competitive Bidding Violation']
+755,68,6,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+756,duplicate,6,['Missing documentation needed to determine eligible service']
+757,zayo,6,[]
+758,213,6,['Missing documentation needed to determine eligible service']
+759,161038879,6,[]
+760,16064795,6,[]
+761,1699083504,6,[]
+762,16082706,6,['Applicant ineligible']
+763,161038865,6,[]
+764,16054291,6,[]
+765,legal,6,"['Competitive Bidding Violation', 'No signed contract in place']"
+766,16050366,6,[]
+767,143014344,6,[]
+768,invoice,6,"['Ineligible Service', 'No signed contract in place']"
+769,1699008914,6,[]
+770,sp,6,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+771,sister,6,[]
+772,remaining,6,['Voice - no discount remaining']
+773,16054293,6,[]
+774,2018,6,[]
+775,inside,6,[]
+776,143002665,6,[]
+777,161006502,6,[]
+778,incorporated,6,[]
+779,160010307,6,[]
+780,mbps,6,['Competitive Bidding Violation - price not primary factor']
+781,specs,6,['Competitive Bidding Violation - price not primary factor']
+782,pacific,6,[]
+783,16054295,6,[]
+784,related,6,[]
+785,hunting,6,[]
+786,proficient,6,[]
+787,city,5,"['470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470']"
+788,scope,5,[]
+789,commission,5,[]
+790,previous,5,['Missing documentation needed to determine eligible service']
+791,premise,5,[]
+792,pre,5,"['470 / 471 Mismatch', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+793,reported,5,['Missing documentation needed to determine eligible service']
+794,52,5,"['470 / 471 Mismatch', 'Ineligible Service']"
+795,containing,5,[]
+796,payment,5,[]
+797,48,5,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471']"
+798,representative,5,[]
+799,property,5,[]
+800,advised,5,[]
+801,reasonably,5,[]
+802,16072034,5,"['Ineligible Service', 'Applicant ineligible']"
+803,16073149,5,[]
+804,600,5,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation to determin competitive bidding']"
+805,022,5,[]
+806,released,5,['Competitive Bidding Violation']
+807,bens,5,[]
+808,recovery,5,[]
+809,65,5,"['Category 2 budget exceeded', 'Applicant ineligible', '470 / 471 Mismatch']"
+810,budget,5,"['Category 2 budget exceeded', 'Ineligible Service', 'c']"
+811,16082681,5,[]
+812,choice,5,['Competitive Bidding Violation - price not primary factor']
+813,cables,5,[]
+814,calculation,5,[]
+815,capacity,5,['470 / 471 Mismatch']
+816,specify,5,['Competitive Bidding Violation - specified vendor in 470']
+817,cell,5,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+818,voluntary,5,[]
+819,143008823,5,[]
+820,high,5,[]
+821,properly,5,['Competitive Bidding Violation - price not primary factor']
+822,62,5,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure']"
+823,copy,5,['No signed contract in place']
+824,1699114657,5,[]
+825,define,5,[]
+826,likely,5,[]
+827,accept,5,[]
+828,tax,5,[]
+829,federal,5,[]
+830,formulate,5,[]
+831,devices,5,[]
+832,27,5,"['Competitive Bidding Violation', 'Fiber review failure', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+833,key,5,[]
+834,enrollment,5,['Missing required fields on 471']
+835,detailed,5,['Competitive Bidding Violation - price not primary factor']
+836,describes,5,[]
+837,undertaken,5,[]
+838,sbc,5,[]
+839,multiple,5,[]
+840,satélite,5,[]
+841,ii,5,[]
+842,29,5,"['Category 2 budget exceeded', 'Competitive Bidding Violation']"
+843,narrative,5,['Competitive Bidding Violation - specified vendor in 470']
+844,greater,5,['Competitive Bidding Violation - price not primary factor']
+845,identified,5,[]
+846,never,5,['Ineligible Service']
+847,1699083545,5,[]
+848,identical,5,['Missing documentation needed to determine eligible service']
+849,840,5,['Competitive Bidding Violation - 28 day failure']
+850,17006298,4,[]
+851,17006299,4,[]
+852,160511176,4,[]
+853,17006296,4,[]
+854,16059742,4,[]
+855,16049993,4,[]
+856,router,4,['Missing documentation needed to determine eligible service']
+857,018,4,['Fiber review failure']
+858,san,4,[]
+859,allotted,4,[]
+860,808,4,['Category 2 budget exceeded']
+861,allowed,4,[]
+862,17006295,4,[]
+863,whether,4,[]
+864,16051175,4,[]
+865,17006304,4,[]
+866,17006331,4,[]
+867,17006319,4,[]
+868,17006310,4,[]
+869,17006311,4,[]
+870,17006314,4,[]
+871,16059745,4,[]
+872,17006309,4,[]
+873,17006307,4,[]
+874,17006306,4,[]
+875,17006315,4,[]
+876,acquisition,4,[]
+877,accurately,4,[]
+878,17006317,4,[]
+879,17006322,4,[]
+880,97,4,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+881,17006323,4,[]
+882,rest,4,[]
+883,17006325,4,[]
+884,17006305,4,[]
+885,17006326,4,[]
+886,absent,4,['Competitive Bidding Violation - price not primary factor']
+887,17006327,4,[]
+888,01,4,"['Competitive Bidding Violation', 'Ineligible Service', 'Voice - no discount remaining', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+889,17006329,4,[]
+890,17006330,4,[]
+891,17006303,4,[]
+892,relative,4,[]
+893,transport,4,['470 / 471 Mismatch']
+894,16071184,4,[]
+895,17006374,4,[]
+896,multimegabit,4,[]
+897,mr4,4,[]
+898,mpls,4,[]
+899,device,4,[]
+900,message,4,[]
+901,directory,4,['Competitive Bidding Violation']
+902,match,4,"['470 / 471 Mismatch', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470']"
+903,1699143853,4,[]
+904,list,4,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', '470 / 471 Mismatch']"
+905,dupage,4,[]
+906,ec,4,"['Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Category 2 budget exceeded', 'c']"
+907,switched,4,[]
+908,ld,4,"['Applicant ineligible', 'Missing required fields on 471', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+909,seeking,4,['Competitive Bidding Violation - price not primary factor']
+910,laws,4,[]
+911,etc,4,[]
+912,late,4,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+913,kairos,4,[]
+914,juan,4,[]
+915,08,4,"['Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+916,116,4,[]
+917,feature,4,['Competitive Bidding Violation']
+918,features,4,[]
+919,tier,4,[]
+920,frontier,4,[]
+921,implementation,4,[]
+922,decreased,4,[]
+923,decision,4,[]
+924,cox,4,['Voice - no discount remaining']
+925,120,4,[]
+926,021,4,['Missing documentation needed to determine eligible service']
+927,16075783,4,['Applicant ineligible']
+928,reference,4,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+929,154,4,[]
+930,recognized,4,[]
+931,similar,4,['Competitive Bidding Violation - price not primary factor']
+932,143046663,4,[]
+933,16080423,4,[]
+934,buses,4,[]
+935,published,4,[]
+936,case,4,[]
+937,16083172,4,[]
+938,children,4,[]
+939,cites,4,[]
+940,commonwealth,4,[]
+941,pr,4,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Missing form 470', 'Voice - no discount remaining', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+942,037,4,[]
+943,policy,4,[]
+944,conferencing,4,['Ineligible Service']
+945,consideration,4,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+946,percentage,4,[]
+947,139,4,[]
+948,utilization,4,[]
+949,correspondence,4,['Competitive Bidding Violation - price not primary factor']
+950,user,4,[]
+951,violating,4,[]
+952,17006371,4,[]
+953,17006358,4,[]
+954,17006403,4,[]
+955,17006415,4,[]
+956,17006336,4,[]
+957,17006414,4,[]
+958,17006413,4,[]
+959,17006412,4,[]
+960,17006362,4,[]
+961,17006411,4,[]
+962,17006332,4,[]
+963,520,4,['470 / 471 Mismatch']
+964,17006410,4,[]
+965,17006354,4,[]
+966,17006409,4,[]
+967,743,4,[]
+968,17008909,4,[]
+969,17006337,4,[]
+970,35,4,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+971,17009994,4,[]
+972,17006408,4,[]
+973,17006369,4,[]
+974,17006406,4,[]
+975,196,4,[]
+976,17006366,4,[]
+977,17006365,4,[]
+978,17006417,4,[]
+979,215,4,[]
+980,66,4,"['470 / 471 Mismatch', 'Category 2 budget exceeded']"
+981,17006425,4,[]
+982,17006431,4,[]
+983,17006430,4,[]
+984,17006429,4,[]
+985,17006428,4,[]
+986,17006427,4,[]
+987,17006352,4,[]
+988,17006433,4,[]
+989,17006434,4,[]
+990,17006351,4,[]
+991,17006426,4,[]
+992,17006424,4,[]
+993,314,4,[]
+994,17007194,4,[]
+995,17006350,4,[]
+996,17006335,4,[]
+997,57,4,"['Applicant ineligible', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+998,17006423,4,[]
+999,17006353,4,[]
+1000,17006422,4,[]
+1001,17006333,4,[]
+1002,17006420,4,[]
+1003,17006419,4,[]
+1004,17006405,4,[]
+1005,250,4,"['Category 2 budget exceeded', 'Ineligible Service']"
+1006,17006383,4,[]
+1007,17006386,4,[]
+1008,17006382,4,[]
+1009,436,4,[]
+1010,17006361,4,[]
+1011,17006379,4,[]
+1012,17006380,4,[]
+1013,17006357,4,[]
+1014,17006360,4,[]
+1015,3rd,4,[]
+1016,17006349,4,[]
+1017,17006359,4,[]
+1018,77,4,['Missing documentation to determin competitive bidding']
+1019,17006381,4,[]
+1020,17006356,4,[]
+1021,17006385,4,[]
+1022,17006341,4,[]
+1023,17006402,4,[]
+1024,39,4,"['Category 2 budget exceeded', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+1025,17006394,4,[]
+1026,17006375,4,[]
+1027,445,4,[]
+1028,17006364,4,[]
+1029,17006338,4,[]
+1030,17006340,4,[]
+1031,17006398,4,[]
+1032,17006396,4,[]
+1033,2019,4,[]
+1034,17006388,4,[]
+1035,17006342,4,[]
+1036,44,4,"['Category 2 budget exceeded', 'Ineligible Service', '470 / 471 Mismatch']"
+1037,17006384,4,[]
+1038,17006378,4,[]
+1039,17006391,4,[]
+1040,17006390,4,[]
+1041,560,3,['Missing documentation needed to determine eligible service']
+1042,calling,3,['Competitive Bidding Violation']
+1043,quality,3,[]
+1044,purposes,3,[]
+1045,garvanza,3,[]
+1046,55,3,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Ineligible Service', 'Category 2 budget exceeded']"
+1047,provision,3,['470 / 471 Mismatch']
+1048,1799044780,3,[]
+1049,143025240,3,[]
+1050,scores,3,[]
+1051,hosting,3,[]
+1052,irving,3,[]
+1053,inwood,3,[]
+1054,troika,3,[]
+1055,5d15,3,[]
+1056,directly,3,[]
+1057,return,3,[]
+1058,ruled,3,[]
+1059,doc,3,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Missing form 470', 'Red light rule violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+1060,baumgart,3,[]
+1061,indicate,3,"['Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+1062,408,3,['Category 2 budget exceeded']
+1063,17006592,3,[]
+1064,160041565,3,[]
+1065,bidder,3,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+1066,tiers,3,[]
+1067,hotspot,3,['Missing documentation needed to determine eligible service']
+1068,scored,3,[]
+1069,protection,3,[]
+1070,17008114,3,[]
+1071,funded,3,[]
+1072,commercial,3,['Competitive Bidding Violation - price not primary factor']
+1073,regional,3,[]
+1074,corp,3,[]
+1075,status,3,['Missing documentation needed to determine eligible service']
+1076,clarification,3,[]
+1077,jon,3,[]
+1078,349,3,['470 / 471 Mismatch']
+1079,combined,3,['Competitive Bidding Violation - price not primary factor']
+1080,cordillera,3,[]
+1081,commercially,3,['Competitive Bidding Violation - price not primary factor']
+1082,17003098,3,['Applicant ineligible']
+1083,extensions,3,[]
+1084,502,3,['Missing documentation needed to determine eligible service']
+1085,356,3,[]
+1086,relying,3,[]
+1087,360,3,[]
+1088,4g,3,[]
+1089,49,3,"['Competitive Bidding Violation', 'Ineligible Service', 'Category 2 budget exceeded', '470 / 471 Mismatch']"
+1090,excessive,3,['Competitive Bidding Violation - specified vendor in 470']
+1091,circuit,3,[]
+1092,fifth,3,[]
+1093,duplication,3,[]
+1094,forwarding,3,[]
+1095,tdm,3,[]
+1096,rather,3,[]
+1097,tabulation,3,[]
+1098,54,3,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Missing documentation to determin competitive bidding']"
+1099,cellco,3,[]
+1100,17008117,3,[]
+1101,rebid,3,[]
+1102,supported,3,[]
+1103,forward,3,[]
+1104,134,3,[]
+1105,suplidores,3,[]
+1106,1708116,3,[]
+1107,force,3,[]
+1108,recommendations,3,[]
+1109,151596,3,['Applicant ineligible']
+1110,150,3,[]
+1111,527,3,[]
+1112,corporation,3,[]
+1113,states,3,['Ineligible Service']
+1114,reviews,3,[]
+1115,9030,3,[]
+1116,multi,3,[]
+1117,via,3,[]
+1118,allotment,3,[]
+1119,occur,3,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+1120,phones,3,[]
+1121,las,3,"['Ineligible Service', 'Applicant ineligible']"
+1122,octavia,3,[]
+1123,allowance,3,[]
+1124,achernar,3,[]
+1125,amendment,3,['No signed contract in place']
+1126,appeal,3,[]
+1127,using,3,['470 / 471 Mismatch']
+1128,november,3,[]
+1129,leadership,3,[]
+1130,across,3,[]
+1131,mresc,3,[]
+1132,worksheets,3,[]
+1133,adherence,3,[]
+1134,769,3,[]
+1135,android,3,[]
+1136,205,3,[]
+1137,model,3,"['Missing required fields on 471', 'Ineligible Service', 'Missing documentation needed to determine eligible service']"
+1138,la,3,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+1139,advanced,3,[]
+1140,validating,3,[]
+1141,judge,3,[]
+1142,ordered,3,[]
+1143,arrangement,3,[]
+1144,longer,3,[]
+1145,vegas,3,"['Ineligible Service', 'Applicant ineligible']"
+1146,located,3,[]
+1147,mobility,3,[]
+1148,750,3,['Category 2 budget exceeded']
+1149,81,3,"['Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service', 'Applicant ineligible', 'Category 2 budget exceeded']"
+1150,mrc,3,[]
+1151,missing,3,['Missing form 470']
+1152,yeshivaday,3,"['Ineligible Service', 'Applicant ineligible']"
+1153,lte,3,[]
+1154,license,3,[]
+1155,1699092691,3,[]
+1156,party,3,[]
+1157,underlying,3,[]
+1158,63,3,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+1159,384,2,['Competitive Bidding Violation']
+1160,17003970,2,[]
+1161,16060393,2,[]
+1162,josh,2,[]
+1163,omitted,2,[]
+1164,move,2,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+1165,moved,2,"['Missing required fields on 471', 'Category 2 budget exceeded', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'c']"
+1166,1699077557,2,[]
+1167,17003971,2,[]
+1168,17003972,2,[]
+1169,16060391,2,[]
+1170,17003969,2,[]
+1171,17003964,2,[]
+1172,16060612,2,[]
+1173,17003959,2,[]
+1174,17003958,2,[]
+1175,exorbitant,2,['Competitive Bidding Violation - price not primary factor']
+1176,mini,2,"['Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', 'Applicant ineligible', 'Missing documentation to determin competitive bidding']"
+1177,exempt,2,[]
+1178,remain,2,['Voice - no discount remaining']
+1179,minimum,2,[]
+1180,mismatch,2,[]
+1181,mitigates,2,['Competitive Bidding Violation - price not primary factor']
+1182,1699111964,2,[]
+1183,excluding,2,[]
+1184,17011127,2,[]
+1185,exceeds,2,['Category 2 budget exceeded']
+1186,remote,2,[]
+1187,17011121,2,[]
+1188,17003968,2,[]
+1189,17003960,2,[]
+1190,evaluating,2,['Competitive Bidding Violation - price not primary factor']
+1191,368,2,['Ineligible Service']
+1192,17003962,2,[]
+1193,383,2,['Competitive Bidding Violation - price not primary factor']
+1194,establishingform,2,[]
+1195,17003963,2,[]
+1196,enhanced,2,['Competitive Bidding Violation']
+1197,17003965,2,[]
+1198,17011117,2,[]
+1199,17011116,2,[]
+1200,17003966,2,[]
+1201,17003967,2,[]
+1202,enrolled,2,[]
+1203,17003977,2,[]
+1204,end,2,"['Competitive Bidding Violation', 'Applicant ineligible', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service']"
+1205,17011113,2,[]
+1206,17011107,2,[]
+1207,nationwide,2,[]
+1208,notified,2,['Competitive Bidding Violation - price not primary factor']
+1209,17011105,2,[]
+1210,17011104,2,[]
+1211,restricted,2,[]
+1212,nonrotary,2,[]
+1213,17003995,2,[]
+1214,17003996,2,[]
+1215,17003997,2,[]
+1216,restriction,2,[]
+1217,16051553,2,[]
+1218,2012,2,[]
+1219,17004001,2,[]
+1220,17004003,2,[]
+1221,division,2,[]
+1222,17011099,2,[]
+1223,17004004,2,[]
+1224,17004005,2,[]
+1225,17004007,2,[]
+1226,17004008,2,[]
+1227,17004009,2,[]
+1228,reverendo,2,[]
+1229,17011098,2,[]
+1230,reviewed,2,[]
+1231,director,2,['Competitive Bidding Violation']
+1232,networks,2,['Competitive Bidding Violation']
+1233,naperville,2,[]
+1234,municipality,2,[]
+1235,17003992,2,[]
+1236,17003982,2,[]
+1237,17011112,2,[]
+1238,399,2,[]
+1239,17003973,2,[]
+1240,17003974,2,[]
+1241,17011111,2,[]
+1242,17003975,2,[]
+1243,17003957,2,[]
+1244,element,2,['Applicant ineligible']
+1245,16054648,2,[]
+1246,17011110,2,[]
+1247,17003979,2,[]
+1248,17003980,2,[]
+1249,17003983,2,[]
+1250,numbers,2,[]
+1251,17003984,2,[]
+1252,17003987,2,[]
+1253,educational,2,[]
+1254,17003988,2,[]
+1255,ed,2,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Missing form 470', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+1256,17011109,2,[]
+1257,3gb,2,[]
+1258,earlier,2,[]
+1259,17003990,2,[]
+1260,msg,2,[]
+1261,17003991,2,[]
+1262,17011108,2,[]
+1263,min,2,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+1264,17003954,2,[]
+1265,17003956,2,[]
+1266,17000407,2,[]
+1267,hunt,2,[]
+1268,providerfor,2,[]
+1269,hotspots,2,[]
+1270,225,2,['470 / 471 Mismatch']
+1271,picture,2,[]
+1272,16082457,2,[]
+1273,16081670,2,[]
+1274,letter,2,[]
+1275,300,2,['Category 2 budget exceeded']
+1276,303,2,"['Competitive Bidding Violation - specified vendor in 470', '470 / 471 Mismatch']"
+1277,health,2,[]
+1278,17004010,2,[]
+1279,16080477,2,[]
+1280,purchases,2,[]
+1281,guidance,2,[]
+1282,purpose,2,[]
+1283,1699029624,2,[]
+1284,1799045594,2,[]
+1285,170,2,"['Category 2 budget exceeded', 'Applicant ineligible', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+1286,16080476,2,[]
+1287,likewise,2,['Competitive Bidding Violation - price not primary factor']
+1288,governing,2,[]
+1289,16080475,2,[]
+1290,1699032399,2,[]
+1291,global,2,[]
+1292,gb,2,[]
+1293,performed,2,[]
+1294,lea,2,"['Competitive Bidding Violation - price not primary factor', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service']"
+1295,227,2,[]
+1296,identifying,2,[]
+1297,present,2,['Competitive Bidding Violation - price not primary factor']
+1298,1699010929,2,[]
+1299,251,2,['Competitive Bidding Violation']
+1300,postmarked,2,[]
+1301,involved,2,[]
+1302,portable,2,[]
+1303,252,2,[]
+1304,international,2,[]
+1305,258,2,['470 / 471 Mismatch']
+1306,premium,2,[]
+1307,population,2,[]
+1308,insurance,2,[]
+1309,preparation,2,[]
+1310,inquiry,2,[]
+1311,284,2,[]
+1312,inquiries,2,[]
+1313,initiated,2,['Competitive Bidding Violation - price not primary factor']
+1314,272,2,['Category 2 budget exceeded']
+1315,individualrepresenting,2,[]
+1316,1799092779,2,[]
+1317,163,2,[]
+1318,processas,2,[]
+1319,273,2,[]
+1320,1799107272,2,[]
+1321,proof,2,[]
+1322,234,2,[]
+1323,point,2,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470']"
+1324,17000321,2,[]
+1325,funds,2,[]
+1326,relevant,2,['Competitive Bidding Violation - price not primary factor']
+1327,179915642,2,[]
+1328,17011147,2,[]
+1329,mary,2,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+1330,210,2,['Missing documentation to determin competitive bidding']
+1331,17011146,2,[]
+1332,19,2,"['Competitive Bidding Violation', 'Red light rule violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded']"
+1333,fcdl,2,[]
+1334,fccform,2,[]
+1335,17003684,2,[]
+1336,17011145,2,[]
+1337,17011141,2,[]
+1338,17011138,2,[]
+1339,matchmaker,2,[]
+1340,17011134,2,[]
+1341,17011130,2,[]
+1342,17003950,2,[]
+1343,17003951,2,[]
+1344,796,2,[]
+1345,pablo,2,[]
+1346,17011129,2,[]
+1347,overlapping,2,[]
+1348,1699123659,2,[]
+1349,meetpoint,2,['Competitive Bidding Violation - price not primary factor']
+1350,17003955,2,[]
+1351,face,2,['Competitive Bidding Violation - price not primary factor']
+1352,otc,2,[]
+1353,1699116109,2,[]
+1354,meyers,2,[]
+1355,17011148,2,[]
+1356,17011149,2,[]
+1357,package,2,[]
+1358,1699133282,2,[]
+1359,17000460,2,[]
+1360,1699032499,2,[]
+1361,318,2,[]
+1362,17000491,2,[]
+1363,locations,2,[]
+1364,327,2,[]
+1365,penalized,2,['Competitive Bidding Violation - price not primary factor']
+1366,1799006128,2,[]
+1367,penalize,2,['Competitive Bidding Violation - price not primary factor']
+1368,pattern,2,[]
+1369,171041363,2,[]
+1370,171,2,[]
+1371,recognizes,2,[]
+1372,17011152,2,[]
+1373,foreign,2,[]
+1374,1699133264,2,[]
+1375,partnership,2,[]
+1376,recover,2,[]
+1377,mainenance,2,[]
+1378,17014322,2,[]
+1379,redundant,2,[]
+1380,1699133245,2,[]
+1381,17002252,2,[]
+1382,file,2,"['Competitive Bidding Violation', 'No signed contract in place', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+1383,183,2,[]
+1384,mandatory,2,[]
+1385,16080478,2,[]
+1386,79766,2,[]
+1387,17011097,2,[]
+1388,tecnologico,2,[]
+1389,check,2,[]
+1390,529,2,[]
+1391,chargeable,2,['Voice - no discount remaining']
+1392,voc,2,[]
+1393,532,2,[]
+1394,123,2,['Missing documentation needed to determine eligible service']
+1395,surcharge,2,[]
+1396,acceptable,2,[]
+1397,technologies,2,['Competitive Bidding Violation']
+1398,117,2,[]
+1399,canada,2,[]
+1400,115,2,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+1401,17007968,2,[]
+1402,calls,2,[]
+1403,548,2,[]
+1404,746,2,['Voice - no discount remaining']
+1405,74,2,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Voice - no discount remaining']"
+1406,552,2,[]
+1407,accounted,2,['Competitive Bidding Violation - price not primary factor']
+1408,ca,2,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Missing form 470', 'Voice - no discount remaining', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'c']"
+1409,telecommunications,2,[]
+1410,telepacific,2,[]
+1411,76,2,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+1412,030,2,['Applicant ineligible']
+1413,03,2,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', '470 / 471 Mismatch']"
+1414,vpn,2,[]
+1415,st,2,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing required fields on 471', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+1416,504,2,['Category 2 budget exceeded']
+1417,communication,2,"['Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding']"
+1418,506,2,[]
+1419,509,2,['Competitive Bidding Violation']
+1420,star2star,2,[]
+1421,codified,2,['Competitive Bidding Violation - price not primary factor']
+1422,co,2,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Voice - no discount remaining', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+1423,143001192,2,[]
+1424,closing,2,[]
+1425,warranty,2,[]
+1426,close,2,['Applicant ineligible']
+1427,968,2,[]
+1428,17008813,2,[]
+1429,clarify,2,[]
+1430,142,2,['Missing documentation to determin competitive bidding']
+1431,storage,2,[]
+1432,17008788,2,[]
+1433,17008786,2,[]
+1434,chosen,2,['Competitive Bidding Violation - price not primary factor']
+1435,chose,2,['Competitive Bidding Violation - price not primary factor']
+1436,735,2,[]
+1437,violate,2,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+1438,compared,2,['Competitive Bidding Violation - price not primary factor']
+1439,backup,2,[]
+1440,allow,2,"['470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Competitive Bidding Violation', 'c']"
+1441,users,2,[]
+1442,behalf,2,[]
+1443,06,2,"['Ineligible Service', 'Applicant ineligible', 'Missing documentation needed to determine eligible service', 'Category 2 budget exceeded', 'c']"
+1444,america,2,[]
+1445,07,2,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', '470 / 471 Mismatch', 'Missing documentation to determin competitive bidding']"
+1446,barrio,2,[]
+1447,bandwidth,2,[]
+1448,5gb,2,[]
+1449,103,2,['Competitive Bidding Violation']
+1450,treated,2,"['Ineligible Service', 'Competitive Bidding Violation', '470 / 471 Mismatch']"
+1451,720,2,"['Ineligible Service', 'Applicant ineligible']"
+1452,tri,2,"['470 / 471 Mismatch', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470']"
+1453,trk,2,[]
+1454,trunk,2,[]
+1455,appears,2,[]
+1456,614,2,[]
+1457,auto,2,[]
+1458,authorized,2,['Category 2 budget exceeded']
+1459,attendant,2,[]
+1460,university,2,[]
+1461,1000,2,[]
+1462,650,2,['Category 2 budget exceeded']
+1463,660,2,[]
+1464,valentín,2,[]
+1465,053,2,[]
+1466,bundled,2,[]
+1467,564,2,[]
+1468,actions,2,[]
+1469,113,2,['Competitive Bidding Violation']
+1470,add,2,"['Competitive Bidding Violation', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - price not primary factor']"
+1471,bridges,2,[]
+1472,texting,2,[]
+1473,viii,2,[]
+1474,the,2,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation - 28 day failure', '470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Missing documentation needed to determine eligible service']"
+1475,binghamton,2,[]
+1476,59,2,"['Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'Applicant ineligible', 'c', 'Missing documentation needed to determine eligible service']"
+1477,additionally,2,['Competitive Bidding Violation - price not primary factor']
+1478,690,2,[]
+1479,68659,2,[]
+1480,038,2,[]
+1481,17004786,2,[]
+1482,timing,2,[]
+1483,040,2,['Category 2 budget exceeded']
+1484,17004788,2,[]
+1485,048,2,['Voice - no discount remaining']
+1486,67,2,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+1487,025,2,['Missing documentation needed to determine eligible service']
+1488,7599,2,[]
+1489,definitions,2,[]
+1490,written,2,[]
+1491,17011090,2,[]
+1492,17011093,2,[]
+1493,corrected,2,[]
+1494,467,2,[]
+1495,006,2,['Ineligible Service']
+1496,143048275,2,[]
+1497,demonstrating,2,[]
+1498,17010978,2,[]
+1499,485,2,['Competitive Bidding Violation']
+1500,887,2,[]
+1501,160022042,2,[]
+1502,829,2,[]
+1503,rulerequirement,2,[]
+1504,17010977,2,[]
+1505,820,2,[]
+1506,17010975,2,[]
+1507,datapro,2,[]
+1508,scale,2,['Competitive Bidding Violation - price not primary factor']
+1509,17010980,2,[]
+1510,costly,2,['Competitive Bidding Violation - price not primary factor']
+1511,46,2,"['Competitive Bidding Violation', 'Category 2 budget exceeded', 'Voice - no discount remaining']"
+1512,deny,2,[]
+1513,17010986,2,[]
+1514,sell,2,['Competitive Bidding Violation - price not primary factor']
+1515,custom,2,[]
+1516,008,2,['Category 2 budget exceeded']
+1517,croom,2,[]
+1518,sent,2,"['Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation']"
+1519,17010985,2,[]
+1520,separately,2,[]
+1521,serviceprovider,2,[]
+1522,worth,2,['Competitive Bidding Violation - price not primary factor']
+1523,450,2,[]
+1524,160,2,"['Ineligible Service', 'Applicant ineligible', 'Category 2 budget exceeded', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'c']"
+1525,17010982,2,[]
+1526,160008834,2,[]
+1527,17010988,2,[]
+1528,show,2,['Competitive Bidding Violation - price not primary factor']
+1529,17011091,2,[]
+1530,17010989,2,[]
+1531,143037005,2,[]
+1532,contactinformation,2,[]
+1533,160095,2,[]
+1534,911,2,['Competitive Bidding Violation - specified vendor in 470']
+1535,17004012,2,[]
+1536,windstream,2,['Competitive Bidding Violation - price not primary factor']
+1537,92,2,"['Ineligible Service', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+1538,143029770,2,[]
+1539,determining,2,['Competitive Bidding Violation - price not primary factor']
+1540,17011095,2,[]
+1541,921,2,[]
+1542,17011096,2,[]
+1543,905,2,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor']"
+1544,window,2,[]
+1545,17010992,2,[]
+1546,143019354,2,['Competitive Bidding Violation']
+1547,420,2,[]
+1548,completed,2,[]
+1549,seat,2,[]
+1550,79,2,"['Category 2 budget exceeded', '470 / 471 Mismatch']"
+1551,17010990,2,[]
+1552,143034129,2,[]
+1553,17010564,2,[]
+1554,smartphone,2,[]
+1555,situations,2,['Competitive Bidding Violation - price not primary factor']
+1556,sch,2,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+1557,section,2,['Competitive Bidding Violation - specified vendor in 470']
+1558,sis,2,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Applicant ineligible']"
+1559,17010910,2,[]
+1560,17011094,2,[]
+1561,010,2,['Applicant ineligible']
+1562,consistent,2,[]
+1563,cyber,2,[]
+1564,rollover,2,[]
+1565,013,2,"['Ineligible Service', 'Applicant ineligible']"
+1566,secretary,2,[]
+1567,160038787,2,[]
+1568,900,2,"['Ineligible Service', 'Category 2 budget exceeded']"
+1569,1699031690,1,[]
+1570,phn,1,[]
+1571,perform,1,[]
+1572,v2,1,[]
+1573,pesas,1,[]
+1574,ph,1,"['Voice - no discount remaining', 'Ineligible Service', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470']"
+1575,performing,1,[]
+1576,1699091196,1,[]
+1577,059,1,"['Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470']"
+1578,oklahoma,1,['Voice - no discount remaining']
+1579,060,1,"['Ineligible Service', 'Category 2 budget exceeded', 'c']"
+1580,unsubstantiated,1,[]
+1581,100mb,1,[]
+1582,port,1,"['Applicant ineligible', '470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Ineligible Service', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor', 'Missing required fields on 471', 'Missing documentation needed to determine eligible service']"
+1583,pop,1,[]
+1584,unknown,1,[]
+1585,pooled,1,[]
+1586,unl,1,['Ineligible Service']
+1587,police,1,[]
+1588,1699095704,1,[]
+1589,1799112483,1,[]
+1590,073,1,[]
+1591,unlisted,1,[]
+1592,yeshiva,1,"['Ineligible Service', 'Applicant ineligible']"
+1593,unsupported,1,[]
+1594,1699025064,1,[]
+1595,plus,1,[]
+1596,1699091260,1,[]
+1597,upgrade,1,[]
+1598,plateau,1,[]
+1599,1699020540,1,[]
+1600,1699024259,1,[]
+1601,1699033836,1,['Competitive Bidding Violation - price not primary factor']
+1602,1799112564,1,[]
+1603,1699024419,1,[]
+1604,072,1,"['Ineligible Service', 'Applicant ineligible']"
+1605,1699024744,1,[]
+1606,usa,1,"['Competitive Bidding Violation', 'Duplicate FRN', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation needed to determine eligible service']"
+1607,planc,1,[]
+1608,pages,1,['Ineligible Service']
+1609,penteledata,1,[]
+1610,201,1,"['Voice - no discount remaining', 'Red light rule violation', 'Competitive Bidding Violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure']"
+1611,virtual,1,[]
+1612,1699051978,1,['Competitive Bidding Violation - price not primary factor']
+1613,words,1,[]
+1614,1699058593,1,['Ineligible Service']
+1615,options,1,[]
+1616,1699062961,1,[]
+1617,1699070795,1,[]
+1618,1699073859,1,[]
+1619,tyh,1,['Missing documentation to determin competitive bidding']
+1620,voicelocal,1,['Ineligible Service']
+1621,obligated,1,[]
+1622,vvm,1,[]
+1623,1699074023,1,[]
+1624,virginia,1,[]
+1625,wan,1,[]
+1626,028,1,[]
+1627,027,1,['Missing documentation needed to determine eligible service']
+1628,1699082857,1,['Missing documentation needed to determine eligible service']
+1629,online,1,[]
+1630,1699081623,1,[]
+1631,offerings,1,[]
+1632,office,1,[]
+1633,wifi,1,[]
+1634,wi,1,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Missing form 470', 'Voice - no discount remaining', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'c']"
+1635,199,1,['Red light rule violation']
+1636,olivera,1,['Missing documentation needed to determine eligible service']
+1637,oregon,1,[]
+1638,1699048312,1,['Voice - no discount remaining']
+1639,www,1,[]
+1640,parcelas,1,[]
+1641,valley,1,"['Category 2 budget exceeded', 'c']"
+1642,180,1,['Category 2 budget exceeded']
+1643,path,1,[]
+1644,velocity,1,['Competitive Bidding Violation - specified vendor in 470']
+1645,wrong,1,[]
+1646,ventures,1,[]
+1647,vic2,1,[]
+1648,1699034668,1,[]
+1649,vic3,1,[]
+1650,2010,1,[]
+1651,1699041172,1,[]
+1652,1699044083,1,[]
+1653,old,1,['Missing documentation to determin competitive bidding']
+1654,outage,1,[]
+1655,paec,1,[]
+1656,nspl,1,[]
+1657,1699045925,1,['Missing documentation needed to determine eligible service']
+1658,nuevas,1,[]
+1659,035,1,"['Competitive Bidding Violation', 'Category 2 budget exceeded']"
+1660,overflow,1,[]
+1661,1699090436,1,[]
+1662,work,1,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+1663,195,1,[]
+1664,outside,1,"['Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure']"
+1665,outlined,1,[]
+1666,034339,1,[]
+1667,100mbps,1,[]
+1668,tlk,1,[]
+1669,txt,1,[]
+1670,statements,1,[]
+1671,17012422,1,[]
+1672,subscriber,1,[]
+1673,132,1,[]
+1674,137,1,['Voice - no discount remaining']
+1675,17008711,1,[]
+1676,138,1,[]
+1677,strands,1,['Fiber review failure']
+1678,rejected,1,[]
+1679,sprint,1,[]
+1680,143000677,1,[]
+1681,16068510,1,[]
+1682,143001197,1,[]
+1683,17008877,1,[]
+1684,standard,1,[]
+1685,srvc,1,[]
+1686,relocation,1,[]
+1687,17014286,1,[]
+1688,subsidized,1,[]
+1689,130,1,"['Ineligible Service', 'Applicant ineligible']"
+1690,12mb,1,[]
+1691,telcom,1,['Voice - no discount remaining']
+1692,1799020827,1,[]
+1693,17008041,1,[]
+1694,taxes,1,[]
+1695,17008083,1,[]
+1696,119,1,[]
+1697,system,1,['Ineligible Service']
+1698,ready,1,[]
+1699,17008301,1,[]
+1700,177,1,[]
+1701,175,1,['Ineligible Service']
+1702,174,1,[]
+1703,17008372,1,[]
+1704,17008378,1,[]
+1705,125,1,[]
+1706,srst,1,[]
+1707,143004441,1,[]
+1708,quick,1,[]
+1709,seca,1,[]
+1710,149,1,[]
+1711,several,1,[]
+1712,151,1,['Applicant ineligible']
+1713,seneca,1,['Missing documentation needed to determine eligible service']
+1714,160014210,1,['Missing documentation to determin competitive bidding']
+1715,responded,1,[]
+1716,160024673,1,[]
+1717,160038854,1,[]
+1718,17009148,1,[]
+1719,sabana,1,[]
+1720,resulted,1,[]
+1721,16032752,1,[]
+1722,16036780,1,[]
+1723,rpf,1,[]
+1724,rollervoer,1,[]
+1725,rfps,1,[]
+1726,signal,1,[]
+1727,146,1,[]
+1728,similarly,1,['Competitive Bidding Violation - price not primary factor']
+1729,16061731,1,['Missing documentation needed to determine eligible service']
+1730,17009939,1,[]
+1731,17009989,1,[]
+1732,143025536,1,[]
+1733,sow,1,[]
+1734,143026181,1,[]
+1735,143028369,1,[]
+1736,16066081,1,[]
+1737,143032173,1,['Competitive Bidding Violation - specified vendor in 470']
+1738,removing,1,[]
+1739,143035853,1,[]
+1740,renewals,1,[]
+1741,smart,1,[]
+1742,six,1,[]
+1743,sites,1,[]
+1744,143036204,1,[]
+1745,qwest,1,[]
+1746,170075477,1,['Missing documentation to determin competitive bidding']
+1747,102,1,['Category 2 budget exceeded']
+1748,1699001259,1,[]
+1749,1699005065,1,[]
+1750,1699005000,1,[]
+1751,1699003289,1,[]
+1752,1799097114,1,[]
+1753,trails,1,[]
+1754,1699002143,1,[]
+1755,print,1,[]
+1756,traffic,1,[]
+1757,tomorrow,1,[]
+1758,procedure,1,['Competitive Bidding Violation - 28 day failure']
+1759,township,1,[]
+1760,totaling,1,[]
+1761,104,1,[]
+1762,produce,1,[]
+1763,16199132887,1,[]
+1764,tony,1,[]
+1765,previously,1,[]
+1766,1799098018,1,[]
+1767,press,1,[]
+1768,1799098424,1,[]
+1769,1699018769,1,[]
+1770,1799106572,1,[]
+1771,1699015699,1,[]
+1772,1799106496,1,[]
+1773,tv,1,[]
+1774,1699011107,1,['Competitive Bidding Violation - price not primary factor']
+1775,trunking,1,[]
+1776,1799106371,1,[]
+1777,1699005619,1,[]
+1778,power,1,['Ineligible Service']
+1779,truconnect,1,[]
+1780,pozas,1,[]
+1781,1799106307,1,[]
+1782,1799106205,1,[]
+1783,tree,1,[]
+1784,161045553,1,[]
+1785,161045543,1,[]
+1786,1799045070,1,[]
+1787,16081004,1,['Missing documentation needed to determine eligible service']
+1788,1799056889,1,[]
+1789,17006604,1,[]
+1790,10gb,1,[]
+1791,17007419,1,[]
+1792,third,1,[]
+1793,110,1,['Competitive Bidding Violation - price not primary factor']
+1794,thecontract,1,[]
+1795,1799056885,1,[]
+1796,1799088626,1,[]
+1797,1799054158,1,[]
+1798,pueblo,1,[]
+1799,114,1,['Category 2 budget exceeded']
+1800,purchasing,1,[]
+1801,term,1,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+1802,1154,1,[]
+1803,17007477,1,[]
+1804,tierras,1,[]
+1805,1799060241,1,[]
+1806,1799063158,1,[]
+1807,108,1,[]
+1808,1799087166,1,[]
+1809,1799082550,1,[]
+1810,1799081939,1,[]
+1811,1799081395,1,[]
+1812,prohibited,1,[]
+1813,1799081349,1,[]
+1814,1799081273,1,[]
+1815,1799075802,1,[]
+1816,nif,1,"['Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+1817,1799072914,1,[]
+1818,1799072096,1,[]
+1819,1799067017,1,[]
+1820,16084390,1,['Missing documentation needed to determine eligible service']
+1821,prorated,1,['Competitive Bidding Violation']
+1822,179906679,1,[]
+1823,reviewing,1,[]
+1824,1699144929,1,[]
+1825,1699099035,1,[]
+1826,17004414,1,[]
+1827,17004409,1,[]
+1828,17004410,1,[]
+1829,chok,1,['Applicant ineligible']
+1830,522,1,[]
+1831,525,1,['Ineligible Service']
+1832,17004411,1,[]
+1833,531,1,[]
+1834,1699099809,1,[]
+1835,17004416,1,[]
+1836,17004418,1,[]
+1837,17004420,1,[]
+1838,17004421,1,[]
+1839,17004422,1,[]
+1840,centurylink,1,[]
+1841,17004407,1,[]
+1842,christian,1,[]
+1843,circuits,1,[]
+1844,521,1,[]
+1845,17004405,1,[]
+1846,520750001036957,1,[]
+1847,519,1,"['Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded']"
+1848,clackamas,1,[]
+1849,classroom,1,[]
+1850,512k,1,[]
+1851,512,1,[]
+1852,17004404,1,[]
+1853,cloud,1,[]
+1854,cme,1,['Ineligible Service']
+1855,17004403,1,[]
+1856,college,1,[]
+1857,comm,1,"['Ineligible Service', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing documentation to determin competitive bidding']"
+1858,535,1,[]
+1859,17004423,1,[]
+1860,17004424,1,[]
+1861,561,1,[]
+1862,5940,1,[]
+1863,17004435,1,[]
+1864,580,1,[]
+1865,billing,1,['Competitive Bidding Violation']
+1866,17004434,1,[]
+1867,blackberry,1,[]
+1868,bny,1,['Missing documentation to determin competitive bidding']
+1869,17004433,1,[]
+1870,box,1,[]
+1871,17004432,1,[]
+1872,17004431,1,[]
+1873,565,1,['Applicant ineligible']
+1874,563,1,[]
+1875,562,1,['Competitive Bidding Violation']
+1876,bx,1,[]
+1877,539,1,['Category 2 budget exceeded']
+1878,c2901,1,[]
+1879,cablem,1,[]
+1880,caliche,1,[]
+1881,000,1,"['Competitive Bidding Violation - specified vendor in 470', 'Missing required fields on 471', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor']"
+1882,17004430,1,[]
+1883,17004429,1,[]
+1884,cantera,1,[]
+1885,547,1,['Missing documentation to determin competitive bidding']
+1886,17004428,1,[]
+1887,17004426,1,[]
+1888,546,1,[]
+1889,17004425,1,[]
+1890,cc,1,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Ineligible Service', 'Red light rule violation', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service']"
+1891,ccc,1,[]
+1892,511,1,['Category 2 budget exceeded']
+1893,companion,1,[]
+1894,4gb,1,[]
+1895,criterion,1,['Competitive Bidding Violation - price not primary factor']
+1896,47,1,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Competitive Bidding Violation - specified vendor in 470', 'Missing form 470', 'Ineligible Service', 'No signed contract in place', 'No 470', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Competitive Bidding Violation - price not primary factor']"
+1897,466,1,[]
+1898,465,1,[]
+1899,17004364,1,[]
+1900,17004363,1,[]
+1901,457,1,[]
+1902,17004361,1,[]
+1903,17004360,1,[]
+1904,course,1,[]
+1905,covered,1,[]
+1906,covering,1,['No signed contract in place']
+1907,449,1,['Ineligible Service']
+1908,17004339,1,[]
+1909,17004335,1,[]
+1910,17004334,1,[]
+1911,17004368,1,[]
+1912,cvin,1,[]
+1913,cwida,1,[]
+1914,da,1,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', 'Missing required fields on 471', '470 / 471 Mismatch', 'No signed contract in place', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding', 'Category 2 budget exceeded', 'c']"
+1915,17004332,1,[]
+1916,dat,1,"['Applicant ineligible', 'Missing required fields on 471', 'Ineligible Service', 'Competitive Bidding Violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Missing documentation needed to determine eligible service']"
+1917,17004331,1,[]
+1918,dataconnect,1,[]
+1919,17004330,1,[]
+1920,17004328,1,[]
+1921,17004327,1,[]
+1922,17004326,1,[]
+1923,17004325,1,[]
+1924,440,1,[]
+1925,deduction,1,[]
+1926,cooperative,1,[]
+1927,17004369,1,[]
+1928,comparison,1,[]
+1929,confidentiality,1,[]
+1930,17004400,1,[]
+1931,17004399,1,[]
+1932,17004398,1,[]
+1933,17004397,1,[]
+1934,17004396,1,[]
+1935,complies,1,[]
+1936,component,1,['Competitive Bidding Violation']
+1937,17004394,1,[]
+1938,17004392,1,[]
+1939,concurrently,1,[]
+1940,17004389,1,[]
+1941,conducted,1,['Competitive Bidding Violation - specified vendor in 470']
+1942,conference,1,[]
+1943,4fxo,1,[]
+1944,confirm,1,[]
+1945,17004371,1,[]
+1946,17004387,1,[]
+1947,17004385,1,[]
+1948,17004383,1,[]
+1949,499,1,[]
+1950,connectivity,1,[]
+1951,17004382,1,[]
+1952,496,1,['470 / 471 Mismatch']
+1953,17004381,1,[]
+1954,17004380,1,[]
+1955,17004379,1,[]
+1956,17004378,1,[]
+1957,17004377,1,[]
+1958,17004374,1,[]
+1959,490,1,[]
+1960,17004677,1,[]
+1961,17004779,1,[]
+1962,596,1,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible']"
+1963,ac,1,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - price not primary factor', 'Competitive Bidding Violation - specified vendor in 470', 'Voice - no discount remaining', 'Ineligible Service', 'Duplicate FRN', 'Red light rule violation', 'No signed contract in place', 'Competitive Bidding Violation - 28 day failure', 'Applicant ineligible', 'Missing documentation to determin competitive bidding', 'Missing documentation needed to determine eligible service', 'Category 2 budget exceeded', 'c']"
+1964,950,1,['Category 2 budget exceeded']
+1965,952,1,[]
+1966,954,1,[]
+1967,959,1,[]
+1968,768,1,['Competitive Bidding Violation']
+1969,960,1,[]
+1970,964,1,[]
+1971,767,1,[]
+1972,978,1,['Competitive Bidding Violation - price not primary factor']
+1973,765,1,['Category 2 budget exceeded']
+1974,983,1,[]
+1975,98515,1,[]
+1976,762,1,[]
+1977,995,1,[]
+1978,753,1,[]
+1979,947,1,['470 / 471 Mismatch']
+1980,751,1,[]
+1981,accokeek,1,[]
+1982,740,1,[]
+1983,account,1,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor']"
+1984,732,1,[]
+1985,721,1,[]
+1986,719,1,[]
+1987,707,1,[]
+1988,705,1,[]
+1989,699001259,1,[]
+1990,699,1,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+1991,addl,1,[]
+1992,695,1,[]
+1993,adds,1,[]
+1994,949,1,['Competitive Bidding Violation']
+1995,94538,1,[]
+1996,adspo13,1,[]
+1997,86,1,['Category 2 budget exceeded']
+1998,792,1,[]
+1999,788,1,[]
+2000,81305,1,[]
+2001,814,1,['Competitive Bidding Violation - specified vendor in 470']
+2002,825,1,[]
+2003,828,1,['Missing documentation needed to determine eligible service']
+2004,83,1,"['Category 2 budget exceeded', 'Voice - no discount remaining', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor']"
+2005,832,1,[]
+2006,833,1,['Competitive Bidding Violation - specified vendor in 470']
+2007,780,1,[]
+2008,778,1,[]
+2009,840y7fiber,1,[]
+2010,85,1,"['Competitive Bidding Violation', 'Ineligible Service', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service']"
+2011,859,1,['Ineligible Service']
+2012,864,1,[]
+2013,94,1,"['Competitive Bidding Violation', '470 / 471 Mismatch', 'Category 2 budget exceeded']"
+2014,774,1,[]
+2015,884,1,[]
+2016,89,1,"['470 / 471 Mismatch', 'Category 2 budget exceeded']"
+2017,8974,1,[]
+2018,898,1,[]
+2019,91,1,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - 28 day failure', 'Fiber review failure', 'Competitive Bidding Violation - specified vendor in 470', '470 / 471 Mismatch', 'c', 'Missing documentation needed to determine eligible service']"
+2020,9111,1,['Competitive Bidding Violation - specified vendor in 470']
+2021,923,1,['Ineligible Service']
+2022,926,1,[]
+2023,927,1,[]
+2024,929,1,[]
+2025,930,1,[]
+2026,932,1,[]
+2027,939,1,[]
+2028,69,1,"['Ineligible Service', 'Competitive Bidding Violation', 'Voice - no discount remaining', 'Competitive Bidding Violation - price not primary factor', 'Fiber review failure', '470 / 471 Mismatch', 'Category 2 budget exceeded', 'c', 'Missing documentation needed to determine eligible service']"
+2029,adult,1,[]
+2030,beyond,1,[]
+2031,17005001,1,[]
+2032,601,1,[]
+2033,5m,1,[]
+2034,17005011,1,[]
+2035,17005010,1,[]
+2036,arizona,1,[]
+2037,17005009,1,[]
+2038,17005008,1,[]
+2039,17005007,1,[]
+2040,17005006,1,[]
+2041,asurion,1,[]
+2042,17005005,1,[]
+2043,17005004,1,[]
+2044,avpn,1,[]
+2045,17005003,1,[]
+2046,az,1,[]
+2047,604,1,['Ineligible Service']
+2048,azlibrary,1,[]
+2049,b2b,1,[]
+2050,back,1,[]
+2051,balancing,1,[]
+2052,17005000,1,[]
+2053,17004998,1,[]
+2054,bb,1,[]
+2055,17004995,1,[]
+2056,17004994,1,[]
+2057,599,1,[]
+2058,17004993,1,[]
+2059,17004992,1,[]
+2060,17004991,1,[]
+2061,598,1,[]
+2062,17005013,1,[]
+2063,17005014,1,[]
+2064,684,1,[]
+2065,17005071,1,[]
+2066,advantage,1,[]
+2067,680,1,['Missing documentation needed to determine eligible service']
+2068,679,1,[]
+2069,agencies,1,['Missing documentation needed to determine eligible service']
+2070,672,1,[]
+2071,668,1,[]
+2072,667,1,[]
+2073,666,1,['Category 2 budget exceeded']
+2074,alexandria,1,[]
+2075,645,1,['Missing documentation needed to determine eligible service']
+2076,640,1,[]
+2077,638,1,[]
+2078,17005960,1,[]
+2079,already,1,[]
+2080,636,1,['Category 2 budget exceeded']
+2081,17005015,1,[]
+2082,always,1,[]
+2083,americas,1,[]
+2084,17005069,1,[]
+2085,17005038,1,[]
+2086,anexo,1,[]
+2087,17005037,1,[]
+2088,619,1,[]
+2089,617,1,['Missing documentation needed to determine eligible service']
+2090,17005019,1,[]
+2091,antelope,1,[]
+2092,anthony,1,[]
+2093,17005018,1,[]
+2094,615,1,[]
+2095,17005017,1,[]
+2096,17004322,1,[]
+2097,17004321,1,[]
+2098,17004319,1,[]
+2099,1699144647,1,[]
+2100,2480,1,[]
+2101,k9,1,['Ineligible Service']
+2102,240,1,['470 / 471 Mismatch']
+2103,labor,1,['Competitive Bidding Violation']
+2104,239,1,[]
+2105,238,1,[]
+2106,lawrence,1,[]
+2107,231302,1,[]
+2108,2269,1,[]
+2109,1699144703,1,[]
+2110,22321,1,[]
+2111,lee,1,[]
+2112,223,1,[]
+2113,221005,1,[]
+2114,1699144602,1,[]
+2115,jetpacks,1,[]
+2116,leyisroel,1,['Applicant ineligible']
+2117,1699144555,1,[]
+2118,1699144394,1,[]
+2119,1699144357,1,[]
+2120,22012,1,[]
+2121,limited,1,[]
+2122,1699144356,1,[]
+2123,1699144290,1,[]
+2124,1699144288,1,[]
+2125,21per,1,['Competitive Bidding Violation']
+2126,1699144112,1,[]
+2127,1699143934,1,[]
+2128,load,1,"['Competitive Bidding Violation - 28 day failure', 'Competitive Bidding Violation - price not primary factor']"
+2129,locate,1,[]
+2130,june,1,['No signed contract in place']
+2131,jersey,1,[]
+2132,1699137812,1,[]
+2133,institutions,1,[]
+2134,indicating,1,[]
+2135,1699145575,1,[]
+2136,indicator,1,[]
+2137,1699145574,1,[]
+2138,1699145573,1,[]
+2139,1699145572,1,[]
+2140,268,1,[]
+2141,1699145571,1,[]
+2142,initial,1,"['Ineligible Service', 'Missing documentation needed to determine eligible service']"
+2143,inlt,1,[]
+2144,266,1,[]
+2145,1699145570,1,[]
+2146,1699145569,1,[]
+2147,instant,1,[]
+2148,instruction,1,['Competitive Bidding Violation']
+2149,1699144818,1,[]
+2150,instructional,1,[]
+2151,1699145568,1,[]
+2152,1699145567,1,[]
+2153,25mb,1,[]
+2154,1699145566,1,[]
+2155,1699145562,1,[]
+2156,interstate,1,[]
+2157,ios,1,[]
+2158,ipads,1,[]
+2159,iphn,1,[]
+2160,iphone,1,[]
+2161,1699145362,1,[]
+2162,issue,1,['Competitive Bidding Violation']
+2163,1699144908,1,[]
+2164,1699138692,1,[]
+2165,lot,1,[]
+2166,275,1,[]
+2167,mr5,1,[]
+2168,1699111337,1,[]
+2169,modifies,1,[]
+2170,1699110998,1,[]
+2171,monetary,1,[]
+2172,1699110653,1,[]
+2173,1699110419,1,[]
+2174,months,1,[]
+2175,1699109448,1,[]
+2176,203,1,"['Ineligible Service', 'Applicant ineligible', 'Category 2 budget exceeded']"
+2177,1699108358,1,[]
+2178,1699108351,1,[]
+2179,1699107068,1,[]
+2180,1699105507,1,[]
+2181,2025,1,[]
+2182,mr6,1,[]
+2183,mitigate,1,['Competitive Bidding Violation - price not primary factor']
+2184,msd,1,[]
+2185,1699105027,1,['Missing documentation needed to determine eligible service']
+2186,2021,1,[]
+2187,1699105025,1,['Missing documentation needed to determine eligible service']
+2188,márques,1,[]
+2189,1699104380,1,[]
+2190,nation,1,[]
+2191,national,1,[]
+2192,1699104043,1,[]
+2193,necesseray,1,[]
+2194,need,1,"['Ineligible Service', 'Applicant ineligible', 'Competitive Bidding Violation', 'Missing required fields on 471', 'Missing form 470', 'Competitive Bidding Violation - 28 day failure', 'Category 2 budget exceeded', 'No signed contract in place', 'Missing documentation needed to determine eligible service']"
+2195,1699101541,1,[]
+2196,negotiated,1,[]
+2197,net,1,"['470 / 471 Mismatch', 'Competitive Bidding Violation', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+2198,1699112659,1,[]
+2199,might,1,[]
+2200,low,1,"['Ineligible Service', 'Competitive Bidding Violation', 'Applicant ineligible', '470 / 471 Mismatch', 'Missing required fields on 471', 'Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Missing form 470', 'Voice - no discount remaining', 'Fiber review failure', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'c']"
+2201,1699125717,1,[]
+2202,1699137462,1,['Voice - no discount remaining']
+2203,loyal,1,[]
+2204,1699133350,1,[]
+2205,lubavitch,1,['Applicant ineligible']
+2206,main,1,"['Competitive Bidding Violation', 'Voice - no discount remaining', 'Ineligible Service']"
+2207,major,1,[]
+2208,1699133227,1,[]
+2209,1699131018,1,[]
+2210,managed,1,['Ineligible Service']
+2211,management,1,[]
+2212,1699129345,1,[]
+2213,manufactures,1,[]
+2214,1699127772,1,[]
+2215,matches,1,['Competitive Bidding Violation - specified vendor in 470']
+2216,mb,1,"['Missing required fields on 471', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Applicant ineligible', 'Competitive Bidding Violation - price not primary factor']"
+2217,mifi,1,[]
+2218,mci,1,[]
+2219,meadows,1,[]
+2220,means,1,[]
+2221,medium,1,[]
+2222,1699123625,1,[]
+2223,1699122426,1,['Competitive Bidding Violation']
+2224,1699117409,1,[]
+2225,208,1,['Applicant ineligible']
+2226,messenger,1,[]
+2227,1699114671,1,[]
+2228,207,1,['Applicant ineligible']
+2229,mi,1,"['Competitive Bidding Violation', 'Ineligible Service', 'Applicant ineligible', 'Missing required fields on 471', 'Competitive Bidding Violation - specified vendor in 470', 'Competitive Bidding Violation - price not primary factor', 'Missing form 470', 'Category 2 budget exceeded', 'Fiber review failure', '470 / 471 Mismatch', 'No signed contract in place', 'Missing documentation needed to determine eligible service', 'Missing documentation to determin competitive bidding']"
+2230,microwave,1,[]
+2231,middlesex,1,[]
+2232,1699145576,1,[]
+2233,incorrect,1,[]
+2234,definitive,1,[]
+2235,error,1,[]
+2236,ds1,1,[]
+2237,3mb,1,[]
+2238,399520001238888,1,[]
+2239,ecot,1,[]
+2240,electronic,1,[]
+2241,elem,1,['Applicant ineligible']
+2242,eligibilty,1,[]
+2243,398,1,[]
+2244,3948,1,[]
+2245,392,1,[]
+2246,enterprise,1,[]
+2247,epc,1,[]
+2248,equally,1,[]
+2249,erate,1,[]
+2250,375,1,[]
+2251,dream,1,[]
+2252,everthg,1,[]
+2253,every,1,[]
+2254,everything,1,[]
+2255,exceed,1,['Category 2 budget exceeded']
+2256,excess,1,"['470 / 471 Mismatch', 'Competitive Bidding Violation - specified vendor in 470', 'Fiber review failure']"
+2257,executed,1,['No signed contract in place']
+2258,experience,1,[]
+2259,expired,1,[]
+2260,357,1,[]
+2261,facility,1,[]
+2262,17003805,1,[]
+2263,failing,1,[]
+2264,failover,1,[]
+2265,17003689,1,[]
+2266,ds,1,"['Competitive Bidding Violation', 'Competitive Bidding Violation - price not primary factor', 'Category 2 budget exceeded', 'Ineligible Service', 'Competitive Bidding Violation - specified vendor in 470', 'Fiber review failure']"
+2267,dr4,1,[]
+2268,family,1,['Missing documentation needed to determine eligible service']
+2269,4250,1,[]
+2270,deluxe,1,[]
+2271,17004316,1,[]
+2272,17004313,1,[]
+2273,17004312,1,[]
+2274,17004311,1,[]
+2275,17004310,1,[]
+2276,429,1,[]
+2277,dependent,1,"['Voice - no discount remaining', 'Missing documentation needed to determine eligible service']"
+2278,17004309,1,[]
+2279,17004305,1,[]
+2280,426480001240887,1,[]
+2281,17004303,1,[]
+2282,despite,1,[]
+2283,17004300,1,[]
+2284,425,1,[]
+2285,406,1,[]
+2286,17004296,1,[]
+2287,deterred,1,['Competitive Bidding Violation - specified vendor in 470']
+2288,4200,1,[]
+2289,418,1,[]
+2290,dids,1,['Competitive Bidding Violation']
+2291,digital,1,[]
+2292,415,1,[]
+2293,411,1,['Missing documentation needed to determine eligible service']
+2294,disaster,1,[]
+2295,discnt,1,[]
+2296,dish,1,[]
+2297,diversity,1,[]
+2298,dld,1,[]
+2299,dollars,1,['Missing documentation needed to determine eligible service']
+2300,17003688,1,[]
+2301,fax,1,[]
+2302,276,1,[]
+2303,2g,1,[]
+2304,guayanilla,1,[]
+2305,308,1,"['Ineligible Service', 'Category 2 budget exceeded']"
+2306,hagans,1,[]
+2307,hall,1,[]
+2308,1699145592,1,[]
+2309,hardware,1,[]
+2310,304,1,['Applicant ineligible']
+2311,1699145591,1,[]
+2312,1699145590,1,[]
+2313,home,1,['Missing documentation needed to determine eligible service']
+2314,2mb,1,[]
+2315,1699145589,1,[]
+2316,1699145588,1,[]
+2317,2gb,1,[]
+2318,2fxs,1,[]
+2319,309,1,"['Competitive Bidding Violation', 'Applicant ineligible']"
+2320,294,1,[]
+2321,1699145587,1,[]
+2322,illegibility,1,[]
+2323,illinois,1,[]
+2324,immediate,1,[]
+2325,implemented,1,[]
+2326,1699145586,1,[]
+2327,1699145585,1,[]
+2328,1699145584,1,[]
+2329,1699145583,1,[]
+2330,1699145582,1,[]
+2331,1699145581,1,[]
+2332,1699145577,1,[]
+2333,inclusive,1,['No signed contract in place']
+2334,guayaney,1,[]
+2335,ground,1,[]
+2336,34,1,"['Ineligible Service', 'Applicant ineligible', 'Category 2 budget exceeded', 'Missing documentation needed to determine eligible service', '470 / 471 Mismatch']"
+2337,17000596,1,[]
+2338,336,1,[]
+2339,335,1,['Category 2 budget exceeded']
+2340,17003608,1,[]
+2341,17003187,1,[]
+2342,fiberlink,1,[]
+2343,17002244,1,[]
+2344,fire,1,['Competitive Bidding Violation - specified vendor in 470']
+2345,firewall,1,['Competitive Bidding Violation - specified vendor in 470']
+2346,flat,1,[]
+2347,334,1,[]
+2348,17002081,1,['Applicant ineligible']
+2349,follows,1,[]
+2350,17001375,1,[]
+2351,17001304,1,['Applicant ineligible']
+2352,330,1,[]
+2353,green,1,[]
+2354,four,1,[]
+2355,33,1,"['Competitive Bidding Violation - specified vendor in 470', 'Category 2 budget exceeded', 'Competitive Bidding Violation - price not primary factor', 'Missing documentation needed to determine eligible service']"
+2356,17000501,1,[]
+2357,17000500,1,[]
+2358,frn0799075817,1,[]
+2359,frn1799075817,1,[]
+2360,320,1,[]
+2361,17000450,1,[]
+2362,gbps,1,[]
+2363,generation,1,[]
+2364,313,1,[]
+2365,17000090,1,[]
+2366,gov,1,[]
+2367,310,1,[]
+2368,emergency,1,[]

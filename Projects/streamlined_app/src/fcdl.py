@@ -130,25 +130,9 @@ def ngrams2(comment, n):
     #comment[i], comment[i + 1]
 
 
-denied['bigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 2)))
-denied['bigram_array_test'] = denied['fcdl_comment_array'].apply(lambda x: ngrams2(x, 2))
+
 print(denied.head())
 denied['trigram_array'] = denied['fcdl_comment_array'].apply(lambda x: Counter(ngrams(x, 3)))
-
-##bigrams
-all_bigrams = pd.Series()
-for row in denied['bigram_array']:
-  s = pd.Series(row, name = 'bigrams')
-  all_bigrams = all_bigrams.append(s)
-
-print(type(all_bigrams))
-all_bigrams = pd.DataFrame(all_bigrams)
-
-print('----------')
-all_bigrams.index.names = ['bigram']
-all_bigrams.columns = ['count']
-all_bigrams = all_bigrams.groupby(['bigram']).sum()
-print(all_bigrams.sort_values('count', ascending = False).head(20))
 
 ##trigrams
 all_trigrams = pd.Series()
@@ -167,11 +151,10 @@ print(all_trigrams.sort_values('count', ascending = False).head(20))
 
 print('result of new n grams with adrianna')
 print(denied.iloc[0]['fcdl_comment_array'])
-print(ngrams2(denied.iloc[0]['fcdl_comment_array'],2))
+#print(ngrams2(denied.iloc[0]['fcdl_comment_array'],2))
 
 ##---------------------------------------------------------------------------------
 ##write results to CSVs
 
 word_counts.sort_values('count', ascending = False).to_csv('fcdl_data/single_words.csv')
-all_bigrams.sort_values('count', ascending = False).to_csv('fcdl_data/bigrams.csv')
 all_trigrams.sort_values('count', ascending = False).to_csv('fcdl_data/trigrams.csv')
