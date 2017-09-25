@@ -26,5 +26,3 @@ $(EXT_DATA_DIR)/acgr-lea-sy2012-13.csv:
 $(CODE_DIR)/out_files/query_data.Rout: $(CODE_DIR)/query_data.R 
 	@echo "query_data"
 	@R CMD BATCH --no-restore '--args $(GITHUB)' $(CODE_DIR)/query_data.R $(CODE_DIR)/outfiles/query_data.Rout 
-
-	
