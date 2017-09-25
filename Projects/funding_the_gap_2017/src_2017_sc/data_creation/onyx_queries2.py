@@ -23,7 +23,7 @@ def getCampuses( conn ) :
                   case
                     when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
@@ -86,7 +86,7 @@ select ce.district_esh_id, ce.campus_id
   and ce.campus_id = sd.campus_id
   where district_include_in_universe_of_districts
   and exclude_from_campus_analysis = false
-  and category='Correct Non-fiber'
+  and category  like '%Correct Non-fiber%'
 
   group by ce.district_esh_id, ce.campus_id
   ) correct_nonfiber
@@ -159,7 +159,7 @@ select  distinct  dd.esh_id,
                   case
                     when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,

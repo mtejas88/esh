@@ -23,7 +23,7 @@ select  distinct  dd.esh_id,
                   case
                     when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
@@ -134,7 +134,7 @@ select  distinct  dd.esh_id,
                   case
                     when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
