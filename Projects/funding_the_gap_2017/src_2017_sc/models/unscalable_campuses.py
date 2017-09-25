@@ -37,7 +37,8 @@ print("Campuses limited to closest unscalable")
 
 ##calculate assumed build bw needed based on campuses' number of students
 unscalable_campuses['build_bandwidth'] = where(unscalable_campuses['campus_student_count']<1000, 1000, 10000)
-unscalable_campuses['build_fraction_wan'] = where(unscalable_campuses['campus_distance_rank']>unscalable_campuses['district_num_campuses_unscalable'],
+unscalable_campuses['build_fraction_wan'] = where((unscalable_campuses['correct_match'] = 0) &
+												(unscalable_campuses['campus_distance_rank']>unscalable_campuses['district_num_campuses_unscalable']),
 												1-(unscalable_campuses['campus_distance_rank']-unscalable_campuses['district_num_campuses_unscalable']),
 												1)
 #to potentially put into build_fraction_wan where: unscalable_campuses['correct_match'] = 0	& 

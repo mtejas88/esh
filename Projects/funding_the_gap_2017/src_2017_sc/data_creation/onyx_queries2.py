@@ -21,11 +21,8 @@ def getCampuses( conn ) :
                     else dd.discount_rate_c1_matrix
                   end as c1_discount_rate_or_state_avg,
                   case
-                    when  dd.exclude_from_current_fiber_analysis = false
-                            and dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
+                    when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    when  dd.exclude_from_current_fiber_analysis = false
-                      then '2: Fit for FTG, Not Target'
                     else '3: Not Fit for FTG'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
@@ -160,11 +157,8 @@ select  distinct  dd.esh_id,
                     else dd.discount_rate_c1_matrix
                   end as c1_discount_rate_or_state_avg,
                   case
-                    when  dd.exclude_from_current_fiber_analysis = false
-                            and dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
+                    when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    when  dd.exclude_from_current_fiber_analysis = false
-                      then '2: Fit for FTG, Not Target'
                     else '3: Not Fit for FTG'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
