@@ -13,8 +13,8 @@ GITHUB = os.environ.get("GITHUB")
 
 import sys
 sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017/data_creation')
-from onyx_queries import getDistricts
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017_sc/data_creation')
+from onyx_queries2 import getDistricts
 
 
 ##connect to onyx and save list of all districts into pandas dataframe

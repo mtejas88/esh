@@ -13,8 +13,8 @@ GITHUB = os.environ.get("GITHUB")
 
 import sys
 sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017/data_creation')
-from onyx_queries import getCampuses
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017_sc/data_creation')
+from onyx_queries2 import getCampuses
 from classes import distanceCalculator, getAPIKey
 sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
 from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS

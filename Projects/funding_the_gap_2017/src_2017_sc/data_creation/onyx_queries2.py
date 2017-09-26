@@ -29,9 +29,17 @@ def getCampuses( conn ) :
                   dd.fiber_target_status as district_fiber_target_status,
                   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses as district_num_campuses_unscalable,
                   dd.hierarchy_ia_connect_category as district_hierarchy_ia_connect_category,
-                  case when dd.esh_id = correct_nonfiber.district_esh_id
-                  and campus_schools.campus_id = correct_nonfiber.campus_id
-                  then 1 else 0 end as correct_match,                  
+
+                  case when dd.esh_id = campus_category.district_esh_id
+                  and campus_schools.campus_id = campus_category.campus_id
+                  and category  ilike '%Correct Non-fiber%' and category != 'Incorrect Non-fiber'
+                  then 1 else 0 end as correct_nonfiber_match,    
+
+                  case when dd.esh_id = campus_category.district_esh_id
+                  and campus_schools.campus_id = campus_category.campus_id
+                  and category  = 'Correct Fiber' 
+                  then 1 else 0 end as correct_fiber_match,  
+
                   campus_schools.campus_id,
                   campus_schools.campus_school_names,
                   campus_schools.campus_school_nces_cds,
@@ -79,19 +87,18 @@ left join (
 on dd.esh_id = campus_schools.district_esh_id
 
 left join (
-select ce.district_esh_id, ce.campus_id
+select ce.district_esh_id, ce.campus_id, category
   from public.fy2017_campuses_excluded_from_analysis_matr ce
   join public.fy2017_schools_demog_matr  sd
   on ce.district_esh_id = sd.district_esh_id
   and ce.campus_id = sd.campus_id
   where district_include_in_universe_of_districts
   and exclude_from_campus_analysis = false
-  and category  like '%Correct Non-fiber%'
 
-  group by ce.district_esh_id, ce.campus_id
-  ) correct_nonfiber
-on dd.esh_id = correct_nonfiber.district_esh_id
-and campus_schools.campus_id = correct_nonfiber.campus_id
+  group by ce.district_esh_id, ce.campus_id, category
+  ) campus_category
+on dd.esh_id = campus_category.district_esh_id
+and campus_schools.campus_id = campus_category.campus_id
 
 left join (
   select
