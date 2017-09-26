@@ -27,7 +27,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'Charter'
 
-                when reporting_name is null then service_provider_name
+                when reporting_name is null or reporting_name = '' then service_provider_name
                 else reporting_name
 
               end as reporting_name,
@@ -46,7 +46,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       where purpose in ('Upstream', 'Internet')
       and inclusion_status in ('clean_with_cost', 'clean_no_cost')
       and recipient_include_in_universe_of_districts
-      and district_type = 'Traditional'
       and recipient_exclude_from_ia_analysis = false
       group by 1,2,3,4
     )recipient_sp_bw
@@ -74,7 +73,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'Charter'
 
-                when reporting_name is null then service_provider_name
+                when reporting_name is null or reporting_name = '' then service_provider_name
                 else reporting_name
 
               end as reporting_name,
@@ -92,7 +91,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       where purpose in ('Upstream', 'Internet')
       and inclusion_status in ('clean_with_cost', 'clean_no_cost')
       and recipient_include_in_universe_of_districts
-      and district_type = 'Traditional'
       and recipient_exclude_from_ia_analysis = false
       group by 1,2,3,4
     )recipient_sp_bw
@@ -107,8 +105,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 /*
 Author: Justine Schott
 Created On Date: 1/26/2017
-Last Modified Date: 3/30/2017 - - included clean_no_cost line items. Included districts whose primary
-      service provider gives them IA and upstream
+Last Modified Date: 9/6/2017 - Jamie slight tweak to deal with instances where reporting_name = '' and including AZ charters 
 Name of QAing Analyst(s):
 Purpose: Service provider assignment as done in 2016 SotS
 Methodology:

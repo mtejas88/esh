@@ -37,7 +37,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'Charter'
 
-                when reporting_name is null then service_provider_name
+                when reporting_name is null or reporting_name = '' then service_provider_name
                 else reporting_name
 
               end as reporting_name,
@@ -71,8 +71,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       and inclusion_status in ('clean_with_cost', 'clean_no_cost')
 
       and recipient_include_in_universe_of_districts
-
-      and district_type = 'Traditional'
 
       and recipient_exclude_from_ia_analysis = false
 
@@ -110,7 +108,7 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
 
                   then 'Charter'
 
-                when reporting_name is null then service_provider_name
+                when reporting_name is null or reporting_name = '' then service_provider_name
                 else reporting_name
 
               end as reporting_name,
@@ -142,8 +140,6 @@ recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total as primary_sp_perc
       and inclusion_status in ('clean_with_cost', 'clean_no_cost')
 
       and recipient_include_in_universe_of_districts
-
-      and district_type = 'Traditional'
 
       and recipient_exclude_from_ia_analysis = false
 
@@ -242,5 +238,10 @@ Modified Date: 8/9/2017
 Name of Modifier: Sierra Costanza
 Purpose/Methodology: Small modifications to reporting name (if null, use service_provider_name). The same logic was ap[plied to the 2016 view.
 Also applying a table with DQT primary service provider overrides for some mostly dirty Large and Mega districts unique to 2017.
+
+
+Modified Date: 9/6/2017
+Name of Modifier: Jamie Barnes
+Purpose/Methodology: slight tweak to deal with instances where reporting_name = '' and open up to AZ Charters
 
 */
