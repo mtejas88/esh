@@ -68,8 +68,10 @@ print(len(result))
 denied = denied.merge(result, how = 'left', left_on = 'frn', right_index = True)
 denied = denied[['frn', 'fcdl_comment_cleaned', 'fcdl_comment_array', 'trigram_array', 'fixed_category']]
 #needs_cateogory = denied.dropna(subset = ['fixed_category'])
+needs_cateogory = denied[pd.isnull(denied['fixed_category'])]
+print(needs_cateogory.head())
 #needs_cateogory = needs_cateogory[['frn', 'fcdl_comment_cleaned', 'fcdl_comment_array', 'trigram_array', 'fixed_category']]
 
 #print(len(needs_cateogory))
 
-denied.to_csv('fcdl_data/still_needs_category.csv')
+needs_cateogory.to_csv('fcdl_data/still_needs_category.csv')
