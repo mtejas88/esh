@@ -9,11 +9,10 @@ HOST = os.environ.get("HOST")
 USER = os.environ.get("USER")
 PASSWORD = os.environ.get("PASSWORD")
 DB = os.environ.get("DB")
-GITHUB = os.environ.get("GITHUB")
 
 import sys
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap_2017/src_2017_sc/data_creation')
+sys.path.insert(0, '/home/sat/sat_r_programs/funding_the_gap/src/features')
+sys.path.insert(0, '/home/sat/sat_r_programs/funding_the_gap_2017/src_2017_sc/data_creation')
 from onyx_queries2 import getDistricts
 
 
@@ -22,11 +21,11 @@ myConnection = psycopg2.connect( host=HOST, user=USER, password=PASSWORD, dbname
 districts = getDistricts( myConnection )
 myConnection.close()
 
-districts.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv')
+districts.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/districts.csv')
 print("Districts pulled from database and saved")
 
-districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
-unscalable_campuses = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
+districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
+unscalable_campuses = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
 print("Unscalable campuses imported")
 
 unscalable_districts_with_0_wan_builds = unscalable_campuses.groupby(['esh_id']).sum()
@@ -52,5 +51,5 @@ unscalable_districts['build_bandwidth'] = where(unscalable_districts['district_n
 unscalable_districts['build_fraction_ia'] = 1
 print("Districts formatted")
 
-unscalable_districts.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_districts.csv')
+unscalable_districts.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_districts.csv')
 print("File saved")

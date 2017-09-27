@@ -4,15 +4,14 @@ from numpy import where
 import os
 #from dotenv import load_dotenv, find_dotenv
 #load_dotenv(find_dotenv())
-GITHUB = os.environ.get("GITHUB")
 
 import sys
-sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
+sys.path.insert(0, '/home/sat/sat_r_programs/funding_the_gap/src/features')
 
 from classes import cost_magnifier
 
-unscalable_districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_districts.csv',index_col=0)
-district_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_costs.csv',index_col=0)
+unscalable_districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_districts.csv',index_col=0)
+district_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/district_costs.csv',index_col=0)
 print("Distrct costs imported")
 
 district_build_costs = concat([unscalable_districts, district_costs], axis=1)
@@ -36,5 +35,5 @@ district_build_costs['total_district_funding_ia'] = where(	(district_build_costs
 															0,
 															district_build_costs['total_district_funding_ia'])
 
-district_build_costs.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv')
+district_build_costs.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/district_build_costs.csv')
 print("File saved")

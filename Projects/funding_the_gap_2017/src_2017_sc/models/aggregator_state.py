@@ -4,10 +4,8 @@ from numpy import NaN, where, logical_or
 import os
 #from dotenv import load_dotenv, find_dotenv
 #load_dotenv(find_dotenv())
-GITHUB = os.environ.get("GITHUB")
 
-
-districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
+districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
 print("Districts imported")
 
 ##EXTRAPOLATION
@@ -57,11 +55,11 @@ state_metrics_orig['extrapolation_orig'] = state_metrics_orig.extrapolation_orig
 state_metrics = merge(state_metrics_orig, state_metrics, how='outer', on='district_postal_cd')
 print("Extrapolations calculated")
 
-state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/state_extrapolations.csv')
+state_metrics.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/state_extrapolations.csv')
 ##WAN COST
 
 #import campus build costs
-campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs.csv',index_col=0)
+campus_build_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs.csv',index_col=0)
 print("Campus costs imported")
 
 #determine min and max values
@@ -109,7 +107,7 @@ campus_build_costs['builds_wan'] = campus_build_costs['build_fraction_wan']
 campus_build_costs['builds_az_pop_wan'] = 2 * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_wan'] = campus_build_costs['distance'] * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_pop_wan'] = campus_build_costs['build_distance_az_pop'] * campus_build_costs['build_fraction_wan']
-campus_build_costs.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs_max_min.csv')
+campus_build_costs.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs_max_min.csv')
 print("Min max calculated")
 
 ##
@@ -196,7 +194,7 @@ print("Campus costs extrapolated")
 ##IA COST
 
 #import district build costs
-district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv',index_col=0)
+district_build_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/district_build_costs.csv',index_col=0)
 print("District costs imported")
 
 #determine cost amounts
@@ -340,20 +338,20 @@ state_metrics.columns = [	'district_postal_cd', 'min_total_cost', 'min_total_sta
 							]
 
 state_metrics['advice_max_cost_per_mile'] = where(state_metrics['max_total_cost_per_mile']>=100000,
-														'high - skew towards minimum',
-														'no insight')
+														1,
+														0)
 state_metrics['advice_ia_builds'] = where(state_metrics['max_builds_ia']<10,
-												'low - skew towards minimum',
-												'no insight')
+												-1,
+												0)
 state_metrics['advice_ratio_miles_per_build'] = where(state_metrics['max_miles_per_build']/state_metrics['min_miles_per_build']>2,
-															'high - skew towards minimum',
-															'no insight')
+															1,
+															0)
 state_metrics['advice_skew'] = where(	logical_or(	(state_metrics['total_cost_az_wan']-state_metrics['min_total_cost_wan'])/(state_metrics['total_cost_az_pop_wan']-state_metrics['min_total_cost_wan'])>3,
 													(state_metrics['total_cost_az_pop_wan']-state_metrics['min_total_cost_wan'])/(state_metrics['total_cost_az_wan']-state_metrics['min_total_cost_wan'])>3),
-															'high - skew towards minimum',
-															'no insight')
+															1,
+															0)
 
-state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv')
+state_metrics.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/processed/state_metrics.csv')
 print("File saved")
 
 
