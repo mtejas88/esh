@@ -158,3 +158,4 @@ print(denied.iloc[0]['fcdl_comment_array'])
 
 word_counts.sort_values('count', ascending = False).to_csv('fcdl_data/single_words.csv')
 all_trigrams.sort_values('count', ascending = False).to_csv('fcdl_data/trigrams.csv')
+denied.to_csv('fcdl_data/denied_data.csv')
