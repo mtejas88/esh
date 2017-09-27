@@ -13,7 +13,6 @@ tx_16 <- read.csv("data/external/tx_2016.csv", as.is = T, header = T, stringsAsF
 tx_15 <- read.csv("data/external/tx_2015.csv", as.is = T, header = T, stringsAsFactors = F)
 tx_nces_num <- read.csv("data/external/tx_nces_num.csv", as.is = T, header = T, stringsAsFactors = F)
 
-
 ## load packages
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv","dplyr","secr")
 for (i in 1:length(packages.to.install)){
@@ -52,6 +51,19 @@ tx_grad <- merge(tx_nces_num[,c("DISTRICT_C","NCES_DISTR")],tx_grad, by.x = "DIS
 
 ## merge in broadband data 
 tx_data <- merge(tx_grad,broadband_data, by.x="NCES_DISTR", by.y= "nces_cd")
+
+## check that they're aren't any nulls
+any(is.na(tx_data))
+
+summary(tx_data)
+
+tx_data[is.na(tx_data$frl_percent),]
+
+# removing district with NA for frl_percent
+tx_data <- tx_data[is.na(tx_data$frl_percent)==FALSE,]
+
+any(is.na(tx_data))
+
 
 ## write out
 write.csv(tx_data, "data/tx_data.csv", row.names = FALSE)

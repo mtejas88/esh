@@ -15,7 +15,8 @@ d.frl_percent as frl_percent,
 dd.ia_bw_mbps_total as total_bw_16,
 dd.ia_bandwidth_per_student_kbps as bw_per_student_16,
 ddd.total_ia_bw_mbps as total_bw_15,
-ddd.ia_bandwidth_per_student as bw_per_student_15
+ddd.ia_bandwidth_per_student as bw_per_student_15,
+(dd.ia_bandwidth_per_student_kbps-ddd.ia_bandwidth_per_student::numeric)/ddd.ia_bandwidth_per_student::numeric as percent_bw_per_student_change
 
 from public.fy2016_districts_deluxe_matr dd 
 inner join public.fy2015_districts_deluxe_m ddd
@@ -29,3 +30,4 @@ and dd.district_type = 'Traditional'
 
 and dd.exclude_from_ia_analysis = false
 and ddd.exclude_from_analysis = false
+and ddd.ia_bandwidth_per_student != 'Insufficient data'
