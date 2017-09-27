@@ -29,5 +29,13 @@ modelA <- lm(grad_percent_change ~ num_students + num_schools + num_campuses + d
 print(summary(modelA))
 
 
+modelB <- lm(grad_percent_change ~ num_students + num_schools +
+               locale + frl_percent + percent_bw_per_student_change, data = train)
+
+print(summary(modelB))
+
+modelc <- lm(grad_percent_change ~ frl_percent + percent_bw_per_student_change, data = train)
+
+print(summary(modelc))
 
 

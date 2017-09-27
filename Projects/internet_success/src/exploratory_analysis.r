@@ -19,8 +19,9 @@ cor.data <- cor(tx1)
 print(corrplot(cor.data,method = 'color'))
 
 
-
 a <- ggplot(data = tx_data, aes(x=percent_bw_per_student_change,y=grad_percent_change))
+# try to look at random 100
+# do linear regression on just the two
 
 b <- a + geom_point(alpha=.8)
 print(b)
@@ -29,5 +30,3 @@ c <- a + geom_point(alpha=.8,aes(size = num_students,color = num_students))
 print(c)
 
 c + scale_color_gradient(low = 'blue', high = 'red')
-
-

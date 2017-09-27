@@ -48,3 +48,4 @@ dbDisconnect(con)
 
 ## write out
 write.csv(broadband_data, "data/broadband_data.csv", row.names = FALSE)
+
