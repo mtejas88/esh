@@ -21,6 +21,7 @@
     fr_agg.funded_frns,
     fr_agg.denied_frns,
     fr_agg.frns,
+    fr_agg.appealed_funded_frns,
     fr_agg.avg_wave_number,
     frns_agg.min_contract_expiry_date,
     frns_agg.max_contract_expiry_date,
@@ -41,7 +42,6 @@
     select *
     from fy2016.basic_informations
     where total_funding_year_commitment_amount_request::numeric > 0
-    and window_status = 'In Window'
   ) bi
   join (
   	select     
@@ -77,10 +77,10 @@
 	    				end) as num_frns_from_previous_year,
 	   	count(distinct ros.ben) as num_recipients
 
-  	from fy2016.frns
+  from fy2016.frns
 	left join fy2016.recipients_of_services ros
-  	on frns.application_number = ros.application_number
-  	group by 1
+	on frns.application_number = ros.application_number
+	group by 1
   ) frns_agg 
   on bi.application_number = frns_agg.application_number
   join (
@@ -89,9 +89,9 @@
   		array_to_string(array_agg(distinct 	case
   												when function ilike '%fiber%'
   													then 'Fiber'
-  												when purpose ilike '%wireless%'
+  												when function ilike '%wireless%'
   													then 'Wireless'
-  												when purpose ilike '%copper%'
+  												when function ilike '%copper%'
   													then 'Copper'
   											end),';') as functions,
   		array_to_string(array_agg(distinct 	case
@@ -129,6 +129,12 @@
 	          else 0
 	        end) as denied_frns,
 	    count(*) as frns,
+      sum(case
+            when fr.appeal_wave_number != ''
+            and fr.frn_status = 'Funded'
+              then 1
+            else 0
+          end) as appealed_funded_frns,
 	    avg(case
 	          when fr.wave_number is not null and fr.wave_number != ''
 	            then fr.wave_number::numeric
