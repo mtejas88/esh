@@ -7,7 +7,6 @@
 ## for 14 states using various state metrics (start with those used for the "advice" columns).
 ##      -Since there are so few datapoints, may try to use (Iteratively re-) Weighted Least Squares http://www.statisticshowto.com/weighted-least-squares/ 
 ##      -Will look at the confidence intervals and prediction intervals and compare to known estimated range
-##      -Might look into bootstrapping
 ## ======================================================================================================================
 
 ## Clearing memory
@@ -98,7 +97,7 @@ summary(regw.2) #better in terms of R^2 and coefficient SEs
     fit.w = lm(y_midrange ~ ., weights=w, data = state.metrics.2016.14.regression)
   } #confirmed with more iterations that this has converged
 
-## will use fit.w and regw1 to run bootstrapping
+summary(fit.w)
 
 ## visualize
 plot(reg,which=2)
@@ -120,18 +119,34 @@ reg.results_c #predicted value is outside the range too much
 regw1.results_c #5or6/14x, model range > data range; 2/14x the predicted value was outside true range, data is 5x
 fit.w.results_c #4/14x, model range > data range; 3/14x the predicted value was outside true range, data is 5x
 
+#*****************************************************************************************************************
+##### 2017 data
+state.metrics.2017 <- read.csv("state_metrics_2017.csv", as.is=T, header=T, stringsAsFactors=F)
+state.metrics.2017 <- state.metrics.2017[state.metrics.2017$min_total_state_funding >0,]
+
+state.metrics.2017$ratio_miles_per_build = state.metrics.2017$max_miles_per_build/state.metrics.2017$min_miles_per_build
+state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan) > 0,
+                                                    (state.metrics.2017$total_cost_az_wan - state.metrics.2017$min_total_cost_wan)/(state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan),
+                                                    (state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan)/(state.metrics.2017$total_cost_az_wan - state.metrics.2017$min_total_cost_wan))
+
+state.metrics.2017.regression = state.metrics.2017[, names(state.metrics.2017) %in% c('ratio_miles_per_build','ratio_total_cost_wan','min_total_state_funding','max_total_state_funding')]
+
+regw1_pred = as.data.frame(predict(regw1,newdata = state.metrics.2017.regression))
+names(regw1_pred) = c("regw1_pred")
+fit.w_pred = as.data.frame(predict(fit.w,newdata = state.metrics.2017.regression))
+names(fit.w_pred) = c("fit.w_pred")
+
+result_export=as.data.frame(cbind(state.metrics.2017$district_postal_cd, state.metrics.2017$min_total_state_funding/1000000,state.metrics.2017$max_total_state_funding/1000000, regw1_pred, fit.w_pred))
+names(result_export) = c("postal_cd", "min_2017", "max_2017", "prediction_wm", "prediction_wf")
+
+dim(result_export[result_export$prediction_wm < 0,])
+dim(result_export[result_export$prediction_wf < 0,])
+
+result_export = result_export %>% mutate(prediction=ifelse(prediction_wm < min_2017 , min_2017, prediction_wm))
+result_export = result_export[, names(result_export) %in% c("postal_cd", "min_2017", "max_2017", "prediction")]
+
+write.csv(result_export, file = "initial_results_2017.csv")
 
 #*****************************************************************************************************************
-# Bootstrap 95% CI for regression predictions - using fixed X
-
-
-
-# bootw1=bootCase(regw1, function(x)predict(x), B=999)
-# 
-# results=as.data.frame(cbind(as.data.frame(predict(regw1)), as.data.frame(apply(bootw1, 2, quantile, 0.025)),as.data.frame(apply(bootw1, 2, quantile, .975)), state.metrics.2016.14.regression$y_midrange, true_range_estimates, state.metrics.2016.14.regression$min_total_state_funding/1000000,state.metrics.2016.14.regression$max_total_state_funding/1000000))
-# names(results) = c("fit","lwr","upr","y_midrange", "true_range_estimate", "data_min", "data_max")
-# results = results %>% mutate(error = y_midrange - fit, pred_range = upr - lwr, data_range = data_max - data_min)
-# results
-
 
 
