@@ -21,6 +21,7 @@ GITHUB = os.environ.get("GITHUB")
 os.chdir(GITHUB+'/Projects/streamlined_app/data/interim') 
 frns_2016 = pd.read_csv('frns_2016.csv', encoding = "ISO-8859-1")
 frns_2017 = pd.read_csv('frns_2017.csv', encoding = "ISO-8859-1")
+frns_model = pd.read_csv('frns_model.csv', encoding = "ISO-8859-1")
 
 
 ## BELOW HAS NOT BEEN UPDATED

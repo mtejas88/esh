@@ -21,6 +21,8 @@ GITHUB = os.environ.get("GITHUB")
 os.chdir(GITHUB+'/Projects/streamlined_app/data/interim') 
 frns_2016 = pd.read_csv('frns_2016.csv')
 frns_2017 = pd.read_csv('frns_2017.csv')
+#low priority -- append 2016/2017 using feature columns, and then filter to those that are in this CSV. this is because everything before "features for inclusion" has already been done to frns_model & would be best to be consistent
+#frns_model = pd.read_csv('frns_model.csv', encoding = "ISO-8859-1")
 
 ##prep data for modeling
 #model using cat 1 data only
