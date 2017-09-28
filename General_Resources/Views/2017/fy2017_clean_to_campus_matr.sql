@@ -59,6 +59,12 @@ select
      and c.fiber_target_status != 'Target'
      and da.lines_w_dirty >= dm.num_campuses
       then false
+    --For districts that are targets and have an unscalable heirarchy_ia_connect_cat they are clean to the campus
+    --because every school in the district needs a fiber internet connection
+    WHEN dd.fiber_target_status = 'Target'
+      AND dd.hierarchy_ia_connect_category IN  ('Cable','Copper','Satellite/LTE','Fixed Wireless')
+      AND dd.exclude_from_ia_analysis = FALSE
+      then false
     --for all districts, if they are not fit for wan analysis then they are not fit for campus
     --or if they have less lines than campuses
     when c.exclude_from_wan_analysis = true
@@ -112,6 +118,7 @@ group by
 Author: Jeremy Holtzman
 Created On Date: 9/8/2017
 Modied: 9/20/17 - JH need at least as many lines than campuses to be fit for campus analysis
+Updated On: 9/28/2017 Chris Kemnitzer added ia heirarchy
 Name of QAing Analyst(s):
 Purpose: use the campus summary to determine if fit for campus analysis
 Methodology:
@@ -122,4 +129,5 @@ Methodology:
     or a campus with Correct non-fiber and incorrect fiber are NOT fit for campus analysis
 4. Remaining districts that have any correct non-fiber and every campus has some sort of connection are fit fot campus analysis
 5. Remaining districts are NOT fit for campus analysis
+
 */

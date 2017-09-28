@@ -117,7 +117,7 @@ temp as (
   --counting fiber circuits to specific campus
   (case
     when li.connect_category ilike '%Fiber%'
-  		then ac.allocation_lines
+      then ac.allocation_lines
     else 0
   end) as campus_fiber_lines_w_dirty,
 
@@ -125,32 +125,58 @@ temp as (
   (case
     when li.connect_category ilike '%Fiber%'
     and ac.num_open_flags = 0
-  		then ac.allocation_lines
+      then ac.allocation_lines
     else 0
   end) as campus_fiber_lines,
 
   --counting number of correctly allocated fiber circuits to specific campus
   (case
-  	when li.connect_category ilike '%Fiber%'
-  	and li.num_lines != -1
-  	and ( li.num_lines >= alloc.recipients or --num lines >= num recipients
+    when li.connect_category ilike '%Fiber%'
+    and li.num_lines != -1
+    and ( li.num_lines >= alloc.recipients or --num lines >= num recipients
         li.num_lines >= alloc.alloc or --num lines >= sum of the allocations
         li.num_lines >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-  		then ac.allocation_lines
+      then ac.allocation_lines
     else 0
   end) as campus_fiber_lines_alloc_w_dirty,
 
   --counting number of clean correctly allocated fiber circuits to specific campus
   (case
-  	when li.connect_category ilike '%Fiber%'
-  	and li.num_lines != -1
-  	and ac.num_open_flags = 0
-  	and ( li.num_lines >= alloc.recipients or --num lines >= num recipients
+    when li.connect_category ilike '%Fiber%'
+    and li.num_lines != -1
+    and ac.num_open_flags = 0
+    and ( li.num_lines >= alloc.recipients or --num lines >= num recipients
         li.num_lines >= alloc.alloc or --num lines >= sum of the allocations
         li.num_lines >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
-  		then ac.allocation_lines
+      then ac.allocation_lines
     else 0
-  end) as campus_fiber_lines_alloc
+  end) as campus_fiber_lines_alloc,
+
+   --counting clean fiber IA circuits to specific campus
+  (case
+    when li.connect_category ilike '%Fiber%'
+    and li.Purpose IN ('Bundled Internet access service that includes a connection from any applicant site directly to the Internet Service Provider',
+                        'Data connection(s) for an applicant’s hub site to an Internet Service Provider or state/regional network where Internet access service is billed separately')
+    and ac.num_open_flags = 0
+    AND NOT ( li.num_lines >= alloc.recipients or --num lines >= num recipients
+        li.num_lines >= alloc.alloc or --num lines >= sum of the allocations
+        li.num_lines >= alloc.num_campuses_and_others ) --num lines >= num campuses and other recips
+      then ac.allocation_lines
+    else 0
+  end) as campus_fiber_ia_lines_no_alloc,
+
+  --counting clean non fiber wan with correct allocations to sepcific campus
+  (case
+    when not(li.connect_category ilike '%Fiber%')
+    and li.num_lines != -1
+    and ac.num_open_flags = 0
+    and ( li.num_lines = alloc.recipients or --num lines = num recipients
+        li.num_lines = alloc.alloc or --num lines = sum of the allocations
+        li.num_lines = alloc.num_campuses_and_others ) --num lines = num campuses and other recips
+    and li.purpose = 'Data Connection between two or more sites entirely within the applicant’s network'
+      then ac.allocation_lines
+    else 0
+  end) as campus_nonfiber_wan_lines_alloc
 
   from public.fy2017_districts_predeluxe_matr d
 
@@ -187,14 +213,14 @@ temp as (
   and li.funding_year = 2017
 
   left join (
-  	select 	line_item_id,
-  		sum(a.num_lines_to_allocate) as alloc,
-  		count(distinct a.recipient_ben) as recipients,
-  		count(distinct c.campus_id) + sum(case when c.campus_id is null then 1
+    select  line_item_id,
+      sum(a.num_lines_to_allocate) as alloc,
+      count(distinct a.recipient_ben) as recipients,
+      count(distinct c.campus_id) + sum(case when c.campus_id is null then 1
                                         else 0 end) as num_campuses_and_others
-  	from public.esh_allocations a
+    from public.esh_allocations a
 
-  	join public.esh_line_items li
+    join public.esh_line_items li
     on a.line_item_id = li.id
     and li.funding_year = 2017
 
@@ -204,15 +230,15 @@ temp as (
     left join public.fy2017_schools_demog_matr c
     on eb.entity_id::varchar = c.school_esh_id
 
-  	where li.broadband = true
-  	group by line_item_id
+    where li.broadband = true
+    group by line_item_id
   ) alloc
   on ac.line_item_id = alloc.line_item_id
 
   where d.include_in_universe_of_districts_all_charters
   and li.funding_year = 2017
 
-  group by 1,2,3,4,5,6,7,8,9,10,11
+  group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 
   order by 1, 2
 
@@ -228,7 +254,10 @@ select
   sum(campus_fiber_lines_w_dirty) as campus_fiber_lines_w_dirty,
   sum(campus_fiber_lines) as campus_fiber_lines,
   sum(campus_fiber_lines_alloc_w_dirty) as campus_fiber_lines_alloc_w_dirty,
-  sum(campus_fiber_lines_alloc) as campus_fiber_lines_alloc
+  sum(campus_fiber_lines_alloc) as campus_fiber_lines_alloc,
+  sum(campus_fiber_ia_lines_no_alloc) AS campus_fiber_ia_lines_no_alloc,
+  sum(campus_nonfiber_wan_lines_alloc) as campus_nonfiber_wan_lines_alloc
+
 
 from
   temp
@@ -243,6 +272,8 @@ group by
 /*
 Author: Jeremy Holtzman
 Created On Date: 9/8/2017
+Updates: Chris Kemnitzer 9/28/2017
+-- added fiber ia and non fiber wan counts
 
 Name of QAing Analyst(s):
 Purpose: To make a campus table for cleaning to campus summary
