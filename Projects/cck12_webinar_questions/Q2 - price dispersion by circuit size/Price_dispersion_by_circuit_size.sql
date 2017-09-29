@@ -1,4 +1,6 @@
-select esh_id, name, line_item_mrc_unless_null, bandwidth_in_mbps
+## Only selected fields from services recieved so that there are no duplicates.
+
+SELECT DISTINCT line_item_id, applicant_name, recipient_postal_cd, reporting_name, monthly_circuit_cost_recurring, bandwidth_in_mbps
 from public.fy2017_districts_deluxe_matr dd
 join public.fy2017_services_received_matr sr
     ON dd.esh_id = sr.recipient_id
