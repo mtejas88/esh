@@ -155,8 +155,7 @@ temp as (
    --counting clean fiber IA circuits to specific campus
   (case
     when li.connect_category ilike '%Fiber%'
-    and li.Purpose IN ('Bundled Internet access service that includes a connection from any applicant site directly to the Internet Service Provider',
-                        'Data connection(s) for an applicant’s hub site to an Internet Service Provider or state/regional network where Internet access service is billed separately')
+    and li.internet_conditions_met = true or li.upstream_conditions_met = true
     and ac.num_open_flags = 0
     AND NOT ( li.num_lines >= alloc.recipients or --num lines >= num recipients
         li.num_lines >= alloc.alloc or --num lines >= sum of the allocations
@@ -173,7 +172,7 @@ temp as (
     and ( li.num_lines = alloc.recipients or --num lines = num recipients
         li.num_lines = alloc.alloc or --num lines = sum of the allocations
         li.num_lines = alloc.num_campuses_and_others ) --num lines = num campuses and other recips
-    and li.purpose = 'Data Connection between two or more sites entirely within the applicant’s network'
+    and li.wan_conditions_met = true
       then ac.allocation_lines
     else 0
   end) as campus_nonfiber_wan_lines_alloc
