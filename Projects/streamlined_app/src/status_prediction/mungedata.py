@@ -36,14 +36,14 @@ service_dummies = pd.get_dummies(frns_2016.service_type, prefix='service')
 frns_2016 = pd.concat([frns_2016, service_dummies], axis=1)
 
 #type of service
-frns_2016['fiber_indicator'] = np.where(frns_2016['functions'].str.contains('Fiber'), 1, 0)
-frns_2016['copper_indicator'] = np.where(frns_2016['functions'].str.contains('Copper'), 1, 0)
-frns_2016['wireless_indicator'] = np.where(frns_2016['functions'].str.contains('Wireless'), 1, 0)
-frns_2016['isp_indicator'] = np.where(frns_2016['purposes'].str.contains('ISP'), 1, 0)
-frns_2016['upstream_indicator'] = np.where(frns_2016['purposes'].str.contains('Upstream'), 1, 0)
-frns_2016['internet_indicator'] = np.where(frns_2016['purposes'].str.contains('Internet'), 1, 0)
-frns_2016['wan_indicator'] = np.where(frns_2016['purposes'].str.contains('WAN'), 1, 0)
-frns_2016['backbone_indicator'] = np.where(frns_2016['purposes'].str.contains('Backbone'), 1, 0)
+frns_2016['fiber_indicator'] = np.where(frns_2016['functions'].str.contains('Fiber', na=False), 1, 0)
+frns_2016['copper_indicator'] = np.where(frns_2016['functions'].str.contains('Copper', na=False), 1, 0)
+frns_2016['wireless_indicator'] = np.where(frns_2016['functions'].str.contains('Wireless', na=False), 1, 0)
+frns_2016['isp_indicator'] = np.where(frns_2016['purposes'].str.contains('ISP', na=False), 1, 0)
+frns_2016['upstream_indicator'] = np.where(frns_2016['purposes'].str.contains('Upstream', na=False), 1, 0)
+frns_2016['internet_indicator'] = np.where(frns_2016['purposes'].str.contains('Internet', na=False), 1, 0)
+frns_2016['wan_indicator'] = np.where(frns_2016['purposes'].str.contains('WAN', na=False), 1, 0)
+frns_2016['backbone_indicator'] = np.where(frns_2016['purposes'].str.contains('Backbone', na=False), 1, 0)
 
 ## 2017 FRN data prep
 #discount category
@@ -65,14 +65,14 @@ service_dummies = pd.get_dummies(frns_2017.service_type, prefix='service')
 frns_2017 = pd.concat([frns_2017, service_dummies], axis=1)
 
 #type of service
-frns_2017['fiber_indicator'] = np.where(frns_2017['functions'].str.contains('Fiber'), 1, 0)
-frns_2017['copper_indicator'] = np.where(frns_2017['functions'].str.contains('Copper'), 1, 0)
-frns_2017['wireless_indicator'] = np.where(frns_2017['functions'].str.contains('Wireless'), 1, 0)
-frns_2017['isp_indicator'] = np.where(frns_2017['purposes'].str.contains('ISP'), 1, 0)
-frns_2017['upstream_indicator'] = np.where(frns_2017['purposes'].str.contains('Upstream'), 1, 0)
-frns_2017['internet_indicator'] = np.where(frns_2017['purposes'].str.contains('Internet'), 1, 0)
-frns_2017['wan_indicator'] = np.where(frns_2017['purposes'].str.contains('WAN'), 1, 0)
-frns_2017['backbone_indicator'] = np.where(frns_2017['purposes'].str.contains('Backbone'), 1, 0)
+frns_2017['fiber_indicator'] = np.where(frns_2017['functions'].str.contains('Fiber', na=False), 1, 0)
+frns_2017['copper_indicator'] = np.where(frns_2017['functions'].str.contains('Copper', na=False), 1, 0)
+frns_2017['wireless_indicator'] = np.where(frns_2017['functions'].str.contains('Wireless', na=False), 1, 0)
+frns_2017['isp_indicator'] = np.where(frns_2017['purposes'].str.contains('ISP', na=False), 1, 0)
+frns_2017['upstream_indicator'] = np.where(frns_2017['purposes'].str.contains('Upstream', na=False), 1, 0)
+frns_2017['internet_indicator'] = np.where(frns_2017['purposes'].str.contains('Internet', na=False), 1, 0)
+frns_2017['wan_indicator'] = np.where(frns_2017['purposes'].str.contains('WAN', na=False), 1, 0)
+frns_2017['backbone_indicator'] = np.where(frns_2017['purposes'].str.contains('Backbone', na=False), 1, 0)
 
 
 ##2016 application data prep
@@ -106,19 +106,19 @@ locale_dummies = pd.get_dummies(applications_2016.urban_rural_status, prefix='lo
 applications_2016 = pd.concat([applications_2016, locale_dummies], axis=1)
 
 #type of service
-applications_2016['maintenance_indicator'] = np.where(applications_2016['service_types'].str.contains('Basic Maintenance'), 1, 0)
-applications_2016['connections_indicator'] = np.where(applications_2016['service_types'].str.contains('Internal Connections'), 1, 0)
-applications_2016['managedbb_indicator'] = np.where(applications_2016['service_types'].str.contains('Managed Internal Broadband Services'), 1, 0)
-applications_2016['voice_indicator'] = np.where(applications_2016['service_types'].str.contains('Voice'), 1, 0)
-applications_2016['datatrans_indicator'] = np.where(applications_2016['service_types'].str.contains('Data Transmission'), 1, 0)
-applications_2016['fiber_indicator'] = np.where(applications_2016['functions'].str.contains('Fiber'), 1, 0)
-applications_2016['copper_indicator'] = np.where(applications_2016['functions'].str.contains('Copper'), 1, 0)
-applications_2016['wireless_indicator'] = np.where(applications_2016['functions'].str.contains('Wireless'), 1, 0)
-applications_2016['isp_indicator'] = np.where(applications_2016['purposes'].str.contains('ISP'), 1, 0)
-applications_2016['upstream_indicator'] = np.where(applications_2016['purposes'].str.contains('Upstream'), 1, 0)
-applications_2016['internet_indicator'] = np.where(applications_2016['purposes'].str.contains('Internet'), 1, 0)
-applications_2016['wan_indicator'] = np.where(applications_2016['purposes'].str.contains('WAN'), 1, 0)
-applications_2016['backbone_indicator'] = np.where(applications_2016['purposes'].str.contains('Backbone'), 1, 0)
+applications_2016['maintenance_indicator'] = np.where(applications_2016['service_types'].str.contains('Basic Maintenance', na=False), 1, 0)
+applications_2016['connections_indicator'] = np.where(applications_2016['service_types'].str.contains('Internal Connections', na=False), 1, 0)
+applications_2016['managedbb_indicator'] = np.where(applications_2016['service_types'].str.contains('Managed Internal Broadband Services', na=False), 1, 0)
+applications_2016['voice_indicator'] = np.where(applications_2016['service_types'].str.contains('Voice', na=False), 1, 0)
+applications_2016['datatrans_indicator'] = np.where(applications_2016['service_types'].str.contains('Data Transmission', na=False), 1, 0)
+applications_2016['fiber_indicator'] = np.where(applications_2016['functions'].str.contains('Fiber', na=False), 1, 0)
+applications_2016['copper_indicator'] = np.where(applications_2016['functions'].str.contains('Copper', na=False), 1, 0)
+applications_2016['wireless_indicator'] = np.where(applications_2016['functions'].str.contains('Wireless', na=False), 1, 0)
+applications_2016['isp_indicator'] = np.where(applications_2016['purposes'].str.contains('ISP', na=False), 1, 0)
+applications_2016['upstream_indicator'] = np.where(applications_2016['purposes'].str.contains('Upstream', na=False), 1, 0)
+applications_2016['internet_indicator'] = np.where(applications_2016['purposes'].str.contains('Internet', na=False), 1, 0)
+applications_2016['wan_indicator'] = np.where(applications_2016['purposes'].str.contains('WAN', na=False), 1, 0)
+applications_2016['backbone_indicator'] = np.where(applications_2016['purposes'].str.contains('Backbone', na=False), 1, 0)
 
 #date cleaning -- min contract expiry date
 applications_2016['min_contract_expiry_date'] = np.where(applications_2016['min_contract_expiry_date'] == '06/30/3017', '06/30/2017', applications_2016['min_contract_expiry_date'])
@@ -166,17 +166,17 @@ locale_dummies = pd.get_dummies(applications_2017.urban_rural_status, prefix='lo
 applications_2017 = pd.concat([applications_2017, locale_dummies], axis=1)
 
 #type of service
-applications_2017['managedbb_indicator'] = np.where(applications_2017['service_types'].str.contains('Managed Internal Broadband Services'), 1, 0)
-applications_2017['voice_indicator'] = np.where(applications_2017['service_types'].str.contains('Voice'), 1, 0)
-applications_2017['datatrans_indicator'] = np.where(applications_2017['service_types'].str.contains('Data Transmission'), 1, 0)
-applications_2017['fiber_indicator'] = np.where(applications_2017['functions'].str.contains('Fiber'), 1, 0)
-applications_2017['copper_indicator'] = np.where(applications_2017['functions'].str.contains('Copper'), 1, 0)
-applications_2017['wireless_indicator'] = np.where(applications_2017['functions'].str.contains('Wireless'), 1, 0)
-applications_2017['isp_indicator'] = np.where(applications_2017['purposes'].str.contains('ISP'), 1, 0)
-applications_2017['upstream_indicator'] = np.where(applications_2017['purposes'].str.contains('Upstream'), 1, 0)
-applications_2017['internet_indicator'] = np.where(applications_2017['purposes'].str.contains('Internet'), 1, 0)
-applications_2017['wan_indicator'] = np.where(applications_2017['purposes'].str.contains('WAN'), 1, 0)
-applications_2017['backbone_indicator'] = np.where(applications_2017['purposes'].str.contains('Backbone'), 1, 0)
+applications_2017['managedbb_indicator'] = np.where(applications_2017['service_types'].str.contains('Managed Internal Broadband Services', na=False), 1, 0)
+applications_2017['voice_indicator'] = np.where(applications_2017['service_types'].str.contains('Voice', na=False), 1, 0)
+applications_2017['datatrans_indicator'] = np.where(applications_2017['service_types'].str.contains('Data Transmission', na=False), 1, 0)
+applications_2017['fiber_indicator'] = np.where(applications_2017['functions'].str.contains('Fiber', na=False), 1, 0)
+applications_2017['copper_indicator'] = np.where(applications_2017['functions'].str.contains('Copper', na=False), 1, 0)
+applications_2017['wireless_indicator'] = np.where(applications_2017['functions'].str.contains('Wireless', na=False), 1, 0)
+applications_2017['isp_indicator'] = np.where(applications_2017['purposes'].str.contains('ISP', na=False), 1, 0)
+applications_2017['upstream_indicator'] = np.where(applications_2017['purposes'].str.contains('Upstream', na=False), 1, 0)
+applications_2017['internet_indicator'] = np.where(applications_2017['purposes'].str.contains('Internet', na=False), 1, 0)
+applications_2017['wan_indicator'] = np.where(applications_2017['purposes'].str.contains('WAN', na=False), 1, 0)
+applications_2017['backbone_indicator'] = np.where(applications_2017['purposes'].str.contains('Backbone', na=False), 1, 0)
 
 
 ##save

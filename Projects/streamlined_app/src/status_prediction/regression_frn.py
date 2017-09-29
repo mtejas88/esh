@@ -75,6 +75,7 @@ X = train[feature_cols]
 y = np.logical_or(train.denied_frn, train.appealed_funded_frn)
 
 #undersample approved frns due to low number of denials
+#to-do: see if removing this makes accuracy we want higher
 rus = RandomUnderSampler(random_state=1)
 X_res, y_res = rus.fit_sample(X,y)
 rows = X_res.shape[0]
