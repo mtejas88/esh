@@ -8,7 +8,6 @@
 rm(list=ls())
 
 github_path <- "~/Documents/ESH-Code/ficher/"
-ecto_path <- "~/Documents/ESH-Code/ecto/"
 
 ## load packages (if not already in the environment)
 packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv")
@@ -50,7 +49,8 @@ querydb <- function(query_name){
   return(data)
 }
 
-suggested_districts <- querydb(paste(ecto_path, "db_ecto/material_girl/endpoint/fy2017/fy2017_bandwidth_suggested_districts_v06.sql", sep=""))
+suggested_bandwidth_districts <- querydb("src/fy2017_bandwidth_suggested_districts_v06.sql")
+suggested_fiber_ia_districts <- querydb("src/fy2017_fiber_ia_suggested_districts_v05.sql")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -58,4 +58,5 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 ## write out the datasets
 
-write.csv(suggested_districts, paste("data/suggested_districts_", date, ".csv", sep=""), row.names=F)
+write.csv(suggested_bandwidth_districts, paste("data/suggested_bandwidth_districts_", date, ".csv", sep=""), row.names=F)
+write.csv(suggested_fiber_ia_districts, paste("data/suggested_fiber_ia_districts_", date, ".csv", sep=""), row.names=F)
