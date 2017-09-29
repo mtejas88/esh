@@ -7,8 +7,12 @@ and those who upgraded paying the same or less than previous year. */
 /* Upgraders are defined as those districts that increased its bandwidth more than 11% since the previous year. */
 
 SELECT distinct count (*)
-FROM public.fy2017_districts_deluxe_matr
-WHERE upgrade_indicator = true
+FROM public.fy2017_districts_deluxe_matr fy2017
+WHERE fy2017.include_in_universe_of_districts = 'True'
+    AND fy2017.district_type = 'Traditional'
+    AND fy2017.upgrade_indicator = 'True'
+    AND fy2017.exclude_from_ia_analysis = 'False'
+    AND fy2017.exclude_from_ia_cost_analysis = 'False'
 
 /* Upgraders are defined as those districts that increased its bandwidth more than 11% since the previous year.
 Only looking at districts that paid the same or less than previous year (for little-to-no cost increase) */
