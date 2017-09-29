@@ -12,7 +12,6 @@ WHERE fy2017.include_in_universe_of_districts = 'True'
     AND fy2017.district_type = 'Traditional'
     AND fy2017.upgrade_indicator = 'True'
     AND fy2017.exclude_from_ia_analysis = 'False'
-    AND fy2017.exclude_from_ia_cost_analysis = 'False'
 
 /* Upgraders are defined as those districts that increased its bandwidth more than 11% since the previous year.
 Only looking at districts that paid the same or less than previous year (for little-to-no cost increase) */
