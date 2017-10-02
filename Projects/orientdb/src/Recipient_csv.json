@@ -1,0 +1,25 @@
+{
+  "config" : { "haltOnError": false },
+  "source": { "file": { "path": "../etl/files/Recipient.csv" } },
+  "extractor": { "csv": { "columns": ["recipient_id","recipient_type","recipient_campus_id"],
+                                "columnsOnFirstLine": true } },
+  "transformers": [
+    { "vertex": { "class": "Recipient" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",
+       "dbPassword": "admin",
+       "dbType": "graph",
+       "classes": [
+         {"name": "Recipient", "extends": "V"}
+       ],
+	"indexes": [
+         {"class":"Recipient", "fields":["recipient_id:integer"], "type":"UNIQUE" }
+       ]
+    }
+  }
+}

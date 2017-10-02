@@ -1,0 +1,26 @@
+{
+  "config" : { "haltOnError": false },
+  "source": { "file": { "path": "../etl/files/School.csv" } },
+  "extractor": { "csv": { "columns": ["district_esh_id", "locale", "district_num_students", "district_name", "district_address", "district_city", "district_zip", "campus_id", "school_esh_id", "school_name", "school_num_students", "school_address", "school_city", "school_zip"],
+                                "columnsOnFirstLine": true } },
+  "transformers": [
+    { "vertex": { "class": "School" } },
+    { "edge": { "class": "isSchool",  "joinFieldName": "campus_id", "lookup": "Campus.campus_id" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",
+       "dbPassword": "admin",
+       "dbType": "graph",
+       "classes": [
+         {"name": "School", "extends": "V"},
+         {"name": "isSchool", "extends": "E"}
+       ], "indexes": [
+         {"class":"School", "fields":["school_esh_id:integer"], "type":"UNIQUE" }
+       ]
+    }
+  }
+}

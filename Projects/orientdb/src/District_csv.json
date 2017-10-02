@@ -1,0 +1,21 @@
+{
+  "source": { "file": { "path": "../etl/files/District.csv" } },
+  "extractor": { "csv": {} },
+  "transformers": [
+    { "vertex": { "class": "District" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",       
+       "dbType": "graph",
+       "classes": [
+         {"name": "District", "extends": "V"}
+       ], "indexes": [
+         {"class":"Districts", "fields":["district_esh_id:integer"], "type":"UNIQUE" }
+       ]
+    }
+  }
+}

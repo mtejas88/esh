@@ -1,0 +1,22 @@
+{
+  "config" : { "haltOnError": false },
+  "source": { "file": { "path": "../etl/files/Applicant.csv" } },
+  "extractor": { "csv": { "columns": ["applicant_id","applicant_type","applicant_name"],
+                                "columnsOnFirstLine": true } },
+  "transformers": [
+    { "vertex": { "class": "Applicant" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",
+       "dbPassword": "admin",
+       "dbType": "graph",
+       "classes": [
+         {"name": "Applicant", "extends": "V"}
+       ]
+    }
+  }
+}

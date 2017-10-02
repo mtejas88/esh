@@ -1,0 +1,111 @@
+{
+    "config":
+    {
+        "haltOnError": false,
+        "parallel": true
+    },
+    "source":
+    {
+        "file":
+        {
+            "path": "../etl/files/CorrectNonFiber.csv"
+        }
+    },
+    "extractor":
+    {
+        "csv":
+        {
+            "columns": [
+                "district_esh_id",
+                "recipient_id",
+                "recipient_type",
+                "recipient_campus_id",
+                "open_flag_labels",
+                "open_tag_labels",
+                "line_item_id",
+                "num_lines",
+                "connect_category",
+                "purpose",
+                "applicant_id",
+                "applicant_type",
+                "applicant_name",
+                "num_open_flags",
+                "sum_lines_to_allocate",
+                "allocation_lines",
+                "correct_allocation",
+                "edgeClass"
+            ],
+            "columnsOnFirstLine": true
+        }
+    },
+    "transformers": [
+    {
+        "merge":
+        {
+            "joinFieldName": "recipient_id",
+            "lookup": "Recipient.recipient_id"
+        }
+    },
+    {
+        "vertex":
+        {
+            "class": "Recipient"
+        }
+    },
+    {
+        "edge":
+        {
+            "class": "CorrectNonFiber",
+            "joinFieldName": "applicant_id",
+            "lookup": "Applicant.applicant_id",
+            "direction": "in",
+            "edgeFields":
+            {
+                "open_flag_labels": "${input.open_flag_labels}",
+                "open_tag_labels": "${input.open_tag_labels}",
+                "line_item_id": "${input.line_item_id}",
+                "num_lines": "${input.num_lines}",
+                "purpose": "${input.purpose}"
+            },
+            "unresolvedLinkAction": "NOTHING"
+        }
+    },
+    {
+        "field":
+        {
+            "fieldNames": ["district_esh_id",
+                "recipient_id",
+                "recipient_type",
+                "recipient_campus_id", "connect_category",
+                "applicant_id",
+                "applicant_type",
+                "applicant_name", "sum_lines_to_allocate",
+                "allocation_lines",
+                "correct_allocation","edgeClass"
+            ],
+            "operation": "remove"
+        }
+    }],
+    "loader":
+    {
+        "orientdb":
+        {
+            "dbURL": "remote:localhost/databases/DistrictsAllocations",
+            "serverUser": "root",
+            "serverPassword": "g0S@t",
+            "dbUser": "admin",
+            "dbPassword": "admin",
+            "dbType": "graph",
+            "batchCommit": 1000,
+            "classes": [
+            {
+                "name": "Recipient",
+                "extends": "V"
+            },
+            {
+                "name": "Applicant",
+                "extends": "V"
+            }]
+        }
+    }
+}

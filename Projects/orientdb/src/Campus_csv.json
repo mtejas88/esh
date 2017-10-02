@@ -1,0 +1,24 @@
+{
+  "config" : { "haltOnError": false },
+  "source": { "file": { "path": "../etl/files/Campus.csv" } },
+  "extractor": { "csv": { "columns": ["campus_id","district_esh_id"],
+                                "columnsOnFirstLine": true } },
+  "transformers": [
+    { "vertex": { "class": "Campus" } },
+    { "edge": { "class": "isCampus",  "joinFieldName": "district_esh_id", "lookup": "District.district_esh_id" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",
+       "dbPassword": "admin",
+       "dbType": "graph",
+       "classes": [
+         {"name": "Campus", "extends": "V"},
+         {"name": "isCampus", "extends": "E"}
+       ]
+    }
+  }
+}
