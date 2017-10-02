@@ -61,9 +61,9 @@ select
       then false
     --For districts that are targets and have an unscalable heirarchy_ia_connect_cat they are clean to the campus
     --because every school in the district needs a fiber internet connection
-    WHEN dd.fiber_target_status = 'Target'
-      AND dd.hierarchy_ia_connect_category IN  ('Cable','Copper','Satellite/LTE','Fixed Wireless')
-      AND dd.exclude_from_ia_analysis = FALSE
+    WHEN df.fiber_target_status = 'Target'
+      AND df.hierarchy_ia_connect_category IN  ('Cable','Copper','Satellite/LTE','Fixed Wireless')
+      AND df.exclude_from_ia_analysis = FALSE
       then false
     --for all districts, if they are not fit for wan analysis then they are not fit for campus
     --or if they have less lines than campuses
@@ -102,6 +102,9 @@ on c.district_esh_id = da.district_esh_id
 
 left join public.fy2017_districts_metrics_matr dm
 on c.district_esh_id = dm.esh_id
+
+left join public.fy2017_districts_fiberpredeluxe_matr df
+on c.district_esh_id = df.esh_id
 
 
 group by 

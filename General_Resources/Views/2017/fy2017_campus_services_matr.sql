@@ -155,7 +155,7 @@ temp as (
    --counting clean fiber IA circuits to specific campus
   (case
     when li.connect_category ilike '%Fiber%'
-    and li.internet_conditions_met = true or li.upstream_conditions_met = true
+    and (li.internet_conditions_met = true or li.upstream_conditions_met = true)
     and ac.num_open_flags = 0
     AND NOT ( li.num_lines >= alloc.recipients or --num lines >= num recipients
         li.num_lines >= alloc.alloc or --num lines >= sum of the allocations
