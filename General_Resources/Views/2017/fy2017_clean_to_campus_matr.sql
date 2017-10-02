@@ -114,7 +114,10 @@ group by
   c.exclude_from_wan_analysis,
   da.lines_w_dirty,
   dm.num_campuses,
-  c.fiber_target_status
+  c.fiber_target_status,
+  df.fiber_target_status,
+  df.hierarchy_ia_connect_category,
+  df.exclude_from_ia_analysis
 
 
 /*
