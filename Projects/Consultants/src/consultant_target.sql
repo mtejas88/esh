@@ -25,15 +25,13 @@ left join public.fy2017_districts_deluxe_matr d
 join fy2017.consultants c
 	on eb.ben = c.ben
 
-join public.fy2017_esh_line_items_v li
-	on c.application_number = li.application_number
-
 where 
 	d.include_in_universe_of_districts and
 	exclude_from_ia_analysis = false and
 	c.name like '%360%' and
-	(d.fiber_target_status != ('Not Target')
+	(d.fiber_target_status in ('Target','Potential Target')
 	or
-	d.bw_target_status != ('Not Target')
+	d.bw_target_status in ('Target','Potential Target')
 	or
-	d.wifi_target_status != ('Not Target'))
+	d.wifi_target_status in ('Target','Potential Target'))
+
