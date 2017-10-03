@@ -165,7 +165,9 @@ this prevents the creation of the materialized view due to division error of 0*/
 
   and recipient_sp_bw_rank.bandwidth/recipient_sp_bw_total.bw_total > .5
 
-)
+),
+
+clean_providers AS (
 
 select t.esh_id,
 case when l.esh_id is not null then (
@@ -207,7 +209,7 @@ NULL as primary_sp_bandwidth,
 NULL as primary_sp_percent_of_bandwidth
 from  public.large_mega_dqt_overrides l
 where l.esh_id::varchar not in (select esh_id from t)
-
+)
 
 
 
@@ -236,7 +238,7 @@ Methodology: Using updated tables names for 2017 underline tables, as per discus
 
 Modified Date: 8/9/2017
 Name of Modifier: Sierra Costanza
-Purpose/Methodology: Small modifications to reporting name (if null, use service_provider_name). The same logic was ap[plied to the 2016 view.
+Purpose/Methodology: Small modifications to reporting name (if null, use service_provider_name). The same logic was applied to the 2016 view.
 Also applying a table with DQT primary service provider overrides for some mostly dirty Large and Mega districts unique to 2017.
 
 
