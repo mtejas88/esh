@@ -1,0 +1,54 @@
+{
+  "config": {
+    "haltOnError": false 
+  },
+  "extractor" : {
+    "jdbc": { "driver": "org.postgresql.Driver",
+              "url": "jdbc:postgresql://ec2-54-156-167-103.compute-1.amazonaws.com:5432/dai3g95tesvtj9?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory",
+              "userName": "ufr4in10gd10qn",
+              "userPassword": "pe0b7b0f0b61ce6694e37dd3084d35ece490333517f0b9b7dd733f61db7de2dba",
+              "query": "
+              	with t as(select 
+				district_esh_id,
+				dd.locale,
+				dd.num_students as district_num_students,
+				dd.name as district_name,
+				dd.address as district_address,
+				dd.city as district_city,
+				dd.zip as district_zip,
+				campus_id,
+				school_esh_id,
+				sd.name as school_name,
+				sd.num_students as school_num_students,
+				sd.address as school_address,
+				sd.city as school_city,
+				sd.zip as school_zip
+				from public.fy2017_schools_demog_matr sd
+				left join public.fy2017_districts_deluxe_matr dd
+				on sd.district_esh_id=dd.esh_id
+				where include_in_universe_of_districts
+				and district_type='Traditional'
+				order by district_esh_id)
+
+				select 
+				distinct district_esh_id from t" }
+  },
+  "transformers" : [
+   { "vertex": { "class": "District"} }
+  ],
+  "loader" : {
+    "orientdb": {
+       "dbURL": "remote:localhost/databases/DistrictsAllocations",
+       "serverUser": "root",
+       "serverPassword": "g0S@t",
+       "dbUser": "admin",
+       "dbPassword": "admin",
+       "dbType": "graph",
+       "classes": [
+         {"name": "District", "extends": "V"}
+       ],
+       "indexes": [{"class":"District", "fields":["district_esh_id:integer"], "type":"UNIQUE" }]
+    }
+  }
+}
+
