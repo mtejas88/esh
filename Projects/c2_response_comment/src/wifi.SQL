@@ -1,6 +1,8 @@
 select esh_id,
 name,
 postal_cd,
+locale,
+district_size,
 c2_prediscount_budget_15,
 c2_prediscount_remaining_17,
 c2_postdiscount_remaining_17,

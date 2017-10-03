@@ -45,7 +45,7 @@ querydb <- function(query_name){
 }
 
 wifi <- querydb("src/wifi.SQL")
-
+suff.state <- querydb("src/suffiency_by_state.SQL")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -53,3 +53,4 @@ dbDisconnect(con)
 ##**************************************************************************************************************************************************
 
 write.csv(wifi, "data/raw/wifi.csv", row.names=F)
+write.csv(suff.state, "data/raw/suff_state.csv", row.names=F)
