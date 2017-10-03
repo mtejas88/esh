@@ -13,20 +13,6 @@ tx_16 <- read.csv("data/external/tx_2016.csv", as.is = T, header = T, stringsAsF
 tx_15 <- read.csv("data/external/tx_2015.csv", as.is = T, header = T, stringsAsFactors = F)
 tx_nces_num <- read.csv("data/external/tx_nces_num.csv", as.is = T, header = T, stringsAsFactors = F)
 
-## load packages
-packages.to.install <- c("DBI", "rJava", "RJDBC", "dotenv","dplyr","secr")
-for (i in 1:length(packages.to.install)){
-  if (!packages.to.install[i] %in% rownames(installed.packages())){
-    install.packages(packages.to.install[i])
-  }
-}
-library(DBI)
-library(rJava)
-library(RJDBC)
-library(dotenv)
-library(dplyr)
-library(secr)
-
 ## limiting graduation rates calculated for federal accountability purposes and not state accountability 
 tx_16 <- tx_16[which(tx_16$CALC_FOR_STATE_ACCT=="No"),]
 tx_15 <- tx_15[which(tx_15$CALC_FOR_STATE_ACCT=="No"),]
@@ -52,6 +38,9 @@ tx_grad <- merge(tx_nces_num[,c("DISTRICT_C","NCES_DISTR")],tx_grad, by.x = "DIS
 ## merge in broadband data 
 tx_data <- merge(tx_grad,broadband_data, by.x="NCES_DISTR", by.y= "nces_cd")
 
+## calculated percent bw change
+tx_data$percent_bw_change <- (tx_data$total_bw_16-tx_data$total_bw_15)/tx_data$total_bw_15
+
 ## check that they're aren't any nulls
 any(is.na(tx_data))
 
@@ -63,6 +52,19 @@ tx_data[is.na(tx_data$frl_percent),]
 tx_data <- tx_data[is.na(tx_data$frl_percent)==FALSE,]
 
 any(is.na(tx_data))
+
+# removing districts with NA for percent_c2_budget_used, not necessary if don't use this variable
+tx_data <- tx_data[is.na(tx_data$percent_c2_budget_used)==FALSE,]
+
+any(is.na(tx_data))
+
+# rounding percent change fields
+tx_data$percent_bw_change <- round(tx_data$percent_bw_change,3)
+tx_data$percent_bw_per_student_change <- round(tx_data$percent_bw_per_student_change,3)
+tx_data$grad_percent_change <- round(tx_data$grad_percent_change,3)
+
+str(tx_data)
+
 
 
 ## write out
