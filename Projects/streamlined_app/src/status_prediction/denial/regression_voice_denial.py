@@ -1,6 +1,3 @@
-##include appeals frns or no
-#this note is throughout and provides a model based on final approval decision. we determined that initial approval decision is what we want to learn about since that's how this model would be used.
-
 ##imports and definitions
 #packages
 import matplotlib.pyplot as plt
@@ -28,26 +25,14 @@ frns_cats = pd.read_csv('frns_cats.csv')
 frns_2016['orig_denied_frn'] = np.where(np.logical_or(frns_2016.denied_frn, frns_2016.appealed_funded_frn),1,0)
 frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
 
-#create features for inclusion - ineligible voice services
-frns_2016['ineligible_voice'] = np.where(np.logical_and(frns_2016['service_Voice'] == 1, frns_2016['discount_category'] >= 70),1,0)
-frns_2017['ineligible_voice'] = np.where(np.logical_and(frns_2017['service_Voice'] == 1, frns_2017['discount_category'] >= 70),1,0)
-
 #features for inclusion
-feature_cols = ['orig_denied_frn', 'ineligible_voice']
+feature_cols = ['line_items', 'consultant_indicator', 'discount_category', 'wireless_indicator', 'service_Voice', 'frn_0_bids', 'locale_Rural',  'applicant_type_School District',  'internet_indicator']
 
-#these seem to have high likelihood of being included but make accuracy worse
-almost_feature = ['locale_Rural', 'applicant_type_Library System', 'discount_category', 'consultant_indicator', 'applicant_type_Library', 'copper_indicator', 'denied_indicator_py', 'total_monthly_eligible_recurring_costs', 'backbone_indicator',
-#almost
-'frn_0_bids', 'applicant_type_School',  'line_items', 'service_Voice',
-'service_Data Transmission and/or Internet Access', 'wireless_indicator', 'fiber_indicator']
-
-insig_cols = ['applicant_type_Consortium', 'applicant_type_School District',   
-'internet_indicator', 'wan_indicator', 
-'total_eligible_one_time_costs', 'total_funding_year_commitment_amount_request', 'num_recipients',  'fulltime_enrollment']
+insig_cols = ['wan_indicator', 'copper_indicator', 'fiber_indicator', 'denied_indicator_py', 'applicant_type_School', 'applicant_type_Library', 'applicant_type_Library System',  'applicant_type_Consortium', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_monthly_eligible_recurring_costs', 'total_funding_year_commitment_amount_request', 'num_recipients',  'fulltime_enrollment']
 
 #frns with modeling inputs
-frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016[almost_feature], frns_2016[insig_cols], frns_2016['frn']], axis=1)
-frns_2017 = pd.concat([frns_2017[feature_cols], frns_2017[almost_feature], frns_2017[insig_cols], frns_2017['frn']], axis=1)
+frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016[insig_cols], frns_2016['frn']], axis=1)
+frns_2017 = pd.concat([frns_2017[feature_cols], frns_2017[insig_cols], frns_2017['frn']], axis=1)
 
 #append 2016 and 2017 frns
 frns_model = pd.concat([frns_2016, frns_2017], axis=0)

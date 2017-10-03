@@ -26,9 +26,9 @@ frns_2016['orig_denied_frn'] = np.where(np.logical_or(frns_2016.denied_frn, frns
 frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
 
 #features for inclusion
-feature_cols = ['denied_indicator_py', 'line_items', 'consultant_indicator', 'discount_category', 'wireless_indicator', 'fiber_indicator', 'service_Voice', 'frn_0_bids',  'applicant_type_School', 'applicant_type_School District', 'wan_indicator', 'internet_indicator']
+feature_cols = ['denied_indicator_py', 'locale_Rural', 'consultant_indicator', 'discount_category', 'fiber_indicator', 'service_Voice', 'frn_0_bids',  'applicant_type_School', 'applicant_type_School District', 'wan_indicator', 'internet_indicator']
 
-insig_cols = ['copper_indicator', 'applicant_type_Library', 'applicant_type_Library System',  'total_monthly_eligible_recurring_costs', 'locale_Rural', 'applicant_type_Consortium', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_funding_year_commitment_amount_request', 'num_recipients',  'fulltime_enrollment']
+insig_cols = ['applicant_type_Library', 'applicant_type_Library System',  'total_monthly_eligible_recurring_costs', 'copper_indicator', 'wireless_indicator', 'applicant_type_Consortium', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment']
 
 #frns with modeling inputs
 frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016[insig_cols], frns_2016['frn']], axis=1)
@@ -51,14 +51,14 @@ train, test = train_test_split(frns_model, train_size=0.75, random_state=1)
 
 #create train inputs
 X = train[feature_cols]
-y = train['category_Ineligible Services']
+y = train['category_Missing Documentation']
 
 #undersample approved frns due to low number of denials
 rus = RandomUnderSampler(random_state=1)
 X_res, y_res = rus.fit_sample(X,y)
 rows = X_res.shape[0]
 X_res =  pd.DataFrame(data=X_res, index=range(rows), columns=feature_cols)
-y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['category_Ineligible Services'])
+y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['category_Missing Documentation'])
 #add constant for regression model
 X_res = sm.add_constant(X_res)
 
@@ -68,7 +68,7 @@ logit = sm.Logit(y_res, X_res.astype(float)).fit()
 
 #create test inputs
 X_test = test[feature_cols]
-y_test = test['category_Ineligible Services']
+y_test = test['category_Missing Documentation']
 
 #add constant for regression model
 X_test = sm.add_constant(X_test)
