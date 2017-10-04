@@ -205,7 +205,6 @@ frns_manual_cats['CATEGORY'] = frns_manual_cats.CATEGORY.str.title()
 
 #cleaning categorizations - remove approved / none
 frns_manual_cats = frns_manual_cats.loc[np.logical_and(frns_manual_cats['CATEGORY'] != 'None', frns_manual_cats['CATEGORY'] != 'Approved')]
-
 #create indicator for each category
 category_dummies = pd.get_dummies(frns_manual_cats.CATEGORY, prefix='category')
 frns_manual_cats = pd.concat([frns_manual_cats, category_dummies], axis=1)
@@ -220,7 +219,7 @@ frns_cats = pd.concat([frns_cats, frns_manual_cats], axis=0)
 frns_cats = frns_cats.fillna(value=0)
 
 #aggregate indicators to FRN level
-frns_cats = frn_cats.groupby('frn').sum()
+frns_cats = frns_cats.groupby('frn').mean()
 
 #make sum into indicator
 for col in frns_cats.columns:

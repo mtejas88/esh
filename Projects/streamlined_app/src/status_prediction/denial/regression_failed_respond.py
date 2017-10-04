@@ -26,9 +26,9 @@ frns_2016['orig_denied_frn'] = np.where(np.logical_or(frns_2016.denied_frn, frns
 frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
 
 #features for inclusion
-feature_cols = ['denied_indicator_py', 'locale_Rural', 'consultant_indicator', 'fiber_indicator', 'service_Voice', 'frn_0_bids',  'applicant_type_Consortium', 'wan_indicator', 'internet_indicator']
+feature_cols = ['locale_Rural', 'consultant_indicator', 'denied_indicator_py', 'discount_category', 'service_Voice', 'frn_0_bids',  'internet_indicator']
 
-insig_cols = ['discount_category', 'copper_indicator', 'wireless_indicator', 'applicant_type_School', 'applicant_type_Library System',   'applicant_type_School District', 'applicant_type_Library', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_monthly_eligible_recurring_costs',  'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment']
+insig_cols = ['applicant_type_Library', 'applicant_type_Consortium', 'applicant_type_School District', 'applicant_type_Library System', 'copper_indicator', 'fiber_indicator', 'wireless_indicator', 'wan_indicator', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_monthly_eligible_recurring_costs', 'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment']
 
 #frns with modeling inputs
 frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016[insig_cols], frns_2016['frn']], axis=1)
@@ -46,24 +46,19 @@ frns_model = frns_model.reset_index(drop = True)
 #fill NAs
 frns_model = frns_model.fillna(value=0)
 
-#remove cost outliers for model since cost is a feature for inclusion
-mean= np.mean(frns_model['total_monthly_eligible_recurring_costs'])
-std = np.std(frns_model['total_monthly_eligible_recurring_costs'])
-frns_model = frns_model.loc[abs(frns_model['total_monthly_eligible_recurring_costs'] - mean) < 4 * std]
-
 #split into test and train sets
 train, test = train_test_split(frns_model, train_size=0.75, random_state=1)
 
 #create train inputs
 X = train[feature_cols]
-y = train['category_Competitive Bidding Violation']
+y = train['category_Failed To Respond To Request']
 
 #undersample approved frns due to low number of denials
 rus = RandomUnderSampler(random_state=1)
 X_res, y_res = rus.fit_sample(X,y)
 rows = X_res.shape[0]
 X_res =  pd.DataFrame(data=X_res, index=range(rows), columns=feature_cols)
-y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['category_Competitive Bidding Violation'])
+y_res =  pd.DataFrame(data=y_res, index=range(rows), columns=['category_Failed To Respond To Request'])
 #add constant for regression model
 X_res = sm.add_constant(X_res)
 
@@ -73,7 +68,7 @@ logit = sm.Logit(y_res, X_res.astype(float)).fit()
 
 #create test inputs
 X_test = test[feature_cols]
-y_test = test['category_Competitive Bidding Violation']
+y_test = test['category_Failed To Respond To Request']
 
 #add constant for regression model
 X_test = sm.add_constant(X_test)

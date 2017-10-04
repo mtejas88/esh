@@ -114,6 +114,3 @@ print(logit.summary())
 #print reports, balanced
 print(cm_balanced)
 print(cr_balanced)
-
-##save
-frns_model.to_csv('frns_model_denied.csv')

@@ -1,6 +1,3 @@
-##include appeals frns or no
-#this note is throughout and provides a model based on final approval decision. we determined that initial approval decision is what we want to learn about since that's how this model would be used.
-
 ##imports and definitions
 #packages
 import matplotlib.pyplot as plt
@@ -19,60 +16,55 @@ GITHUB = os.environ.get("GITHUB")
 
 #import data
 os.chdir(GITHUB+'/Projects/streamlined_app/data/interim') 
-frns_2016 = pd.read_csv('frns_2016.csv')
-frns_2017 = pd.read_csv('frns_2017.csv')
+frns_2016 = pd.read_csv('frns_2016.csv', encoding = "ISO-8859-1")
+frns_2017 = pd.read_csv('frns_2017.csv', encoding = "ISO-8859-1")
 #low priority -- append 2016/2017 using feature columns, and then filter to those that are in this CSV. this is because everything before "features for inclusion" has already been done to frns_model & would be best to be consistent
 #frns_model = pd.read_csv('frns_model.csv', encoding = "ISO-8859-1")
 
 ##prep data for modeling
 #model using cat 1 data only
-frns_2016  = frns_2016.loc[frns_2016['category_of_service'] < 2]
-frns_2017  = frns_2017.loc[frns_2017['category_of_service'] < 2]
+frns_2016_model  = frns_2016.loc[frns_2016['category_of_service'] < 2].copy()
+frns_2017_model  = frns_2017.loc[frns_2017['category_of_service'] < 2].copy()
 
 #model without special construction apps only
-frns_2016  = frns_2016.loc[frns_2016['special_construction_indicator'] < 1]
-frns_2017  = frns_2017.loc[frns_2017['special_construction_indicator'] < 1]
+frns_2016_model_model  = frns_2016_model.loc[frns_2016_model['special_construction_indicator'] < 1]
+frns_2017  = frns_2017_model.loc[frns_2017_model['special_construction_indicator'] < 1]
 
 #filter to those frns where none of the FRNS have a pending or cancelled status
-frns_2016_model  = frns_2016.loc[np.logical_or(frns_2016['funded_frn']> 0, frns_2016['denied_frn'])>0]
-frns_2017_model  = frns_2017.loc[np.logical_or(frns_2017['funded_frn']> 0, frns_2017['denied_frn'])>0]
+frns_2016_model  = frns_2016_model.loc[np.logical_or(frns_2016_model['funded_frn']> 0, frns_2016_model['denied_frn'])>0]
+frns_2017_model  = frns_2017_model.loc[np.logical_or(frns_2017_model['funded_frn']> 0, frns_2017_model['denied_frn'])>0]
+
+#create denial indicator
+frns_2016_model['orig_denied_frn'] = np.where(np.logical_or(frns_2016_model.denied_frn, frns_2016_model.appealed_funded_frn),1,0)
+frns_2017_model['orig_denied_frn'] = np.where(np.logical_or(frns_2017_model.denied_frn, frns_2017_model.appealed_funded_frn),1,0)
 
 #features for inclusion
-feature_cols = ['locale_Rural', 'discount_category', 'consultant_indicator', 'denied_indicator_py', 'applicant_type_Library', 'applicant_type_Library System', 
-#these seem to have low likelihood of being included but make accuracy better
-'backbone_indicator', 'copper_indicator', 'total_monthly_eligible_recurring_costs']
+feature_cols = [
+'frn_0_bids', 'consultant_indicator', 'locale_Rural', 
+'denied_indicator_py', 
+#include only variables below this line had straight approval accuracy 64% with r2 .062
+#'internet_indicator', 
+#'applicant_type_School',
+#variables before this line had straight approval accuracy 71% with r2 .056
+'service_Voice',
+'discount_category'
+]
 
-#these seem to have high likelihood of being included but make accuracy worse
-almost_feature = ['frn_0_bids', 'applicant_type_School',  'line_items',
-'service_Data Transmission and/or Internet Access', 'service_Voice', 'wireless_indicator']
+insig_cols = ['applicant_type_Library', 'applicant_type_Consortium', 'applicant_type_Library System', 'copper_indicator', 'wireless_indicator', 'service_Data Transmission and/or Internet Access', 'total_eligible_one_time_costs', 'total_monthly_eligible_recurring_costs', 'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment', 'wan_indicator']
 
 #frns with modeling inputs
-frns_2016_model = pd.concat([frns_2016_model[feature_cols], frns_2016_model['denied_frn'], frns_2016_model['appealed_funded_frn']], axis=1)
-frns_2017_model = pd.concat([frns_2017_model[feature_cols], frns_2017_model['denied_frn'], frns_2017_model['appealed_funded_frn']], axis=1)
-
-#create year
-#frns_2016_model['2017_funding'] = 1
-#frns_2017_model['2017_funding'] = 0
-
-#include funding year in regression
-#feature_cols.append('2017_funding')
+frns_2016_model = pd.concat([frns_2016_model[feature_cols], frns_2016_model.orig_denied_frn], axis=1)
+frns_2017_model = pd.concat([frns_2017_model[feature_cols], frns_2017_model.orig_denied_frn], axis=1)
 
 #append 2016 and 2017 frns
 frns_model = pd.concat([frns_2016_model, frns_2017_model], axis=0)
-
-#remove cost outliers for model since cost is a feature for inclusion
-#mean= np.mean(frns_model['total_monthly_eligible_recurring_costs'])
-#std = np.std(frns_model['total_monthly_eligible_recurring_costs'])
-#frns_model = frns_model.loc[abs(frns_model['total_monthly_eligible_recurring_costs'] - mean) < 3 * std]
 
 #split into test and train sets
 train, test = train_test_split(frns_model, train_size=0.75, random_state=1)
 
 #create train inputs
 X = train[feature_cols]
-#include appeals frns or no
-#y = train.denied_frn
-y = np.logical_or(train.denied_frn, train.appealed_funded_frn)
+y = train.orig_denied_frn
 
 #undersample approved frns due to low number of denials
 #to-do: see if removing this makes accuracy we want higher
@@ -91,9 +83,7 @@ logit = sm.Logit(y_res, X_res.astype(float)).fit()
 
 #create test inputs
 X_test = test[feature_cols]
-#include appeals frns or no
-#y_test = test.denied_frn
-y_test = np.logical_or(test.denied_frn, test.appealed_funded_frn)
+y_test = test.orig_denied_frn
 
 #add constant for regression model
 X_test = sm.add_constant(X_test)
@@ -216,6 +206,28 @@ summarize_2016_50k_approval_optimized_apps = summarize_2016_50k_apps.groupby(['y
 #calculate percent false positives of approvals to apply to 2017 -- applications
 false_pos_pct_approval_optimized_apps = summarize_2016_50k_approval_optimized_apps['application_number'][0][1] / (summarize_2016_50k_approval_optimized_apps['application_number'][0][1] + summarize_2016_50k_approval_optimized_apps['application_number'][0][0])
 
+#aggregate applications by estimated status
+summarize_2016_50k_apps_est_denied = summary_2016_50k_approval_optimized.groupby(['application_number', 'yhat']).agg({'frn': 'count'})
+
+#create list of applications we denied
+summarize_2016_50k_apps_est_denied = summarize_2016_50k_apps_est_denied.loc[pd.IndexSlice[:,[1]],:]
+
+#aggregate applications 
+summarize_2016_50k_apps = summary_2016_50k_approval_optimized.groupby('application_number').agg({'total_frn_funding': 'sum'})
+
+#reset index for merge
+summarize_2016_50k_apps = summarize_2016_50k_apps.reset_index()  
+summarize_2016_50k_apps_est_denied = summarize_2016_50k_apps_est_denied.reset_index()  
+
+#determine if application has any denial
+summarize_2016_50k_apps = pd.merge(summarize_2016_50k_apps, summarize_2016_50k_apps_est_denied, on = 'application_number', how = 'outer')
+
+#fill in approvals
+summarize_2016_50k_apps['yhat'] = np.where(summarize_2016_50k_apps['yhat']==1, 1, 0)
+
+#aggregate applications
+summarize_2016_50k_approval_optimized_apps = summarize_2016_50k_apps.groupby(['yhat']).agg({'application_number': 'count'})
+
 ## predict funding status (2017) denial optimized
 #create 2017 inputs
 X_2017 = frns_2017[feature_cols]
@@ -278,7 +290,10 @@ false_pos_2017_approval_optimized_dlrs = false_pos_pct_approval_optimized_dlrs *
 false_pos_2017_approval_optimized_apps = false_pos_pct_approval_optimized_apps *summarize_2017_50k_approval_optimized_apps['application_number'][0]
 
 ##print prediction results
+pd.set_option('display.float_format', lambda x: '%.3f' % x)
+
 print(summarize_2016_50k_approval_optimized)
+print(summarize_2016_50k_approval_optimized_apps)
 print(summarize_2017_50k_approval_optimized)
 print(summarize_2017_50k_approval_optimized_apps)
 print("\nFalse approvals calcd using accuracy:")
