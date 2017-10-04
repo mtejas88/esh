@@ -114,6 +114,31 @@ ggplot(remaining.hist, aes(perc_remaining)) +
   theme(text = element_text(size = 12))
 dev.off()
 
+remaining.hist$group <- ifelse(remaining.hist$perc_remaining < .05, '0-.05',
+                          ifelse(remaining.hist$perc_remaining < .1, '.05-.1',
+                          ifelse(remaining.hist$perc_remaining < .15, '.1-.15',
+                          ifelse(remaining.hist$perc_remaining < .2, '.15-.2',
+                          ifelse(remaining.hist$perc_remaining < .25, '.2-.25',
+                          ifelse(remaining.hist$perc_remaining < .3, '.25-.3',
+                          ifelse(remaining.hist$perc_remaining < .35, '.3-.35',
+                          ifelse(remaining.hist$perc_remaining < .4, '.35-.4',
+                          ifelse(remaining.hist$perc_remaining < .45, '.4-.45',
+                          ifelse(remaining.hist$perc_remaining < .5, '.45-.5',
+                          ifelse(remaining.hist$perc_remaining < .55, '.5-.55',
+                          ifelse(remaining.hist$perc_remaining < .6, '.55-.6',
+                          ifelse(remaining.hist$perc_remaining < .65, '.6-.65',
+                          ifelse(remaining.hist$perc_remaining < .7, '.65-.7',
+                          ifelse(remaining.hist$perc_remaining < .75, '.7-.75',
+                          ifelse(remaining.hist$perc_remaining < .8, '.75-.8',
+                          ifelse(remaining.hist$perc_remaining < .85, '.8-.85',
+                          ifelse(remaining.hist$perc_remaining < .9, '.85-.9',
+                          ifelse(remaining.hist$perc_remaining < .95, '.9-.95', '.95-1')))))))))))))))))))
+
+remaining.hist.summ <- group_by(remaining.hist, group) %>%
+                          summarise(num_districts = n(),
+                                    post_discount_remaining_funds = sum(c2_postdiscount_remaining_17))
+
+
 ##**************************************************************************************************************************************************
 ##WRITE TO CSV
 write.csv(spend.all.wifi, 'data/interim/spent_all_wifi.csv', row.names = F)
@@ -125,3 +150,4 @@ write.csv(needs.wifi.and.spent.all.wifi, 'data/interim/insuff_wifi_and_spent_all
 write.csv(needs.wifi.and.spent.no.wifi, 'data/interim/insuff_wifi_and_spent_none.csv', row.names = F)
 write.csv(has.wifi.and.spent.no.wifi, 'data/interim/suff_wifi_and_spent_none.csv', row.names = F)
 write.csv(top.states, 'data/interim/state_summaries.csv', row.names = F)
+write.csv(remaining.hist.summ, 'data/interim/hist_summaries.csv', row.names = F)
