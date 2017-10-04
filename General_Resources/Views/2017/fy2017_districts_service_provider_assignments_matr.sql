@@ -1,3 +1,6 @@
+/*The first portion from t to clean_providers calculates
+the primary provider for dirty districts*/
+
 with t as (
 select  recipient_sp_bw_rank.recipient_id as esh_id,
 
@@ -209,10 +212,171 @@ NULL as primary_sp_bandwidth,
 NULL as primary_sp_percent_of_bandwidth
 from  public.large_mega_dqt_overrides l
 where l.esh_id::varchar not in (select esh_id from t)
+),
+
+
+
+/*Below determines the primary provider for Dirty Districts*/
+
+
+
+single_provider AS (
+
+   SELECT dd.esh_id,
+      dd.postal_cd,
+      dd.name,
+      COUNT(DISTINCT sr.reporting_name) AS provider_count,
+      ARRAY_AGG(DISTINCT CASE WHEN (sr.reporting_name IS NULL OR sr.reporting_name = '') then sr.service_provider_name
+          ELSE sr.reporting_name END) AS providers
+FROM public.fy2017_districts_predeluxe_matr dd
+
+LEFT JOIN public.fy2017_services_received_matr sr
+ON dd.esh_id = sr.recipient_id
+
+WHERE dd.include_in_universe_of_districts = TRUE
+AND dd.district_type = 'Traditional'
+AND dd.exclude_from_ia_analysis = TRUE
+AND sr.purpose NOT IN ('ISP','Backbone')
+AND sr.consortium_shared = false
+AND sr.inclusion_status != 'dqs_excluded'
+AND NOT(sr.reporting_name ILIKE '% Owned')
+
+
+GROUP BY dd.esh_id,
+      dd.postal_cd,
+      dd.name
+
+
+
+HAVING COUNT(DISTINCT sr.reporting_name) = 1
+
+ORDER BY dd.postal_cd,
+        dd.esh_id::int
+
+),
+
+ district_lines AS (
+  
+  SELECT sr.line_item_id,
+        sr.recipient_id,
+        CASE WHEN sr.reporting_name IS NULL THEN sr.service_provider_name
+          ELSE sr.reporting_name END AS reporting_name,
+        sr.bandwidth_in_mbps,
+        sr.open_tags,
+        eb.entity_type
+  FROM public.fy2017_services_received_matr sr
+  
+  LEFT JOIN  public.entity_bens eb
+  ON sr.applicant_id = eb.entity_id
+  
+
+  WHERE sr.quantity_of_line_items_received_by_district > 0
+  AND eb.entity_type IN ('District','School')
+  AND sr.consortium_shared = FALSE
+  AND 'primary_provider' = ANY(sr.open_tags)
+
+  
+),
+
+consortia_lines AS (
+  
+  SELECT sr.line_item_id, 
+        sr.recipient_id,
+        CASE WHEN sr.reporting_name IS NULL THEN sr.service_provider_name
+          ELSE sr.reporting_name END AS reporting_name,
+        sr.bandwidth_in_mbps,
+        sr.open_tags,
+        eb.entity_type,
+        RANK() OVER (Partition BY sr.recipient_id ORDER BY sr.bandwidth_in_mbps DESC) AS bandwidth_rank
+  FROM public.fy2017_services_received_matr sr
+  
+  LEFT JOIN  public.entity_bens eb
+  ON sr.applicant_id = eb.entity_id
+  
+
+  WHERE sr.quantity_of_line_items_received_by_district > 0
+  AND eb.entity_type NOT IN ('District','School')
+  AND sr.consortium_shared = FALSE
+  AND sr.purpose != 'Backbone'
+  AND 'primary_provider' = ANY(sr.open_tags)
+  AND sr.recipient_id NOT IN (SELECT recipient_id FROM district_lines)
+  
+),
+
+primary_services AS (
+
+    SELECT *
+    FROM district_lines
+    
+    UNION 
+    
+    SELECT  line_item_id, 
+        recipient_id,
+        reporting_name,
+        bandwidth_in_mbps,
+        open_tags,
+        entity_type
+    FROM consortia_lines
+    
+    WHERE consortia_lines.bandwidth_rank = 1
+
+),
+
+dirty_providers AS (
+SELECT dd.esh_id,
+      dd.postal_cd,
+      dd.name,
+      --primary service provider column
+      CASE 
+      
+      --Single provider districts
+          WHEN dd.esh_id IN ( SELECT esh_id FROM single_provider)  THEN array_to_string(single_provider.providers,';')
+      
+      --Provider Unknown
+          WHEN 'primary_provider_unknown' = ANY(dd.tag_array) THEN 'Unknown'
+      
+      --district applied primary provider
+          WHEN 'primary_provider' = ANY(primary_services.open_tags) 
+                AND primary_services.entity_type IN ('District','School')
+                AND NOT ('primary_provider_unknown' = ANY(dd.tag_array)) 
+                THEN primary_services.reporting_name
+      
+      --consortia applied primary provider
+          WHEN 'primary_provider' = ANY(primary_services.open_tags)
+                AND primary_services.entity_type NOT IN ('District','School')
+                AND NOT ('primary_provider_unknown' = ANY(dd.tag_array))
+                THEN primary_services.reporting_name
+      END AS reporting_name
+
+FROM public.fy2017_districts_predeluxe_matr dd
+
+LEFT JOIN primary_services
+ON dd.esh_id = primary_services.recipient_id
+
+LEFT JOIN single_provider
+ON dd.esh_id = single_provider.esh_id
+
+WHERE dd.include_in_universe_of_districts
+AND (dd.district_type = 'Traditional' OR dd.postal_cd = 'AZ' AND dd.district_type = 'Charter')
+AND dd.exclude_from_ia_analysis = TRUE
+
+
 )
 
 
+/*Union of clean and dirty district primary provider tables*/
 
+SELECT *
+FROM clean_providers
+
+UNION
+
+SELECT esh_id,
+      reporting_name,
+      NULL as primary_sp_purpose,
+      NULL as primary_sp_bandwidth,
+      NULL as primary_sp_percent_of_bandwidth
+FROM dirty_providers
 
 /*
 
@@ -245,5 +409,9 @@ Also applying a table with DQT primary service provider overrides for some mostl
 Modified Date: 9/6/2017
 Name of Modifier: Jamie Barnes
 Purpose/Methodology: slight tweak to deal with instances where reporting_name = '' and open up to AZ Charters
+
+Modified Date: 10/4/2017
+Name of Modifier: Chris Kemnitzer
+Purpose/Methodology: Added logic to incorporate dirty district providers
 
 */
