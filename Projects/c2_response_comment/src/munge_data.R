@@ -16,9 +16,11 @@ library(ggplot2)
 wifi <- read.csv('data/raw/wifi.csv', as.is = T, header = T, stringsAsFactors = F)
 suff.state <- read.csv('data/raw/suff_state.csv', as.is = T, header = T, stringsAsFactors = F)
 remaining.hist <- read.csv('data/raw/remaining_hist.csv', as.is = T, header = T, stringsAsFactors = F)
+all.make.17 <- read.csv('data/raw/all_make_17.csv', as.is = T, header = T, stringsAsFactors = F)
 source('../../General_Resources/common_functions/correct_dataset.R')
 wifi <- correct.dataset(wifi, 0 , 0)
 suff.state <- correct.dataset(suff.state, 0 , 0)
+all.make.17 <- correct.dataset(all.make.17, 0 , 0)
 
 ##**************************************************************************************************************************************************
 ## LIST OF DISTRICTS TO POSSIBLY SURVEY
@@ -137,6 +139,22 @@ remaining.hist$group <- ifelse(remaining.hist$perc_remaining < .05, '0-.05',
 remaining.hist.summ <- group_by(remaining.hist, group) %>%
                           summarise(num_districts = n(),
                                     post_discount_remaining_funds = sum(c2_postdiscount_remaining_17))
+
+##**************************************************************************************************************************************************
+## TOP VARs & MAKE
+
+##ALL VARs of C2 (not just received by districts in our universe)
+var.only <- filter(all.make.17, !is.na(service_provider_name))
+var.only <- filter(var.only, !(service_provider_name == ''))
+var.only <- group_by(var.only, service_provider_name) %>%
+  summarise(total_cost = sum(total_cost, na.rm = T)) %>% as.data.frame()
+var.only <- var.only[order(-var.only$total_cost),]
+
+##ALL MAKE of C2 (not just received by districts in our universe)
+make.only <- filter(all.make.17, !is.na(make))
+make.only <- group_by(make.only, make) %>%
+                summarise(total_cost = sum(total_cost, na.rm = T)) %>% as.data.frame()
+make.only <- make.only[order(-make.only$total_cost),]
 
 
 ##**************************************************************************************************************************************************
