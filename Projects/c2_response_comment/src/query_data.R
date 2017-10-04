@@ -54,3 +54,4 @@ dbDisconnect(con)
 
 write.csv(wifi, "data/raw/wifi.csv", row.names=F)
 write.csv(suff.state, "data/raw/suff_state.csv", row.names=F)
+

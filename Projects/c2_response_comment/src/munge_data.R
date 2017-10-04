@@ -14,8 +14,10 @@ library(ggplot2)
 ##**************************************************************************************************************************************************
 ## READ IN DATA AND CLEANING DATA
 wifi <- read.csv('data/raw/wifi.csv', as.is = T, header = T, stringsAsFactors = F)
+suff.state <- read.csv('data/raw/suff_state.csv', as.is = T, header = T, stringsAsFactors = F)
 source('../../General_Resources/common_functions/correct_dataset.R')
 wifi <- correct.dataset(wifi, 0 , 0)
+suff.state <- correct.dataset(suff.state, 0 , 0)
 
 ##**************************************************************************************************************************************************
 ## LIST OF DISTRICTS TO POSSIBLY SURVEY
@@ -41,9 +43,16 @@ print('districts')
 wifi$requested_funding <- !(round(wifi$c2_prediscount_remaining_17, 0) == round(wifi$c2_prediscount_budget_15, 0))
 top.states <- group_by(wifi, postal_cd) %>%
                 summarise(num_districts = n(),
-                          requested_funding = sum(requested_funding))
+                          requested_funding = sum(requested_funding),
+                          c2_prediscount_budget_15 = sum(c2_prediscount_budget_15),
+                          c2_prediscount_remaining_17 = sum(c2_prediscount_remaining_17),
+                          c2_percent_remaining = sum(c2_prediscount_remaining_17) / sum(c2_prediscount_budget_15),
+                          c2_postdiscount_remaining_17 = sum(c2_postdiscount_remaining_17))
 top.states$perc_requested_funding <- top.states$requested_funding / top.states$num_districts
+
+top.states <- merge(top.states, suff.state, by = 'postal_cd')
 top.states <- top.states[order(-top.states$perc_requested_funding),]
+
 ##**************************************************************************************************************************************************
 ## LARGER URBAN DIstrICTS vs. SMALLER RURAL DISTRICTS
 wifi$locale_adj = ifelse(wifi$locale %in% c('Urban', 'Suburban'), 'Urban/Suburban', 'Rural/Town')
@@ -59,6 +68,29 @@ print(paste0('rural / town ',
              filter(by.locale_adj, locale_adj == 'Rural/Town')['perc_remaining'] %>% round(2) * 100,
              '% of their funding remaining'))
 
+by.size = group_by(wifi, district_size) %>%
+  summarise(num_districts = n(),
+            c2_prediscount_budget_15 = sum(c2_prediscount_budget_15),
+            c2_prediscount_remaining_17 = sum(c2_prediscount_remaining_17))
+by.size$perc_remaining <- by.size$c2_prediscount_remaining_17 / by.size$c2_prediscount_budget_15
+by.size <- select(by.size, district_size, perc_remaining)
+by.size
+
+##**************************************************************************************************************************************************
+## CHICAGO vs. IL
+wifi$chicago <- wifi$esh_id == '901027'
+chicago = filter(wifi, postal_cd == 'IL') %>%
+            group_by(chicago) %>%
+            summarise(total_districts = n(),
+                      num_students = sum(num_students),
+                      c2_prediscount_budget_15 = sum(c2_prediscount_budget_15),
+                      c2_prediscount_remaining_17 = sum(c2_prediscount_remaining_17),
+                      c2_postdiscount_remaining_17 = sum(c2_postdiscount_remaining_17))
+chicago$perc_students = chicago$num_students / sum(chicago$num_students)
+chicago$perc_remaining = chicago$c2_postdiscount_remaining_17 / sum(chicago$c2_postdiscount_remaining_17)
+print(paste0('Chicago has ', round(chicago$perc_remaining[2] * 100, 2), '% of the remaining Wi-Fi funds in IL'))
+print(paste0('Chicago has ', round(chicago$perc_students[2] * 100, 2), '% of the students in IL'))
+
 ##**************************************************************************************************************************************************
 ##WRITE TO CSV
 write.csv(spend.all.wifi, 'data/interim/spent_all_wifi.csv', row.names = F)
@@ -69,3 +101,4 @@ write.csv(needs.wifi, 'data/interim/insuff_wifi.csv', row.names = F)
 write.csv(needs.wifi.and.spent.all.wifi, 'data/interim/insuff_wifi_and_spent_all.csv', row.names = F)
 write.csv(needs.wifi.and.spent.no.wifi, 'data/interim/insuff_wifi_and_spent_none.csv', row.names = F)
 write.csv(has.wifi.and.spent.no.wifi, 'data/interim/suff_wifi_and_spent_none.csv', row.names = F)
+write.csv(top.states, 'data/interim/state_summaries.csv', row.names = F)
