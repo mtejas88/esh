@@ -1,0 +1,10 @@
+select esh_id,
+postal_cd,
+c2_prediscount_budget_15,
+c2_prediscount_remaining_17,
+c2_postdiscount_remaining_17,
+c2_prediscount_remaining_17 / c2_prediscount_budget_15 as perc_remaining
+
+from public.fy2017_districts_deluxe_matr
+
+where include_in_universe_of_districts and district_type = 'Traditional'

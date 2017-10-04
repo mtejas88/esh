@@ -15,6 +15,7 @@ library(ggplot2)
 ## READ IN DATA AND CLEANING DATA
 wifi <- read.csv('data/raw/wifi.csv', as.is = T, header = T, stringsAsFactors = F)
 suff.state <- read.csv('data/raw/suff_state.csv', as.is = T, header = T, stringsAsFactors = F)
+remaining.hist <- read.csv('data/raw/remaining_hist.csv', as.is = T, header = T, stringsAsFactors = F)
 source('../../General_Resources/common_functions/correct_dataset.R')
 wifi <- correct.dataset(wifi, 0 , 0)
 suff.state <- correct.dataset(suff.state, 0 , 0)
@@ -90,6 +91,28 @@ chicago$perc_students = chicago$num_students / sum(chicago$num_students)
 chicago$perc_remaining = chicago$c2_postdiscount_remaining_17 / sum(chicago$c2_postdiscount_remaining_17)
 print(paste0('Chicago has ', round(chicago$perc_remaining[2] * 100, 2), '% of the remaining Wi-Fi funds in IL'))
 print(paste0('Chicago has ', round(chicago$perc_students[2] * 100, 2), '% of the students in IL'))
+
+##**************************************************************************************************************************************************
+## HISTOGRAM OF REMAINING FUNDS
+
+#histogram of funds remaining
+pdf('figures/district_budget_remaining.pdf', width = 11, height = 8)
+ggplot(remaining.hist, aes(c2_postdiscount_remaining_17)) +
+  geom_histogram(binwidth = 100000) +
+  xlim(-100000,2000000) +
+  labs(x = 'Budget Remaining 2017', y = 'Number of Districts', 
+       title = 'Remaining C2 Budget Histogram',
+       subtitle = 'Note: removed the 156 districts who each have over $2M left') +
+  theme_bw() +
+  theme(text = element_text(size = 12))
+
+ggplot(remaining.hist, aes(perc_remaining)) +
+  geom_histogram(binwidth = .05) +
+  labs(x = '% Budget Remaining 2017', y = 'Number of Districts', 
+       title = '% Remaining C2 Budget Histogram') +
+  theme_bw() +
+  theme(text = element_text(size = 12))
+dev.off()
 
 ##**************************************************************************************************************************************************
 ##WRITE TO CSV
