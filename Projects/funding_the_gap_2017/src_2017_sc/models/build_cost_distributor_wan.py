@@ -61,6 +61,6 @@ campus_build_costs['total_district_funding_az_wan'] = where((	campus_build_costs
 																0,
 																campus_build_costs['total_district_funding_az_wan'])
 
-
+campus_build_costs['az_min']= where( campus_build_costs['total_cost_az_wan'] <= campus_build_costs['total_cost_az_pop_wan'],1,0)
 campus_build_costs.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs.csv')
 print("File saved")

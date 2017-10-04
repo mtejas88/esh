@@ -11,24 +11,13 @@ print("Districts imported")
 ##EXTRAPOLATION
 
 #determine number of campuses in clean districts for extrapolation
-state_clean = districts[districts['denomination'].isin(['1: Fit for FTG, Target', '2: Fit for FTG, Not Target'])]
-state_clean = state_clean[state_clean['district_exclude_from_ia_analysis'] == False]
+state_clean = districts
 state_clean = state_clean.groupby(['district_postal_cd']).sum()
 state_clean['clean_num_campuses'] = state_clean['district_num_campuses']
 state_clean = state_clean[['clean_num_campuses']]
-state_clean = state_clean.reset_index()
+state_metrics = state_clean.reset_index()
 
-#determine number of campuses that need extrapolation
-state_extrapolate = districts[districts['denomination'] == '3: Not Fit for FTG']
-state_extrapolate = state_extrapolate.groupby(['district_postal_cd']).sum()
-state_extrapolate['extrapolate_num_campuses'] = state_extrapolate['district_num_campuses']
-state_extrapolate = state_extrapolate[['extrapolate_num_campuses']]
-state_extrapolate = state_extrapolate.reset_index()
-
-#join number of campuses
-state_metrics = merge(state_extrapolate, state_clean, how='outer', on='district_postal_cd')
-state_metrics['extrapolation'] = (state_metrics['clean_num_campuses'] + state_metrics['extrapolate_num_campuses'])/state_metrics['clean_num_campuses']
-state_metrics['extrapolation'] = state_metrics.extrapolation.replace(NaN, 1)
+state_metrics['extrapolation'] = 1
 
 ##ORIG EXTRAPOLATION
 

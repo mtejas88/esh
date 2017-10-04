@@ -214,7 +214,7 @@ on dd.postal_cd = state_agg_dr.recipient_postal_cd
 
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
-ORDER BY esh_id;""" )
+order by esh_id;""" )
     names = [ x[0] for x in cur.description]
     rows = cur.fetchall()
     return DataFrame( rows, columns=names)

@@ -1,6 +1,6 @@
 import psycopg2
 from numpy import where, logical_or, logical_and
-from pandas import DataFrame, read_csv, merge
+from pandas import DataFrame, read_csv, merge, concat
 
 import os
 #from dotenv import load_dotenv, find_dotenv
@@ -26,6 +26,7 @@ print("Districts pulled from database and saved")
 
 districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
 unscalable_campuses = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_campuses.csv',index_col=0)
+campus_build_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs.csv', index_col=0)
 print("Unscalable campuses imported")
 
 unscalable_districts_with_0_wan_builds = unscalable_campuses.groupby(['esh_id']).sum()
@@ -34,12 +35,37 @@ unscalable_districts_with_0_wan_builds = unscalable_districts_with_0_wan_builds.
 unscalable_districts_with_0_wan_builds = unscalable_districts_with_0_wan_builds.reset_index()
 unscalable_districts_with_0_wan_builds = DataFrame(unscalable_districts_with_0_wan_builds)
 
-districts = districts.merge(unscalable_districts_with_0_wan_builds, left_on='esh_id', right_on='esh_id', how='outer')
+unscalable_districts_with_all_az  = campus_build_costs.groupby(['esh_id','district_num_campuses_unscalable_integer']).sum()
+##move the index to a column so we can use the values
+unscalable_districts_with_all_az['district_num_campuses_unscalable_integer_col']=unscalable_districts_with_all_az.index.get_level_values('district_num_campuses_unscalable_integer')
+unscalable_districts_with_all_az.sort_index(inplace=True)
+##filter for districts where every build (lowest cost) is AZ
+unscalable_districts_with_all_az = unscalable_districts_with_all_az[unscalable_districts_with_all_az['az_min'] == unscalable_districts_with_all_az['district_num_campuses_unscalable_integer_col']]
+unscalable_districts_with_all_az = unscalable_districts_with_all_az[['az_min']]
+unscalable_districts_with_all_az = unscalable_districts_with_all_az.reset_index()
+unscalable_districts_with_all_az = DataFrame(unscalable_districts_with_all_az)
+
 
 unscalable_districts = districts[(districts.denomination == '1: Fit for FTG, Target')]
-unscalable_districts = unscalable_districts[(unscalable_districts.district_hierarchy_ia_connect_category != 'Fiber')]
-unscalable_districts = unscalable_districts[logical_or(unscalable_districts.district_num_campuses_unscalable == 0,
-											logical_and(unscalable_districts.district_num_campuses_unscalable > 0, unscalable_districts.distance == 0))]
+##combine with the AZ districts
+unscalable_districtsAZ = unscalable_districts.merge(unscalable_districts_with_all_az, left_on='esh_id', right_on='esh_id', how='outer')
+unscalable_districtsAZ = unscalable_districtsAZ[(unscalable_districtsAZ.az_min >= 1)]
+unscalable_districtsAZ = unscalable_districtsAZ.reset_index()
+unscalable_districtsAZ.drop(['index', 'district_num_campuses_unscalable_integer','az_min'], axis=1, inplace=True)
+
+##apply old logic
+unscalable_districts0 = unscalable_districts.merge(unscalable_districts_with_0_wan_builds, left_on='esh_id', right_on='esh_id', how='outer')
+unscalable_districts0 = unscalable_districts0[(unscalable_districts0.district_hierarchy_ia_connect_category != 'Fiber')]
+unscalable_districts0 = unscalable_districts0[logical_or(unscalable_districts0.district_num_campuses_unscalable == 0,
+                                                logical_and(unscalable_districts0.district_num_campuses_unscalable > 0, unscalable_districts0.distance == 0))]
+unscalable_districts0 = unscalable_districts0.reset_index()
+unscalable_districts0.drop(['index', 'distance'], axis=1, inplace=True)
+
+##combine (if necessary)
+unscalable_districts = concat([unscalable_districtsAZ,unscalable_districts0], axis=0)
+unscalable_districts = unscalable_districts.reset_index(drop=True)
+
+unscalable_districts.drop_duplicates(inplace=True)
 unscalable_districts = unscalable_districts.reset_index(drop=True)
 
 ##calculate assumed build bw needed based on district's number of students
