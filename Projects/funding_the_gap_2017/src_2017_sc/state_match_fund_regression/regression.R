@@ -123,7 +123,7 @@ saveRDS(regw1, "regw1.rds")
 saveRDS(fit.w, "fit.w")
 #*****************************************************************************************************************
 ##### 2017 data
-state.metrics.2017 <- read.csv("state_metrics_2017.csv", as.is=T, header=T, stringsAsFactors=F)
+state.metrics.2017 <- read.csv("../../data/state_metrics.csv", as.is=T, header=T, stringsAsFactors=F)
 state.metrics.2017 <- state.metrics.2017[state.metrics.2017$min_total_state_funding >0,]
 
 state.metrics.2017$ratio_miles_per_build = state.metrics.2017$max_miles_per_build/state.metrics.2017$min_miles_per_build
@@ -132,8 +132,6 @@ state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_
                                                  (state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan)/(state.metrics.2017$total_cost_az_wan - state.metrics.2017$min_total_cost_wan))
 
 state.metrics.2017.regression = state.metrics.2017[, names(state.metrics.2017) %in% c('ratio_miles_per_build','ratio_total_cost_wan','min_total_state_funding','max_total_state_funding')]
-
-model <- readRDS("../state_match_fund_regression/regw1.rds")
 
 regw1_pred = as.data.frame(predict(regw1,newdata = state.metrics.2017.regression))
 names(regw1_pred) = c("regw1_pred")
