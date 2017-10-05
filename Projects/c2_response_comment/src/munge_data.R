@@ -16,11 +16,16 @@ library(ggplot2)
 wifi <- read.csv('data/raw/wifi.csv', as.is = T, header = T, stringsAsFactors = F)
 suff.state <- read.csv('data/raw/suff_state.csv', as.is = T, header = T, stringsAsFactors = F)
 remaining.hist <- read.csv('data/raw/remaining_hist.csv', as.is = T, header = T, stringsAsFactors = F)
+c2.consultants <- read.csv('data/raw/c2_consultants.csv', as.is = T, header = T, stringsAsFactors = F)
+c1.consultants <- read.csv('data/raw/c1_consultants.csv', as.is = T, header = T, stringsAsFactors = F)
 all.make.17 <- read.csv('data/raw/all_make_17.csv', as.is = T, header = T, stringsAsFactors = F)
+make.17.districts <- read.csv('data/raw/make_17_districts.csv', as.is = T, header = T, stringsAsFactors = F)
+ffl <- read.csv('data/raw/ffl.csv', as.is = T, header = T, stringsAsFactors = F)
 source('../../General_Resources/common_functions/correct_dataset.R')
 wifi <- correct.dataset(wifi, 0 , 0)
 suff.state <- correct.dataset(suff.state, 0 , 0)
 all.make.17 <- correct.dataset(all.make.17, 0 , 0)
+make.17.districts <- correct.dataset(make.17.districts, 0 , 0)
 
 ##**************************************************************************************************************************************************
 ## LIST OF DISTRICTS TO POSSIBLY SURVEY
@@ -97,6 +102,11 @@ print(paste0('Chicago has ', round(chicago$perc_students[2] * 100, 2), '% of the
 ##**************************************************************************************************************************************************
 ## HISTOGRAM OF REMAINING FUNDS
 
+#remaining.hist$perc_remaining <- remaining.hist$c2_prediscount_remaining_17 / remaining.hist$c2_prediscount_budget_15
+#remaining.hist$project_status <- ifelse(remaining.hist$)
+remaining.hist <- merge(remaining.hist, c2.consultants, by = 'esh_id', all.x = T)
+remaining.hist <- merge(remaining.hist, c1.consultants, by = 'esh_id', all.x = T)
+
 #histogram of funds remaining
 pdf('figures/district_budget_remaining.pdf', width = 11, height = 8)
 ggplot(remaining.hist, aes(c2_postdiscount_remaining_17)) +
@@ -141,6 +151,20 @@ remaining.hist.summ <- group_by(remaining.hist, group) %>%
                                     post_discount_remaining_funds = sum(c2_postdiscount_remaining_17))
 
 ##**************************************************************************************************************************************************
+low.perc.remaining <- filter(remaining.hist, perc_remaining < .15)
+low.perc.remaining <- select(low.perc.remaining, esh_id, name, city, 
+                             postal_cd, district_size, locale, 
+                             num_students, discount_rate_c2, outreach_status__c, c2_consultants, c1_consultants)
+
+high.perc.remaining <- filter(remaining.hist, perc_remaining >= .85)
+high.perc.remaining <- select(high.perc.remaining, esh_id, name, city, 
+                             postal_cd, district_size, locale, 
+                             num_students, discount_rate_c2, outreach_status__c, c2_consultants, c1_consultants)
+
+nrow(low.perc.remaining)
+nrow(high.perc.remaining)
+
+##**************************************************************************************************************************************************
 ## TOP VARs & MAKE
 
 ##ALL VARs of C2 (not just received by districts in our universe)
@@ -156,6 +180,51 @@ make.only <- group_by(make.only, make) %>%
                 summarise(total_cost = sum(total_cost, na.rm = T)) %>% as.data.frame()
 make.only <- make.only[order(-make.only$total_cost),]
 
+##ALL VARs of C2 RECEIVED by districts in our universe
+head(make.17.districts)
+var.only.districts <- filter(make.17.districts, !is.na(service_provider_name))
+var.only.districts <- filter(var.only.districts, !(service_provider_name == ''))
+var.only.districts <- group_by(var.only.districts, service_provider_name) %>%
+                        summarise(total_cost = sum(amount, na.rm = T),
+                                  num_districts = unique(esh_id) %>% length()) %>% as.data.frame()
+var.only.districts <- var.only.districts[order(-var.only.districts$total_cost),]
+
+##ALL VARs of C2 RECEIVED by districts in our universe
+make.only.districts <- filter(make.17.districts, !is.na(make))
+make.only.districts <- group_by(make.only.districts, make) %>%
+  summarise(total_cost = sum(amount, na.rm = T),
+            num_districts = unique(esh_id) %>% length()) %>% as.data.frame()
+make.only.districts <- make.only.districts[order(-make.only.districts$total_cost),]
+make.only.districts <- make.only.districts[order(-make.only.districts$total_cost),]
+
+##**************************************************************************************************************************************************
+## Breakdown of districts requests by discount rate
+by.discount <- group_by(wifi, discount_rate_c2) %>%
+  summarise(num_districts = n(),
+            num_students = sum(num_students),
+            c2_prediscount_budget_15 = sum(c2_prediscount_budget_15),
+            c2_postdiscount_budget_15 = sum(c2_postdiscount_budget_15),
+            c2_prediscount_remaining_17 = sum(c2_prediscount_remaining_17),
+            c2_postdiscount_remaining_17 = sum(c2_postdiscount_remaining_17),
+            pre_budget_spent = sum(c2_prediscount_budget_15) - sum(c2_prediscount_remaining_17),
+            post_budget_spent = sum(c2_postdiscount_budget_15) - sum(c2_postdiscount_remaining_17),
+            requested_funding = sum(requested_funding),
+            perc_requested_funding = sum(requested_funding) / n())
+by.discount <- filter(by.discount, !(is.na(discount_rate_c2)))
+by.discount$district_oop <- by.discount$pre_budget_spent - by.discount$post_budget_spent
+by.discount$perc_remaining_pre <- by.discount$c2_prediscount_remaining_17 / by.discount$c2_prediscount_budget_15
+by.discount$perc_remaining_post <- by.discount$c2_postdiscount_remaining_17 / by.discount$c2_postdiscount_budget_15
+by.discount$erate_dollars_per_district <- by.discount$post_budget_spent / by.discount$num_districts
+by.discount$erate_dollars_per_student <- by.discount$post_budget_spent / by.discount$num_students
+
+pdf('figures/by_discount.pdf', width = 11, height = 8)
+ggplot(by.discount, aes(factor(discount_rate_c2), perc_requested_funding, label = round(perc_requested_funding,2))) +
+  geom_bar(stat = 'Identity',  fill = '#fcd56a') +
+  geom_text(size = 3.7, position = position_stack(vjust = 1.02)) +
+  labs(x = 'C2 discount rate', y = '%', title = 'Percent of Districts Requesting C2 Funding') +
+  theme_classic() +
+  theme(text = element_text(size = 12))
+dev.off()
 
 ##**************************************************************************************************************************************************
 ##WRITE TO CSV
@@ -169,3 +238,8 @@ write.csv(needs.wifi.and.spent.no.wifi, 'data/interim/insuff_wifi_and_spent_none
 write.csv(has.wifi.and.spent.no.wifi, 'data/interim/suff_wifi_and_spent_none.csv', row.names = F)
 write.csv(top.states, 'data/interim/state_summaries.csv', row.names = F)
 write.csv(remaining.hist.summ, 'data/interim/hist_summaries.csv', row.names = F)
+write.csv(low.perc.remaining, 'data/interim/low_remaining.csv', row.names = F)
+write.csv(high.perc.remaining, 'data/interim/high_remaining.csv', row.names = F)
+write.csv(var.only.districts, 'data/interim/top_var_districts.csv', row.names = F)
+write.csv(make.only.districts, 'data/interim/top_make_districts.csv', row.names = F)
+write.csv(by.discount, 'data/interim/by_discount.csv', row.names = F)
