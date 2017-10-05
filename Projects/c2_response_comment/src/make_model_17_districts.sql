@@ -266,6 +266,7 @@ select distinct
   fli.total_monthly_eligible_recurring_costs::numeric,
   fli.total_eligible_recurring_costs::numeric,
   fli.total_eligible_one_time_costs::numeric,
+  dd.esh_id,
   ros.ben,
   ros.amount
 

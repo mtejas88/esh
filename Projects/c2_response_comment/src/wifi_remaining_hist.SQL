@@ -1,4 +1,4 @@
-select 
+select distinct
   d.esh_id,
   d.name,
   d.city,
@@ -10,7 +10,8 @@ select
   d.c2_prediscount_budget_15,
   d.c2_prediscount_remaining_17,
   d.c2_postdiscount_remaining_17,
-  a.outreach_status__c
+  a.outreach_status__c,
+  c2_prediscount_remaining_17 / c2_prediscount_budget_15 as perc_remaining
 
 from public.fy2017_districts_deluxe_matr d
 
