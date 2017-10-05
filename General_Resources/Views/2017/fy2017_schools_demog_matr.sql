@@ -1,7 +1,7 @@
 
 with entity_demog_big as (
 -- classifies all entities using hybrid of entity table, dd, and SFDC 
--- note this will create duplicate records for entities that have more than one ben mapped to them
+-- note this will make duplicate records for entities that have more than one ben mapped to them
   select e.entity_id as entity_esh_id,
   eb.ben as entity_ben,
   case
