@@ -119,6 +119,8 @@ reg.results_c #predicted value is outside the range too much
 regw1.results_c #5or6/14x, model range > data range; 2/14x the predicted value was outside true range, data is 5x
 fit.w.results_c #4/14x, model range > data range; 3/14x the predicted value was outside true range, data is 5x
 
+saveRDS(regw1, "regw1.rds")
+saveRDS(fit.w, "fit.w")
 #*****************************************************************************************************************
 ##### 2017 data
 state.metrics.2017 <- read.csv("state_metrics_2017.csv", as.is=T, header=T, stringsAsFactors=F)
@@ -130,6 +132,8 @@ state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_
                                                  (state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan)/(state.metrics.2017$total_cost_az_wan - state.metrics.2017$min_total_cost_wan))
 
 state.metrics.2017.regression = state.metrics.2017[, names(state.metrics.2017) %in% c('ratio_miles_per_build','ratio_total_cost_wan','min_total_state_funding','max_total_state_funding')]
+
+model <- readRDS("../state_match_fund_regression/regw1.rds")
 
 regw1_pred = as.data.frame(predict(regw1,newdata = state.metrics.2017.regression))
 names(regw1_pred) = c("regw1_pred")
