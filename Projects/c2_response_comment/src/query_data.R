@@ -48,6 +48,7 @@ wifi <- querydb("src/wifi.SQL")
 suff.state <- querydb("src/suffiency_by_state.SQL")
 remaining.hist <- querydb("src/wifi_remaining_hist.SQL")
 make.17 <- querydb("src/make_model_17.sql")
+make.17.districts <- querydb("src/make_model_17_districts.sql")
 
 ## disconnect from database
 dbDisconnect(con)
@@ -58,4 +59,5 @@ write.csv(wifi, "data/raw/wifi.csv", row.names=F)
 write.csv(suff.state, "data/raw/suff_state.csv", row.names=F)
 write.csv(remaining.hist, "data/raw/remaining_hist.csv", row.names=F)
 write.csv(make.17, "data/raw/all_make_17.csv", row.names = F)
+write.csv(make.17.districts, "data/raw/make_17_districts.csv", row.names = F)
 

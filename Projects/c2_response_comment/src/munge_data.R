@@ -17,10 +17,12 @@ wifi <- read.csv('data/raw/wifi.csv', as.is = T, header = T, stringsAsFactors = 
 suff.state <- read.csv('data/raw/suff_state.csv', as.is = T, header = T, stringsAsFactors = F)
 remaining.hist <- read.csv('data/raw/remaining_hist.csv', as.is = T, header = T, stringsAsFactors = F)
 all.make.17 <- read.csv('data/raw/all_make_17.csv', as.is = T, header = T, stringsAsFactors = F)
+make.17.districts <- read.csv('data/raw/make_17_districts.csv', as.is = T, header = T, stringsAsFactors = F)
 source('../../General_Resources/common_functions/correct_dataset.R')
 wifi <- correct.dataset(wifi, 0 , 0)
 suff.state <- correct.dataset(suff.state, 0 , 0)
 all.make.17 <- correct.dataset(all.make.17, 0 , 0)
+make.17.districts <- correct.dataset(make.17.districts, 0 , 0)
 
 ##**************************************************************************************************************************************************
 ## LIST OF DISTRICTS TO POSSIBLY SURVEY
@@ -97,6 +99,8 @@ print(paste0('Chicago has ', round(chicago$perc_students[2] * 100, 2), '% of the
 ##**************************************************************************************************************************************************
 ## HISTOGRAM OF REMAINING FUNDS
 
+remaining.hist$perc_remaining <- remaining.hist$c2_prediscount_remaining_17 / remaining.hist$c2_prediscount_budget_15
+
 #histogram of funds remaining
 pdf('figures/district_budget_remaining.pdf', width = 11, height = 8)
 ggplot(remaining.hist, aes(c2_postdiscount_remaining_17)) +
@@ -141,6 +145,17 @@ remaining.hist.summ <- group_by(remaining.hist, group) %>%
                                     post_discount_remaining_funds = sum(c2_postdiscount_remaining_17))
 
 ##**************************************************************************************************************************************************
+low.perc.remaining <- filter(remaining.hist, perc_remaining < .15)
+low.perc.remaining <- select(low.perc.remaining, esh_id, name, city, 
+                             postal_cd, district_size, locale, 
+                             num_students, discount_rate_c2, outreach_status__c)
+
+high.perc.remaining <- filter(remaining.hist, perc_remaining >= .85)
+high.perc.remaining <- select(high.perc.remaining, esh_id, name, city, 
+                             postal_cd, district_size, locale, 
+                             num_students, discount_rate_c2, outreach_status__c)
+
+##**************************************************************************************************************************************************
 ## TOP VARs & MAKE
 
 ##ALL VARs of C2 (not just received by districts in our universe)
@@ -156,6 +171,15 @@ make.only <- group_by(make.only, make) %>%
                 summarise(total_cost = sum(total_cost, na.rm = T)) %>% as.data.frame()
 make.only <- make.only[order(-make.only$total_cost),]
 
+##ALL VARs of C2 RECEIVED by districts in our universe
+head(make.17.districts)
+var.only.districts <- filter(make.17.districts, !is.na(service_provider_name))
+var.only.districts <- filter(var.only.districts, !(service_provider_name == ''))
+var.only.districts <- group_by(var.only.districts, service_provider_name) %>%
+                        summarise(total_cost = sum(amount, na.rm = T)) %>% as.data.frame()
+
+##ALL VARs of C2 RECEIVED by districts in our universe
+
 
 ##**************************************************************************************************************************************************
 ##WRITE TO CSV
@@ -169,3 +193,5 @@ write.csv(needs.wifi.and.spent.no.wifi, 'data/interim/insuff_wifi_and_spent_none
 write.csv(has.wifi.and.spent.no.wifi, 'data/interim/suff_wifi_and_spent_none.csv', row.names = F)
 write.csv(top.states, 'data/interim/state_summaries.csv', row.names = F)
 write.csv(remaining.hist.summ, 'data/interim/hist_summaries.csv', row.names = F)
+write.csv(low.perc.remaining, 'data/interim/low_remaining.csv', row.names = F)
+write.csv(high.perc.remaining, 'data/interim/high_remaining.csv', row.names = F)
