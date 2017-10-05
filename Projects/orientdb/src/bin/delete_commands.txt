@@ -1,0 +1,6 @@
+CONNECT REMOTE:localhost/DistrictsAllocations root g0S@t;
+SET ignoreErrors TRUE;
+SET echo TRUE;
+DELETE VERTEX Applicant;DELETE VERTEX Recipient;
+DELETE EDGE CorrectFiber;DELETE EDGE CorrectNonFiber;
+DELETE EDGE IncorrectFiber;DELETE EDGE IncorrectNonFiber;
