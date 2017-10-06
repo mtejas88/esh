@@ -327,6 +327,6 @@ where shared_campus_reg = true
 or (applicant_own_district > 0
 	and applicant_self = 0
 	and applicant_charter_district = 0
-	and applicant_other_charter_school = 0
+	and applicant_other_charter_school = 0)
 
 	
