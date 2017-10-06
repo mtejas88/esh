@@ -123,7 +123,7 @@ saveRDS(regw1, "regw1.rds")
 saveRDS(fit.w, "fit.w")
 #*****************************************************************************************************************
 ##### 2017 data
-state.metrics.2017 <- read.csv("../../data/state_metrics.csv", as.is=T, header=T, stringsAsFactors=F)
+state.metrics.2017 <- read.csv("../../data/processed/state_metrics.csv", as.is=T, header=T, stringsAsFactors=F)
 state.metrics.2017 <- state.metrics.2017[state.metrics.2017$min_total_state_funding >0,]
 
 state.metrics.2017$ratio_miles_per_build = state.metrics.2017$max_miles_per_build/state.metrics.2017$min_miles_per_build
