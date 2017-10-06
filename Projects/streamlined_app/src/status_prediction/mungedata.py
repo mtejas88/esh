@@ -19,6 +19,7 @@ frns_2017 = pd.read_csv('frns_2017.csv', encoding = "ISO-8859-1")
 ## 2016 FRN data prep
 #discount category
 frns_2016['discount_category'] = np.floor(frns_2016['category_one_discount_rate']/10)*10
+frns_2016['discount_category'] = np.where(frns_2016['discount_category'] == 30, 20, frns_2016['discount_category'])
 
 #applicant type
 applicant_type_dummies = pd.get_dummies(frns_2016.applicant_type, prefix='applicant_type')
@@ -48,6 +49,7 @@ frns_2016['backbone_indicator'] = np.where(frns_2016['purposes'].str.contains('B
 ## 2017 FRN data prep
 #discount category
 frns_2017['discount_category'] = np.floor(frns_2017['category_one_discount_rate']/10)*10
+frns_2017['discount_category'] = np.where(frns_2017['discount_category'] == 30, 20, frns_2017['discount_category'])
 
 #applicant type
 applicant_type_dummies = pd.get_dummies(frns_2017.applicant_type, prefix='applicant_type')

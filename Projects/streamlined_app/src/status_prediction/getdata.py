@@ -20,7 +20,7 @@ PORT_ONYX = os.environ.get("PORT_ONYX")
 GITHUB = os.environ.get("GITHUB")
 
 #import classes
-os.chdir(GITHUB+'/Projects/streamlined_app/src') 
+os.chdir(GITHUB+'/Projects/streamlined_app/src/status_prediction') 
 from query import getData
 
 ##connect to onyx and save list of FRNs into pandas dataframe

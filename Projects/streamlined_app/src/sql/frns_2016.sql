@@ -1,4 +1,4 @@
-  select 
+  select distinct
     frns_agg.frn,
     case
       when c.application_number is null
@@ -39,7 +39,6 @@
   from (
     select *
     from fy2016.basic_informations
-    where total_funding_year_commitment_amount_request::numeric > 0
   ) bi
   join (
   	select     
