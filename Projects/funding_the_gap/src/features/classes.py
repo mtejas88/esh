@@ -6,9 +6,10 @@ HOST = os.environ.get("HOST")
 USER = os.environ.get("USER")
 PASSWORD = os.environ.get("PASSWORD")
 DB = os.environ.get("DB")
+GITHUB = os.environ.get("GITHUB")
 
 import sys
-sys.path.insert(0, '/home/sat/sat_r_programs/funding_the_gap/src')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src')
 from credentials import MAPBOX_ACCESS_TOKEN, COSTQUEST_USER_ID, COSTQUEST_PASS
 
 cost_magnifier = 1.2

@@ -3,10 +3,9 @@ from pandas import DataFrame, concat, read_csv
 from numpy import where
 
 import os
-#from dotenv import load_dotenv, find_dotenv
-#load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
 
-campuses_distances = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campuses_distances.csv',index_col=0)
+campuses_distances = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campuses_distances.csv',index_col=0)
 print("Campuses with distances imported")
 
 ##create parameter input if arg=1 then csv else rerun with default as csv
@@ -33,5 +32,5 @@ unscalable_campuses['build_fraction_wan'] = where(unscalable_campuses['campus_di
 												1-(unscalable_campuses['campus_distance_rank']-unscalable_campuses['district_num_campuses_unscalable']),
 												1)
 
-unscalable_campuses.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
+unscalable_campuses.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_campuses.csv')
 print("File saved")

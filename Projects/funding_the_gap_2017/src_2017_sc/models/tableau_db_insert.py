@@ -3,30 +3,39 @@ import csv
 from pandas import DataFrame, concat, read_csv, merge
  
 import os
-##from dotenv import load_dotenv, find_dotenv
-##load_dotenv(find_dotenv())
+
 HOST = os.environ.get("P_HOST")
 USER = os.environ.get("P_USER")
 PASSWORD = os.environ.get("P_PASSWORD")
 DB = os.environ.get("P_DB")
+GITHUB = os.environ.get("GITHUB")
 
 
-csv_data = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/processed/state_metrics_tableau.csv', index_col=0, header=0)
+state_metrics_tableau = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics_tableau.csv', index_col=0, header=0)
+initial_results_2017 = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/initial_results_2017.csv', index_col=0, header=0)
 
-print csv_data.iloc[0,]
+print state_metrics_tableau.iloc[0,]
 
 myConnection = psycopg2.connect( host=HOST, user=USER, password=PASSWORD, database=DB, port=5432)
 cursor = myConnection.cursor()
 
 
 cursor.execute("delete from  bus_intel.ftg;")
+cursor.execute("delete from  bus_intel.ftg_model;")
 
-
-for index, row in csv_data.iterrows():
+#first tableau table
+for index, row in state_metrics_tableau.iterrows():
 
 	cursor.execute("INSERT INTO bus_intel.ftg (district_postal_cd,methodology,value,cut,numbers)"\
                 "VALUES (%s,%s,%s,%s,%s)",
                (row['district_postal_cd'],row['methodology'],row['value'],row['cut'],row['numbers']))
+
+#second tabeau table (predictions)
+for index, row in initial_results_2017.iterrows():
+
+	cursor.execute("INSERT INTO bus_intel.ftg_model (postal_cd,min_2017,max_2017,prediction,prediction_lwr,prediction_upr,approved_state)"\
+                "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+               (row['postal_cd'],row['min_2017'],row['max_2017'],row['prediction'],row['prediction_lwr'],row['prediction_upr'],row['approved_state'])
 
 
 cursor.close()

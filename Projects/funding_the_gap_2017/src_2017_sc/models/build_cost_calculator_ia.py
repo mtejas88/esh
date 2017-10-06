@@ -2,15 +2,14 @@ from pandas import DataFrame, concat, read_csv
 from numpy import where, arange
 
 import os
-#from dotenv import load_dotenv, find_dotenv
-#load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
 
 import sys
-sys.path.insert(0, '/home/sat/sat_r_programs/funding_the_gap/src/features')
+sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
 from classes import buildCostCalculator, cost_magnifier
 
-unscalable_districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/unscalable_districts.csv',index_col=0)
+unscalable_districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_districts.csv',index_col=0)
 print("Unscalable districts imported")
 
 ##calculate Z-PoP cost for all unscalable districts and save into pandas dataframe
@@ -37,5 +36,5 @@ print("Costs calculated")
 ## convert and save
 district_costs = DataFrame(district_costs)
 
-district_costs.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/district_costs.csv')
+district_costs.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_costs.csv')
 print("File saved")

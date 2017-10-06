@@ -2,8 +2,9 @@ from pandas import DataFrame, read_csv
 from numpy import append, column_stack
 
 import os 
+GITHUB = os.environ.get("GITHUB")
 
-state_metrics = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/processed/state_metrics.csv',index_col=0)
+state_metrics = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv',index_col=0)
 print("State metrics imported")
 
 #create empty arrays and base arrays
@@ -97,5 +98,5 @@ columns = ['district_postal_cd', 'methodology', 'value', 'cut', 'numbers']
 
 state_metrics_tableau = DataFrame(data = state_metrics_tableau, index = index, columns = columns)
 
-state_metrics_tableau.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/processed/state_metrics_tableau.csv')
+state_metrics_tableau.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics_tableau.csv')
 print("File saved")

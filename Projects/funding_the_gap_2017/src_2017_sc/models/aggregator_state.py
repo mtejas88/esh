@@ -2,53 +2,15 @@ from pandas import DataFrame, merge, read_csv
 from numpy import NaN, where, logical_or
 
 import os
-#from dotenv import load_dotenv, find_dotenv
-#load_dotenv(find_dotenv())
+GITHUB = os.environ.get("GITHUB")
 
-districts = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
+districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/districts.csv',index_col=0)
 print("Districts imported")
 
-##EXTRAPOLATION
-
-#determine number of campuses in clean districts for extrapolation
-state_clean = districts
-state_clean = state_clean.groupby(['district_postal_cd']).sum()
-state_clean['clean_num_campuses'] = state_clean['district_num_campuses']
-state_clean = state_clean[['clean_num_campuses']]
-state_metrics = state_clean.reset_index()
-
-state_metrics['extrapolation'] = 1
-
-##ORIG EXTRAPOLATION
-
-#determine number of campuses in clean districts for original extrapolation
-state_clean_orig = districts[districts['district_exclude_from_ia_analysis'] == False]
-state_clean_orig = state_clean_orig.groupby(['district_postal_cd']).sum()
-state_clean_orig['clean_orig_num_campuses'] = state_clean_orig['district_num_campuses']
-state_clean_orig = state_clean_orig[['clean_orig_num_campuses']]
-state_clean_orig = state_clean_orig.reset_index()
-
-#determine number of campuses that need original extrapolation
-state_extrapolate_orig = districts[districts['district_exclude_from_ia_analysis'] == True]
-state_extrapolate_orig = state_extrapolate_orig.groupby(['district_postal_cd']).sum()
-state_extrapolate_orig['extrapolate_orig_num_campuses'] = state_extrapolate_orig['district_num_campuses']
-state_extrapolate_orig = state_extrapolate_orig[['extrapolate_orig_num_campuses']]
-state_extrapolate_orig = state_extrapolate_orig.reset_index()
-
-#join number of campuses or original extrapolation
-state_metrics_orig = merge(state_extrapolate_orig, state_clean_orig, how='outer', on='district_postal_cd')
-state_metrics_orig['extrapolation_orig'] = (state_metrics_orig['clean_orig_num_campuses'] + state_metrics_orig['extrapolate_orig_num_campuses'])/state_metrics_orig['clean_orig_num_campuses']
-state_metrics_orig['extrapolation_orig'] = state_metrics_orig.extrapolation_orig.replace(NaN, 1)
-
-#combine extrapolations
-state_metrics = merge(state_metrics_orig, state_metrics, how='outer', on='district_postal_cd')
-print("Extrapolations calculated")
-
-state_metrics.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/state_extrapolations.csv')
 ##WAN COST
 
 #import campus build costs
-campus_build_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs.csv',index_col=0)
+campus_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs.csv',index_col=0)
 print("Campus costs imported")
 
 #determine min and max values
@@ -96,12 +58,12 @@ campus_build_costs['builds_wan'] = campus_build_costs['build_fraction_wan']
 campus_build_costs['builds_az_pop_wan'] = 2 * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_wan'] = campus_build_costs['distance'] * campus_build_costs['build_fraction_wan']
 campus_build_costs['build_distance_az_pop_wan'] = campus_build_costs['build_distance_az_pop'] * campus_build_costs['build_fraction_wan']
-campus_build_costs.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/campus_build_costs_max_min.csv')
+campus_build_costs.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/campus_build_costs_max_min.csv')
 print("Min max calculated")
 
 ##
 #determine state cost amounts
-state_wan_costs = campus_build_costs.groupby(['district_postal_cd', 'district_exclude_from_ia_analysis']).sum()
+state_wan_costs = campus_build_costs.groupby(['district_postal_cd']).sum()
 state_wan_costs = state_wan_costs[[	'min_total_cost_wan', 'min_discount_erate_funding_wan', 'min_total_state_funding_wan', 'min_total_erate_funding_wan',
 									'min_total_district_funding_wan', 'min_builds_wan', 'min_build_distance_wan', 'builds_wan',
 									'max_total_cost_wan', 'max_discount_erate_funding_wan', 'max_total_state_funding_wan', 'max_total_erate_funding_wan',
@@ -110,80 +72,13 @@ state_wan_costs = state_wan_costs[[	'min_total_cost_wan', 'min_discount_erate_fu
 									'total_district_funding_az_wan',  'build_fraction_wan', 'build_distance_az_wan',
 									'total_cost_az_pop_wan', 'discount_erate_funding_az_pop_wan', 'total_state_funding_az_pop_wan', 'total_erate_funding_az_pop_wan',
 									'total_district_funding_az_pop_wan',  'builds_az_pop_wan', 'build_distance_az_pop_wan']]
-state_wan_costs = state_wan_costs.reset_index()
+state_metrics = state_wan_costs.reset_index()
 
-#determine clean cost amounts for extrapolation and extrapolate -- min / max / a-->z / a-->pop-->z
-state_clean_wan_costs = state_wan_costs[state_wan_costs['district_exclude_from_ia_analysis'] == False]
-state_metrics = merge(state_metrics, state_clean_wan_costs, how='outer', on='district_postal_cd')
-state_metrics['extrapolated_min_total_cost_wan'] = state_metrics['min_total_cost_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_discount_erate_funding_wan'] = state_metrics['min_discount_erate_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_total_state_funding_wan'] = state_metrics['min_total_state_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_total_erate_funding_wan'] = state_metrics['min_total_erate_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_total_district_funding_wan'] = state_metrics['min_total_district_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_builds_wan'] = state_metrics['min_builds_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_min_build_distance_wan'] = state_metrics['min_build_distance_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_total_cost_wan'] = state_metrics['max_total_cost_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_discount_erate_funding_wan'] = state_metrics['max_discount_erate_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_total_state_funding_wan'] = state_metrics['max_total_state_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_total_erate_funding_wan'] = state_metrics['max_total_erate_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_total_district_funding_wan'] = state_metrics['max_total_district_funding_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_builds_wan'] = state_metrics['max_builds_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_builds_wan'] = state_metrics['builds_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_max_build_distance_wan'] = state_metrics['max_build_distance_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_cost_az_wan'] = state_metrics['total_cost_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_discount_erate_funding_az_wan'] = state_metrics['discount_erate_funding_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_state_funding_az_wan'] = state_metrics['total_state_funding_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_erate_funding_az_wan'] = state_metrics['total_erate_funding_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_district_funding_az_wan'] = state_metrics['total_district_funding_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_builds_az_wan'] = state_metrics['build_fraction_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_build_distance_az_wan'] = state_metrics['build_distance_az_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_cost_az_pop_wan'] = state_metrics['total_cost_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_discount_erate_funding_az_pop_wan'] = state_metrics['discount_erate_funding_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_state_funding_az_pop_wan'] = state_metrics['total_state_funding_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_erate_funding_az_pop_wan'] = state_metrics['total_erate_funding_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_total_district_funding_az_pop_wan'] = state_metrics['total_district_funding_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_builds_az_pop_wan'] = state_metrics['builds_az_pop_wan'] * state_metrics['extrapolation']
-state_metrics['extrapolated_build_distance_az_pop_wan'] = state_metrics['build_distance_az_pop_wan'] * state_metrics['extrapolation']
-
-#determine dirty cost amounts for and add to extrapolation -- min / max / a-->z / a-->pop-->z
-state_dirty_wan_costs = state_wan_costs[state_wan_costs['district_exclude_from_ia_analysis'] == True]
-state_metrics = merge(state_metrics, state_dirty_wan_costs, how='outer', on='district_postal_cd')
-state_metrics['extrapolated_min_total_cost_wan'] = state_metrics['extrapolated_min_total_cost_wan'].replace(NaN, 0) + state_metrics['min_total_cost_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_min_discount_erate_funding_wan'] = state_metrics['extrapolated_min_discount_erate_funding_wan'].replace(NaN, 0) + state_metrics['min_discount_erate_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_min_total_state_funding_wan'] = state_metrics['extrapolated_min_total_state_funding_wan'].replace(NaN, 0) + state_metrics['min_total_state_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_min_total_erate_funding_wan'] = state_metrics['extrapolated_min_total_erate_funding_wan'].replace(NaN, 0) + state_metrics['min_total_erate_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_min_total_district_funding_wan'] = 	state_metrics['extrapolated_min_total_district_funding_wan'].replace(NaN, 0) + state_metrics['min_total_district_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_min_builds_wan'] = 	state_metrics['extrapolated_min_builds_wan'].replace(NaN, 0) + (state_metrics['min_builds_wan_y'].replace(NaN, 0) * 2)
-state_metrics['extrapolated_min_build_distance_wan'] = 	state_metrics['extrapolated_min_build_distance_wan'].replace(NaN, 0) + state_metrics['min_build_distance_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_total_cost_wan'] = state_metrics['extrapolated_max_total_cost_wan'].replace(NaN, 0) + state_metrics['max_total_cost_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_discount_erate_funding_wan'] = state_metrics['extrapolated_max_discount_erate_funding_wan'].replace(NaN, 0) + state_metrics['max_discount_erate_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_total_state_funding_wan'] = state_metrics['extrapolated_max_total_state_funding_wan'].replace(NaN, 0) + state_metrics['max_total_state_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_total_erate_funding_wan'] = state_metrics['extrapolated_max_total_erate_funding_wan'].replace(NaN, 0) + state_metrics['max_total_erate_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_total_district_funding_wan'] = 	state_metrics['extrapolated_max_total_district_funding_wan'].replace(NaN, 0) + state_metrics['max_total_district_funding_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_max_builds_wan'] = 	state_metrics['extrapolated_max_builds_wan'].replace(NaN, 0) + (state_metrics['max_builds_wan_y'].replace(NaN, 0) * 2)
-state_metrics['extrapolated_builds_wan'] = 	state_metrics['extrapolated_builds_wan'].replace(NaN, 0) + (state_metrics['builds_wan_y'].replace(NaN, 0))
-state_metrics['extrapolated_max_build_distance_wan'] = 	state_metrics['extrapolated_max_build_distance_wan'].replace(NaN, 0) + state_metrics['max_build_distance_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_cost_az_wan'] = state_metrics['extrapolated_total_cost_az_wan'].replace(NaN, 0) + state_metrics['total_cost_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_discount_erate_funding_az_wan'] = state_metrics['extrapolated_discount_erate_funding_az_wan'].replace(NaN, 0) + state_metrics['discount_erate_funding_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_state_funding_az_wan'] = state_metrics['extrapolated_total_state_funding_az_wan'].replace(NaN, 0) + state_metrics['total_state_funding_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_erate_funding_az_wan'] = state_metrics['extrapolated_total_erate_funding_az_wan'].replace(NaN, 0) + state_metrics['total_erate_funding_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_district_funding_az_wan'] = 	state_metrics['extrapolated_total_district_funding_az_wan'].replace(NaN, 0) + state_metrics['total_district_funding_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_builds_az_wan'] = state_metrics['extrapolated_builds_az_wan'].replace(NaN, 0) + state_metrics['build_fraction_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_build_distance_az_wan'] = 	state_metrics['extrapolated_build_distance_az_wan'].replace(NaN, 0) + state_metrics['build_distance_az_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_cost_az_pop_wan'] = state_metrics['extrapolated_total_cost_az_pop_wan'].replace(NaN, 0) + state_metrics['total_cost_az_pop_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_discount_erate_funding_az_pop_wan'] = state_metrics['extrapolated_discount_erate_funding_az_pop_wan'].replace(NaN, 0) + state_metrics['discount_erate_funding_az_pop_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_state_funding_az_pop_wan'] = state_metrics['extrapolated_total_state_funding_az_pop_wan'].replace(NaN, 0) + state_metrics['total_state_funding_az_pop_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_erate_funding_az_pop_wan'] = state_metrics['extrapolated_total_erate_funding_az_pop_wan'].replace(NaN, 0) + state_metrics['total_erate_funding_az_pop_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_total_district_funding_az_pop_wan'] = 	state_metrics['extrapolated_total_district_funding_az_pop_wan'].replace(NaN, 0) + state_metrics['total_district_funding_az_pop_wan_y'].replace(NaN, 0)
-state_metrics['extrapolated_builds_az_pop_wan'] = 	state_metrics['extrapolated_builds_az_pop_wan'].replace(NaN, 0) + (state_metrics['builds_az_pop_wan_y'].replace(NaN, 0) * 2)
-state_metrics['extrapolated_build_distance_az_pop_wan'] = 	state_metrics['extrapolated_build_distance_az_pop_wan'].replace(NaN, 0) + state_metrics['build_distance_az_pop_wan_y'].replace(NaN, 0)
-
-print("Campus costs extrapolated")
 
 ##IA COST
 
 #import district build costs
-district_build_costs = read_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/interim/district_build_costs.csv',index_col=0)
+district_build_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_build_costs.csv',index_col=0)
 print("District costs imported")
 
 #determine cost amounts
@@ -264,26 +159,26 @@ state_metrics['extrapolated_max_build_distance_ia'] = where(state_metrics['extra
 																	state_metrics['extrapolated_build_distance_ia'])
 
 #add IA and WAN costs
-state_metrics['extrapolated_min_total_cost'] = state_metrics['extrapolated_min_total_cost_ia'] + state_metrics['extrapolated_min_total_cost_wan']
-state_metrics['extrapolated_min_discount_erate_funding'] = state_metrics['extrapolated_min_discount_erate_funding_ia'] + state_metrics['extrapolated_min_discount_erate_funding_wan']
-state_metrics['extrapolated_min_total_state_funding'] = state_metrics['extrapolated_min_total_state_funding_ia'] + state_metrics['extrapolated_min_total_state_funding_wan']
-state_metrics['extrapolated_min_total_erate_funding'] = state_metrics['extrapolated_min_total_erate_funding_ia'] + state_metrics['extrapolated_min_total_erate_funding_wan']
-state_metrics['extrapolated_min_total_district_funding'] = 	state_metrics['extrapolated_min_total_district_funding_ia'] + state_metrics['extrapolated_min_total_district_funding_wan']
-state_metrics['extrapolated_min_builds'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['extrapolated_min_builds_wan']
-state_metrics['extrapolated_min_builds_1'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['extrapolated_builds_wan']
-state_metrics['extrapolated_min_build_distance'] = 	state_metrics['extrapolated_min_build_distance_ia'] + state_metrics['extrapolated_min_build_distance_wan']
-state_metrics['min_total_cost_per_mile'] = 	state_metrics['extrapolated_min_total_cost'] / state_metrics['extrapolated_min_build_distance']
-state_metrics['min_miles_per_build'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['extrapolated_min_builds']
-state_metrics['min_miles_per_build_1'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['extrapolated_min_builds_1']
+state_metrics['extrapolated_min_total_cost'] = state_metrics['extrapolated_min_total_cost_ia'] + state_metrics['min_total_cost_wan']
+state_metrics['extrapolated_min_discount_erate_funding'] = state_metrics['extrapolated_min_discount_erate_funding_ia'] + state_metrics['min_discount_erate_funding_wan']
+state_metrics['extrapolated_min_total_state_funding'] = state_metrics['extrapolated_min_total_state_funding_ia'] + state_metrics['min_total_state_funding_wan']
+state_metrics['extrapolated_min_total_erate_funding'] = state_metrics['extrapolated_min_total_erate_funding_ia'] + state_metrics['min_total_erate_funding_wan']
+state_metrics['extrapolated_min_total_district_funding'] = 	state_metrics['extrapolated_min_total_district_funding_ia'] + state_metrics['min_total_district_funding_wan']
+state_metrics['extrapolated_min_builds'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['min_builds_wan']
+state_metrics['extrapolated_min_builds_1'] = 	state_metrics['extrapolated_min_builds_ia'] + state_metrics['builds_wan']
+state_metrics['extrapolated_min_build_distance'] = 	state_metrics['extrapolated_min_build_distance_ia'] + state_metrics['min_build_distance_wan']
+state_metrics['min_total_cost_per_mile'] = 	state_metrics['extrapolated_min_total_cost'] / state_metrics['min_build_distance']
+state_metrics['min_miles_per_build'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['min_builds']
+state_metrics['min_miles_per_build_1'] = 	state_metrics['extrapolated_min_build_distance'] / state_metrics['min_builds_1']
 
-state_metrics['extrapolated_max_total_cost'] = state_metrics['extrapolated_max_total_cost_ia'] + state_metrics['extrapolated_max_total_cost_wan']
-state_metrics['extrapolated_max_discount_erate_funding'] = state_metrics['extrapolated_max_discount_erate_funding_ia'] + state_metrics['extrapolated_max_discount_erate_funding_wan']
-state_metrics['extrapolated_max_total_state_funding'] = state_metrics['extrapolated_max_total_state_funding_ia'] + state_metrics['extrapolated_max_total_state_funding_wan']
-state_metrics['extrapolated_max_total_erate_funding'] = state_metrics['extrapolated_max_total_erate_funding_ia'] + state_metrics['extrapolated_max_total_erate_funding_wan']
-state_metrics['extrapolated_max_total_district_funding'] = 	state_metrics['extrapolated_max_total_district_funding_ia'] + state_metrics['extrapolated_max_total_district_funding_wan']
-state_metrics['extrapolated_max_builds'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['extrapolated_max_builds_wan']
-state_metrics['extrapolated_max_builds_1'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['extrapolated_builds_wan']
-state_metrics['extrapolated_max_build_distance'] = 	state_metrics['extrapolated_max_build_distance_ia'] + state_metrics['extrapolated_max_build_distance_wan']
+state_metrics['extrapolated_max_total_cost'] = state_metrics['extrapolated_max_total_cost_ia'] + state_metrics['max_total_cost_wan']
+state_metrics['extrapolated_max_discount_erate_funding'] = state_metrics['extrapolated_max_discount_erate_funding_ia'] + state_metrics['max_discount_erate_funding_wan']
+state_metrics['extrapolated_max_total_state_funding'] = state_metrics['extrapolated_max_total_state_funding_ia'] + state_metrics['max_total_state_funding_wan']
+state_metrics['extrapolated_max_total_erate_funding'] = state_metrics['extrapolated_max_total_erate_funding_ia'] + state_metrics['max_total_erate_funding_wan']
+state_metrics['extrapolated_max_total_district_funding'] = 	state_metrics['extrapolated_max_total_district_funding_ia'] + state_metrics['max_total_district_funding_wan']
+state_metrics['extrapolated_max_builds'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['max_builds_wan']
+state_metrics['extrapolated_max_builds_1'] = 	state_metrics['extrapolated_max_builds_ia'] + state_metrics['builds_wan']
+state_metrics['extrapolated_max_build_distance'] = 	state_metrics['extrapolated_max_build_distance_ia'] + state_metrics['max_build_distance_wan']
 state_metrics['max_total_cost_per_mile'] = 	state_metrics['extrapolated_max_total_cost'] / state_metrics['extrapolated_max_build_distance']
 state_metrics['max_miles_per_build'] = 	state_metrics['extrapolated_max_build_distance'] / state_metrics['extrapolated_max_builds']
 state_metrics['max_miles_per_build_1'] = 	state_metrics['extrapolated_max_build_distance'] / state_metrics['extrapolated_max_builds_1']
@@ -340,7 +235,7 @@ state_metrics['advice_skew'] = where(	logical_or(	(state_metrics['total_cost_az_
 															1,
 															0)
 
-state_metrics.to_csv('/home/sat/sat_r_programs/funding_the_gap_2017/data/processed/state_metrics.csv')
+state_metrics.to_csv(GITHUB+'/Projects/funding_the_gap_2017/data/processed/state_metrics.csv')
 print("File saved")
 
 
