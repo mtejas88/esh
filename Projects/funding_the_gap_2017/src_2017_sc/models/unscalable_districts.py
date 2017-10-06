@@ -50,13 +50,13 @@ unscalable_districts = districts[(districts.denomination == '1: Fit for FTG, Tar
 unscalable_districts = unscalable_districts[(unscalable_districts.district_hierarchy_ia_connect_category != 'Fiber')]
 
 ##combine with the AZ districts
-unscalable_districtsAZ = unscalable_districts.merge(unscalable_districts_with_all_az, left_on='esh_id', right_on='esh_id', how='outer')
+unscalable_districtsAZ = unscalable_districts.merge(unscalable_districts_with_all_az, left_on='esh_id', right_on='esh_id', how='left')
 unscalable_districtsAZ = unscalable_districtsAZ[(unscalable_districtsAZ.az_min >= 1)]
 unscalable_districtsAZ = unscalable_districtsAZ.reset_index()
 unscalable_districtsAZ.drop(['index', 'district_num_campuses_unscalable_integer','az_min'], axis=1, inplace=True)
 
 ##apply old logic
-unscalable_districts0 = unscalable_districts.merge(unscalable_districts_with_0_wan_builds, left_on='esh_id', right_on='esh_id', how='outer')
+unscalable_districts0 = unscalable_districts.merge(unscalable_districts_with_0_wan_builds, left_on='esh_id', right_on='esh_id', how='left')
 unscalable_districts0 = unscalable_districts0[logical_or(unscalable_districts0.district_num_campuses_unscalable == 0,
                                                 logical_and(unscalable_districts0.district_num_campuses_unscalable > 0, unscalable_districts0.distance == 0))]
 unscalable_districts0 = unscalable_districts0.reset_index()
