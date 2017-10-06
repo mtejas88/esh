@@ -125,6 +125,9 @@ trigrams_cats['CATEGORY'] = trigrams_cats.CATEGORY.str.title()
 #reset index
 trigrams_cats = trigrams_cats.reset_index(drop=True)
 
+#save trigram cats
+trigrams_cats.to_csv("trigrams_cats.csv")
+
 ##prep frns for trigrams categorization
 #note: code takes 30 sec - 1 min
 
@@ -227,5 +230,4 @@ for col in frns_cats.columns:
 
 ##save
 os.chdir(GITHUB+'/Projects/streamlined_app/data/interim') 
-frns_model.to_csv('frns_model.csv')
 frns_cats.to_csv('frns_cats.csv')
