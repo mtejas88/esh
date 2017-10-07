@@ -25,10 +25,15 @@ frns_cats = pd.read_csv('frns_cats.csv')
 frns_2016['orig_denied_frn'] = np.where(np.logical_or(frns_2016.denied_frn, frns_2016.appealed_funded_frn),1,0)
 frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
 
-#features for inclusion
-feature_cols = ['locale_Rural', 'consultant_indicator', 'denied_indicator_py', 'discount_category', 'service_Voice', 'frn_0_bids',  'internet_indicator']
+#create discount indicator
+frns_2016['high_dr'] = np.where(frns_2016['discount_category'] >= 70,1,0)
+frns_2017['high_dr'] = np.where(frns_2017['discount_category'] >= 70,1,0)
 
-insig_cols = ['applicant_type_Library', 'applicant_type_Consortium', 'applicant_type_School District', 'applicant_type_Library System', 'copper_indicator', 'fiber_indicator', 'wireless_indicator', 'wan_indicator', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'total_monthly_eligible_recurring_costs', 'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment']
+
+#features for inclusion
+feature_cols = ['applicant_type_Consortium', 'locale_Rural', 'denied_indicator_py', 'service_Voice', 'frn_0_bids', 'fiber_indicator', 'copper_indicator', 'high_dr', 'consultant_indicator']
+
+insig_cols = ['applicant_type_Library', 'discount_category', 'applicant_type_School District', 'applicant_type_Library System', 'wireless_indicator',  'internet_indicator', 'service_Data Transmission and/or Internet Access', 'orig_denied_frn', 'total_eligible_one_time_costs', 'wan_indicator',  'total_monthly_eligible_recurring_costs', 'total_funding_year_commitment_amount_request', 'line_items', 'num_recipients',  'fulltime_enrollment']
 
 #frns with modeling inputs
 frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016[insig_cols], frns_2016['frn']], axis=1)

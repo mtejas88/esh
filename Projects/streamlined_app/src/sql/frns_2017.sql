@@ -34,7 +34,15 @@
     fli_agg.line_items,
     fli_agg.total_monthly_eligible_recurring_costs,
     fli_agg.total_eligible_one_time_costs,
-    total_pre_discount_charges::numeric *(category_one_discount_rate::numeric/100) as total_frn_funding
+    frns_agg.total_pre_discount_charges::numeric *( case
+                                                      when frns_agg.service_type = 'Voice'
+                                                        then  case
+                                                                when bi.category_one_discount_rate::numeric < 60
+                                                                  then 0
+                                                                else bi.category_one_discount_rate::numeric-60
+                                                              end
+                                                      else bi.category_one_discount_rate::numeric
+                                                    end/100) as total_frn_funding
      
   from (
     select *

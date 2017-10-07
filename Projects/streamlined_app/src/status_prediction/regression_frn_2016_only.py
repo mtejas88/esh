@@ -17,28 +17,28 @@ GITHUB = os.environ.get("GITHUB")
 #import data
 os.chdir(GITHUB+'/Projects/streamlined_app/data/interim') 
 frns_2016 = pd.read_csv('frns_2016.csv', encoding = "ISO-8859-1")
-frns_2017 = pd.read_csv('frns_2017.csv', encoding = "ISO-8859-1")
+#frns_2017 = pd.read_csv('frns_2017.csv', encoding = "ISO-8859-1")
 
 ##prep data for modeling
 #model using cat 1 data only
 frns_2016  = frns_2016.loc[frns_2016['category_of_service'] < 2]
-frns_2017  = frns_2017.loc[frns_2017['category_of_service'] < 2]
+#frns_2017  = frns_2017.loc[frns_2017['category_of_service'] < 2]
 
 #model without special construction apps only
 frns_2016 = frns_2016.loc[frns_2016['special_construction_indicator'] < 1]
-frns_2017  = frns_2017.loc[frns_2017['special_construction_indicator'] < 1]
+#frns_2017  = frns_2017.loc[frns_2017['special_construction_indicator'] < 1]
 
 #create denial indicator
 frns_2016['orig_denied_frn'] = np.where(np.logical_or(frns_2016.denied_frn, frns_2016.appealed_funded_frn),1,0)
-frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
+#frns_2017['orig_denied_frn'] = np.where(np.logical_or(frns_2017.denied_frn, frns_2017.appealed_funded_frn),1,0)
 
 #create discount indicator
 frns_2016['high_dr'] = np.where(frns_2016['discount_category'] >= 70,1,0)
-frns_2017['high_dr'] = np.where(frns_2017['discount_category'] >= 70,1,0)
+#frns_2017['high_dr'] = np.where(frns_2017['discount_category'] >= 70,1,0)
 
 #filter to those frns where none of the FRNS have a pending or cancelled status
 frns_2016_model  = frns_2016.loc[np.logical_or(frns_2016['funded_frn']> 0, frns_2016['denied_frn'])>0].copy()
-frns_2017_model  = frns_2017.loc[np.logical_or(frns_2017['funded_frn']> 0, frns_2017['denied_frn'])>0].copy()
+#frns_2017_model  = frns_2017.loc[np.logical_or(frns_2017['funded_frn']> 0, frns_2017['denied_frn'])>0].copy()
 
 #features for inclusion
 feature_cols = ['frn_0_bids', 'service_Voice', 'consultant_indicator', 'locale_Rural', 'high_dr', 'denied_indicator_py', 'internet_indicator', 'fiber_indicator', 'applicant_type_School', 'applicant_type_School District', 'wan_indicator', 'applicant_type_Consortium',  'fulltime_enrollment', 'copper_indicator']
@@ -47,17 +47,19 @@ insig_cols = ['discount_category', 'applicant_type_Library', 'applicant_type_Lib
 
 #frns with modeling inputs
 frns_2016_model = pd.concat([frns_2016_model[feature_cols], frns_2016_model.orig_denied_frn], axis=1)
-frns_2017_model = pd.concat([frns_2017_model[feature_cols], frns_2017_model.orig_denied_frn], axis=1)
+#frns_2017_model = pd.concat([frns_2017_model[feature_cols], frns_2017_model.orig_denied_frn], axis=1)
 
 #append 2016 and 2017 frns
-frns_model = pd.concat([frns_2016_model, frns_2017_model], axis=0)
+frns_model = frns_2016_model
+#frns_model = pd.concat([frns_2016_model, frns_2017_model], axis=0)
 
 #for calculations later on - frns with modeling inputs
 #frns_2016 = pd.concat([frns_2016[feature_cols], frns_2016.orig_denied_frn], axis=1)
 #frns_2017 = pd.concat([frns_2017[feature_cols], frns_2017.orig_denied_frn], axis=1)
 
 #for calculations later on - append 2016 and 2017 frns
-frns_results = pd.concat([frns_2016, frns_2017], axis=0)
+frns_results = frns_2016
+#frns_results = pd.concat([frns_2016, frns_2017], axis=0)
 
 #split into test and train sets
 train, test = train_test_split(frns_model, train_size=0.75, random_state=1)
@@ -209,67 +211,64 @@ false_pos_pct_approval_optimized_apps = summarize_2016_50k_approval_optimized_ap
 
 ## predict funding status (2017) denial optimized
 #create 2017 inputs
-X_2017 = frns_2017[feature_cols]
-X_2017 = sm.add_constant(X_2017)
+#X_2017 = frns_2017[feature_cols]
+#X_2017 = sm.add_constant(X_2017)
 
 #run regression model on 2017 set
-yhat_2017 = logit.predict(X_2017)
+#yhat_2017 = logit.predict(X_2017)
 
 #cat results to optimize denial accuracy
-yhat_2017_denial_optimized = [ 0 if y < 0.3 else 1 for y in yhat_2017 ]
-yhat_2017_approval_optimized = [ 0 if y < .75 else 1 for y in yhat_2017 ]
-yhat_2017_balanced = [ 0 if y < 0.5 else 1 for y in yhat_2017 ]
+#yhat_2017_denial_optimized = [ 0 if y < 0.3 else 1 for y in yhat_2017 ]
+#yhat_2017_approval_optimized = [ 0 if y < .75 else 1 for y in yhat_2017 ]
+#yhat_2017_balanced = [ 0 if y < 0.5 else 1 for y in yhat_2017 ]
 
 #prep predictions to merge results predictions with inputs
-rows = yhat_2017.count()
-yhat_2017_approval_optimized = pd.DataFrame(data=yhat_2017_approval_optimized, index=range(rows), columns=['yhat'])
+#rows = yhat_2017.count()
+#yhat_2017_approval_optimized = pd.DataFrame(data=yhat_2017_approval_optimized, index=range(rows), columns=['yhat'])
 
 #reset index for merge
-frns_2017 = frns_2017.reset_index()
+#frns_2017 = frns_2017.reset_index()
 
 #merge results predictions with inputs
-summary_2017_approval_optimized = frns_2017.merge(yhat_2017_approval_optimized, left_index=True, right_index=True)
+#summary_2017_approval_optimized = frns_2017.merge(yhat_2017_approval_optimized, left_index=True, right_index=True)
 
 #filter to 50k for summary
-summary_2017_50k_approval_optimized  = summary_2017_approval_optimized.loc[summary_2017_approval_optimized['total_funding_year_commitment_amount_request'] < 50000]
-
-#print for QA
-summary_2017_50k_approval_optimized.to_csv("frns_2017_approval_optimized.csv")
+#summary_2017_50k_approval_optimized  = summary_2017_approval_optimized.loc[summary_2017_approval_optimized['total_funding_year_commitment_amount_request'] < 50000]
 
 #create summary of results lt 50k
-summarize_2017_50k_approval_optimized = summary_2017_50k_approval_optimized.groupby('yhat').agg({'total_frn_funding': 'sum', 'frn': 'count'})
+#summarize_2017_50k_approval_optimized = summary_2017_50k_approval_optimized.groupby('yhat').agg({'total_frn_funding': 'sum', 'frn': 'count'})
 
 #aggregate applications by estimated status
-summarize_2017_50k_apps_est_denied = summary_2017_50k_approval_optimized.groupby(['application_number', 'yhat']).agg({'frn': 'count'})
+#summarize_2017_50k_apps_est_denied = summary_2017_50k_approval_optimized.groupby(['application_number', 'yhat']).agg({'frn': 'count'})
 
 #create list of applications we denied
-summarize_2017_50k_apps_est_denied = summarize_2017_50k_apps_est_denied.loc[pd.IndexSlice[:,[1]],:]
+#summarize_2017_50k_apps_est_denied = summarize_2017_50k_apps_est_denied.loc[pd.IndexSlice[:,[1]],:]
 
 #aggregate applications 
-summarize_2017_50k_apps = summary_2017_50k_approval_optimized.groupby('application_number').agg({'total_frn_funding': 'sum'})
+#summarize_2017_50k_apps = summary_2017_50k_approval_optimized.groupby('application_number').agg({'total_frn_funding': 'sum'})
 
 #reset index for merge
-summarize_2017_50k_apps = summarize_2017_50k_apps.reset_index()  
-summarize_2017_50k_apps_est_denied = summarize_2017_50k_apps_est_denied.reset_index()  
+#summarize_2017_50k_apps = summarize_2017_50k_apps.reset_index()  
+#summarize_2017_50k_apps_est_denied = summarize_2017_50k_apps_est_denied.reset_index()  
 
 #determine if application has any denial
-summarize_2017_50k_apps = pd.merge(summarize_2017_50k_apps, summarize_2017_50k_apps_est_denied, on = 'application_number', how = 'outer')
+#summarize_2017_50k_apps = pd.merge(summarize_2017_50k_apps, summarize_2017_50k_apps_est_denied, on = 'application_number', how = 'outer')
 
 #fill in approvals
-summarize_2017_50k_apps['yhat'] = np.where(summarize_2017_50k_apps['yhat']==1, 1, 0)
+#summarize_2017_50k_apps['yhat'] = np.where(summarize_2017_50k_apps['yhat']==1, 1, 0)
 
 #aggregate applications
-summarize_2017_50k_approval_optimized_apps = summarize_2017_50k_apps.groupby(['yhat']).agg({'application_number': 'count'})
+#summarize_2017_50k_approval_optimized_apps = summarize_2017_50k_apps.groupby(['yhat']).agg({'application_number': 'count'})
 
 #potential false positives
-false_pos_2017_approval_optimized_frns_pot = false_pos_pct *summarize_2017_50k_approval_optimized['frn'][0]
-false_pos_2017_approval_optimized_dlrs_pot = false_pos_pct *summarize_2017_50k_approval_optimized['total_frn_funding'][0]
-false_pos_2017_approval_optimized_apps_pot = false_pos_pct *summarize_2017_50k_approval_optimized_apps['application_number'][0]
+#false_pos_2017_approval_optimized_frns_pot = false_pos_pct *summarize_2017_50k_approval_optimized['frn'][0]
+#false_pos_2017_approval_optimized_dlrs_pot = false_pos_pct *summarize_2017_50k_approval_optimized['total_frn_funding'][0]
+#false_pos_2017_approval_optimized_apps_pot = false_pos_pct *summarize_2017_50k_approval_optimized_apps['application_number'][0]
 
 #actual false positives
-false_pos_2017_approval_optimized_frns = false_pos_pct_approval_optimized_frns *summarize_2017_50k_approval_optimized['frn'][0]
-false_pos_2017_approval_optimized_dlrs = false_pos_pct_approval_optimized_dlrs *summarize_2017_50k_approval_optimized['total_frn_funding'][0]
-false_pos_2017_approval_optimized_apps = false_pos_pct_approval_optimized_apps *summarize_2017_50k_approval_optimized_apps['application_number'][0]
+#false_pos_2017_approval_optimized_frns = false_pos_pct_approval_optimized_frns *summarize_2017_50k_approval_optimized['frn'][0]
+#false_pos_2017_approval_optimized_dlrs = false_pos_pct_approval_optimized_dlrs *summarize_2017_50k_approval_optimized['total_frn_funding'][0]
+#false_pos_2017_approval_optimized_apps = false_pos_pct_approval_optimized_apps *summarize_2017_50k_approval_optimized_apps['application_number'][0]
 
 ##print prediction results
 pd.set_option('display.float_format', lambda x: '%.0f' % x)
@@ -278,53 +277,38 @@ print("2016:")
 print(summarize_2016_50k_approval_optimized)
 #print(summarize_2016_50k_approval_optimized_apps)
 print(summarize_2016_50k_approval_optimized_apps_fps)
-print("\n2017:")
-print(summarize_2017_50k_approval_optimized)
-print(summarize_2017_50k_approval_optimized_apps)
-print("\nFalse approvals calcd using accuracy:")
-print(false_pos_2017_approval_optimized_dlrs_pot)
-print(false_pos_2017_approval_optimized_frns_pot)
-print(false_pos_2017_approval_optimized_apps_pot)
-print("\nFalse approvals calcd using 2016 actual:")
-print(false_pos_2017_approval_optimized_dlrs)
-print(false_pos_2017_approval_optimized_frns)
-print(false_pos_2017_approval_optimized_apps)
+#print("\n2017:")
+#print(summarize_2017_50k_approval_optimized)
+#print(summarize_2017_50k_approval_optimized_apps)
+#print("\nFalse approvals calcd using accuracy:")
+#print(false_pos_2017_approval_optimized_dlrs_pot)
+#print(false_pos_2017_approval_optimized_frns_pot)
+#print(false_pos_2017_approval_optimized_apps_pot)
+#print("\nFalse approvals calcd using 2016 actual:")
+#print(false_pos_2017_approval_optimized_dlrs)
+#print(false_pos_2017_approval_optimized_frns)
+#print(false_pos_2017_approval_optimized_apps)
 
 ##print deck display table
-basis = ['applications', 'applications', 'frns', 'frns', 'funding', 'funding']
+#basis = ['applications', 'applications', 'frns', 'frns', 'funding', 'funding']
 
-year = ['2016', '2017', '2016', '2017', '2016', '2017']
+#year = ['2016', '2017', '2016', '2017', '2016', '2017']
 
-total = [summarize_2016_50k_approval_optimized_apps_fps.application_number.sum(), summarize_2017_50k_approval_optimized_apps.application_number.sum(), summarize_2016_50k_approval_optimized.frn.sum(), 
-summarize_2017_50k_approval_optimized.frn.sum(),
-summarize_2016_50k_approval_optimized.total_frn_funding.sum()/1000000, 
-summarize_2017_50k_approval_optimized.total_frn_funding.sum()/1000000]
+#total = [summarize_2016_50k_approval_optimized_apps_fps.application_number.sum(), summarize_2017_50k_approval_optimized_apps.application_number.sum(), summarize_2016_50k_approval_optimized.frn.sum(), summarize_2017_50k_approval_optimized.frn.sum(), summarize_2016_50k_approval_optimized.total_frn_funding.sum()/1000000,  summarize_2017_50k_approval_optimized.total_frn_funding.sum()/1000000]
 
-approved = [summarize_2016_50k_approval_optimized_apps_fps.loc[(0,False):(0,True)].application_number.sum(), summarize_2017_50k_approval_optimized_apps.loc[0].application_number.sum(), summarize_2016_50k_approval_optimized.loc[(0,0):(0,1)].frn.sum(), 
-summarize_2017_50k_approval_optimized.loc[0].frn.sum(),
-summarize_2016_50k_approval_optimized.loc[(0,0):(0,1)].total_frn_funding.sum()/1000000, 
-summarize_2017_50k_approval_optimized.loc[0].total_frn_funding.sum()/1000000]
+#approved = [summarize_2016_50k_approval_optimized_apps_fps.loc[(0,False):(0,True)].application_number.sum(), summarize_2017_50k_approval_optimized_apps.loc[0].application_number.sum(), summarize_2016_50k_approval_optimized.loc[(0,0):(0,1)].frn.sum(),  summarize_2017_50k_approval_optimized.loc[0].frn.sum(), summarize_2016_50k_approval_optimized.loc[(0,0):(0,1)].total_frn_funding.sum()/1000000,  summarize_2017_50k_approval_optimized.loc[0].total_frn_funding.sum()/1000000]
 
-false_neg = [summarize_2016_50k_approval_optimized_apps_fps.loc[(0,True)].application_number.sum(), false_pos_2017_approval_optimized_apps_pot, summarize_2016_50k_approval_optimized.loc[(0,1)].frn.sum(), 
-false_pos_2017_approval_optimized_frns_pot,
-summarize_2016_50k_approval_optimized.loc[(0,1)].total_frn_funding.sum()/1000000, 
-false_pos_2017_approval_optimized_dlrs_pot/1000000]
+#false_neg = [summarize_2016_50k_approval_optimized_apps_fps.loc[(0,True)].application_number.sum(), false_pos_2017_approval_optimized_apps_pot, summarize_2016_50k_approval_optimized.loc[(0,1)].frn.sum(),  false_pos_2017_approval_optimized_frns_pot, summarize_2016_50k_approval_optimized.loc[(0,1)].total_frn_funding.sum()/1000000,  false_pos_2017_approval_optimized_dlrs_pot/1000000]
 
-denied = [summarize_2016_50k_approval_optimized_apps_fps.loc[(1,False):(1,True)].application_number.sum(), summarize_2017_50k_approval_optimized_apps.loc[1].application_number.sum(), summarize_2016_50k_approval_optimized.loc[(1,0):(1,1)].frn.sum(), 
-summarize_2017_50k_approval_optimized.loc[1].frn.sum(),
-summarize_2016_50k_approval_optimized.loc[(1,0):(1,1)].total_frn_funding.sum()/1000000, 
-summarize_2017_50k_approval_optimized.loc[1].total_frn_funding.sum()/1000000]
+#denied = [summarize_2016_50k_approval_optimized_apps_fps.loc[(1,False):(1,True)].application_number.sum(), summarize_2017_50k_approval_optimized_apps.loc[1].application_number.sum(), summarize_2016_50k_approval_optimized.loc[(1,0):(1,1)].frn.sum(),  summarize_2017_50k_approval_optimized.loc[1].frn.sum(), summarize_2016_50k_approval_optimized.loc[(1,0):(1,1)].total_frn_funding.sum()/1000000,  summarize_2017_50k_approval_optimized.loc[1].total_frn_funding.sum()/1000000]
 
-false_pos = [summarize_2016_50k_approval_optimized_apps_fps.loc[(1,False)].application_number.sum(), -1, summarize_2016_50k_approval_optimized.loc[(1,0)].frn.sum(), 
--1,
-summarize_2016_50k_approval_optimized.loc[(1,0)].total_frn_funding.sum()/1000000, 
--1]
+#false_pos = [summarize_2016_50k_approval_optimized_apps_fps.loc[(1,False)].application_number.sum(), -1, summarize_2016_50k_approval_optimized.loc[(1,0)].frn.sum(),  -1, summarize_2016_50k_approval_optimized.loc[(1,0)].total_frn_funding.sum()/1000000,  -1]
 
 
-final_table = pd.DataFrame({'basis': basis, 'year': year, 'total': total, 'approved': approved, 'false neg':false_neg, 'denied': denied, 'false pos':false_pos})
+#final_table = pd.DataFrame({'basis': basis, 'year': year, 'total': total, 'approved': approved, 'false neg':false_neg, 'denied': denied, 'false pos':false_pos})
 
-final_table = final_table[['basis', 'year', 'total', 'approved', 'false neg', 'denied', 'false pos']]
+#final_table = final_table[['basis', 'year', 'total', 'approved', 'false neg', 'denied', 'false pos']]
 
-print(final_table)
-##
-final_table.to_csv("final_table.csv")
+#print(final_table)
+
+#final_table.to_csv("final_table.csv")
