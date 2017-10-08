@@ -124,7 +124,7 @@ saveRDS(fit.w, "fit.w")
 #*****************************************************************************************************************
 ##### 2017 data
 state.metrics.2017 <- read.csv("../../data/processed/state_metrics.csv", as.is=T, header=T, stringsAsFactors=F)
-state.metrics.2017 <- state.metrics.2017[state.metrics.2017$min_total_state_funding >0,]
+state.metrics.2017 <- state.metrics.2017[!is.na(state.metrics.2017$min_total_state_funding) & state.metrics.2017$min_total_state_funding >0,]
 
 state.metrics.2017$ratio_miles_per_build = state.metrics.2017$max_miles_per_build/state.metrics.2017$min_miles_per_build
 state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan) > 0,
@@ -132,7 +132,8 @@ state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_
                                                  (state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan)/(state.metrics.2017$total_cost_az_wan - state.metrics.2017$min_total_cost_wan))
 
 state.metrics.2017.regression = state.metrics.2017[, names(state.metrics.2017) %in% c('ratio_miles_per_build','ratio_total_cost_wan','min_total_state_funding','max_total_state_funding')]
-
+regw1=readRDS("../state_match_fund_regression/regw1.rds")
+fit.w=readRDS("../state_match_fund_regression/fit.w")
 regw1_pred = as.data.frame(predict(regw1,newdata = state.metrics.2017.regression))
 names(regw1_pred) = c("regw1_pred")
 fit.w_pred = as.data.frame(predict(fit.w,newdata = state.metrics.2017.regression))
@@ -169,7 +170,6 @@ result_export$approved_state = ifelse(result_export$postal_cd %in% c('AZ',
                                                                      'OK',
                                                                      'TX',
                                                                      'VA'),"Already approved/known","To estimate")
-
 write.csv(result_export, file = "initial_results_2017.csv")
 
 #*****************************************************************************************************************

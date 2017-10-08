@@ -1,4 +1,4 @@
-state.metrics.2017 <- state.metrics.2017[state.metrics.2017$min_total_state_funding >0,]
+state.metrics.2017 <- state.metrics.2017[!is.na(state.metrics.2017$min_total_state_funding) & state.metrics.2017$min_total_state_funding >0,]
 
 state.metrics.2017$ratio_miles_per_build = state.metrics.2017$max_miles_per_build/state.metrics.2017$min_miles_per_build
 state.metrics.2017$ratio_total_cost_wan = ifelse((state.metrics.2017$total_cost_az_pop_wan - state.metrics.2017$min_total_cost_wan) > 0,
