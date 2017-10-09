@@ -62,10 +62,10 @@ FROM (
           SELECT
             li.id AS line_item_id,
             CASE
-              WHEN  'exclude' = any(li.open_flag_labels) or
+              WHEN  
+                    ('exclude' = any(li.open_flag_labels) and (li.open_tag_labels is null or 'charter_service' != any(li.open_tag_labels))) or
                     'canceled' = any(li.open_flag_labels) or
-                    'video_conferencing' = any(li.open_flag_labels) or
-                    'charter_service' = any(li.open_tag_labels) 
+                    'video_conferencing' = any(li.open_flag_labels)
                 THEN 'dqs_excluded'
               WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
                 OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
