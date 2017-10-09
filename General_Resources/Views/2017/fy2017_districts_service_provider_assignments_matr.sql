@@ -1,5 +1,5 @@
 /*The first portion from t to clean_providers calculates
-the primary provider for dirty districts*/
+the primary provider for clean districts*/
 
 with t as (
 select  recipient_sp_bw_rank.recipient_id as esh_id,
@@ -259,7 +259,7 @@ ORDER BY dd.postal_cd,
   
   SELECT sr.line_item_id,
         sr.recipient_id,
-        CASE WHEN sr.reporting_name IS NULL THEN sr.service_provider_name
+        CASE WHEN (sr.reporting_name IS NULL OR sr.reporting_name = '') THEN sr.service_provider_name
           ELSE sr.reporting_name END AS reporting_name,
         sr.bandwidth_in_mbps,
         sr.open_tags,
@@ -282,7 +282,7 @@ consortia_lines AS (
   
   SELECT sr.line_item_id, 
         sr.recipient_id,
-        CASE WHEN sr.reporting_name IS NULL THEN sr.service_provider_name
+        CASE WHEN (sr.reporting_name IS NULL OR sr.reporting_name = '') THEN sr.service_provider_name
           ELSE sr.reporting_name END AS reporting_name,
         sr.bandwidth_in_mbps,
         sr.open_tags,
@@ -333,7 +333,7 @@ SELECT dd.esh_id,
           WHEN dd.esh_id IN ( SELECT esh_id FROM single_provider)  THEN array_to_string(single_provider.providers,';')
       
       --Provider Unknown
-          WHEN 'primary_provider_unknown' = ANY(dd.tag_array) THEN 'Unknown'
+          WHEN 'primary_provider_unknown' = ANY(dd.tag_array) THEN NULL
       
       --district applied primary provider
           WHEN 'primary_provider' = ANY(primary_services.open_tags) 
