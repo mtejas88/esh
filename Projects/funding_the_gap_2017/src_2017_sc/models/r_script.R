@@ -16,7 +16,7 @@ names(result_export) = c("postal_cd", "min_2017", "max_2017", "prediction")
 
 result_export$prediction=ifelse(result_export$prediction < result_export$min_2017 , result_export$min_2017, result_export$prediction)
 
-result_export$prediction_lwr = ifelse(result_export$prediction == result_export$min_2017,result_export$min_2017,
+result_export$prediction_lwr = ifelse(result_export$prediction <= result_export$min_2017,result_export$min_2017,
                                       result_export$prediction - (.2*result_export$prediction))
 result_export$prediction_upr = ifelse(result_export$prediction >= result_export$max_2017,result_export$max_2017,
                                                   result_export$prediction + (.2*result_export$prediction))
