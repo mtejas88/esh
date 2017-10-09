@@ -4,6 +4,7 @@ with entity_demog_big as (
 -- note this will create duplicate records for entities that have more than one ben mapped to them
 	select e.entity_id as entity_esh_id,
 	eb.ben as entity_ben,
+	e.postal_cd as entity_postal_cd,
 	case
 		-- districts
 		when dd.district_type = 'Traditional' and dd.include_in_universe_of_districts = true
@@ -94,6 +95,7 @@ with entity_demog_big as (
 entity_demog as (select entity_esh_id,
 	entity_ben,
 	entity_class,
+	entity_postal_cd,
 	entity_campus_id,
 	parent_district_esh_id,
 	parent_district_class
@@ -104,6 +106,7 @@ entity_demog as (select entity_esh_id,
 	entity_esh_id,
 	entity_ben,
 	entity_class,
+	entity_postal_cd,
 	entity_campus_id,
 	parent_district_esh_id,
 	parent_district_class
@@ -124,6 +127,7 @@ rs_campus as (select entity_campus_id,
 cs_1 as (select
 	ed.entity_esh_id as charter_esh_id,
 	ed.parent_district_esh_id as district_esh_id,
+	ed.entity_postal_cd as postal_cd,
 	case 
 		when rs_campus.entity_campus_id is null
 		then false
@@ -210,6 +214,15 @@ serv as (select
 	recipient_district_entity_class
 ),
 
+applicant_recip_count as (select applicant_entity_id,
+	count(distinct recipient_entity_id) as distinct_recipient
+
+	from serv
+	where applicant_entity_id != recipient_entity_id
+
+	group by applicant_entity_id
+),
+
 -- limit to applicants that serve regular schools other than their districts
 reg_serv as (select applicant_entity_id,
 	recipient_district_entity_id
@@ -227,11 +240,16 @@ reg_serv as (select applicant_entity_id,
 charter_recip_big as (select cs_1.charter_esh_id,
 	cs_1.district_esh_id,
 	cs_1.shared_campus_reg,
+	cs_1.postal_cd,
 	--file for themselves
 	case
 		when serv.applicant_entity_id = charter_esh_id
 		then serv.applicant_entity_id
 	end as applicant_self,
+	case
+		when serv.applicant_entity_id = charter_esh_id and applicant_recip_count.distinct_recipient > 0
+		then serv.applicant_entity_id
+	end as applicant_self_other_recips,
 	--receive services from their district or reg school, district office in their district
 	case
 		when serv.applicant_district_entity_id = cs_1.district_esh_id
@@ -239,7 +257,10 @@ charter_recip_big as (select cs_1.charter_esh_id,
 		then serv.applicant_entity_id
 	end as applicant_own_district,
 	--receive services from applicant that also serves regular districts
-	reg_serv.applicant_entity_id as applicant_servs_reg_schools,
+	case
+		when reg_serv.applicant_entity_id = serv.applicant_entity_id
+		then serv.applicant_entity_id
+	end as applicant_servs_reg_schools,
 	--receive services from another charter school in reg district other than self
 	case 
 		when serv.applicant_entity_class = 'Charter School' 
@@ -270,12 +291,17 @@ charter_recip_big as (select cs_1.charter_esh_id,
 
 	left join reg_serv
 	on reg_serv.recipient_district_entity_id = cs_1.district_esh_id
+
+	left join applicant_recip_count
+	on applicant_recip_count.applicant_entity_id = cs_1.charter_esh_id
 ),
 
 charter_recip as (select charter_esh_id,
 	district_esh_id,
 	shared_campus_reg,
+	postal_cd,
 	applicant_self,
+	applicant_self_other_recips,
 	applicant_own_district,
 	applicant_servs_reg_schools,
 	applicant_other_charter_school,
@@ -289,7 +315,9 @@ charter_recip as (select charter_esh_id,
 	group by charter_esh_id,
 	district_esh_id,
 	shared_campus_reg,
+	postal_cd,
 	applicant_self,
+	applicant_self_other_recips,
 	applicant_own_district,
 	applicant_servs_reg_schools,
 	applicant_other_charter_school,
@@ -298,11 +326,110 @@ charter_recip as (select charter_esh_id,
 	applicant_consoria_not_reg,
 	all_applicants
 ),
-charter_recip_agg as (select charter_esh_id,
+
+charter_line_item_big  as (select cr.*,
+	a.line_item_id,
+	case
+	  when a.line_item_id in (select taggable_id
+	                        from public.tags t
+	                        where t.funding_year = 2017
+	                        and t.deleted_at is null
+	                        and t.taggable_type = 'LineItem'
+	                        and t.label = 'charter_service')
+	  then 1
+	  else 0
+	end as charter_service_tag
+
+	from charter_recip cr
+
+	left join fy2017.esh_allocations_v a
+	on a.recipient_id = cr.charter_esh_id 
+	  and cr.all_applicants = a.applicant_id
+	  and a.broadband = true),
+
+charter_line_item as (select charter_esh_id,
 	district_esh_id,
 	shared_campus_reg,
+	postal_cd,
+	applicant_self,
+	applicant_self_other_recips,
+	applicant_own_district,
+	case 
+		when charter_service_tag > 0
+		then applicant_own_district
+		else null 
+	end as applicant_own_district_charter_tag,
+	applicant_servs_reg_schools,
+	applicant_other_charter_school,
+	applicant_charter_district,
+	applicant_consortia,
+	applicant_consoria_not_reg,
+	all_applicants,
+	line_item_id,
+	charter_service_tag
+
+	from charter_line_item_big
+
+	group by charter_esh_id,
+	district_esh_id,
+	shared_campus_reg,
+	postal_cd,
+	applicant_self,
+	applicant_self_other_recips,
+	applicant_own_district,
+	applicant_servs_reg_schools,
+	applicant_other_charter_school,
+	applicant_charter_district,
+	applicant_consortia,
+	applicant_consoria_not_reg,
+	all_applicants,
+	line_item_id,
+	charter_service_tag
+),
+
+charter_line_item_agg as (select charter_esh_id,
+	district_esh_id,
+	shared_campus_reg,
+	postal_cd,
+	applicant_self,
+	applicant_self_other_recips,
+	applicant_own_district,
+	applicant_own_district_charter_tag,
+	applicant_servs_reg_schools,
+	applicant_other_charter_school,
+	applicant_charter_district,
+	applicant_consortia,
+	applicant_consoria_not_reg,
+	all_applicants,
+	count(line_item_id) as line_items,
+	sum(charter_service_tag) as charter_service_line_items
+
+	from charter_line_item
+
+	group by charter_esh_id,
+	district_esh_id,
+	shared_campus_reg,
+	postal_cd,
+	applicant_self,
+	applicant_self_other_recips,
+	applicant_own_district,
+	applicant_own_district_charter_tag,
+	applicant_servs_reg_schools,
+	applicant_other_charter_school,
+	applicant_charter_district,
+	applicant_consortia,
+	applicant_consoria_not_reg,
+	all_applicants
+),
+
+charter_final_agg as (select charter_esh_id,
+	district_esh_id,
+	shared_campus_reg,
+	postal_cd,
 	count(distinct applicant_self) as applicant_self,
+	count(distinct applicant_self_other_recips) as applicant_self_other_recips,
 	count(distinct applicant_own_district) as applicant_own_district,
+	count(distinct applicant_own_district_charter_tag) as applicant_own_district_charter_tag,
 	count(distinct applicant_servs_reg_schools) as applicant_servs_reg_schools,
 	count(distinct applicant_other_charter_school) as applicant_other_charter_school,
 	count(distinct applicant_charter_district) as applicant_charter_district,
@@ -310,14 +437,64 @@ charter_recip_agg as (select charter_esh_id,
 	count(distinct applicant_consoria_not_reg) as applicant_consoria_not_reg,
 	count(distinct all_applicants) as all_applicants
 
-	from charter_recip
+	from charter_line_item_agg
 
 
 	group by charter_esh_id,
 	district_esh_id,
-	shared_campus_reg
+	shared_campus_reg,
+	postal_cd
 )
 
-select *
 
-from charter_recip_agg 
+select *,
+case
+	when shared_campus_reg = true 
+		and applicant_self = 0
+		and applicant_charter_district = 0
+		and applicant_consoria_not_reg =0
+	then true
+end as group_remain_1,
+case
+	when applicant_own_district > 0
+	and applicant_own_district_charter_tag = 0
+		and applicant_self = 0
+		and applicant_charter_district = 0
+		and applicant_consoria_not_reg =0
+	then true
+end as group_remain_2,
+case
+	when applicant_own_district_charter_tag > 0
+		and applicant_self = 0
+		and applicant_charter_district = 0
+		and applicant_consoria_not_reg = 0
+	then true
+end as group_remain_3,
+case
+	when applicant_servs_reg_schools > 0
+		and applicant_self = 0
+		and applicant_charter_district = 0
+		and applicant_consoria_not_reg = 0
+	then true
+end as group_remain_4,
+case
+	when applicant_self > 0
+		and applicant_self_other_recips = 0
+	then true
+end as group_remove_5,
+case 
+	when applicant_consoria_not_reg > 0
+	then true
+end as group_remove_6,
+case
+	when shared_campus_reg = false
+	and all_applicants = 0
+	then true
+end as group_remove_7,
+case
+	when applicant_self_other_recips > 0
+	then true
+end as group_together_8
+
+from charter_final_agg
+
