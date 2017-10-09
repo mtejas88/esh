@@ -304,7 +304,7 @@ charter_recip_agg as (select charter_esh_id,
 	count(distinct applicant_self) as applicant_self,
 	count(distinct applicant_own_district) as applicant_own_district,
 	count(distinct applicant_servs_reg_schools) as applicant_servs_reg_schools,
-	count(distinct applicant_other_charter_school) as applicant_other_charter_school
+	count(distinct applicant_other_charter_school) as applicant_other_charter_school,
 	count(distinct applicant_charter_district) as applicant_charter_district,
 	count(distinct applicant_consortia) as applicant_consortia,
 	count(distinct applicant_consoria_not_reg) as applicant_consoria_not_reg,
@@ -318,15 +318,6 @@ charter_recip_agg as (select charter_esh_id,
 	shared_campus_reg
 )
 
-select charter_esh_id,
-district_esh_id
+select *
 
 from charter_recip_agg 
-
-where shared_campus_reg = true
-or (applicant_own_district > 0
-	and applicant_self = 0
-	and applicant_charter_district = 0
-	and applicant_other_charter_school = 0)
-
-	
