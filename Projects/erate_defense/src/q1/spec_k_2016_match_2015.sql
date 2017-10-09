@@ -260,7 +260,7 @@ then final_2015.total_eligible_one_time_costs
 end as total_eligible_one_time_costs_15
 
 from (select f.*, 
-ROW_NUMBER() OVER (PARTITION BY f.id
+ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj, num_lines
 ORDER BY total_eligible_one_time_costs desc) as line_item_rank
 from final_2016 f
 join public.tags t
