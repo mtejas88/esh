@@ -118,24 +118,16 @@ select distinct
   li.id,
   li.applicant_ben,
   case when li.isp_conditions_met then 'ISP'
-	when li.upstream_conditions_met then 'Upstream'
-	when li.internet_conditions_met then 'Internet'
-	when li.wan_conditions_met then 'WAN'
-	when li.backbone_conditions_met then 'Backbone'
-	end as purpose_adj,
-	li.num_lines,
-  sr.applicant_name,
+  when li.upstream_conditions_met then 'Upstream'
+  when li.internet_conditions_met then 'Internet'
+  when li.wan_conditions_met then 'WAN'
+  when li.backbone_conditions_met then 'Backbone'
+  end as purpose_adj,
+  li.num_lines,
   fr.applicant_state,
   fr.applicant_zip_code,
   fr.ben_applicant_type,
-  fr.ben_urban_rural_status,
-  case when sr.reporting_name is null or reporting_name = '' then sr.service_provider_name else sr.reporting_name end as service_provider,
-  dd.name,
-  dd.district_size,
-  dd.locale,
-  dd.fiber_target_status,
-  dd.discount_rate_c1_matrix,
-  recipient_include_in_universe_of_districts
+  fr.ben_urban_rural_status
   
   
 from public.funding_requests_2016_and_later fr
@@ -149,22 +141,9 @@ on fr.frn = frns_16.frn
 left join public.esh_line_items li
 on frns_16.line_item = li.frn_complete
 
-left join entity_bens eba
-  on li.applicant_ben = eba.ben
-
-left join public.fy2016_district_lookup_matr dl
-on eba.entity_id::varchar = dl.esh_id::varchar
-
-left join public.fy2016_districts_deluxe_matr dd
-on dl.esh_id = dd.esh_id
-
-left join public.fy2016_services_received_matr sr
-on li.id = sr.irt_line_item_id
-
 where  bi16.category_of_service::numeric = 1
-	and fr.frn_status='Denied'
-	order by applicant_name),
-	
+  and fr.frn_status='Denied'),
+  
 frns_15 as (
 select 
   c."Application Number" as application_number,
@@ -222,7 +201,10 @@ left join fy2015.current_funding_request_key_informations f
 on c."FRN" = f."FRN"),
 
 final_2015 as (
-
+select a.*, 
+  ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj, num_lines
+  ORDER BY total_monthly_eligible_recurring_costs desc) as line_item_rank
+from (
 select distinct
   frns_15.frn,
   frns_15.total_monthly_eligible_recurring_costs,
@@ -230,12 +212,12 @@ select distinct
   li.id,
   li.applicant_ben,
   case when li.isp_conditions_met then 'ISP'
-	when li.upstream_conditions_met then 'Upstream'
-	when li.internet_conditions_met then 'Internet'
-	when li.wan_conditions_met then 'WAN'
-	when li.backbone_conditions_met then 'Backbone'
-	end as purpose_adj,
-	li.num_lines
+  when li.upstream_conditions_met then 'Upstream'
+  when li.internet_conditions_met then 'Internet'
+  when li.wan_conditions_met then 'WAN'
+  when li.backbone_conditions_met then 'Backbone'
+  end as purpose_adj,
+  li.num_lines
 
 from frns_15
 
@@ -251,6 +233,7 @@ on li.id = pli.id
 where li.broadband=true
 and li.funding_year=2015
 and (not('exclude'=any(pli.open_flags)) or pli.open_flags is null)
+) a
 ),
 
 final_w_matches_2016 as (
@@ -259,34 +242,40 @@ select distinct final_2016.*,
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
 and final_2016.num_lines = final_2015.num_lines
+and final_2016.line_item_rank = final_2015.line_item_rank
 then 1 else 0 end as match,
 
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
 and final_2016.num_lines = final_2015.num_lines
+and final_2016.line_item_rank = final_2015.line_item_rank
 then final_2015.total_monthly_eligible_recurring_costs 
 end as total_monthly_eligible_recurring_costs_15,
 
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
 and final_2016.num_lines = final_2015.num_lines
+and final_2016.line_item_rank = final_2015.line_item_rank
 then final_2015.total_eligible_one_time_costs 
 end as total_eligible_one_time_costs_15
 
-from final_2016
-left join final_2015 
-on final_2016.purpose_adj = final_2015.purpose_adj
-and final_2016.applicant_ben = final_2015.applicant_ben
-and final_2016.num_lines = final_2015.num_lines
-)
-
-select f.* from final_w_matches_2016 f
+from (select f.*, 
+ROW_NUMBER() OVER (PARTITION BY f.id
+ORDER BY total_eligible_one_time_costs desc) as line_item_rank
+from final_2016 f
 join public.tags t
 on f.id=t.taggable_id
 where fiber_sub_type = 'Special Construction'
 and t.label = 'special_construction_tag'
---Desoto
---and application_number = '161012491'
-	
+) final_2016
 
-	
+left join final_2015 
+on final_2016.purpose_adj = final_2015.purpose_adj
+and final_2016.applicant_ben = final_2015.applicant_ben
+and final_2016.num_lines = final_2015.num_lines
+and final_2016.line_item_rank = final_2015.line_item_rank
+)
+
+select distinct f.* from final_w_matches_2016 f
+--Desoto
+--where application_number = '161012491'

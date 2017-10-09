@@ -127,6 +127,3 @@ for j in index_frn_cats:
 
 #reset index of final dataframe
 frn_cats = frn_cats.reset_index(drop = True)
-
-##merge trigrams categorizations with frns data
-#create indicator for each category
