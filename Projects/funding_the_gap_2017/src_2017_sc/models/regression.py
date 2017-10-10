@@ -14,7 +14,7 @@ r = pr.R(use_pandas = True)
 r.assign("state.metrics.2017", state_metrics_2017)
 
 # Read in R script for predicting, creating final table (R_script.R is within the current 'models' folder)
-f = open("R_script.R", 'r')
+f = open(GITHUB+'/Projects/funding_the_gap_2017/src_2017_sc/models/r_script.R', 'r')
 r_code = f.read()
 
 # execute R code
