@@ -64,7 +64,7 @@ FROM (
             CASE
               WHEN  'exclude' = any(li.open_flag_labels) or
                     'canceled' = any(li.open_flag_labels) or
-                    'video_conferencing' = any(li.open_flag_labels) or
+                    'video_conferencing' = any(li.open_flag_labels)
                 THEN 'dqs_excluded'
               WHEN ('exclude_for_cost_only_free' = any(li.open_tag_labels) 
                 OR 'exclude_for_cost_only_restricted' = any(li.open_tag_labels) 
