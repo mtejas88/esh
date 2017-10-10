@@ -25,9 +25,7 @@ frns_16 as (
   frn.fiber_sub_type,
   fli.line_item,
   fli.function,
-  fli.type_of_product,
-  fli.total_monthly_eligible_recurring_costs,
-  fli.total_eligible_one_time_costs
+  fli.type_of_product
   
   from fy2016.frns frn
   
@@ -47,9 +45,7 @@ frns_16 as (
   frn.fiber_sub_type,
   fli.line_item,
   fli.function,
-  fli.type_of_product,
-  fli.total_monthly_eligible_recurring_costs,
-  fli.total_eligible_one_time_costs
+  fli.type_of_product
   
   from fy2016.current_frns frn
   
@@ -73,8 +69,6 @@ select distinct
   fr.application_status,
   bi16.category_of_service as category_of_service,
   frns_16.fiber_sub_type as fiber_sub_type,
-  frns_16.total_monthly_eligible_recurring_costs,
-  frns_16.total_eligible_one_time_costs,
   case when frns_16.function = 'Fiber' and type_of_product not in ('Dark Fiber IRU (No Special Construction)',
                                                        'Dark Fiber (No Special Construction)')
         then 'Lit Fiber'
@@ -114,7 +108,7 @@ select distinct
         
         else
          'Uncategorized'
-  end as connect_category,
+  end as connect_category_1,
   li.id,
   li.applicant_ben,
   case when li.isp_conditions_met then 'ISP'
@@ -123,7 +117,11 @@ select distinct
   when li.wan_conditions_met then 'WAN'
   when li.backbone_conditions_met then 'Backbone'
   end as purpose_adj,
+  li.connect_category,
   li.num_lines,
+  li.total_cost,
+  li.one_time_elig_cost,
+  li.rec_elig_cost,
   fr.applicant_state,
   fr.applicant_zip_code,
   fr.ben_applicant_type,
@@ -143,72 +141,13 @@ on frns_16.line_item = li.frn_complete
 
 where  bi16.category_of_service::numeric = 1
   and fr.frn_status='Denied'),
-  
-frns_15 as (
-select 
-  c."Application Number" as application_number,
-  c."FRN" as frn,
-  concat(c."FRN", '-', c."FRN Line Item No") as frn_complete,
-  c."Serv Type" as service_type,
-  c."Serv/Conn Subtype" as type_of_product,
-  null as function,
-  c."Purpose" as purpose,
-  c."IC/BMIC Make" as make,
-  c."IC/BMIC Model" as model,
-  null as other_manufacture,
-  null as basic_firewall_protection,
-  null as is_installation_included_in_price,
-  c."Unit" as unit,
-  c."C1 # of Lines" as monthly_quantity,
-  null as one_time_quantity,
-  c."Rec Elig Cost" as total_monthly_eligible_recurring_costs,
-  c."Total Cost" - c."One-time Elig Cost" as total_eligible_recurring_costs,
-  c."One-time Elig Cost" as total_eligible_one_time_costs,
-  c."Lease/Purch" as lease_or_non_purchase_agreement,
-  f."Serv Descrip" as narrative
-from public.fy2015_item21_services_and_costs c
-left join public.fy2015_funding_request_key_informations f
-on c."FRN" = f."FRN"
-where c."FRN" not in (
-  select distinct "FRN"
-  from fy2015.current_funding_request_key_informations
-)
-union
-select 
-  c."Application Number" as application_number,
-  c."FRN" as frn,
-  concat(c."FRN", '-', c."FRN Line Item No") as frn_complete,
-  c."FRN Service Type" as service_type,
-  c."Serv/Conn Subtype" as type_of_product,
-  null as function,
-  c."Purpose" as purpose,
-  c."IC/BMIC Make" as make,
-  c."IC/BMIC Model" as model,
-  null as other_manufacture,
-  null as basic_firewall_protection,
-  null as is_installation_included_in_price,
-  c."Unit" as unit,
-  c."C1 # of Lines" as monthly_quantity,
-  null as one_time_quantity,
-  c."Rec Elig Cost" as total_monthly_eligible_recurring_costs,
-  c."Total Cost" - c."One-time Elig Cost" as total_eligible_recurring_costs,
-  c."One-time Elig Cost" as total_eligible_one_time_costs,
-  c."Lease/Purch" as lease_or_non_purchase_agreement,
-  f."Serv Descrip" as narrative
-  
-from fy2015.current_item21_services_and_costs c
-left join fy2015.current_funding_request_key_informations f
-on c."FRN" = f."FRN"),
 
 final_2015 as (
 select a.*, 
-  ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj, num_lines
-  ORDER BY total_monthly_eligible_recurring_costs desc) as line_item_rank
+  ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj
+  ORDER BY total_cost desc) as line_item_rank
 from (
 select distinct
-  frns_15.frn,
-  frns_15.total_monthly_eligible_recurring_costs,
-  frns_15.total_eligible_one_time_costs,
   li.id,
   li.applicant_ben,
   case when li.isp_conditions_met then 'ISP'
@@ -217,13 +156,14 @@ select distinct
   when li.wan_conditions_met then 'WAN'
   when li.backbone_conditions_met then 'Backbone'
   end as purpose_adj,
-  li.num_lines
+  li.connect_category,
+  li.num_lines,
+  li.total_cost,
+  li.one_time_elig_cost,
+  li.rec_elig_cost
 
-from frns_15
-
-left join
+from 
 public.esh_line_items li
-on frns_15.frn_complete = li.frn_complete
 
 left join 
 public.line_items pli
@@ -237,45 +177,54 @@ and (not('exclude'=any(pli.open_flags)) or pli.open_flags is null)
 ),
 
 final_w_matches_2016 as (
+select x.*,
+--select the maximum 2015 cost for the remaining duplicates
+ROW_NUMBER() OVER (PARTITION BY id 
+ORDER BY total_costs_15 desc) as post_rank_2015
+from (
 select distinct final_2016.*,
 
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
-and final_2016.num_lines = final_2015.num_lines
 and final_2016.line_item_rank = final_2015.line_item_rank
 then 1 else 0 end as match,
 
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
-and final_2016.num_lines = final_2015.num_lines
 and final_2016.line_item_rank = final_2015.line_item_rank
-then final_2015.total_monthly_eligible_recurring_costs 
+then final_2015.rec_elig_cost 
 end as total_monthly_eligible_recurring_costs_15,
 
 case when final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
-and final_2016.num_lines = final_2015.num_lines
 and final_2016.line_item_rank = final_2015.line_item_rank
-then final_2015.total_eligible_one_time_costs 
-end as total_eligible_one_time_costs_15
+then final_2015.one_time_elig_cost 
+end as total_eligible_one_time_costs_15,
+
+case when final_2016.purpose_adj = final_2015.purpose_adj
+and final_2016.applicant_ben = final_2015.applicant_ben
+and final_2016.line_item_rank = final_2015.line_item_rank
+then final_2015.total_cost 
+end as total_costs_15
 
 from (select f.*, 
-ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj, num_lines
-ORDER BY total_eligible_one_time_costs desc) as line_item_rank
+ROW_NUMBER() OVER (PARTITION BY applicant_ben, purpose_adj
+ORDER BY total_cost desc) as line_item_rank
 from final_2016 f
 join public.tags t
 on f.id=t.taggable_id
-where fiber_sub_type = 'Special Construction'
-and t.label = 'special_construction_tag'
+where fiber_sub_type = 'Special Construction'and 
+t.label = 'special_construction_tag'
 ) final_2016
 
 left join final_2015 
 on final_2016.purpose_adj = final_2015.purpose_adj
 and final_2016.applicant_ben = final_2015.applicant_ben
-and final_2016.num_lines = final_2015.num_lines
 and final_2016.line_item_rank = final_2015.line_item_rank
+) x
 )
 
-select distinct f.* from final_w_matches_2016 f
+select * from final_w_matches_2016 
+where post_rank_2015 = 1
 --Desoto
 --where application_number = '161012491'
