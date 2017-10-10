@@ -2,8 +2,6 @@ from pandas import read_csv, concat
 from numpy import where
 
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
 GITHUB = os.environ.get("GITHUB")
 
 import sys
@@ -11,8 +9,8 @@ sys.path.insert(0, GITHUB+'/Projects/funding_the_gap/src/features')
 
 from classes import cost_magnifier
 
-unscalable_districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_districts.csv')
-district_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_costs.csv')
+unscalable_districts = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/unscalable_districts.csv',index_col=0)
+district_costs = read_csv(GITHUB+'/Projects/funding_the_gap_2017/data/interim/district_costs.csv',index_col=0)
 print("Distrct costs imported")
 
 district_build_costs = concat([unscalable_districts, district_costs], axis=1)

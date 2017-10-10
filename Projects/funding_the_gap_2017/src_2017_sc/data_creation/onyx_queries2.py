@@ -5,7 +5,7 @@ from pandas import DataFrame
 def getCampuses( conn ) :
     cur = conn.cursor()
     cur.execute( """\
-select  distinct  dd.esh_id,
+      select  distinct  dd.esh_id,
                   dd.nces_cd as district_nces_cd,
                   dd.name as district_name,
                   dd.postal_cd as district_postal_cd,
@@ -21,17 +21,25 @@ select  distinct  dd.esh_id,
                     else dd.discount_rate_c1_matrix
                   end as c1_discount_rate_or_state_avg,
                   case
-                    when  dd.exclude_from_current_fiber_analysis = false
-                            and dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
+                    when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    when  dd.exclude_from_current_fiber_analysis = false
-                      then '2: Fit for FTG, Not Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
                   dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses as district_num_campuses_unscalable,
                   dd.hierarchy_ia_connect_category as district_hierarchy_ia_connect_category,
+
+                  case when dd.esh_id = campus_category.district_esh_id
+                  and campus_schools.campus_id = campus_category.campus_id
+                  and category  ilike '%Correct Non-fiber%' and category != 'Incorrect Non-fiber'
+                  then 1 else 0 end as correct_nonfiber_match,    
+
+                  case when dd.esh_id = campus_category.district_esh_id
+                  and campus_schools.campus_id = campus_category.campus_id
+                  and category  = 'Correct Fiber' 
+                  then 1 else 0 end as correct_fiber_match,  
+
                   campus_schools.campus_id,
                   campus_schools.campus_school_names,
                   campus_schools.campus_school_nces_cds,
@@ -77,6 +85,20 @@ left join (
 
 ) campus_schools
 on dd.esh_id = campus_schools.district_esh_id
+
+left join (
+select ce.district_esh_id, ce.campus_id, category
+  from public.fy2017_campuses_excluded_from_analysis_matr ce
+  join public.fy2017_schools_demog_matr  sd
+  on ce.district_esh_id = sd.district_esh_id
+  and ce.campus_id = sd.campus_id
+  where district_include_in_universe_of_districts
+  and exclude_from_campus_analysis = false
+
+  group by ce.district_esh_id, ce.campus_id, category
+  ) campus_category
+on dd.esh_id = campus_category.district_esh_id
+and campus_schools.campus_id = campus_category.campus_id
 
 left join (
   select
@@ -142,12 +164,9 @@ select  distinct  dd.esh_id,
                     else dd.discount_rate_c1_matrix
                   end as c1_discount_rate_or_state_avg,
                   case
-                    when  dd.exclude_from_current_fiber_analysis = false
-                            and dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
+                    when  dd.current_known_unscalable_campuses + dd.current_assumed_unscalable_campuses > 0
                       then '1: Fit for FTG, Target'
-                    when  dd.exclude_from_current_fiber_analysis = false
-                      then '2: Fit for FTG, Not Target'
-                    else '3: Not Fit for FTG'
+                    else '2: Fit for FTG, Not Target'
                   end as denomination,
                   dd.exclude_from_ia_analysis as district_exclude_from_ia_analysis,
                   dd.fiber_target_status as district_fiber_target_status,
@@ -195,7 +214,7 @@ on dd.postal_cd = state_agg_dr.recipient_postal_cd
 
 where dd.include_in_universe_of_districts
 and dd.district_type = 'Traditional'
-ORDER BY esh_id;""" )
+order by esh_id;""" )
     names = [ x[0] for x in cur.description]
     rows = cur.fetchall()
     return DataFrame( rows, columns=names)
