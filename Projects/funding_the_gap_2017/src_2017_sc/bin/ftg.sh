@@ -6,7 +6,7 @@ echo "Starting..."
 cd "/home/sat/ficher/Projects/funding_the_gap_2017/src_2017_sc/models/"
 python distance_calculator.py &&
 python unscalable_campuses.py &&
-wait
+echo "Distances calculated"
 python build_cost_calculator_apop.py &
 python build_cost_calculator_az.py &
 python build_cost_calculator_zpop.py &
